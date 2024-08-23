@@ -1,27 +1,27 @@
 {
  "actions": [],
  "allow_import": 1,
- "autoname": "naming_series:",
+ "autoname": "format:EXP-{YY}-{MM}-{DD}-{####}",
  "creation": "2013-01-10 16:34:14",
  "doctype": "DocType",
  "document_type": "Setup",
  "engine": "InnoDB",
  "field_order": [
-  "expenses_and_advances_tab",
   "naming_series",
   "employee",
   "employee_name",
   "department",
-  "company",
   "column_break_5",
+  "branch",
+  "cost_center",
   "expense_approver",
   "approval_status",
+  "delivery_trip",
+  "is_paid",
   "expense_details",
   "expenses",
-  "taxes_and_charges_sb",
+  "sb1",
   "taxes",
-  "advance_payments_sb",
-  "advances",
   "transactions_section",
   "total_sanctioned_amount",
   "total_taxes_and_charges",
@@ -30,38 +30,41 @@
   "grand_total",
   "total_claimed_amount",
   "total_amount_reimbursed",
-  "accounting_details_tab",
-  "accounting_details",
+  "section_break_16",
   "posting_date",
-  "is_paid",
-  "mode_of_payment",
-  "payable_account",
-  "column_break_24",
-  "clearance_date",
+  "vehicle_log",
+  "task",
+  "cb1",
   "remark",
+  "title",
+  "email_id",
+  "accounting_details",
+  "company",
+  "mode_of_payment",
+  "clearance_date",
+  "column_break_24",
+  "payable_account",
   "accounting_dimensions_section",
   "project",
   "dimension_col_break",
-  "cost_center",
-  "more_info_tab",
   "more_details",
+  "payment_journal",
   "status",
-  "task",
   "amended_from",
-  "column_break_xdzn",
-  "delivery_trip",
-  "vehicle_log",
-  "dashboard_tab"
+  "advance_payments",
+  "advances",
+  "ref_doc",
+  "report_supporting_doc"
  ],
  "fields": [
   {
    "fieldname": "naming_series",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Series",
    "no_copy": 1,
    "options": "HR-EXP-.YYYY.-",
    "print_hide": 1,
-   "reqd": 1,
    "set_only_once": 1
   },
   {
@@ -102,6 +105,7 @@
   {
    "fieldname": "expense_approver",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Expense Approver",
    "options": "User"
   },
@@ -109,16 +113,15 @@
    "default": "Draft",
    "fieldname": "approval_status",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Approval Status",
    "no_copy": 1,
    "options": "Draft\nApproved\nRejected",
-   "permlevel": 1,
    "search_index": 1
   },
   {
    "fieldname": "total_claimed_amount",
    "fieldtype": "Currency",
-   "in_list_view": 1,
    "label": "Total Claimed Amount",
    "no_copy": 1,
    "oldfieldname": "total_claimed_amount",
@@ -160,6 +163,11 @@
    "reqd": 1
   },
   {
+   "fieldname": "sb1",
+   "fieldtype": "Section Break",
+   "options": "Simple"
+  },
+  {
    "default": "Today",
    "fieldname": "posting_date",
    "fieldtype": "Date",
@@ -190,9 +198,12 @@
    "remember_last_selected_value": 1
   },
   {
+   "fieldname": "cb1",
+   "fieldtype": "Column Break"
+  },
+  {
    "fieldname": "total_amount_reimbursed",
    "fieldtype": "Currency",
-   "in_list_view": 1,
    "label": "Total Amount Reimbursed",
    "no_copy": 1,
    "options": "Company:company:default_currency",
@@ -207,12 +218,29 @@
    "oldfieldtype": "Small Text"
   },
   {
+   "allow_on_submit": 1,
+   "default": "{employee_name}",
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Title",
+   "no_copy": 1
+  },
+  {
+   "fieldname": "email_id",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Employees Email Id",
+   "oldfieldname": "email_id",
+   "oldfieldtype": "Data",
+   "print_hide": 1
+  },
+  {
    "fieldname": "accounting_details",
    "fieldtype": "Section Break",
    "label": "Accounting Details"
   },
   {
-   "fetch_from": "employee.company",
    "fieldname": "company",
    "fieldtype": "Link",
    "in_standard_filter": 1,
@@ -220,7 +248,7 @@
    "oldfieldname": "company",
    "oldfieldtype": "Link",
    "options": "Company",
-   "read_only": 1,
+   "remember_last_selected_value": 1,
    "reqd": 1
   },
   {
@@ -240,24 +268,26 @@
    "fieldtype": "Column Break"
   },
   {
-   "fetch_from": "company.default_expense_claim_payable_account",
-   "fetch_if_empty": 1,
    "fieldname": "payable_account",
    "fieldtype": "Link",
    "label": "Payable Account",
-   "options": "Account"
+   "options": "Account",
+   "reqd": 1
   },
   {
-   "fetch_from": "company.cost_center",
+   "fetch_from": "branch.cost_center",
    "fetch_if_empty": 1,
    "fieldname": "cost_center",
    "fieldtype": "Link",
    "label": "Cost Center",
-   "options": "Cost Center"
+   "options": "Cost Center",
+   "reqd": 1
   },
   {
+   "collapsible": 1,
    "fieldname": "more_details",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "More Details"
   },
   {
    "default": "Draft",
@@ -285,9 +315,7 @@
    "width": "160px"
   },
   {
-   "collapsible": 1,
-   "collapsible_depends_on": "eval:doc.advances?.length",
-   "fieldname": "advance_payments_sb",
+   "fieldname": "advance_payments",
    "fieldtype": "Section Break",
    "label": "Advance Payments"
   },
@@ -320,14 +348,16 @@
    "options": "Expense Taxes and Charges"
   },
   {
+   "fieldname": "section_break_16",
+   "fieldtype": "Section Break"
+  },
+  {
    "fieldname": "transactions_section",
-   "fieldtype": "Section Break",
-   "label": "Totals"
+   "fieldtype": "Section Break"
   },
   {
    "fieldname": "grand_total",
    "fieldtype": "Currency",
-   "in_list_view": 1,
    "label": "Grand Total",
    "options": "Company:company:default_currency",
    "read_only": 1
@@ -351,54 +381,46 @@
    "options": "Delivery Trip"
   },
   {
-   "fieldname": "column_break_xdzn",
-   "fieldtype": "Column Break"
+   "fetch_from": "employee.branch",
+   "fetch_if_empty": 1,
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch",
+   "reqd": 1
   },
   {
-   "fieldname": "accounting_details_tab",
-   "fieldtype": "Tab Break",
-   "label": "Accounting"
+   "fieldname": "payment_journal",
+   "fieldtype": "Data",
+   "label": "Payment Journal Entry"
   },
   {
-   "fieldname": "more_info_tab",
-   "fieldtype": "Tab Break",
-   "label": "More Info"
+   "fieldname": "ref_doc",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Reference Doctype",
+   "read_only": 1
   },
   {
-   "fieldname": "dashboard_tab",
-   "fieldtype": "Tab Break",
-   "label": "Dashboard",
-   "show_dashboard": 1
-  },
-  {
-   "fieldname": "expenses_and_advances_tab",
-   "fieldtype": "Tab Break",
-   "label": "Expenses & Advances"
-  },
-  {
-   "collapsible": 1,
-   "collapsible_depends_on": "eval:doc.taxes?.length",
-   "fieldname": "taxes_and_charges_sb",
-   "fieldtype": "Section Break",
-   "label": "Taxes & Charges",
-   "options": "Simple"
+   "fieldname": "report_supporting_doc",
+   "fieldtype": "Attach",
+   "label": "Report/Supporting Document"
   }
  ],
  "icon": "fa fa-money",
  "idx": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-06-12 15:56:45.609119",
+ "modified": "2023-08-14 15:18:02.579599",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Expense Claim",
  "name_case": "Title Case",
- "naming_rule": "By \"Naming Series\" field",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
    "amend": 1,
-   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -408,7 +430,6 @@
    "report": 1,
    "role": "HR Manager",
    "share": 1,
-   "submit": 1,
    "write": 1
   },
   {
@@ -423,96 +444,46 @@
   },
   {
    "amend": 1,
-   "cancel": 1,
    "create": 1,
-   "delete": 1,
    "email": 1,
    "print": 1,
    "read": 1,
    "report": 1,
    "role": "Expense Approver",
    "share": 1,
-   "submit": 1,
    "write": 1
   },
   {
    "amend": 1,
+   "create": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
+   "share": 1,
+   "write": 1
+  },
+  {
    "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
+   "export": 1,
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "HR User",
+   "role": "Accounts User",
    "share": 1,
    "submit": 1,
    "write": 1
-  },
-  {
-   "permlevel": 1,
-   "read": 1,
-   "role": "HR Manager",
-   "write": 1
-  },
-  {
-   "permlevel": 1,
-   "read": 1,
-   "role": "HR User",
-   "write": 1
-  },
-  {
-   "delete": 1,
-   "email": 1,
-   "permlevel": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Expense Approver",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "permlevel": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "All",
-   "share": 1
   }
  ],
  "search_fields": "employee,employee_name",
  "show_name_in_global_search": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": [
-  {
-   "color": "Gray",
-   "title": "Draft"
-  },
-  {
-   "color": "Blue",
-   "title": "Submitted"
-  },
-  {
-   "color": "Red",
-   "title": "Cancelled"
-  },
-  {
-   "color": "Green",
-   "title": "Paid"
-  },
-  {
-   "color": "Yellow",
-   "title": "Unpaid"
-  },
-  {
-   "color": "Red",
-   "title": "Rejected"
-  }
- ],
+ "states": [],
  "timeline_field": "employee",
- "title_field": "employee_name"
+ "title_field": "title"
 }

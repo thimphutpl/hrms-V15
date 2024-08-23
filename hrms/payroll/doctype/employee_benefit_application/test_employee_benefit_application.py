@@ -1,6 +1,8 @@
 # Copyright (c) 2018, Frappe Technologies Pvt. Ltd. and Contributors
 # See license.txt
 
+import unittest
+
 import frappe
 from frappe.tests.utils import FrappeTestCase
 from frappe.utils import add_days, date_diff, get_year_ending, get_year_start, getdate
@@ -8,6 +10,7 @@ from frappe.utils import add_days, date_diff, get_year_ending, get_year_start, g
 from erpnext.setup.doctype.employee.test_employee import make_employee
 from erpnext.setup.doctype.holiday_list.test_holiday_list import set_holiday_list
 
+from hrms.hr.doctype.leave_application.test_leave_application import get_first_sunday
 from hrms.hr.utils import get_holiday_dates_for_employee
 from hrms.payroll.doctype.employee_benefit_application.employee_benefit_application import (
 	calculate_lwp,
@@ -21,7 +24,6 @@ from hrms.payroll.doctype.salary_slip.test_salary_slip import (
 )
 from hrms.payroll.doctype.salary_structure.salary_structure import make_salary_slip
 from hrms.payroll.doctype.salary_structure.test_salary_structure import make_salary_structure
-from hrms.tests.test_utils import get_first_sunday
 
 
 class TestEmployeeBenefitApplication(FrappeTestCase):
@@ -53,7 +55,6 @@ class TestEmployeeBenefitApplication(FrappeTestCase):
 			include_flexi_benefits=True,
 			employee=employee,
 			payroll_period=payroll_period,
-			company="_Test Company",
 		)
 		salary_slip = make_salary_slip(salary_structure.name, employee=employee, posting_date=getdate())
 		salary_slip.insert()

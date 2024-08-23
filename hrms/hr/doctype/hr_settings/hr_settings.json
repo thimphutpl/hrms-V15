@@ -11,6 +11,7 @@
   "standard_working_hours",
   "column_break_9",
   "retirement_age",
+  "return_day_dsa_percent",
   "reminders_section",
   "column_break_11",
   "send_work_anniversary_reminders",
@@ -49,7 +50,20 @@
   "exit_questionnaire_notification_template",
   "attendance_settings_section",
   "allow_employee_checkin_from_mobile_app",
-  "allow_geolocation_tracking"
+  "allow_geolocation_tracking",
+  "enote_email_templates_section",
+  "enote_approval_notification",
+  "enote_copyto_notification",
+  "column_break_qkuh",
+  "enote_status_notification",
+  "enote_reviewer_notification",
+  "approver_settings_tab",
+  "hr_approver",
+  "hrgm",
+  "overtime_settings_tab",
+  "overtime_limit_type",
+  "column_break_ligd",
+  "overtime_limit"
  ],
  "fields": [
   {
@@ -316,13 +330,88 @@
    "fieldname": "attendance_settings_section",
    "fieldtype": "Section Break",
    "label": "Attendance Settings"
+  },
+  {
+   "fieldname": "enote_email_templates_section",
+   "fieldtype": "Section Break",
+   "label": "eNote Email Templates"
+  },
+  {
+   "fieldname": "enote_approval_notification",
+   "fieldtype": "Link",
+   "label": "eNote Approval Notification",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "enote_copyto_notification",
+   "fieldtype": "Link",
+   "label": "eNote CopyTo Notification",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "column_break_qkuh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "enote_status_notification",
+   "fieldtype": "Link",
+   "label": "eNote Status Notification",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "enote_reviewer_notification",
+   "fieldtype": "Link",
+   "label": "eNote Reviewer Notification",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "approver_settings_tab",
+   "fieldtype": "Tab Break",
+   "label": "Approver Settings"
+  },
+  {
+   "fieldname": "hr_approver",
+   "fieldtype": "Link",
+   "label": "HR Approver",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "hrgm",
+   "fieldtype": "Link",
+   "label": "HRGM",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "return_day_dsa_percent",
+   "fieldtype": "Percent",
+   "label": "Return Day DSA Percent"
+  },
+  {
+   "fieldname": "overtime_settings_tab",
+   "fieldtype": "Tab Break",
+   "label": "Overtime Settings"
+  },
+  {
+   "fieldname": "overtime_limit_type",
+   "fieldtype": "Select",
+   "label": "Overtime Limit Type",
+   "options": "\nPer Day\nPer Week\nPer Month"
+  },
+  {
+   "fieldname": "column_break_ligd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "overtime_limit",
+   "fieldtype": "Int",
+   "label": "Overtime Limit In Hrs(Per Day)"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-06-26 15:20:17.802079",
+ "modified": "2024-08-19 17:39:55.011295",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",

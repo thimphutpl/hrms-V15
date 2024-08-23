@@ -57,7 +57,9 @@ class EmployeeBenefitApplication(Document):
 						frappe.throw(
 							_(
 								"An amount of {0} already claimed for the component {1}, set the amount equal or greater than {2}"
-							).format(benefit_claimed, benefit.earning_component, benefit_claim_remining)
+							).format(
+								benefit_claimed, benefit.earning_component, benefit_claim_remining
+							)
 						)
 
 	def validate_remaining_benefit_amount(self):
@@ -76,10 +78,7 @@ class EmployeeBenefitApplication(Document):
 			salary_structure = frappe.get_doc("Salary Structure", salary_struct_name)
 			if salary_structure.earnings:
 				for earnings in salary_structure.earnings:
-					if (
-						earnings.is_flexible_benefit == 1
-						and earnings.salary_component not in benefit_components
-					):
+					if earnings.is_flexible_benefit == 1 and earnings.salary_component not in benefit_components:
 						pay_against_benefit_claim, max_benefit_amount = frappe.db.get_value(
 							"Salary Component",
 							earnings.salary_component,
@@ -104,9 +103,9 @@ class EmployeeBenefitApplication(Document):
 				)
 			elif non_pro_rata_amount == 0:
 				frappe.throw(
-					_(
-						"Please add the remaining benefits {0} to the application as pro-rata component"
-					).format(self.remaining_benefit)
+					_("Please add the remaining benefits {0} to the application as pro-rata component").format(
+						self.remaining_benefit
+					)
 				)
 
 	def validate_max_benefit_for_component(self):
@@ -149,7 +148,7 @@ class EmployeeBenefitApplication(Document):
 		)
 		if application:
 			frappe.throw(
-				_("Employee {0} already submitted an application {1} for the payroll period {2}").format(
+				_("Employee {0} already submited an apllication {1} for the payroll period {2}").format(
 					self.employee, application, self.payroll_period
 				)
 			)
@@ -159,10 +158,10 @@ class EmployeeBenefitApplication(Document):
 def get_max_benefits(employee, on_date):
 	sal_struct = get_assigned_salary_structure(employee, on_date)
 	if sal_struct:
-		max_benefits = frappe.db.get_value("Salary Structure", sal_struct, "max_benefits", cache=True)
+		max_benefits = frappe.db.get_value("Salary Structure", sal_struct, "max_benefits")
 		if max_benefits > 0:
 			return max_benefits
-	return 0
+	return False
 
 
 @frappe.whitelist()
@@ -234,7 +233,7 @@ def calculate_lwp(employee, start_date, holidays, working_days):
 		query = (
 			frappe.qb.from_(LeaveApplication)
 			.inner_join(LeaveType)
-			.on(LeaveType.name == LeaveApplication.leave_type)
+			.on((LeaveType.name == LeaveApplication.leave_type))
 			.select(LeaveApplication.name, is_half_day)
 			.where(
 				(LeaveType.is_lwp == 1)
@@ -247,7 +246,7 @@ def calculate_lwp(employee, start_date, holidays, working_days):
 
 		# if it's a holiday only include if leave type has "include holiday" enabled
 		if date in holidays:
-			query = query.where(LeaveType.include_holiday == "1")
+			query = query.where((LeaveType.include_holiday == "1"))
 		leaves = query.run(as_dict=True)
 
 		if leaves:
@@ -335,6 +334,7 @@ def get_earning_components(doctype, txt, searchfield, start, page_len, filters):
 		return {}
 
 	salary_structure = get_assigned_salary_structure(filters["employee"], filters["date"])
+
 	if salary_structure:
 		return frappe.db.sql(
 			"""

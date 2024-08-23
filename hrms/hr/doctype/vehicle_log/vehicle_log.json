@@ -1,191 +1,140 @@
 {
  "actions": [],
- "autoname": "naming_series:",
+ "autoname": "autoincrement",
  "creation": "2016-09-03 14:14:51.788550",
  "doctype": "DocType",
  "document_type": "Document",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "vehicle_section",
-  "naming_series",
-  "license_plate",
-  "employee",
-  "column_break_7",
-  "model",
-  "make",
-  "odometer_reading",
-  "date",
-  "odometer",
-  "column_break_12",
-  "last_odometer",
-  "refuelling_details",
-  "fuel_qty",
-  "price",
-  "column_break_15",
-  "supplier",
-  "invoice",
-  "service_details",
-  "service_detail",
-  "amended_from"
- ],
- "fields": [
-  {
-   "fieldname": "vehicle_section",
-   "fieldtype": "Section Break",
-   "options": "fa fa-user"
-  },
-  {
-   "fieldname": "naming_series",
-   "fieldtype": "Select",
-   "label": "Series",
-   "no_copy": 1,
-   "options": "HR-VLOG-.YYYY.-",
-   "print_hide": 1,
-   "reqd": 1,
-   "set_only_once": 1
-  },
-  {
-   "fieldname": "license_plate",
-   "fieldtype": "Link",
-   "in_global_search": 1,
-   "in_list_view": 1,
-   "label": "License Plate",
-   "options": "Vehicle",
-   "reqd": 1
-  },
-  {
-   "fetch_from": "license_plate.employee",
-   "fetch_if_empty": 1,
-   "fieldname": "employee",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Employee",
-   "options": "Employee",
-   "reqd": 1
-  },
-  {
-   "fieldname": "column_break_7",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fetch_from": "license_plate.model",
-   "fieldname": "model",
-   "fieldtype": "Read Only",
-   "label": "Model"
-  },
-  {
-   "fetch_from": "license_plate.make",
-   "fieldname": "make",
-   "fieldtype": "Read Only",
-   "label": "Make"
-  },
-  {
-   "fieldname": "odometer_reading",
-   "fieldtype": "Section Break",
-   "label": "Odometer Reading"
-  },
-  {
-   "fieldname": "date",
-   "fieldtype": "Date",
-   "label": "Date",
-   "reqd": 1
-  },
-  {
-   "fieldname": "odometer",
-   "fieldtype": "Int",
-   "label": "Current Odometer value ",
-   "reqd": 1
-  },
-  {
-   "collapsible": 1,
-   "fieldname": "refuelling_details",
-   "fieldtype": "Section Break",
-   "label": "Refuelling Details"
-  },
-  {
-   "fieldname": "fuel_qty",
-   "fieldtype": "Float",
-   "label": "Fuel Qty"
-  },
-  {
-   "fieldname": "price",
-   "fieldtype": "Currency",
-   "label": "Fuel Price"
-  },
-  {
-   "fieldname": "column_break_15",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "supplier",
-   "fieldtype": "Link",
-   "label": "Supplier",
-   "options": "Supplier"
-  },
-  {
-   "fieldname": "invoice",
-   "fieldtype": "Data",
-   "label": "Invoice Ref"
-  },
-  {
-   "collapsible": 1,
-   "fieldname": "service_details",
-   "fieldtype": "Section Break",
-   "label": "Service Details"
-  },
-  {
-   "fieldname": "service_detail",
-   "fieldtype": "Table",
-   "options": "Vehicle Service"
-  },
-  {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Vehicle Log",
-   "print_hide": 1,
-   "read_only": 1
-  },
-  {
-   "fetch_from": "license_plate.last_odometer",
-   "fieldname": "last_odometer",
-   "fieldtype": "Int",
-   "label": "Last Odometer Value ",
-   "read_only": 1,
-   "reqd": 1
-  },
-  {
-   "fieldname": "column_break_12",
-   "fieldtype": "Column Break"
-  }
- ],
- "is_submittable": 1,
+    "date",
+    "section_break_2",
+    "from_place",
+    "from_time",
+    "column_break_4",
+    "to_place",
+    "to_time",
+    "column_break_8",
+    "purpose",
+    "section_break_10",
+    "initial_km",
+    "column_break_12",
+    "final_km",
+    "column_break_14",
+    "total_km_run",
+    "column_break_16",
+    "total_consumption"
+   ],
+   "fields": [
+    {
+     "fieldname": "date",
+     "fieldtype": "Date",
+     "in_list_view": 1,
+     "label": "Date",
+     "reqd": 1
+    },
+    {
+     "fieldname": "section_break_2",
+     "fieldtype": "Section Break"
+    },
+    {
+     "fieldname": "from_place",
+     "fieldtype": "Data",
+     "label": "From Place",
+     "reqd": 1
+    },
+    {
+     "fieldname": "from_time",
+     "fieldtype": "Time",
+     "label": "From Time"
+    },
+    {
+     "fieldname": "column_break_4",
+     "fieldtype": "Column Break"
+    },
+    {
+     "fieldname": "to_place",
+     "fieldtype": "Data",
+     "label": "To Place",
+     "reqd": 1
+    },
+    {
+     "fieldname": "to_time",
+     "fieldtype": "Time",
+     "label": "To Time"
+    },
+    {
+     "fieldname": "column_break_8",
+     "fieldtype": "Column Break"
+    },
+    {
+     "allow_on_submit": 1,
+     "fieldname": "purpose",
+     "fieldtype": "Text",
+     "in_list_view": 1,
+     "label": "Purpose",
+     "reqd": 1
+    },
+    {
+     "fieldname": "section_break_10",
+     "fieldtype": "Section Break"
+    },
+    {
+     "allow_on_submit": 1,
+     "default": "0",
+     "fieldname": "initial_km",
+     "fieldtype": "Float",
+     "in_list_view": 1,
+     "label": "Initial KM",
+     "precision": "2",
+     "reqd": 1
+    },
+    {
+     "fieldname": "column_break_12",
+     "fieldtype": "Column Break"
+    },
+    {
+     "allow_on_submit": 1,
+     "default": "0",
+     "fieldname": "final_km",
+     "fieldtype": "Float",
+     "in_list_view": 1,
+     "label": "Final KM ",
+     "precision": "2",
+     "reqd": 1
+    },
+    {
+     "fieldname": "column_break_14",
+     "fieldtype": "Column Break"
+    },
+    {
+     "fieldname": "total_km_run",
+     "fieldtype": "Float",
+     "label": "Total KM Run",
+     "precision": "2",
+     "read_only": 1
+    },
+    {
+     "fieldname": "column_break_16",
+     "fieldtype": "Column Break"
+    },
+    {
+     "fieldname": "total_consumption",
+     "fieldtype": "Float",
+     "label": "Total Consumption"
+    }
+   ],
+ "istable": 1,
  "links": [],
- "modified": "2021-05-17 00:10:21.188352",
+ "modified": "2024-07-23 11:22:07.496855",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Vehicle Log",
+ "naming_rule": "Autoincrement",
  "owner": "Administrator",
- "permissions": [
-  {
-   "cancel": 1,
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Fleet Manager",
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  }
- ],
+ "permissions": [],
  "sort_field": "modified",
  "sort_order": "DESC",
+ "states": [],
  "track_changes": 1
 }

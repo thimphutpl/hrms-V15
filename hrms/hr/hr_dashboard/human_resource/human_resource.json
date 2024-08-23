@@ -44,20 +44,16 @@
   {
    "chart": "Designation Wise Employee Count",
    "width": "Half"
-  },
-  {
-   "chart": "Department Wise Employee Count",
-   "width": "Half"
   }
  ],
  "creation": "2023-11-17 14:10:56.741833",
  "dashboard_name": "Human Resource",
  "docstatus": 0,
  "doctype": "Dashboard",
- "idx": 0,
+ "idx": 4,
  "is_default": 0,
  "is_standard": 1,
- "modified": "2024-01-08 14:06:32.104261",
+ "modified": "2024-08-06 15:50:19.882190",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Human Resource",

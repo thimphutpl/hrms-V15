@@ -6,19 +6,16 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "employee_section",
   "employee",
   "employee_name",
-  "amended_from",
-  "column_break_5",
   "company",
-  "department",
-  "incentive_section",
-  "salary_component",
   "currency",
-  "column_break_11",
+  "incentive_amount",
+  "column_break_5",
+  "salary_component",
   "payroll_date",
-  "incentive_amount"
+  "department",
+  "amended_from"
  ],
  "fields": [
   {
@@ -93,25 +90,11 @@
    "label": "Company",
    "options": "Company",
    "reqd": 1
-  },
-  {
-   "fieldname": "employee_section",
-   "fieldtype": "Section Break",
-   "label": "Employee"
-  },
-  {
-   "fieldname": "incentive_section",
-   "fieldtype": "Section Break",
-   "label": "Incentive"
-  },
-  {
-   "fieldname": "column_break_11",
-   "fieldtype": "Column Break"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2023-01-05 12:00:57.942233",
+ "modified": "2022-01-19 12:52:19.850710",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Employee Incentive",

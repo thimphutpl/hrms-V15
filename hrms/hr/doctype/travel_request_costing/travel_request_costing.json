@@ -5,19 +5,48 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "expense_type",
+  "date",
   "column_break_2",
-  "sponsored_amount",
-  "funded_amount",
-  "total_amount",
+  "halt",
+  "column_break_4",
+  "till_date",
+  "from_place",
+  "column_break_7",
+  "halt_at",
+  "to_place",
   "section_break_4",
-  "comments"
+  "currency",
+  "column_break_12",
+  "mileage_rate",
+  "column_break_14",
+  "distance",
+  "column_break_16",
+  "dsa",
+  "section_break_18",
+  "dsa_percent",
+  "column_break_20",
+  "actual_amount",
+  "column_break_22",
+  "amount",
+  "column_break_24",
+  "last_day",
+  "exchange_rate",
+  "sb_remarks",
+  "no_days",
+  "days_allocated",
+  "cb_25",
+  "remarks",
+  "hide_section",
+  "comments",
+  "funded_amount",
+  "expense_type",
+  "sponsored_amount",
+  "total_amount"
  ],
  "fields": [
   {
    "fieldname": "expense_type",
    "fieldtype": "Link",
-   "in_list_view": 1,
    "label": "Expense Type",
    "options": "Expense Claim Type"
   },
@@ -28,23 +57,17 @@
   {
    "fieldname": "sponsored_amount",
    "fieldtype": "Currency",
-   "in_list_view": 1,
-   "label": "Sponsored Amount",
-   "options": "Company:company:default_currency"
+   "label": "Sponsored Amount"
   },
   {
    "fieldname": "funded_amount",
    "fieldtype": "Currency",
-   "in_list_view": 1,
-   "label": "Funded Amount",
-   "options": "Company:company:default_currency"
+   "label": "Funded Amount"
   },
   {
    "fieldname": "total_amount",
    "fieldtype": "Currency",
-   "in_list_view": 1,
-   "label": "Total Amount",
-   "options": "Company:company:default_currency"
+   "label": "Total Amount"
   },
   {
    "fieldname": "section_break_4",
@@ -54,18 +77,186 @@
    "fieldname": "comments",
    "fieldtype": "Small Text",
    "label": "Comments"
+  },
+  {
+   "fieldname": "hide_section",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Hide"
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "depends_on": "eval:doc.date",
+   "fieldname": "halt",
+   "fieldtype": "Check",
+   "label": "Halt?",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.halt",
+   "fieldname": "till_date",
+   "fieldtype": "Date",
+   "label": "Till Date",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.halt==0 && doc.date",
+   "fieldname": "from_place",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "From Place"
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "halt_at",
+   "fieldtype": "Data",
+   "label": "Halt At"
+  },
+  {
+   "fieldname": "to_place",
+   "fieldtype": "Data",
+   "label": "To Place"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "label": "Currency",
+   "options": "Currency"
+  },
+  {
+   "fieldname": "column_break_12",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.halt==0 && doc.date && parent.mode_of_travel == \"Personal Car\";",
+   "fieldname": "mileage_rate",
+   "fieldtype": "Select",
+   "label": "Mileage Rate",
+   "options": "\n6\n16"
+  },
+  {
+   "fieldname": "column_break_14",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.halt==0 && doc.date && parent.mode_of_travel == \"Personal Car\";",
+   "fieldname": "distance",
+   "fieldtype": "Data",
+   "label": "Distance (in KM)"
+  },
+  {
+   "fieldname": "column_break_16",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "dsa",
+   "fieldtype": "Currency",
+   "label": " DSA Amount (Per Day)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_18",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "dsa_percent",
+   "fieldtype": "Select",
+   "label": "DSA Percent",
+   "options": "100\n50\n20\n0",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_20",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "actual_amount",
+   "fieldtype": "Currency",
+   "label": "Amount in Nu.",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_22",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount"
+  },
+  {
+   "fieldname": "column_break_24",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "last_day",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Last Day",
+   "read_only": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "exchange_rate",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Exchange Rate"
+  },
+  {
+   "fieldname": "sb_remarks",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "no_days",
+   "fieldtype": "Data",
+   "label": "No.of Days Actual",
+   "read_only": 1
+  },
+  {
+   "fieldname": "days_allocated",
+   "fieldtype": "Int",
+   "label": "No.of Days Accepted For Claim",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb_25",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks",
+   "read_only": 1
   }
  ],
  "istable": 1,
  "links": [],
- "modified": "2024-05-24 12:00:47.413806",
+ "modified": "2022-09-19 19:35:35.915573",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Request Costing",
  "owner": "Administrator",
  "permissions": [],
  "quick_entry": 1,
- "sort_field": "creation",
+ "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
  "track_changes": 1

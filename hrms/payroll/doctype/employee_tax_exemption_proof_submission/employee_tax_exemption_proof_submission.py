@@ -49,6 +49,5 @@ class EmployeeTaxExemptionProofSubmission(Document):
 					hra_exemption["monthly_house_rent"], self.precision("monthly_house_rent")
 				)
 				self.total_eligible_hra_exemption = flt(
-					hra_exemption["total_eligible_hra_exemption"],
-					self.precision("total_eligible_hra_exemption"),
+					hra_exemption["total_eligible_hra_exemption"], self.precision("total_eligible_hra_exemption")
 				)

@@ -1,19 +1,21 @@
 {
  "actions": [],
+ "allow_import": 1,
  "autoname": "Prompt",
  "creation": "2020-03-17 16:50:35.564915",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "disabled",
-  "section_break_2",
   "effective_from",
-  "company",
+  "effective_till",
+  "supporting_document",
   "column_break_3",
+  "company",
   "currency",
   "standard_tax_exemption_amount",
   "allow_tax_exemption",
+  "disabled",
   "amended_from",
   "taxable_salary_slabs_section",
   "slabs",
@@ -37,6 +39,7 @@
    "description": "If enabled, Tax Exemption Declaration will be considered for income tax calculation.",
    "fieldname": "allow_tax_exemption",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Allow Tax Exemption"
   },
   {
@@ -54,6 +57,8 @@
    "read_only": 1
   },
   {
+   "allow_bulk_edit": 1,
+   "allow_in_quick_entry": 1,
    "fieldname": "slabs",
    "fieldtype": "Table",
    "label": "Taxable Salary Slabs",
@@ -68,6 +73,7 @@
    "label": "Disabled"
   },
   {
+   "depends_on": "allow_tax_exemption",
    "fieldname": "standard_tax_exemption_amount",
    "fieldtype": "Currency",
    "label": "Standard Tax Exemption Amount",
@@ -77,13 +83,15 @@
    "fieldname": "company",
    "fieldtype": "Link",
    "label": "Company",
-   "options": "Company"
+   "options": "Company",
+   "reqd": 1
   },
   {
    "collapsible": 1,
    "collapsible_depends_on": "other_taxes_and_charges",
    "fieldname": "taxes_and_charges_on_income_tax_section",
    "fieldtype": "Section Break",
+   "hidden": 1,
    "label": "Taxes and Charges on Income Tax"
   },
   {
@@ -96,19 +104,25 @@
    "fetch_from": "company.default_currency",
    "fieldname": "currency",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Currency",
    "options": "Currency",
-   "print_hide": 1,
-   "reqd": 1
+   "print_hide": 1
   },
   {
-   "fieldname": "section_break_2",
-   "fieldtype": "Section Break"
+   "fieldname": "effective_till",
+   "fieldtype": "Date",
+   "label": "Effective Till"
+  },
+  {
+   "fieldname": "supporting_document",
+   "fieldtype": "Attach",
+   "label": "Supporting Document"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2023-04-30 15:01:22.706198",
+ "modified": "2022-09-24 00:02:41.244260",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Income Tax Slab",

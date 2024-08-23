@@ -10,7 +10,25 @@
  "field_order": [
   "default_salary_structure",
   "currency",
-  "default_base_pay"
+  "default_base_pay",
+  "column_break_vaoa",
+  "sub_level",
+  "gis",
+  "dsa_per_day",
+  "pay_scale_section",
+  "lower_limit",
+  "column_break_tgfh",
+  "increment_method",
+  "column_break_hxuk",
+  "increment_value",
+  "column_break_qjhy",
+  "upper_limit",
+  "promotion_settings_section",
+  "noof_years_for_next_promotion",
+  "column_break_adwe",
+  "promote_to_grade",
+  "allowances_section",
+  "fixed_allowance"
  ],
  "fields": [
   {
@@ -34,11 +52,98 @@
    "label": "Currency",
    "options": "Currency",
    "read_only": 1
+  },
+  {
+   "fieldname": "column_break_vaoa",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sub_level",
+   "fieldtype": "Data",
+   "label": "Sub Level"
+  },
+  {
+   "fieldname": "gis",
+   "fieldtype": "Data",
+   "label": "GIS"
+  },
+  {
+   "fieldname": "dsa_per_day",
+   "fieldtype": "Data",
+   "label": "DSA Per Day"
+  },
+  {
+   "fieldname": "pay_scale_section",
+   "fieldtype": "Section Break",
+   "label": "PAY SCALE"
+  },
+  {
+   "fieldname": "lower_limit",
+   "fieldtype": "Currency",
+   "label": "Lower Limit"
+  },
+  {
+   "fieldname": "column_break_tgfh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "increment_method",
+   "fieldtype": "Select",
+   "label": "Increment Method",
+   "options": "\nLumpsum\nPercent"
+  },
+  {
+   "fieldname": "column_break_hxuk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "increment_value",
+   "fieldtype": "Currency",
+   "label": "Increment Value"
+  },
+  {
+   "fieldname": "column_break_qjhy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "upper_limit",
+   "fieldtype": "Currency",
+   "label": "Upper Limit"
+  },
+  {
+   "fieldname": "promotion_settings_section",
+   "fieldtype": "Section Break",
+   "label": "PROMOTION SETTINGS"
+  },
+  {
+   "fieldname": "noof_years_for_next_promotion",
+   "fieldtype": "Int",
+   "label": "No.of Years For Next Promotion"
+  },
+  {
+   "fieldname": "column_break_adwe",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "promote_to_grade",
+   "fieldtype": "Link",
+   "label": "Promote To Grade",
+   "options": "Employee Grade"
+  },
+  {
+   "fieldname": "allowances_section",
+   "fieldtype": "Section Break",
+   "label": "Allowances"
+  },
+  {
+   "fieldname": "fixed_allowance",
+   "fieldtype": "Currency",
+   "label": "Fixed Allowance"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-05-06 15:42:10.395508",
+ "modified": "2024-07-22 21:35:17.936503",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Grade",

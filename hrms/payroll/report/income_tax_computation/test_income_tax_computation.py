@@ -1,5 +1,6 @@
+import unittest
+
 import frappe
-from frappe.tests.utils import FrappeTestCase
 from frappe.utils import getdate
 
 from erpnext.setup.doctype.employee.test_employee import make_employee
@@ -16,7 +17,7 @@ from hrms.payroll.doctype.salary_structure.test_salary_structure import make_sal
 from hrms.payroll.report.income_tax_computation.income_tax_computation import execute
 
 
-class TestIncomeTaxComputation(FrappeTestCase):
+class TestIncomeTaxComputation(unittest.TestCase):
 	def setUp(self):
 		self.cleanup_records()
 		self.create_records()
@@ -41,7 +42,9 @@ class TestIncomeTaxComputation(FrappeTestCase):
 			date_of_joining=getdate("01-10-2021"),
 		)
 
-		self.payroll_period = create_payroll_period(name="_Test Payroll Period 1", company="_Test Company")
+		self.payroll_period = create_payroll_period(
+			name="_Test Payroll Period 1", company="_Test Company"
+		)
 
 		self.income_tax_slab = create_tax_slab(
 			self.payroll_period,

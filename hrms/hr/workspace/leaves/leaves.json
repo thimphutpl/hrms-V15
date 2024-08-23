@@ -16,7 +16,8 @@
    "hidden": 0,
    "is_query_report": 0,
    "label": "Setup",
-   "link_count": 5,
+   "link_count": 4,
+   "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
   },
@@ -63,18 +64,9 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Leave Block List",
-   "link_count": 0,
-   "link_to": "Leave Block List",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
    "label": "Application",
-   "link_count": 2,
+   "link_count": 1,
+   "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
   },
@@ -91,18 +83,9 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Compensatory Leave Request",
-   "link_count": 0,
-   "link_to": "Compensatory Leave Request",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
    "label": "Reports",
-   "link_count": 3,
+   "link_count": 2,
+   "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
   },
@@ -128,19 +111,10 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 1,
-   "label": "Employees working on a holiday",
-   "link_count": 0,
-   "link_to": "Employees working on a holiday",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
    "is_query_report": 0,
    "label": "Allocation",
-   "link_count": 4,
+   "link_count": 3,
+   "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
   },
@@ -173,20 +147,10 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Leave Encashment",
-   "link_count": 0,
-   "link_to": "Leave Encashment",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
   }
  ],
- "modified": "2023-09-29 16:55:20.281587",
- "modified_by": "Administrator",
+ "modified": "2024-08-19 11:31:50.416317",
+ "modified_by": "tshering.lham@thimphutechpark.bt",
  "module": "HR",
  "name": "Leaves",
  "number_cards": [],
@@ -195,7 +159,7 @@
  "public": 1,
  "quick_lists": [],
  "roles": [],
- "sequence_id": 12.0,
+ "sequence_id": 18.0,
  "shortcuts": [
   {
    "color": "Orange",
@@ -203,7 +167,7 @@
    "format": "{} Open",
    "label": "Leave Application",
    "link_to": "Leave Application",
-   "stats_filter": "{\"status\":[\"=\",\"Open\"]}",
+   "stats_filter": "[[\"Leave Application\",\"status\",\"=\",\"Open\",false]]",
    "type": "DocType"
   },
   {

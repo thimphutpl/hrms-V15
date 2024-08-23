@@ -10,19 +10,16 @@
  "field_order": [
   "employee",
   "employee_name",
-  "department",
+  "currency",
+  "max_benefits",
+  "remaining_benefit",
   "column_break_2",
   "date",
   "payroll_period",
+  "department",
   "company",
   "amended_from",
   "section_break_4",
-  "currency",
-  "column_break_11",
-  "max_benefits",
-  "column_break_13",
-  "remaining_benefit",
-  "section_break_15",
   "employee_benefits",
   "totals",
   "total_amount",
@@ -98,7 +95,7 @@
   {
    "fieldname": "section_break_4",
    "fieldtype": "Section Break",
-   "label": "Benefits"
+   "label": "Benefits Applied"
   },
   {
    "fieldname": "employee_benefits",
@@ -146,23 +143,11 @@
   {
    "fieldname": "column_break",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_13",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "section_break_15",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "column_break_11",
-   "fieldtype": "Column Break"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2022-11-08 16:15:35.392164",
+ "modified": "2022-01-19 12:58:31.664468",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Employee Benefit Application",

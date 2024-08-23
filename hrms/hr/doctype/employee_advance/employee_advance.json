@@ -33,8 +33,10 @@
   "column_break_nhlv",
   "repay_unclaimed_amount_from_salary",
   "more_info_section",
+  "reference_type",
   "status",
   "column_break_kimx",
+  "reference_name",
   "amended_from"
  ],
  "fields": [
@@ -219,7 +221,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "collapsible": 1,
    "fieldname": "more_info_section",
    "fieldtype": "Section Break",
    "label": "More Info"
@@ -237,11 +238,23 @@
   {
    "fieldname": "column_break_crso",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "reference_type",
+   "fieldtype": "Link",
+   "label": "Reference Type",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "reference_name",
+   "fieldtype": "Dynamic Link",
+   "label": "Reference Name",
+   "options": "reference_type"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-04-12 13:53:55.442187",
+ "modified": "2024-08-19 11:52:07.641693",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Advance",

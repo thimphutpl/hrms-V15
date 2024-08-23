@@ -7,18 +7,18 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "add_or_deduct",
   "account_head",
   "rate",
-  "tax_amount",
   "col_break1",
-  "total",
-  "description_sb",
   "description",
+  "section_break_6",
+  "tax_amount",
   "column_break_8",
+  "total",
   "accounting_dimensions_section",
   "cost_center",
-  "dimension_col_break",
-  "project"
+  "dimension_col_break"
  ],
  "fields": [
   {
@@ -82,6 +82,10 @@
    "read_only": 1
   },
   {
+   "fieldname": "section_break_6",
+   "fieldtype": "Section Break"
+  },
+  {
    "fieldname": "column_break_8",
    "fieldtype": "Column Break"
   },
@@ -95,19 +99,15 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "project",
-   "fieldtype": "Link",
-   "label": "Project",
-   "options": "Project"
-  },
-  {
-   "fieldname": "description_sb",
-   "fieldtype": "Section Break"
+   "fieldname": "add_or_deduct",
+   "fieldtype": "Select",
+   "label": "Add or Deduct",
+   "options": "Add\nDeduct"
   }
  ],
  "istable": 1,
  "links": [],
- "modified": "2023-08-07 13:39:17.889817",
+ "modified": "2022-09-26 11:10:11.289218",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Expense Taxes and Charges",

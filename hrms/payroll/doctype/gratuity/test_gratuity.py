@@ -1,14 +1,15 @@
 # Copyright (c) 2020, Frappe Technologies Pvt. Ltd. and Contributors
 # See license.txt
 
+import unittest
+
 import frappe
-from frappe.tests.utils import FrappeTestCase, change_settings
+from frappe.tests.utils import FrappeTestCase
 from frappe.utils import add_days, add_months, floor, flt, get_datetime, get_first_day, getdate
 
 from erpnext.setup.doctype.employee.test_employee import make_employee
 from erpnext.setup.doctype.holiday_list.test_holiday_list import set_holiday_list
 
-from hrms.hr.doctype.attendance.attendance import mark_attendance
 from hrms.hr.doctype.expense_claim.test_expense_claim import get_payable_account
 from hrms.payroll.doctype.gratuity.gratuity import get_last_salary_slip
 from hrms.payroll.doctype.salary_slip.test_salary_slip import (
@@ -18,23 +19,16 @@ from hrms.payroll.doctype.salary_slip.test_salary_slip import (
 	make_holiday_list,
 )
 from hrms.payroll.doctype.salary_structure.salary_structure import make_salary_slip
+from hrms.regional.united_arab_emirates.setup import setup
 
 test_dependencies = ["Salary Component", "Salary Slip", "Account"]
 
 
 class TestGratuity(FrappeTestCase):
 	def setUp(self):
-		for dt in ["Gratuity", "Salary Slip", "Additional Salary"]:
-			frappe.db.delete(dt)
-
-		self.date_of_joining = add_days(getdate(), -(6 * 365))
-		self.relieving_date = getdate()
-		self.employee = make_employee(
-			"test_employee_gratuity@salary.com",
-			company="_Test Company",
-			date_of_joining=self.date_of_joining,
-			relieving_date=self.relieving_date,
-		)
+		frappe.db.delete("Gratuity")
+		frappe.db.delete("Salary Slip")
+		frappe.db.delete("Additional Salary", {"ref_doctype": "Gratuity"})
 
 		make_earning_salary_component(
 			setup=True, test_tax=True, company_list=["_Test Company"], include_flexi_benefits=True
@@ -43,20 +37,33 @@ class TestGratuity(FrappeTestCase):
 		make_holiday_list()
 
 	@set_holiday_list("Salary Slip Test Holiday List", "_Test Company")
+	def test_get_last_salary_slip_should_return_none_for_new_employee(self):
+		new_employee = make_employee("new_employee@salary.com", company="_Test Company")
+		salary_slip = get_last_salary_slip(new_employee)
+		self.assertIsNone(salary_slip)
+
+	@set_holiday_list("Salary Slip Test Holiday List", "_Test Company")
 	def test_gratuity_based_on_current_slab_via_additional_salary(self):
 		"""
 		Range	|	Fraction
 		5-0		|	1
 		"""
-		sal_slip = create_salary_slip(self.employee)
+		doj = add_days(getdate(), -(6 * 365))
+		relieving_date = getdate()
 
-		rule = setup_gratuity_rule("Rule Under Unlimited Contract on termination (UAE)")
-		gratuity = create_gratuity(pay_via_salary_slip=1, employee=self.employee, rule=rule.name)
+		employee = make_employee(
+			"test_employee_gratuity@salary.com",
+			company="_Test Company",
+			date_of_joining=doj,
+			relieving_date=relieving_date,
+		)
+		sal_slip = create_salary_slip("test_employee_gratuity@salary.com")
+
+		rule = get_gratuity_rule("Rule Under Unlimited Contract on termination (UAE)")
+		gratuity = create_gratuity(pay_via_salary_slip=1, employee=employee, rule=rule.name)
 
 		# work experience calculation
-		employee_total_workings_days = (
-			get_datetime(self.relieving_date) - get_datetime(self.date_of_joining)
-		).days
+		employee_total_workings_days = (get_datetime(relieving_date) - get_datetime(doj)).days
 		experience = floor(employee_total_workings_days / rule.total_working_days_per_year)
 		self.assertEqual(gratuity.current_work_experience, experience)
 
@@ -65,7 +72,7 @@ class TestGratuity(FrappeTestCase):
 			"Salary Detail",
 			filters={
 				"docstatus": 1,
-				"parent": sal_slip.name,
+				"parent": sal_slip,
 				"parentfield": "earnings",
 				"salary_component": "Basic Salary",
 			},
@@ -79,7 +86,7 @@ class TestGratuity(FrappeTestCase):
 		self.assertTrue(frappe.db.exists("Additional Salary", {"ref_docname": gratuity.name}))
 
 		# gratuity should be marked "Paid" on the next salary slip submission
-		salary_slip = make_salary_slip("Test Gratuity", employee=self.employee)
+		salary_slip = make_salary_slip("Test Gratuity", employee=employee)
 		salary_slip.posting_date = getdate()
 		salary_slip.insert()
 		salary_slip.submit()
@@ -97,18 +104,26 @@ class TestGratuity(FrappeTestCase):
 		"""
 		from hrms.overrides.employee_payment_entry import get_payment_entry_for_employee
 
-		sal_slip = create_salary_slip(self.employee)
-		rule = setup_gratuity_rule("Rule Under Limited Contract (UAE)")
+		doj = add_days(getdate(), -(6 * 365))
+		relieving_date = getdate()
+
+		employee = make_employee(
+			"test_employee_gratuity@salary.com",
+			company="_Test Company",
+			date_of_joining=doj,
+			relieving_date=relieving_date,
+		)
+
+		sal_slip = create_salary_slip("test_employee_gratuity@salary.com")
+		rule = get_gratuity_rule("Rule Under Limited Contract (UAE)")
 		set_mode_of_payment_account()
 
 		gratuity = create_gratuity(
-			expense_account="Payment Account - _TC", mode_of_payment="Cash", employee=self.employee
+			expense_account="Payment Account - _TC", mode_of_payment="Cash", employee=employee
 		)
 
 		# work experience calculation
-		employee_total_workings_days = (
-			get_datetime(self.relieving_date) - get_datetime(self.date_of_joining)
-		).days
+		employee_total_workings_days = (get_datetime(relieving_date) - get_datetime(doj)).days
 		experience = floor(employee_total_workings_days / rule.total_working_days_per_year)
 		self.assertEqual(gratuity.current_work_experience, experience)
 
@@ -117,7 +132,7 @@ class TestGratuity(FrappeTestCase):
 			"Salary Detail",
 			filters={
 				"docstatus": 1,
-				"parent": sal_slip.name,
+				"parent": sal_slip,
 				"parentfield": "earnings",
 				"salary_component": "Basic Salary",
 			},
@@ -143,41 +158,11 @@ class TestGratuity(FrappeTestCase):
 		self.assertEqual(gratuity.status, "Unpaid")
 		self.assertEqual(gratuity.paid_amount, 0)
 
-	@change_settings(
-		"Payroll Settings",
-		{
-			"payroll_based_on": "Attendance",
-			"consider_unmarked_attendance_as": "Present",
-			"include_holidays_in_total_working_days": True,
-		},
-	)
-	def test_gratuity_amount_consistent_irrespective_of_payment_days(self):
-		date = getdate("2024-01-01")
-		create_salary_slip(self.employee, date)
 
-		setup_gratuity_rule("Rule Under Limited Contract (UAE)")
-		set_mode_of_payment_account()
-
-		gratuity = create_gratuity(
-			expense_account="Payment Account - _TC", mode_of_payment="Cash", employee=self.employee
-		)
-		self.assertEqual(gratuity.amount, 190000.0)
-
-		# gratuity amount should be unaffected inspite of marking the employee absent for a day
-		frappe.db.delete("Gratuity", gratuity.name)
-		mark_attendance(self.employee, date, "Absent")
-		gratuity = create_gratuity(
-			expense_account="Payment Account - _TC", mode_of_payment="Cash", employee=self.employee
-		)
-		self.assertEqual(gratuity.amount, 190000.0)
-
-
-def setup_gratuity_rule(name: str) -> dict:
-	from hrms.regional.united_arab_emirates.setup import setup
-
-	if not frappe.db.exists("Gratuity Rule", name):
+def get_gratuity_rule(name):
+	rule = frappe.db.exists("Gratuity Rule", name)
+	if not rule:
 		setup()
-
 	rule = frappe.get_doc("Gratuity Rule", name)
 	rule.applicable_earnings_component = []
 	rule.append("applicable_earnings_component", {"salary_component": "Basic Salary"})
@@ -215,7 +200,9 @@ def set_mode_of_payment_account():
 	mode_of_payment = frappe.get_doc("Mode of Payment", "Cash")
 
 	mode_of_payment.accounts = []
-	mode_of_payment.append("accounts", {"company": "_Test Company", "default_account": "_Test Bank - _TC"})
+	mode_of_payment.append(
+		"accounts", {"company": "_Test Company", "default_account": "_Test Bank - _TC"}
+	)
 	mode_of_payment.save()
 
 
@@ -231,14 +218,20 @@ def create_account():
 			"parent_account": "Bank Accounts - _TC",
 			"account_type": "Bank",
 		}
-	).insert()
+	).insert(ignore_permissions=True)
 
 
-def create_salary_slip(employee, posting_date=None):
-	posting_date = posting_date or get_first_day(add_months(getdate(), -1))
-	salary_slip = make_employee_salary_slip(employee, "Monthly", "Test Gratuity", posting_date=posting_date)
-	salary_slip.start_date = posting_date
-	salary_slip.end_date = None
-	salary_slip.submit()
+def create_salary_slip(employee):
+	if not frappe.db.exists("Salary Slip", {"employee": employee}):
+		posting_date = get_first_day(add_months(getdate(), -1))
+		salary_slip = make_employee_salary_slip(
+			employee, "Monthly", "Test Gratuity", posting_date=posting_date
+		)
+		salary_slip.start_date = posting_date
+		salary_slip.end_date = None
+		salary_slip.submit()
+		salary_slip = salary_slip.name
+	else:
+		salary_slip = get_last_salary_slip(employee)
 
 	return salary_slip
