@@ -1,0 +1,430 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:id_card",
+ "creation": "2022-11-29 22:18:01.153560",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "id_card",
+  "section_break_1",
+  "person_name",
+  "designation",
+  "list_in_job_card",
+  "column_break_4",
+  "status",
+  "gender",
+  "qualification",
+  "section_break_8",
+  "project",
+  "unit",
+  "column_break_8",
+  "branch",
+  "cost_center",
+  "sec_break_12",
+  "joining_date",
+  "separation_date",
+  "column_break_18",
+  "blood_group",
+  "wage_detail_section",
+  "musterroll",
+  "section_break_12",
+  "salary",
+  "rate_per_day",
+  "is_lumpsum",
+  "column_break_14",
+  "rate_per_hour",
+  "lumpsum",
+  "sb_bank_info",
+  "salary_mode",
+  "bank_branch",
+  "column_break_32",
+  "bank_name",
+  "bank_ac_no",
+  "bank_account_type",
+  "section_break_16",
+  "internal_work_history",
+  "section_break_26",
+  "user_id",
+  "column_break_26",
+  "company",
+  "date_of_transfer",
+  "sb_additional_info",
+  "reference_doctype",
+  "column_break_30",
+  "reference_docname",
+  "temp_doctype",
+  "temp_docname"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_1",
+   "fieldtype": "Section Break",
+   "label": "Personal Details"
+  },
+  {
+   "fieldname": "person_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "MR Employee Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "id_card",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "CID/Passport/Work Permit",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Active\nLeft",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "list_in_job_card",
+   "fieldtype": "Check",
+   "label": "List in Job Card"
+  },
+  {
+   "fieldname": "section_break_8",
+   "fieldtype": "Section Break",
+   "label": "Work Status"
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Project",
+   "options": "Project"
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Branch",
+   "options": "Branch",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "branch.cost_center",
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "sec_break_12",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "joining_date",
+   "fieldtype": "Date",
+   "label": "Joining Date",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.status == 'Left'",
+   "fieldname": "separation_date",
+   "fieldtype": "Date",
+   "label": "Separation Date",
+   "mandatory_depends_on": "eval:doc.status == 'Left'"
+  },
+  {
+   "fieldname": "column_break_18",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "blood_group",
+   "fieldtype": "Link",
+   "label": "Blood Group",
+   "options": "Blood Group"
+  },
+  {
+   "fieldname": "section_break_12",
+   "fieldtype": "Section Break",
+   "label": "Wages Details"
+  },
+  {
+   "default": "0.0",
+   "fieldname": "salary",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Salary Per Month",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.is_lumpsum == 0;",
+   "fieldname": "rate_per_day",
+   "fieldtype": "Currency",
+   "label": "Rate Per Day"
+  },
+  {
+   "fieldname": "column_break_14",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.is_lumpsum == 0;",
+   "fieldname": "rate_per_hour",
+   "fieldtype": "Currency",
+   "label": "Rate Per Hour (Overtime)     (Daily Rate * 1.5 / 8)"
+  },
+  {
+   "fieldname": "sb_bank_info",
+   "fieldtype": "Section Break",
+   "label": "Bank Account Details"
+  },
+  {
+   "fieldname": "salary_mode",
+   "fieldtype": "Select",
+   "label": "Salary Mode",
+   "options": "Bank\nCash"
+  },
+  {
+   "fieldname": "column_break_32",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "bank_name",
+   "fieldtype": "Link",
+   "label": "Bank Name",
+   "options": "Financial Institution"
+  },
+  {
+   "fieldname": "bank_branch",
+   "fieldtype": "Link",
+   "label": "Bank Branch",
+   "options": "Financial Institution Branch"
+  },
+  {
+   "fieldname": "bank_account_type",
+   "fieldtype": "Link",
+   "label": "Bank Account Type",
+   "options": "Bank Account Type"
+  },
+  {
+   "fieldname": "bank_ac_no",
+   "fieldtype": "Data",
+   "label": "Bank Account Number"
+  },
+  {
+   "fieldname": "section_break_16",
+   "fieldtype": "Section Break",
+   "label": "INTERNAL WORK HISTORY"
+  },
+  {
+   "fieldname": "internal_work_history",
+   "fieldtype": "Table",
+   "options": "Employee Internal Work History",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_26",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "user_id",
+   "fieldtype": "Link",
+   "label": "User ID",
+   "options": "User"
+  },
+  {
+   "fieldname": "column_break_26",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "date_of_transfer",
+   "fieldtype": "Date",
+   "label": "Date Of Transfer"
+  },
+  {
+   "fieldname": "sb_additional_info",
+   "fieldtype": "Section Break",
+   "label": "ADDITIONAL INFO"
+  },
+  {
+   "fieldname": "reference_doctype",
+   "fieldtype": "Data",
+   "label": "Reference Doctype",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_30",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "reference_docname",
+   "fieldtype": "Data",
+   "label": "Reference Docname",
+   "read_only": 1
+  },
+  {
+   "fieldname": "temp_doctype",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Temp Doctype",
+   "read_only": 1
+  },
+  {
+   "fieldname": "temp_docname",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Temp Docname",
+   "read_only": 1
+  },
+  {
+   "fieldname": "wage_detail_section",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Wage Detail"
+  },
+  {
+   "fieldname": "musterroll",
+   "fieldtype": "Table",
+   "options": "Musterroll"
+  },
+  {
+   "fieldname": "designation",
+   "fieldtype": "Link",
+   "label": "Designation",
+   "options": "Designation"
+  },
+  {
+   "fieldname": "gender",
+   "fieldtype": "Select",
+   "label": "Gender",
+   "options": "\nMale\nFemale\nOther"
+  },
+  {
+   "fieldname": "qualification",
+   "fieldtype": "Data",
+   "label": "Qualification"
+  },
+  {
+   "fieldname": "unit",
+   "fieldtype": "Link",
+   "label": "Unit",
+   "options": "Department"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_lumpsum",
+   "fieldtype": "Check",
+   "label": "Is Lumpsum"
+  },
+  {
+   "depends_on": "eval:doc.is_lumpsum==1",
+   "fieldname": "lumpsum",
+   "fieldtype": "Currency",
+   "label": "Lumpsum",
+   "mandatory_depends_on": "eval:doc.is_lumpsum==1"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-12-19 11:57:37.818833",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Muster Roll Employee",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Muster Roll Creator",
+   "share": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Projects User",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Projects GM",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "person_name,branch",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "id_card",
+ "track_changes": 1
+}

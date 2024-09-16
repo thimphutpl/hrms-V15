@@ -2,6 +2,16 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Journal Entry", {
+	onload: (frm) => {
+		frm.set_query("branch", function(frm) {
+			return {
+				filters: {
+					'company': doc.company,
+				}
+			}
+		})
+	},
+
 	refresh(frm) {
 		frm.set_query("reference_name", "accounts", function (frm, cdt, cdn) {
 			let jvd = frappe.get_doc(cdt, cdn);
