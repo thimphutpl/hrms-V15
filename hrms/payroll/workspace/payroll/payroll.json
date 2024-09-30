@@ -39,7 +39,8 @@
    "hidden": 0,
    "is_query_report": 0,
    "label": "Quick Links",
-   "link_count": 2,
+   "link_count": 3,
+   "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
   },
@@ -62,10 +63,20 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Salary Structure",
+   "link_count": 0,
+   "link_to": "Salary Structure",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2024-09-12 20:06:41.047551",
- "modified_by": "Administrator",
+ "modified": "2024-09-25 11:13:56.270021",
+ "modified_by": "tshering.lham@thimphutechpark.bt",
  "module": "Payroll",
  "name": "Payroll",
  "number_cards": [],

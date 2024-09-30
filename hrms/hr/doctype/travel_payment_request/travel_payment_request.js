@@ -2,8 +2,25 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Travel Payment Request", {
-	refresh(frm) {
+	setup: function(frm) {
+		frm.set_query("business_activity", function () {
+			return {
+				query: "hrms.hr.doctype.travel_payment_request.travel_payment_request.get_business_activities",
+				filters: {
+					company: frm.doc.company,
+				}
+			};
+		});
+	},
 
+	refresh(frm) {
+		frm.set_query("branch", function(doc){
+			return {
+				filters: {
+					'company': doc.company,
+				}
+			}
+		});
 	},
 
     calculate_total: function (frm) {

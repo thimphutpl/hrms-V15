@@ -262,7 +262,7 @@
  "is_submittable": 1,
  "links": [],
  "max_attachments": 3,
- "modified": "2024-09-16 11:27:20.191070",
+ "modified": "2024-09-25 15:40:58.009472",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Application",
@@ -357,5 +357,6 @@
  "sort_order": "DESC",
  "states": [],
  "timeline_field": "employee",
- "title_field": "employee_name"
+ "title_field": "employee_name",
+ "track_seen": 1
 }

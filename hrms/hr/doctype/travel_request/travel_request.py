@@ -20,7 +20,7 @@ class TravelRequest(AccountsController):
 		# validate_workflow_states(self)
 		validate_active_employee(self.employee)
 		self.validate_travel_dates()
-		self.check_leave_applications()
+		# self.check_leave_applications()
 		self.set_dsa_percent()
 		self.set_currency_exchange()
 		self.update_amount()
@@ -38,7 +38,7 @@ class TravelRequest(AccountsController):
 
 	def on_update(self):
 		self.validate_travel_dates(update=True)
-		self.check_leave_applications()
+		# self.check_leave_applications()
 		self.check_date_overlap()
 		self.check_duplicate_requests()
 		
@@ -73,7 +73,7 @@ class TravelRequest(AccountsController):
 	def set_dsa_percent(self):
 		for item in self.get("itinerary"):
 			if len(self.itinerary) == 1 or item.idx == len(self.itinerary) or cint(item.return_same_day) == 1:
-				item.dsa_percent = cint(frappe.db.get_single_value("HR Settings","return_day_dsa_percent"))
+				item.dsa_percent = cint(frappe.db.get_single_value("HR Settings","return_day_dsa"))
 				if self.travel_type == "International" and flt(item.total_claim) <=0:
 					item.actual_amount = 0
 

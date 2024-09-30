@@ -158,8 +158,8 @@ doc_events = {
 		],
 	},
 	"Holiday List": {
-		"on_update": "hrms.utils.holiday_list.invalidate_cache",
-		"on_trash": "hrms.utils.holiday_list.invalidate_cache",
+		# "on_update": "hrms.utils.holiday_list.invalidate_cache",
+		# "on_trash": "hrms.utils.holiday_list.invalidate_cache",
 	},
 	"Timesheet": {"validate": "hrms.hr.utils.validate_active_employee"},
 	"Payment Entry": {

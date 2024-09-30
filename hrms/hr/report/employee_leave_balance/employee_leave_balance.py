@@ -23,6 +23,7 @@ def execute(filters: Filters | None = None) -> tuple:
 
 	columns = get_columns()
 	data = get_data(filters)
+	
 	charts = get_chart_data(data, filters)
 	return columns, data, None, charts
 
@@ -125,6 +126,7 @@ def get_data(filters: Filters) -> list:
 			closing = new_allocation + opening - (row.leaves_expired + leaves_taken)
 			row.closing_balance = flt(closing, precision)
 			row.indent = 1
+			
 			data.append(row)
 
 	return data

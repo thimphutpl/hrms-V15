@@ -4,17 +4,30 @@
 var in_progress = false;
 
 frappe.ui.form.on('Increment Entry', {
+	setup: function(frm) {
+		frm.set_query("fiscal_year", function () {
+			return {
+				query: "erpnext.accounts.doctype.abstract_bill.abstract_bill.get_fiscal_year",
+				filters: {
+					company: frm.doc.company,
+				}
+			};
+		});
+	},
+	
 	onload: function (frm) {
 		if (!frm.doc.posting_date) {
 			frm.doc.posting_date = frappe.datetime.nowdate();
 		}
 
-		frm.set_query("department", function() {
-			return {
-				"filters": {
-					"company": frm.doc.company,
-				}
-			};
+		["branch", "department", "employee"].forEach(function(field) {
+			frm.set_query(field, function() {
+				return {
+					"filters": {
+						"company": frm.doc.company
+					}
+				};
+			});
 		});
 	},
 
@@ -45,7 +58,7 @@ frappe.ui.form.on('Increment Entry', {
 	},
 
 	get_employee_details: function (frm) {
-		console.log('here')
+		// console.log('here')
 		return frappe.call({
 			method: 'fill_employee_details',
 			doc: frm.doc,

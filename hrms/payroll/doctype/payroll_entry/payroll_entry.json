@@ -8,10 +8,12 @@
  "engine": "InnoDB",
  "field_order": [
   "sb_payroll_period",
+  "company",
   "fiscal_year",
   "month_name",
   "month",
   "column_break_40",
+  "posting_date",
   "processing_branch",
   "status",
   "section_break_8",
@@ -53,10 +55,8 @@
   "bank_account",
   "section_break0",
   "column_break0",
-  "posting_date",
   "payroll_frequency",
-  "column_break1",
-  "company"
+  "column_break1"
  ],
  "fields": [
   {
@@ -366,7 +366,7 @@
  "icon": "fa fa-cog",
  "is_submittable": 1,
  "links": [],
- "modified": "2023-04-17 13:14:18.262627",
+ "modified": "2024-09-19 12:32:54.472481",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Payroll Entry",

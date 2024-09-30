@@ -18,7 +18,6 @@
   "cost_center",
   "department",
   "division",
-  "section",
   "business_activity",
   "letter_head",
   "section_break_10",
@@ -170,13 +169,6 @@
    "fieldname": "division",
    "fieldtype": "Link",
    "label": "Division",
-   "options": "Department",
-   "read_only": 1
-  },
-  {
-   "fieldname": "section",
-   "fieldtype": "Link",
-   "label": "Section",
    "options": "Department",
    "read_only": 1
   },
@@ -341,7 +333,7 @@
    "label": "Bank Name",
    "oldfieldname": "bank_name",
    "oldfieldtype": "Data",
-   "options": "Bank",
+   "options": "Financial Institution",
    "read_only": 1
   },
   {
@@ -561,7 +553,7 @@
  "idx": 9,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-08-02 11:33:55.383647",
+ "modified": "2024-09-20 10:56:45.697200",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Slip",

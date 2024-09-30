@@ -7,6 +7,23 @@ frappe.ui.form.on('Payroll Entry', {
 		if (!frm.doc.posting_date) {
 			frm.doc.posting_date = frappe.datetime.nowdate();
 		}
+		
+		frm.set_query("fiscal_year", function () {
+			return {
+				query: "erpnext.accounts.doctype.abstract_bill.abstract_bill.get_fiscal_year",
+				filters: {
+					company: frm.doc.company,
+				}
+			};
+		});
+
+		frm.set_query("processing_branch", function() {
+			return {
+				"filters": {
+					"company": frm.doc.company,
+				}
+			};
+		});
 
 		frm.set_query("department", function() {
 			return {
@@ -202,7 +219,14 @@ frappe.ui.form.on('Payroll Entry', {
 
 	company: function (frm) {
 		frm.events.clear_employee_table(frm);
+		// frm.events.clear_fiscal_year_field(frm);
 	},
+
+	// clear_fiscal_year_field: function (frm) {
+	// 	console.log("Clearing fiscal_year field");
+	// 	frm.set_value('fiscal_year', '');
+	// 	frm.refresh('fiscal_year');
+	// },
 
 	department: function (frm) {
 		frm.events.clear_employee_table(frm);
@@ -303,6 +327,32 @@ frappe.ui.form.on('Payroll Entry', {
 		frm.refresh();
 	},
 });
+
+frappe.ui.form.on('Payroll Employee Detail', {
+	refresh: function(frm) {
+        calculate_row_total(frm);
+    },
+    // Trigger calculations when the row is added
+    employees_add: function(frm) {
+        calculate_row_total(frm);
+    },
+    // Recalculate totals when a row is removed from the items table
+    employees_remove: function(frm) {
+        calculate_row_total(frm);
+    },
+    // Recalculate totals when a row field is changed
+    employees_on_form_rendered: function(frm) {
+        calculate_row_total(frm);
+    }
+});
+
+function calculate_row_total(frm) {
+    let total_employees_count = frm.doc.employees ? frm.doc.employees.length : 0;
+    // Update the total_items_count field on the form
+    frm.set_value('number_of_employees', total_employees_count);
+    frm.refresh_field('number_of_employees');
+}
+
 
 // Submit salary slips
 

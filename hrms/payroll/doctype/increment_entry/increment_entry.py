@@ -74,7 +74,9 @@ class IncrementEntry(Document):
 		
 		for f in ['company', 'branch', 'department', 'designation', 'employee']:
 			if self.get(f):
-				cond += " and t1." + f + " = '" + self.get(f).replace("'", "\'") + "'"
+				# Properly escape single quotes by doubling them for SQL
+				value = self.get(f).replace("'", "''")
+				cond += f" and t1.{f} = '{value}'"
 
 		return cond
 
@@ -88,10 +90,19 @@ class IncrementEntry(Document):
 	# following method created by SHIV on 2020/10/20
 	def set_month_dates(self):
 		months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-		month = str(int(months.index(self.month_name))+1).rjust(2,"0")
+		month = str(int(months.index(self.month_name)) + 1).rjust(2, "0")
 
-		month_start_date = "-".join([str(self.fiscal_year), month, "01"])
-		month_end_date   = get_last_day(month_start_date)
+		is_canlendar_year = frappe.db.get_value("Fiscal Year", self.fiscal_year, "is_calendar_year")
+		if is_canlendar_year:
+			month_start_date = "-".join([str(self.fiscal_year), month, "01"])
+		else:
+			fiscal_start_year, fiscal_end_year = str(self.fiscal_year).split('-')
+			if int(month) >= 7:
+				year = fiscal_start_year
+			else:
+				year = fiscal_start_year[:2]+str(fiscal_end_year)
+			month_start_date = "-".join([year, month, "01"])
+		month_end_date = get_last_day(month_start_date)
 
 		self.start_date = month_start_date
 		self.end_date = month_end_date
@@ -186,7 +197,9 @@ class IncrementEntry(Document):
 						old_basic = flt(d.amount)
 
 				# Fetching employee group settings
-				group_doc = frappe.get_doc("Employee Group", frappe.db.get_value("Employee",employee,"employee_group"))
+				group_doc = frappe.get_doc("Employee Group", frappe.db.get_value("Employee", employee, "employee_group"))
+				if not group_doc:
+					frappe.throw("Please set Emplouee Group for {}".format(frappe.get_desk_link("Employee", employee)))
 				minimum_months = group_doc.minimum_months
 				total_months = frappe.db.sql("""
 							select (
@@ -202,7 +215,7 @@ class IncrementEntry(Document):
 				grade= frappe.get_doc("Employee Grade", frappe.db.get_value("Employee",employee,"grade"))
 				payscale_minimum   = grade.lower_limit
 				payscale_increment_method = grade.increment_method
-				payscale_increment = grade.increment
+				payscale_increment = grade.increment_value
 				payscale_maximum   = grade.upper_limit 
 
 				# Calculating increment

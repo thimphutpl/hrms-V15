@@ -63,11 +63,20 @@ class PromotionEntry(Document):
 
 		if not self.fiscal_year or not self.month_name:
 			frappe.throw("Please select Fiscal Year and Month.")
-
-		if self.month_name == "January":
-			pe_date = self.fiscal_year+"-01-01"
-		elif self.month_name == "July":
-			pe_date = self.fiscal_year+"-07-01"
+		is_canlendar_year = frappe.db.get_value("Fiscal Year", self.fiscal_year, "is_calendar_year")
+		if not is_canlendar_year:
+			fiscal_start_year, fiscal_end_year = str(self.fiscal_year).split('-')
+			if self.month_name == "January":
+				year = fiscal_start_year
+				pe_date = year+"-01-01"
+			elif self.month_name == "July":
+				year = fiscal_start_year[:2]+str(fiscal_end_year)
+				pe_date = year+"-07-01"
+		else:
+			if self.month_name == "January":
+				pe_date = self.fiscal_year+"-01-01"
+			elif self.month_name == "July":
+				pe_date = self.fiscal_year+"-07-01"
 		# query =	"""
 		# 	select t1.name as employee, t1.employee_name, t1.department, t1.designation, t1.grade as employee_grade
 		# 	from `tabEmployee` t1
@@ -178,12 +187,12 @@ class PromotionEntry(Document):
 
 	def get_additional_details(self, employee, basic_pay, personal_pay):
 		emp = frappe.get_doc("Employee", employee)
-		current_increment = frappe.db.get_value("Employee Grade", emp.grade, "increment")
-		new_grade = frappe.db.get_value("Employee Grade", emp.grade, "promotion_grade")
+		current_increment = frappe.db.get_value("Employee Grade", emp.grade, "increment_value")
+		new_grade = frappe.db.get_value("Employee Grade", emp.grade, "promote_to_grade")
 		if not new_grade:
 			frappe.throw("Promote to Grade not set for Employee {}".format(employee))
 		new_lower_limit = frappe.db.get_value("Employee Grade", new_grade, "lower_limit")
-		new_increment = frappe.db.get_value("Employee Grade", new_grade, "increment")
+		new_increment = frappe.db.get_value("Employee Grade", new_grade, "increment_value")
 		new_upper_limit = frappe.db.get_value("Employee Grade", new_grade, "upper_limit")
 		# if personal_pay > 0:
 		# 	ratio = ((flt(basic_pay) + flt(personal_pay))-flt(new_lower_limit))/flt(new_increment)
@@ -225,10 +234,11 @@ class PromotionEntry(Document):
 		self.check_mandatory()
 
 		cond = ''
-		
 		for f in ['company', 'branch', 'department', 'designation', 'employee']:
 			if self.get(f):
-				cond += " and t1." + f + " = '" + self.get(f).replace("'", "\'") + "'"
+				# Properly escape single quotes by doubling them for SQL
+				value = self.get(f).replace("'", "''")
+				cond += f" and t1.{f} = '{value}'"
 
 		return cond
 
@@ -242,14 +252,23 @@ class PromotionEntry(Document):
 	# following method created by SHIV on 2020/10/20
 	def set_month_dates(self):
 		months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-		month = str(int(months.index(self.month_name))+1).rjust(2,"0")
+		month = str(int(months.index(self.month_name)) + 1).rjust(2, "0")
 
-		month_start_date = "-".join([str(self.fiscal_year), month, "01"])
-		month_end_date   = get_last_day(month_start_date)
+		is_canlendar_year = frappe.db.get_value("Fiscal Year", self.fiscal_year, "is_calendar_year")
+		if is_canlendar_year:
+			month_start_date = "-".join([str(self.fiscal_year), month, "01"])
+		else:
+			fiscal_start_year, fiscal_end_year = str(self.fiscal_year).split('-')
+			if int(month) >= 7:
+				year = fiscal_start_year
+			else:
+				year = fiscal_start_year[:2]+str(fiscal_end_year)
+			month_start_date = "-".join([year, month, "01"])
+		month_end_date = get_last_day(month_start_date)
 
 		self.start_date = month_start_date
 		self.end_date = month_end_date
-		# self.month_name = month
+		self.month = month
 
 	def check_mandatory(self):
 		# following line is replaced by subsequent by SHIV on 2020/10/20

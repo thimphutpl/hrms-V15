@@ -8,16 +8,12 @@
  "field_order": [
   "section_break_frah",
   "company",
-  "employee",
-  "employee_name",
   "column_break_vbhn",
   "branch",
   "cost_center",
-  "from_date",
   "column_break_mwpt",
   "posting_date",
   "business_activity",
-  "to_date",
   "section_break_kwlk",
   "items",
   "total_amount",
@@ -42,23 +38,8 @@
    "search_index": 1
   },
   {
-   "fieldname": "employee",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Employee",
-   "options": "Employee",
-   "reqd": 1
-  },
-  {
    "fieldname": "column_break_vbhn",
    "fieldtype": "Column Break"
-  },
-  {
-   "fetch_from": "employee.employee_name",
-   "fieldname": "employee_name",
-   "fieldtype": "Data",
-   "label": "Employee Name",
-   "read_only": 1
   },
   {
    "default": "Today",
@@ -90,18 +71,6 @@
    "fieldtype": "Currency",
    "label": "Total Amount",
    "read_only": 1
-  },
-  {
-   "fieldname": "from_date",
-   "fieldtype": "Date",
-   "label": "From Date",
-   "reqd": 1
-  },
-  {
-   "fieldname": "to_date",
-   "fieldtype": "Date",
-   "label": "To Date",
-   "reqd": 1
   },
   {
    "fieldname": "branch",
@@ -148,7 +117,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-09-03 11:38:21.678698",
+ "modified": "2024-09-19 00:10:36.121999",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Payment Request",

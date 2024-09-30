@@ -113,8 +113,9 @@ class PayrollEntry(Document):
 		cond = ''
 		for f in ['company', 'branch', 'department', 'designation', 'employee']:
 			if self.get(f):
-				cond += " and t1." + f + " = '" + self.get(f).replace("'", "\'") + "'"
-
+				# Properly escape single quotes by doubling them for SQL
+				value = self.get(f).replace("'", "''")
+				cond += f" and t1.{f} = '{value}'"
 		return cond
 
 	def get_joining_relieving_condition(self):
@@ -127,10 +128,19 @@ class PayrollEntry(Document):
 	# following method created by SHIV on 2020/10/20
 	def set_month_dates(self):
 		months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-		month = str(int(months.index(self.month_name))+1).rjust(2,"0")
+		month = str(int(months.index(self.month_name)) + 1).rjust(2, "0")
 
-		month_start_date = "-".join([str(self.fiscal_year), month, "01"])
-		month_end_date   = get_last_day(month_start_date)
+		is_canlendar_year = frappe.db.get_value("Fiscal Year", self.fiscal_year, "is_calendar_year")
+		if is_canlendar_year:
+			month_start_date = "-".join([str(self.fiscal_year), month, "01"])
+		else:
+			fiscal_start_year, fiscal_end_year = str(self.fiscal_year).split('-')
+			if int(month) >= 7:
+				year = fiscal_start_year
+			else:
+				year = fiscal_start_year[:2]+str(fiscal_end_year)
+			month_start_date = "-".join([year, month, "01"])
+		month_end_date = get_last_day(month_start_date)
 
 		self.start_date = month_start_date
 		self.end_date = month_end_date
@@ -557,8 +567,8 @@ class PayrollEntry(Document):
 		company = frappe.db.get("Company", self.company)
 		default_bank_account    = frappe.db.get_value("Branch", self.processing_branch,"expense_bank_account")
 		# default_bank_account = get_bank_account(self.processing_branch)
-		default_payable_account = company.get("salary_payable_account")
-		company_cc              = company.get("company_cost_center")
+		default_payable_account = company.get("default_salary_payable_account")
+		company_cc              = company.get("cost_center")
 		default_gpf_account     = company.get("employer_contribution_to_pf")
 		default_business_activity = get_default_ba()
 		salary_component_pf     = "PF"
@@ -580,7 +590,7 @@ class PayrollEntry(Document):
 		cc = frappe.db.sql("""
 			select
 				(case
-					when sc.type = 'Deduction' and ifnull(sc.make_party_entry,0) = 0 then c.company_cost_center
+					when sc.type = 'Deduction' and ifnull(sc.make_party_entry,0) = 0 then c.cost_center
 					else t1.cost_center
 				end)                       as cost_center,
 				(case
@@ -632,7 +642,7 @@ class PayrollEntry(Document):
 						and ped.employee = t1.employee)
 			group by 
 				(case
-					when sc.type = 'Deduction' and ifnull(sc.make_party_entry,0) = 0 then c.company_cost_center
+					when sc.type = 'Deduction' and ifnull(sc.make_party_entry,0) = 0 then c.cost_center
 					else t1.cost_center
 				end),
 				(case
