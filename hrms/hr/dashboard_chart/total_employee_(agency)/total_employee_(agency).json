@@ -7,17 +7,24 @@
  "doctype": "Dashboard Chart",
  "filters_json": "{}",
  "group_by_type": "Count",
- "idx": 0,
+ "idx": 5,
  "is_public": 0,
  "is_standard": 1,
- "modified": "2024-10-07 17:54:16.455915",
+ "modified": "2024-10-07 22:51:37.415467",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Total Employee (Agency)",
  "number_of_groups": 0,
  "owner": "Administrator",
  "report_name": "Employee By Agencies",
- "roles": [],
+ "roles": [
+  {
+   "role": "Dashboard Manager"
+  },
+  {
+   "role": "Dashboard Manager Overall"
+  }
+ ],
  "time_interval": "Yearly",
  "timeseries": 0,
  "timespan": "Last Year",
