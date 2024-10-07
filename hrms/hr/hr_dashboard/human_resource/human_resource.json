@@ -45,6 +45,10 @@
   {
    "chart": "Designation Wise Employee Count",
    "width": "Half"
+  },
+  {
+   "chart": "Employee Average Age",
+   "width": "Half"
   }
  ],
  "creation": "2023-11-17 14:10:56.741833",
@@ -54,7 +58,7 @@
  "idx": 4,
  "is_default": 0,
  "is_standard": 1,
- "modified": "2024-10-07 20:33:07.893264",
+ "modified": "2024-10-07 22:19:24.981687",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Human Resource",
