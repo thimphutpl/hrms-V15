@@ -19,17 +19,19 @@ def get_data(filters):
     cond = get_condition(filters)
     current_user = frappe.session.user
     user_roles = frappe.get_roles(current_user)
-    if "Dashboard Manager Overall" in user_roles:
+    if "Dashboard Manager Overall" or "System Manager" in user_roles:
         return frappe.db.sql("""
 		select company,count(name) from `tabEmployee` group by company {condition}
 		""".format(condition=cond))
     else:
         company = frappe.db.sql('''
                                 select company from `tabEmployee` where user_id="{}"
-                                '''.format(current_user))
-        return frappe.db.sql("""
-		select company,count(name) from `tabEmployee` where company ="{condition}" group by company
-		""".format(condition=company[0][0]))
+                                '''.format(current_user), as_dict=True)
+        if company:
+            
+            return frappe.db.sql("""
+            select company,count(name) from `tabEmployee` where company ="{condition}" group by company
+            """.format(condition=company[0]['company']))
     
     
 def get_condition(filters):
