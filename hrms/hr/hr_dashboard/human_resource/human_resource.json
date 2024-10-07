@@ -4,19 +4,13 @@
    "card": "Total Active Employee"
   },
   {
-   "card": "New Hires (This Year)"
+   "card": "New Recruit(This Year)"
   },
   {
-   "card": "Employee Exits (This Year)"
+   "card": "Employee Exits(This Year)"
   },
   {
-   "card": "Employees Joining (This Quarter)"
-  },
-  {
-   "card": "Employees Relieving (This Quarter)"
-  },
-  {
-   "card": "New Recruit"
+   "card": "Employees Joining(This Quarter)"
   }
  ],
  "charts": [
@@ -60,7 +54,7 @@
  "idx": 4,
  "is_default": 0,
  "is_standard": 1,
- "modified": "2024-10-07 19:51:27.418713",
+ "modified": "2024-10-07 20:33:07.893264",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Human Resource",
