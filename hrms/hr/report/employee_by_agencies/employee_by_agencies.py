@@ -19,7 +19,7 @@ def get_data(filters):
     cond = get_condition(filters)
     current_user = frappe.session.user
     user_roles = frappe.get_roles(current_user)
-    if "Dashboard Manager Overall" or "System Manager" in user_roles:
+    if "Dashboard Manager Overall" in user_roles or "System Manager" in user_roles:
         return frappe.db.sql("""
 		select company,count(name) from `tabEmployee` group by company {condition}
 		""".format(condition=cond))
