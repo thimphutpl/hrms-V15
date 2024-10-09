@@ -8,9 +8,11 @@
  "field_order": [
   "employee",
   "employee_name",
+  "type",
   "log_type",
   "shift",
   "column_break_4",
+  "date",
   "time",
   "device_id",
   "skip_auto_attendance",
@@ -164,10 +166,25 @@
    "fieldname": "fetch_geolocation",
    "fieldtype": "Button",
    "label": "Fetch Geolocation"
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Type",
+   "options": "\nOffice\nLunch",
+   "reqd": 1
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date",
+   "reqd": 1
   }
  ],
  "links": [],
- "modified": "2024-05-29 21:19:11.550766",
+ "modified": "2024-09-30 17:21:41.722376",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Checkin",
