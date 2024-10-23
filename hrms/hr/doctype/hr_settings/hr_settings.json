@@ -63,7 +63,9 @@
   "overtime_settings_tab",
   "overtime_limit_type",
   "column_break_ligd",
-  "overtime_limit"
+  "overtime_limit",
+  "travel_settings_tab",
+  "return_day_dsa"
  ],
  "fields": [
   {
@@ -405,13 +407,23 @@
    "fieldname": "overtime_limit",
    "fieldtype": "Int",
    "label": "Overtime Limit In Hrs(Per Day)"
+  },
+  {
+   "fieldname": "travel_settings_tab",
+   "fieldtype": "Tab Break",
+   "label": "Travel Settings"
+  },
+  {
+   "fieldname": "return_day_dsa",
+   "fieldtype": "Percent",
+   "label": "Return Day DSA Percent"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-08-19 17:39:55.011295",
+ "modified": "2024-10-16 13:06:46.001175",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",

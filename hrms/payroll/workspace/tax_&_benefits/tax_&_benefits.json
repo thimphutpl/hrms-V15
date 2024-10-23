@@ -135,8 +135,8 @@
    "type": "Link"
   }
  ],
- "modified": "2024-08-09 15:28:46.929834",
- "modified_by": "pema.dhendup@thimphutechpark.bt",
+ "modified": "2024-10-17 14:32:56.269137",
+ "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Tax & Benefits",
  "number_cards": [],
@@ -145,7 +145,7 @@
  "public": 1,
  "quick_lists": [],
  "roles": [],
- "sequence_id": 24.0,
+ "sequence_id": 25.0,
  "shortcuts": [
   {
    "color": "Red",

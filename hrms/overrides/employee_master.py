@@ -12,8 +12,8 @@ from erpnext.setup.doctype.employee.employee import Employee
 class EmployeeMaster(Employee):
 	def autoname(self):
 		# Added by Dawa Tshering on 2024/07/24
-		if self.old_emp_id:
-			self.employee =	self.name = self.old_emp_id
+		if self.old_id:
+			self.employee =	self.name = self.old_id
 		else:
 			# naming done with combination with joining year, month and 4 digits series
 			new_name = ''

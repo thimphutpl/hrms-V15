@@ -64,8 +64,8 @@
    "type": "Link"
   }
  ],
- "modified": "2024-08-09 15:28:46.837398",
- "modified_by": "pema.dhendup@thimphutechpark.bt",
+ "modified": "2024-10-17 14:32:56.031079",
+ "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Payroll",
  "number_cards": [],
@@ -75,7 +75,7 @@
  "quick_lists": [],
  "restrict_to_domain": "",
  "roles": [],
- "sequence_id": 22.0,
+ "sequence_id": 23.0,
  "shortcuts": [
   {
    "label": "Dashboard",
