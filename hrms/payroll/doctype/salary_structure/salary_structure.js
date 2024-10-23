@@ -344,7 +344,22 @@ frappe.ui.form.on('Salary Structure', {
 	},
 	eligible_for_tswf:function(frm){
 		calculate_others(frm);
-	}
+	},
+	eligible_for_hra: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_le: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_ltc: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_one_off_5_percent_indexation: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_one_off_fixed_payment: function(frm){
+		calculate_others(frm);
+	},
 })
 
 // dynamically display checkboxes based on Salary Component's status

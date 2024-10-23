@@ -2,6 +2,25 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Salary Component', {
+	setup: function(frm) {
+		frm.set_query("account", "accounts", function(doc, cdt, cdn) {
+			var d = locals[cdt][cdn];
+			return {
+				filters: {
+					"is_group": 0,
+					"company": d.company
+				}
+			};
+		});
+		// frm.set_query("earning_component_group", function() {
+		// 	return {
+		// 		filters: {
+		// 			"is_group": 1,
+		// 			"is_flexible_benefit": 1
+		// 		}
+		// 	};
+		// });
+	},
 	onload: function(frm){
 		frm.toggle_reqd(["payment_method"], (frm.doc.type == 'Earning' ? 1 : 0));
 	},
@@ -15,25 +34,6 @@ frappe.ui.form.on('Salary Component', {
 			frm.set_df_property('payment_method', 'reqd', 0)
 		}
 	}
-	// setup: function(frm) {
-	// 	frm.set_query("account", "accounts", function(doc, cdt, cdn) {
-	// 		var d = locals[cdt][cdn];
-	// 		return {
-	// 			filters: {
-	// 				"is_group": 0,
-	// 				"company": d.company
-	// 			}
-	// 		};
-	// 	});
-	// 	frm.set_query("earning_component_group", function() {
-	// 		return {
-	// 			filters: {
-	// 				"is_group": 1,
-	// 				"is_flexible_benefit": 1
-	// 			}
-	// 		};
-	// 	});
-	// },
 	// is_flexible_benefit: function(frm) {
 	// 	if(frm.doc.is_flexible_benefit){
 	// 		set_value_for_condition_and_formula(frm);

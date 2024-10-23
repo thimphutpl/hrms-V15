@@ -22,7 +22,7 @@
   "is_loan_component",
   "is_pf_deductible",
   "accounts_details_section",
-  "table_ayfl",
+  "accounts",
   "sb_posting_settings",
   "make_party_entry",
   "colume_break_5",
@@ -199,7 +199,7 @@
    "label": "Accounts Details"
   },
   {
-   "fieldname": "table_ayfl",
+   "fieldname": "accounts",
    "fieldtype": "Table",
    "options": "Salary Component Account"
   }
@@ -207,7 +207,7 @@
  "icon": "fa fa-flag",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-02 12:23:31.078364",
+ "modified": "2024-10-08 19:41:40.407091",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Component",

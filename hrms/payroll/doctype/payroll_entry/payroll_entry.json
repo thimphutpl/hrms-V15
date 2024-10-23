@@ -1,6 +1,5 @@
 {
  "actions": [],
- "allow_copy": 1,
  "autoname": "HR-PRUN-.YYYY.-.#####",
  "creation": "2017-10-23 15:22:29.291323",
  "doctype": "DocType",
@@ -134,7 +133,8 @@
   },
   {
    "fieldname": "sec_break20",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "no_copy": 1
   },
   {
    "fieldname": "employees",
@@ -249,6 +249,7 @@
    "fieldname": "salary_slips_created",
    "fieldtype": "Check",
    "label": "Salary Slips Created",
+   "no_copy": 1,
    "read_only": 1
   },
   {
@@ -256,6 +257,7 @@
    "fieldname": "salary_slips_submitted",
    "fieldtype": "Check",
    "label": "Salary Slips Submitted",
+   "no_copy": 1,
    "read_only": 1
   },
   {
@@ -366,7 +368,7 @@
  "icon": "fa fa-cog",
  "is_submittable": 1,
  "links": [],
- "modified": "2024-09-19 12:32:54.472481",
+ "modified": "2024-10-08 17:12:01.561394",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Payroll Entry",

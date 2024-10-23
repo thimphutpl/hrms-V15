@@ -294,7 +294,33 @@ class SalaryStructure(Document):
 						_("Percentage cannot exceed 200 for component <b>{0}</b>").format(m['name']), title="Invalid Data")
 
 				if ed == 'earnings':
-					if self.get(m['field_name']):
+					if self.get(m['field_name']) and m['name'] == 'HRA':
+						hra_allowance = frappe.db.get_single_value("HR Settings", "hra")
+						hra_lumpsum = frappe.db.get_single_value("HR Settings", "lumpsum_amt")
+						if not flt(hra_allowance):
+							frappe.throw("Setup HRA Percent in HR Settings")
+						elif not flt(hra_lumpsum):
+							frappe.throw("Setup HRA Lumpsum in HR Settings")
+
+						calc_amt = round(flt(basic_pay)*flt(hra_allowance)*0.01)
+						if flt(calc_amt) <= flt(hra_lumpsum):
+							calc_amt  = flt(hra_lumpsum)
+						total_earning += calc_amt
+						calc_map.append({'salary_component': m['name'], 'amount': calc_amt})
+					elif self.get(m['field_name']) and m['name'] in ('LE','LTC','One-off 5% Indexation','One-off fixed payment'):
+						if not self.employee_grade:
+							frappe.throw("Set Employee Grade in employees salary struture")
+						else:
+							if m['name']:
+								value = frappe.get_value("Allowances details", filters={"parent": m['name'], "positiongrade": self.employee_grade}, fieldname="amount_per_month")
+							if not value:
+								frappe.throw("Please set the amount for the {allowances} in the Allowances Doctype for this employee grade".format(allowances=m['name']))
+							calc_amt = flt(value)
+							total_earning += calc_amt
+							calc_map.append({'salary_component': m['name'], 'amount': calc_amt})
+							
+
+					elif self.get(m['field_name']):
 						if self.get(m["field_method"]) == 'Percent':
 							if m['based_on'] == 'Pay Scale Lower Limit':
 								calc_amt = flt(payscale_lower_limit)*flt(self.get(m['field_value']))*0.01
@@ -487,7 +513,7 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 				})
 		#Getting Approved OTs
 		ot_details = frappe.db.sql("""select  * from `tabOvertime Application` where docstatus = 1 and employee = '{0}' 
-			and processed = 0 and workflow_state = 'Approved' and posting_date <= '{1}'""".format(source.employee, end_date), as_dict =1)
+			and processed = 0 and posting_date <= '{1}'""".format(source.employee, end_date), as_dict =1)
 		# frappe.throw(str(ot_details))
 		total_overtime_amount = 0.0
 		for d in ot_details:
