@@ -1,0 +1,47 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-11-06 11:16:33.682555",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "heads_section",
+  "afd_head"
+ ],
+ "fields": [
+  {
+   "fieldname": "heads_section",
+   "fieldtype": "Section Break",
+   "label": "Heads"
+  },
+  {
+   "fieldname": "afd_head",
+   "fieldtype": "Link",
+   "label": "AFD Head",
+   "options": "User"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2024-11-06 11:18:54.661151",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Overall Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

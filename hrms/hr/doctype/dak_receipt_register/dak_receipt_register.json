@@ -1,0 +1,143 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "DAK-.######",
+ "creation": "2024-11-04 16:38:26.620654",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_i1ut",
+  "amended_from",
+  "header_section",
+  "date_of_receipt",
+  "postage",
+  "column_break_rntg",
+  "letter_no",
+  "main_section",
+  "from_whom_received",
+  "column_break_xgos",
+  "purpose",
+  "forward_section",
+  "employee",
+  "column_break_sine",
+  "employee_name",
+  "forward_id"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_i1ut",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "DAK Receipt Register",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "header_section",
+   "fieldtype": "Section Break",
+   "label": "Header"
+  },
+  {
+   "fieldname": "date_of_receipt",
+   "fieldtype": "Date",
+   "label": "Date of Receipt"
+  },
+  {
+   "fieldname": "column_break_rntg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "letter_no",
+   "fieldtype": "Data",
+   "label": "Letter No"
+  },
+  {
+   "fieldname": "main_section",
+   "fieldtype": "Section Break",
+   "label": "Main"
+  },
+  {
+   "fieldname": "from_whom_received",
+   "fieldtype": "Data",
+   "label": "From Whom Received"
+  },
+  {
+   "fieldname": "purpose",
+   "fieldtype": "Data",
+   "label": "Purpose"
+  },
+  {
+   "depends_on": "eval: frappe.user_roles.includes(\"AFD Head\")",
+   "fieldname": "forward_section",
+   "fieldtype": "Section Break",
+   "label": "Forward To"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "mandatory_depends_on": "eval: frappe.user_roles.includes(\"AFD Head\")",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "column_break_sine",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name"
+  },
+  {
+   "fieldname": "column_break_xgos",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "employee.user_id",
+   "fieldname": "forward_id",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "User ID",
+   "options": "User"
+  },
+  {
+   "fieldname": "postage",
+   "fieldtype": "Data",
+   "label": "Postage "
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2024-11-06 12:06:07.233258",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "DAK Receipt Register",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
