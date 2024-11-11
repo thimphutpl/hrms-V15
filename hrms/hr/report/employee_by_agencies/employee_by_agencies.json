@@ -6,11 +6,11 @@
  "docstatus": 0,
  "doctype": "Report",
  "filters": [],
- "idx": 0,
+ "idx": 7,
  "is_standard": "Yes",
- "letter_head": "Office of the Gyalpoi Zimpon",
+ "letter_head": "His Majesty's Secretariat",
  "letterhead": null,
- "modified": "2024-10-07 16:55:38.919686",
+ "modified": "2024-11-11 23:32:26.064991",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee By Agencies",
@@ -27,13 +27,7 @@
    "role": "HR Manager"
   },
   {
-   "role": "Employee"
-  },
-  {
-   "role": "Employee Self Service"
-  },
-  {
-   "role": "Dashboard Manager"
+   "role": "Master Dashboard"
   }
  ]
 }
