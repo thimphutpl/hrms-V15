@@ -1,0 +1,32 @@
+{
+ "chart_name": "Total Employee by  Agency",
+ "chart_type": "Report",
+ "creation": "2024-10-07 17:52:49.321333",
+ "custom_options": "{\"x_field\": \"agency\", \"chart_type\": \"Bar\", \"y_axis_fields\": [{\"idx\": 1, \"__islocal\": true, \"y_field\": \"total_number\", \"name\": \"row 1\"}], \"y_fields\": [\"total_number\"], \"colors\": [null]}",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart",
+ "filters_json": "{}",
+ "group_by_type": "Count",
+ "idx": 2,
+ "is_public": 1,
+ "is_standard": 1,
+ "modified": "2024-11-08 09:54:07.468621",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Total Employee by  Agency",
+ "number_of_groups": 0,
+ "owner": "Administrator",
+ "report_name": "Employee By Agencies",
+ "roles": [],
+ "time_interval": "Yearly",
+ "timeseries": 0,
+ "timespan": "Last Year",
+ "type": "Bar",
+ "use_report_chart": 0,
+ "x_field": "agency",
+ "y_axis": [
+  {
+   "y_field": "total_number"
+  }
+ ]
+}
