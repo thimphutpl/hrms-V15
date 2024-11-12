@@ -243,13 +243,13 @@ class SalaryStructure(Document):
 			for sc in frappe.db.sql("select * from `tabSalary Component` where `type`='{0}' and ifnull(field_name,'') != ''".format(tbl_list[ed]), as_dict=True):
 				sst_map.setdefault(ed, []).append(sc)
 			ed_map = [i.name for i in sst_map[ed]]
-
 			for ed_item in self.get(ed):
 				# validate component validity dates
 				if ed_item.from_date and ed_item.to_date and str(ed_item.to_date) < str(ed_item.from_date):
 					frappe.throw(_("<b>Row#{}:</b> Invalid <b>From Date</b> for <b>{}</b> under <b>{}s</b>").format(ed_item.idx, ed_item.salary_component, tbl_list[ed]))
-
+				
 				ed_item.amount = roundoff(ed_item.amount)
+				
 				amount = ed_item.amount
 
 				if ed_item.salary_component not in ed_map:
@@ -282,7 +282,6 @@ class SalaryStructure(Document):
 
 			if remove_flag:
 				[self.remove(d) for d in del_list]
-
 			# Calculating Earnings and Deductions based on preferences and values set
 			for m in sst_map[ed]:
 				calc_amt = 0
@@ -301,6 +300,7 @@ class SalaryStructure(Document):
 							else:
 								calc_amt = flt(basic_pay)*flt(self.get(m['field_value']))*0.01
 						else:
+							
 							calc_amt = flt(self.get(m['field_value']))
 						if not self.fixed_allowance:
 							if m["field_name"] == "eligible_for_fixed_allowance":
@@ -366,7 +366,10 @@ class SalaryStructure(Document):
 		return del_list_all
 
 def roundoff(amount):
-	return math.ceil(amount) if (amount - int(amount)) >= 0.5 else math.floor(amount)
+	if amount:
+		return math.ceil(amount) if (amount - int(amount)) >= 0.5 else math.floor(amount)
+	else:
+		return 0
 	
 @frappe.whitelist()
 def make_salary_slip(source_name, target_doc=None, calc_days={}):

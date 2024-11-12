@@ -26,8 +26,13 @@ class OvertimeApplication(Document):
 		if "Employee" not in frappe.get_roles(frappe.session.user):
 			frappe.msgprint(_("Only employee of {} can apply for Overtime").format(frappe.bold(self.company)), title="Not Allowed", indicator="red", raise_exception=1)
 
-		if cint(frappe.db.get_value('Employee Grade',self.grade,'eligible_for_overtime')) == 0:
+		salary_struc=frappe.db.sql("select name from `tabSalary Structure` where employee='{}' and is_active='Yes'".format(self.employee), as_dict=True)[0].name
+		if not salary_struc:
+			frappe.throw("There is no salary strcuture for the employee ")
+
+		if cint(frappe.db.get_value('Salary Structure',salary_struc,'eligible_for_overtime_and_payment')) == 0:
 			frappe.msgprint(_("You are not eligible for overtime"), title="Not Eligible", indicator="red", raise_exception=1)
+
 	def calculate_totals(self):			
 		settings = frappe.get_single("HR Settings")
 		overtime_limit_type, overtime_limit = settings.overtime_limit_type, flt(settings.overtime_limit)
@@ -57,13 +62,44 @@ class OvertimeApplication(Document):
 
 	def on_cancel(self):
 		# notify_workflow_states(self)
-		pass
+		self.update_salary_structure(True)
 
 	def on_submit(self):
-		pass
+		self.update_salary_structure()
+		
 		# notify_workflow_states(self)
+	def update_salary_structure(self, cancel=False):
+		if cancel:
+			rem_list = []
+			if self.salary_structure:
+				doc = frappe.get_doc("Salary Structure", self.salary_structure)
+				for d in doc.get("earnings"):
+					if d.salary_component == self.salary_component and self.name in (d.reference_number, d.ref_docname):
+						rem_list.append(d)
+
+				[doc.remove(d) for d in rem_list]
+				doc.save(ignore_permissions=True)
+		else:
+			if frappe.db.exists("Salary Structure", {"employee": self.employee, "is_active": "Yes"}):
+				doc = frappe.get_doc("Salary Structure", {"employee": self.employee, "is_active": "Yes"})
+				row = doc.append("earnings",{})
+				row.salary_component        = "Overtime Allowance"
+				# row.from_date               = self.recovery_start_date
+				# row.to_date                 = self.recovery_end_date
+				row.amount                  = flt(self.total_amount)
+				row.default_amount          = flt(self.total_amount)
+				row.reference_number        = self.name
+				row.ref_docname             = self.name
+				row.total_days_in_month     = 0
+				row.working_days            = 0
+				row.leave_without_pay       = 0
+				row.payment_days            = 0
+				doc.save(ignore_permissions=True)
+				# self.db_set("salary_structure", doc.name)
+			else:
+				frappe.throw(_("No active salary structure found for employee {0} {1}").format(self.employee, self.employee_name), title="No Data Found")
+
 	# Dont allow duplicate dates
-	##
 	def validate_dates(self):				
 		for a in self.items:
 			if not a.from_date or not a.to_date:

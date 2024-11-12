@@ -1,0 +1,335 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:id_card",
+ "creation": "2024-10-29 10:11:12.445466",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_n9hz",
+  "amended_from",
+  "id_card",
+  "section_break_pvyp",
+  "person_name",
+  "list_in_job_card",
+  "column_break_jfro",
+  "status",
+  "designation",
+  "column_break_nptv",
+  "project",
+  "qualification",
+  "section_break_ykwe",
+  "cost_center",
+  "column_break_lvtt",
+  "branch",
+  "column_break_mqgq",
+  "blood_group",
+  "section_break_suvz",
+  "date_of_joining",
+  "column_break_liah",
+  "date_of_seperation",
+  "column_break_rdhz",
+  "tpn_number",
+  "section_break_vczw",
+  "salary",
+  "column_break_btdw",
+  "rate_per_currency",
+  "rate_per_hour",
+  "column_break_wktn",
+  "bank",
+  "account_no",
+  "internal_work_history_section",
+  "internal_work_history",
+  "section_break_bycq",
+  "user_id",
+  "column_break_qstp",
+  "company",
+  "date_of_transfer",
+  "bank_details_section",
+  "bank_name",
+  "bank_branch",
+  "column_break_mkfo",
+  "bank_account_type",
+  "bank_ac_no"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_n9hz",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "GEP Employee",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "id_card",
+   "fieldtype": "Data",
+   "label": "ID Card",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "section_break_pvyp",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "person_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Full Name",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "list_in_job_card",
+   "fieldtype": "Check",
+   "label": "List in Job Card"
+  },
+  {
+   "fieldname": "column_break_jfro",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Active\nLeft",
+   "reqd": 1
+  },
+  {
+   "fieldname": "designation",
+   "fieldtype": "Data",
+   "label": "Designation"
+  },
+  {
+   "fieldname": "column_break_nptv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "label": "Project",
+   "options": "Project"
+  },
+  {
+   "fieldname": "qualification",
+   "fieldtype": "Data",
+   "label": "Qualification"
+  },
+  {
+   "fieldname": "section_break_ykwe",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center"
+  },
+  {
+   "fieldname": "column_break_lvtt",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Branch",
+   "options": "Branch",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_mqgq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "blood_group",
+   "fieldtype": "Link",
+   "label": "Blood Group",
+   "options": "Blood Group"
+  },
+  {
+   "fieldname": "section_break_suvz",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "date_of_joining",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date of Joining",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_liah",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.status == \"Left\"",
+   "fieldname": "date_of_seperation",
+   "fieldtype": "Date",
+   "label": "Date of Separation"
+  },
+  {
+   "fieldname": "column_break_rdhz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tpn_number",
+   "fieldtype": "Data",
+   "label": "TPN Number"
+  },
+  {
+   "fieldname": "section_break_vczw",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "salary",
+   "fieldtype": "Currency",
+   "label": "Salary Per Month",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_btdw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rate_per_currency",
+   "fieldtype": "Currency",
+   "label": "Rate Per Day",
+   "read_only": 1
+  },
+  {
+   "fieldname": "rate_per_hour",
+   "fieldtype": "Currency",
+   "label": "Over Time Amount/Hour",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_wktn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "bank",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Bank",
+   "options": "Financial Institution",
+   "read_only": 1
+  },
+  {
+   "fieldname": "account_no",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Account No.",
+   "read_only": 1
+  },
+  {
+   "fieldname": "internal_work_history_section",
+   "fieldtype": "Section Break",
+   "label": "INTERNAL WORK HISTORY"
+  },
+  {
+   "fieldname": "internal_work_history",
+   "fieldtype": "Table",
+   "options": "Employee Internal Work History",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_bycq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "user_id",
+   "fieldtype": "Link",
+   "label": "User Id",
+   "options": "User"
+  },
+  {
+   "fieldname": "column_break_qstp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "date_of_transfer",
+   "fieldtype": "Date",
+   "hidden": 1,
+   "label": "Date of Transfer"
+  },
+  {
+   "fieldname": "bank_details_section",
+   "fieldtype": "Section Break",
+   "label": "Bank Details"
+  },
+  {
+   "fieldname": "bank_name",
+   "fieldtype": "Link",
+   "label": "Bank Name",
+   "options": "Financial Institution"
+  },
+  {
+   "fieldname": "bank_branch",
+   "fieldtype": "Link",
+   "label": "Bank Branch",
+   "options": "Financial Institution Branch"
+  },
+  {
+   "fieldname": "column_break_mkfo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "bank_account_type",
+   "fieldtype": "Link",
+   "label": "Bank Account Type",
+   "options": "Bank Account Type"
+  },
+  {
+   "fieldname": "bank_ac_no",
+   "fieldtype": "Data",
+   "label": "Bank A/C No."
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2024-10-29 11:09:50.982587",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "GEP Employee",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "person_name, id_card",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "person_name",
+ "track_changes": 1
+}

@@ -22,6 +22,7 @@ class TravelAuthorization(Document):
         validate_workflow_states(self)
         self.validate_project()
         self.assign_end_date()
+        
         self.validate_advance()
         self.set_travel_period()
         self.validate_travel_dates(update=True)
@@ -32,7 +33,7 @@ class TravelAuthorization(Document):
             self.update_training_event()
 
     def on_update(self):
-        self.set_dsa_rate()
+        # self.set_dsa_rate()
         self.validate_travel_dates()
         self.check_double_dates()
         self.check_leave_applications()
@@ -110,8 +111,9 @@ class TravelAuthorization(Document):
 
     def validate_advance(self):
         self.advance_amount     = 0 if not self.need_advance else self.advance_amount
-        if self.advance_amount > self.estimated_amount * 0.75:
-            frappe.throw("Advance Amount cannot be greater than 75% of Total Estimated Amount")
+        #frappe.throw("hi")
+        if self.advance_amount > self.estimated_amount * 0.9:
+            frappe.throw("Advance Amount cannot be greater than 90% of Total Estimated Amount")
         self.advance_amount_nu  = 0 if not self.need_advance else self.advance_amount_nu
         self.advance_journal    = None if self.docstatus == 0 else self.advance_journal
 
@@ -314,53 +316,42 @@ class TravelAuthorization(Document):
             except:
                 pass
 
-    def set_dsa_rate(self):
+    # def set_dsa_rate(self):
         
-        if self.place_type=="In-Country":
-            if self.grade:
-                self.db_set("dsa_per_day", frappe.db.get_value("Employee Grade", self.grade, "dsa_per_day"))
+    #     if self.place_type=="In-Country":
+    #         if self.grade:
+    #             self.db_set("dsa_per_day", frappe.db.get_value("Employee Grade", self.grade, "dsa_per_day"))
                 
                 
-        elif self.place_type=="Out-Country":
-            if "India" in self.countrys:
-                roles=frappe.get_roles(self.owner)
+    #     elif self.place_type=="Out-Country":
+    #         if "India" in self.countrys:
+    #             roles=frappe.get_roles(self.owner)
             
-                if "CEO" in roles:
-                    ex_country_dsa=flt(frappe.db.get_value("DSA Out Country", self.countrys, "ceo"))
-                else:
-                    ex_country_dsa=flt(frappe.db.get_value("DSA Out Country", self.countrys, "others"))
-            else:
-                ex_country_dsa=flt(frappe.db.get_value("DSA Out Country", self.countrys, "dsa_rate"))
-            currency_from=frappe.db.get_value("DSA Out Country", self.countrys, "currency")
+    #             if "CEO" in roles:
+    #                 ex_country_dsa=flt(frappe.db.get_value("DSA Out Country", self.countrys, "ceo"))
+    #             else:
+    #                 ex_country_dsa=flt(frappe.db.get_value("DSA Out Country", self.countrys, "others"))
+    #         else:
+    #             ex_country_dsa=flt(frappe.db.get_value("DSA Out Country", self.countrys, "dsa_rate"))
+    #         currency_from=frappe.db.get_value("DSA Out Country", self.countrys, "currency")
             
-            ex_country_dsa=ex_country_dsa*flt(get_exchange_rate(currency_from, "BTN", self.posting_date ))
-            self.db_set("dsa_per_day", ex_country_dsa)
+    #         ex_country_dsa=ex_country_dsa*flt(get_exchange_rate(currency_from, "BTN", self.posting_date ))
+    #         self.db_set("dsa_per_day", ex_country_dsa)
 
       
     @frappe.whitelist()
     def set_estimate_amount(self):
         total_days = 0.0
-        dsa_rate = flt(frappe.db.get_value("Employee Grade", self.grade, "dsa_per_day"))
-        return_dsa = frappe.get_doc("HR Settings").return_day_dsa
         return_day = 1
         full_dsa = 0
         for i in self.items:
+
             from_date = i.date
             to_date   = i.date if not i.till_date else i.till_date
             no_days   = date_diff(to_date, from_date) + 1
-            # if i.quarantine:
-            # 	no_days = 0
-            total_days  += no_days
-            # frappe.msgprint("{0} {1}".format(from_date, total_days))
+            full_dsa+=flt(i.dsa_rate)*(flt(i.percent)/100)*flt(no_days)            
+        self.estimated_amount = flt(full_dsa) 
         
-        full_dsa = flt(total_days) - flt(return_day) 
-            
-        self.estimated_amount = (flt(full_dsa) * flt(dsa_rate))  + flt(return_day) * (flt(return_dsa)/100)* flt(dsa_rate) 
-        
-            
-                
-            
-              
     @frappe.whitelist()
     def check_double_dates(self):
         for i in self.get('items'):
@@ -391,12 +382,10 @@ def make_travel_claim(source_name, target_doc=None):
         target.currency = source_parent.currency
         target.currency_exchange_date = source_parent.posting_date
         target.within_the_dzongkhag=source_parent.within_the_dzongkhag
-        target.food=source_parent.food
-        target.lodge=source_parent.lodge
-        target.incidental_expense=source_parent.incidental_expense 
         
-        target.dsa = source_parent.dsa_per_day
-        target.country=source_parent.countrys
+        target.dsa = source_parent.dsa_rate
+        target.dsa_percent = source_parent.percent
+        target.country=source_parent.country
             
         if target.currency == "BTN":
             target.exchange_rate = 1
@@ -404,44 +393,21 @@ def make_travel_claim(source_name, target_doc=None):
             target.exchange_rate = get_exchange_rate(target.currency, "BTN", date=source_parent.posting_date)
         
         target.amount = target.dsa
-        target.dsa_percent= 100
-        if target.halt:
-            
-                
-            target.amount = flt(target.dsa) * flt(target.no_days)
-            
-            if source_parent.food==1 and source_parent.lodge==1 and source_parent.incidental_expense==1:
-                target.dsa_percent='20'
-            elif source_parent.food==1 and source_parent.lodge==1:
-                target.dsa_percent='30'
-            elif source_parent.lodge==1:
-                target.dsa_percent='50'
-            elif source_parent.food==1:
-                target.dsa_percent='75'
-            
-            target.dsa=flt(target.dsa)
-            target.amount = flt(target.dsa) * flt(target.no_days) 
-            
-        else:
-            
-            target.dsa = flt(frappe.db.get_value("Employee Grade", source_parent.grade, "dsa_per_day"))
-            target.amount = flt(target.dsa)
-             
-            
-            
+              
         target.actual_amount = target.amount * target.exchange_rate * (flt(target.dsa_percent)/100)
         target.amount=target.actual_amount
         
     def adjust_last_date(source, target):
-        target.within_the_dzongkhag=source.within_the_dzongkhag
-        dsa_percent = frappe.db.get_single_value("HR Settings", "return_day_dsa")
+        pass
+        # target.within_the_dzongkhag=source.within_the_dzongkhag
+        # dsa_percent = frappe.db.get_single_value("HR Settings", "return_day_dsa")
         
         
-        if target.items[len(target.items) - 1].halt!=1:
-            target.items[len(target.items) - 1].dsa_percent = dsa_percent
-            target.items[len(target.items) - 1].actual_amount = flt(target.items[len(target.items) - 1].actual_amount) * flt(dsa_percent)/100
-            target.items[len(target.items) - 1].amount = flt(target.items[len(target.items) - 1].amount) * flt(dsa_percent)/100
-            target.items[len(target.items) - 1].last_day = 1 
+        # if target.items[len(target.items) - 1].halt!=1:
+        #     target.items[len(target.items) - 1].dsa_percent = dsa_percent
+        #     target.items[len(target.items) - 1].actual_amount = flt(target.items[len(target.items) - 1].actual_amount) * flt(dsa_percent)/100
+        #     target.items[len(target.items) - 1].amount = flt(target.items[len(target.items) - 1].amount) * flt(dsa_percent)/100
+        #     target.items[len(target.items) - 1].last_day = 1 
         
 
     doc = get_mapped_doc("Travel Authorization", source_name, {

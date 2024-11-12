@@ -151,17 +151,17 @@ frappe.ui.form.on('Travel Authorization', {
 	},
 	"advance_amount": function (frm) {
 		// if (frm.doc.advance_amount > frm.doc.estimated_amount * 0.9) {
-		// 	msgprint("Advance amount cannot be greater than 90% of the estimated amount")
-		// 	frm.set_value("advance_amount", 0)
+		 //	msgprint("Advance amount cannot be greater than 90% of the estimated amount")
+		 //	frm.set_value("advance_amount", 0)
 		// }
-		// else {
+	//	 else {
 		if (frm.doc.currency == "BTN") {
 			frm.set_value("advance_amount_nu", flt(frm.doc.advance_amount))
 		}
 		else {
 			update_advance_amount(frm)
 		}
-		// }
+	       // }
 	},
 	"document_status": function (frm) {
 		if (frm.doc.document_status == "Rejected") {
@@ -234,6 +234,7 @@ frappe.ui.form.on("Travel Authorization Item", {
 			
 			//Tandin Phuntsho: setting the field to read only. somehow the toggle_editable is not working
 			frm.fields_dict['items'].grid.grid_rows_by_docname[cdn].docfields[3].read_only=1
+			frm.fields_dict['items'].grid.grid_rows_by_docname[cdn].docfields[12].read_only=1
 			frm.fields_dict['items'].grid.grid_rows_by_docname[cdn].toggle_editable('halt', false);
 			frm.fields_dict['items'].grid.grid_rows_by_docname[cdn].toggle_editable('halt_at', false);
 			frm.fields_dict['items'].grid.grid_rows_by_docname[cdn].toggle_editable('return_same_day', true);
@@ -244,6 +245,7 @@ frappe.ui.form.on("Travel Authorization Item", {
 		else {
 			
 			halt.read_only = 0;
+			frm.fields_dict['items'].grid.grid_rows_by_docname[cdn].docfields[12].read_only=0
 			frm.fields_dict['items'].grid.grid_rows_by_docname[cdn].toggle_editable('halt', true);
 			frm.fields_dict['items'].grid.grid_rows_by_docname[cdn].toggle_editable('halt_at', true);
 			frm.fields_dict['items'].grid.grid_rows_by_docname[cdn].toggle_editable('return_same_day', false);

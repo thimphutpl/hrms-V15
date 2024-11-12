@@ -60,6 +60,9 @@
   "approver_settings_tab",
   "hr_approver",
   "hrgm",
+  "column_break_scpi",
+  "hr_approver_name",
+  "hrgm_name",
   "overtime_settings_tab",
   "overtime_limit_type",
   "column_break_ligd",
@@ -417,13 +420,29 @@
    "fieldname": "return_day_dsa",
    "fieldtype": "Percent",
    "label": "Return Day DSA Percent"
+  },
+  {
+   "fieldname": "column_break_scpi",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "hr_approver.employee_name",
+   "fieldname": "hr_approver_name",
+   "fieldtype": "Data",
+   "label": "HR Approver Name"
+  },
+  {
+   "fetch_from": "hrgm.employee_name",
+   "fieldname": "hrgm_name",
+   "fieldtype": "Data",
+   "label": "HRGM Name"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-10-16 13:06:46.001175",
+ "modified": "2024-10-31 16:00:06.721359",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",

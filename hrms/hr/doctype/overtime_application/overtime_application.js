@@ -6,18 +6,33 @@ frappe.ui.form.on('Overtime Application', {
 		if(!frm.doc.posting_date) {
 			frm.set_value("posting_date", get_today())
 		}
+		// frappe.call({
+		// 	method:'frappe.client.get_value',
+		// 	args:{
+		// 		doctype:'Salary Structure',
+		// 		filters:{
+		// 			'name':frm.doc.grade
+		// 		},
+		// 		fieldname:'eligible_for_overtime',
+		// 	},
+		// 	callback:function(r){
+		// 		if (cint(r.message.eligible_for_overtime) == 0 ){
+		// 			frappe.msgprint(_("You are not eligible for overtime"), title="Error", indicator="red", raise_exception=1)
+		// 		}
+		// 	}
+		// })
 	},
 	refresh: function(frm){
-		//enable_disable(frm);
-		frm.set_query("approver", function() {
-                        return {
-                                query: "erpnext.custom_workflow.approver_list",
-                                filters: {
-                                        employee: frm.doc.employee
-                                }
-                        };
-                });	
-		//set_approver(frm);
+		// enable_disable(frm);
+		// frm.set_query("approver", function() {
+        //                 return {
+        //                         query: "erpnext.custom_workflow.approver_list",
+        //                         filters: {
+        //                                 employee: frm.doc.employee
+        //                         }
+        //                 };
+        //         });	
+		// set_approver(frm);
 	},
 	approver: function(frm) {
 		if(frm.doc.approver){
@@ -29,21 +44,21 @@ frappe.ui.form.on('Overtime Application', {
 		frm.set_value("total_amount", flt(frm.doc.rate) * flt(frm.doc.total_hours))
 	},
 	grade:function(frm){
-		frappe.call({
-			method:'frappe.client.get_value',
-			args:{
-				doctype:'Employee Grade',
-				filters:{
-					'name':frm.doc.grade
-				},
-				fieldname:'eligible_for_overtime',
-			},
-			callback:function(r){
-				if (cint(r.message.eligible_for_overtime) == 0 ){
-					frappe.msgprint(_("You are not eligible for overtime"), title="Error", indicator="red", raise_exception=1)
-				}
-			}
-		})
+		// frappe.call({
+		// 	method:'frappe.client.get_value',
+		// 	args:{
+		// 		doctype:'Salary Structure',
+		// 		filters:{
+		// 			'name':frm.doc.grade
+		// 		},
+		// 		fieldname:'eligible_for_overtime',
+		// 	},
+		// 	callback:function(r){
+		// 		if (cint(r.message.eligible_for_overtime) == 0 ){
+		// 			frappe.msgprint(_("You are not eligible for overtime"), title="Error", indicator="red", raise_exception=1)
+		// 		}
+		// 	}
+		// })
 	}
 });
 frappe.ui.form.on("Overtime Application Item", {
@@ -141,28 +156,28 @@ function enable_disable(frm){
 	}
 	else {
 		// Request Creator
-		if(in_list(user_roles, "Employee") && (frm.doc.workflow_state.indexOf("Draft") >= 0 || frm.doc.workflow_state.indexOf("Rejected") >= 0)){
+		if(in_list(frappe.user_roles, "Employee") && (frm.doc.workflow_state.indexOf("Draft") >= 0 || frm.doc.workflow_state.indexOf("Rejected") >= 0)){
 			if(frappe.session.user === frm.doc.owner){
 				toggle_form_fields(frm, toggle_fields, 0);
 			}
 		}
 		
 		// OT Supervisor
-		if(in_list(user_roles, "OT Supervisor") && frm.doc.workflow_state.indexOf("Waiting Approval") >= 0){
+		if(in_list(frappe.user_roles, "OT Supervisor") && frm.doc.workflow_state.indexOf("Waiting Approval") >= 0){
 			if(frappe.session.user != frm.doc.owner){
 				toggle_form_fields(frm, toggle_fields, 0);
 			}
 		}
 		
 		// OT Approver
-		if(in_list(user_roles, "OT Approver") && frm.doc.workflow_state.indexOf("Verified by Supervisor") >= 0){
+		if(in_list(frappe.user_roles, "OT Approver") && frm.doc.workflow_state.indexOf("Verified by Supervisor") >= 0){
 			toggle_form_fields(frm, toggle_fields, 0);
 		}
 	}
 }
 
 frappe.ui.form.on("Overtime Application", "after_save", function(frm, cdt, cdn){
-	if(in_list(user_roles, "OT Supervisor") || in_list(user_roles, "OT Approver")){
+	if(in_list(frappe.user_roles, "OT Supervisor") || in_list(frappe.user_roles, "OT Approver")){
 		if (frm.doc.workflow_state && frm.doc.workflow_state.indexOf("Rejected") >= 0){
 			frappe.prompt([
 				{

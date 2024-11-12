@@ -356,35 +356,6 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Muster Roll Management",
-   "link_count": 2,
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Muster Roll Application",
-   "link_count": 0,
-   "link_to": "MusterRoll Application",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Muster Roll Employee",
-   "link_count": 0,
-   "link_to": "Muster Roll Employee",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
    "label": "Payroll",
    "link_count": 1,
    "link_type": "DocType",
@@ -453,8 +424,47 @@
   {
    "hidden": 0,
    "is_query_report": 0,
+   "label": "Muster Roll Management",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Muster Roll Application",
+   "link_count": 0,
+   "link_to": "MusterRoll Application",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Muster Roll Employee",
+   "link_count": 0,
+   "link_to": "Muster Roll Employee",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Upload Attendance & Overtime for MR",
+   "link_count": 0,
+   "link_to": "Bulk Upload Tool",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
    "label": "Expense Claim",
-   "link_count": 5,
+   "link_count": 4,
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
@@ -482,16 +492,6 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Travel Request",
-   "link_count": 0,
-   "link_to": "Travel Request",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
    "label": "Travel Authorization",
    "link_count": 0,
    "link_to": "Travel Authorization",
@@ -510,8 +510,8 @@
    "type": "Link"
   }
  ],
- "modified": "2024-10-21 09:45:39.943981",
- "modified_by": "kinzang.namgyal@cdcl.bt",
+ "modified": "2024-10-31 15:57:27.292721",
+ "modified_by": "sonam.choki@thimphutechpark.bt",
  "module": "HR",
  "name": "HR",
  "number_cards": [],

@@ -28,16 +28,13 @@
   "training_event",
   "training_event_child_ref",
   "place_type",
-  "countrys",
   "col_break_mode",
   "mode_of_travel",
-  "business_activity",
   "travel_details",
-  "lodge",
   "column_break_iirtw",
-  "food",
-  "column_break_t4v0o",
-  "incidental_expense",
+  "sponsorship",
+  "column_break_deeg",
+  "if_sponsorship_is_others",
   "section_break_s22dq",
   "within_the_dzongkhag",
   "items",
@@ -174,6 +171,7 @@
    "options": "Cost Center"
   },
   {
+   "fetch_from": "grade.dsa_per_day",
    "fieldname": "dsa_per_day",
    "fieldtype": "Currency",
    "label": "DSA Per Day"
@@ -208,18 +206,6 @@
    "label": "Mode of Travel",
    "options": "\nFlight\nTrain\nTaxi\nOffice Car\nPersonal Car",
    "reqd": 1
-  },
-  {
-   "fieldname": "business_activity",
-   "fieldtype": "Link",
-   "label": "Business Activity",
-   "options": "Business Activity",
-   "reqd": 1
-  },
-  {
-   "fieldname": "travel_details",
-   "fieldtype": "Section Break",
-   "label": "Sponsership"
   },
   {
    "allow_on_submit": 1,
@@ -415,6 +401,7 @@
    "label": "For Maintenance/Project"
   },
   {
+   "fetch_from": "supervisor.email",
    "fieldname": "supervisor_manager",
    "fieldtype": "Link",
    "label": "Supervisor Manager Email",
@@ -472,43 +459,33 @@
    "label": "Travel Claim"
   },
   {
-   "default": "0",
-   "fieldname": "lodge",
-   "fieldtype": "Check",
-   "label": "Lodge"
+   "fieldname": "travel_details",
+   "fieldtype": "Section Break",
+   "label": "Sponsorship"
+  },
+  {
+   "fieldname": "column_break_deeg",
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "column_break_iirtw",
    "fieldtype": "Column Break"
   },
   {
-   "default": "0",
-   "fieldname": "food",
-   "fieldtype": "Check",
-   "label": "Food"
+   "fieldname": "sponsorship",
+   "fieldtype": "Select",
+   "label": "Sponsorship",
+   "options": "CDCL\nOthers"
   },
   {
-   "fieldname": "column_break_t4v0o",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "0",
-   "fieldname": "incidental_expense",
-   "fieldtype": "Check",
-   "label": "Incidental Expense"
-  },
-  {
-   "depends_on": "eval: doc.place_type==\"Out-Country\"",
-   "fieldname": "countrys",
-   "fieldtype": "Link",
-   "label": "Country",
-   "mandatory_depends_on": "eval: doc.place_type==\"Out-Country\"",
-   "options": "DSA Out Country"
+   "fieldname": "if_sponsorship_is_others",
+   "fieldtype": "Data",
+   "label": "If sponsorship is others"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-10-16 12:37:57.066915",
+ "modified": "2024-10-31 16:45:32.454452",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",

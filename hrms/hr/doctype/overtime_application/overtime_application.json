@@ -47,22 +47,13 @@
   "salary_component",
   "column_break_20",
   "payment_jv",
-  "salary_slip",
-  "business_activity"
+  "salary_slip"
  ],
  "fields": [
   {
    "fieldname": "section_break_1",
    "fieldtype": "Section Break",
    "label": "Application Status"
-  },
-  {
-   "default": "Common",
-   "fieldname": "business_activity",
-   "fieldtype": "Link",
-   "label": "Business Activity",
-   "options": "Business Activity",
-   "read_only": 1
   },
   {
    "default": "Open",
@@ -334,7 +325,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-08-20 10:14:45.058055",
+ "modified": "2024-11-08 14:16:21.712102",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Overtime Application",

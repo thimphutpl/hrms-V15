@@ -12,6 +12,7 @@
   "salary_component",
   "salary_component_abbr",
   "description",
+  "gl_head",
   "enabled",
   "col_break",
   "type",
@@ -21,10 +22,12 @@
   "default",
   "is_loan_component",
   "is_pf_deductible",
+  "group_by_institution_name",
   "accounts_details_section",
   "table_ayfl",
   "sb_posting_settings",
   "make_party_entry",
+  "make_cc_entry",
   "colume_break_5",
   "clubbed_component",
   "remittance_settings_section",
@@ -202,12 +205,30 @@
    "fieldname": "table_ayfl",
    "fieldtype": "Table",
    "options": "Salary Component Account"
+  },
+  {
+   "default": "0",
+   "fieldname": "group_by_institution_name",
+   "fieldtype": "Check",
+   "label": "Group By Institution Name"
+  },
+  {
+   "default": "0",
+   "fieldname": "make_cc_entry",
+   "fieldtype": "Check",
+   "label": "Make Cost Center Wise Entries"
+  },
+  {
+   "fieldname": "gl_head",
+   "fieldtype": "Link",
+   "label": "GL Head",
+   "options": "Account"
   }
  ],
  "icon": "fa fa-flag",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-02 12:23:31.078364",
+ "modified": "2024-11-06 12:55:49.826123",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Component",

@@ -48,6 +48,9 @@
   "eligible_for_shift",
   "shift_method",
   "shift",
+  "eligible_for_underground_allowance",
+  "eligible_for_underground_allowance_payment_method",
+  "valueunderground_allowance",
   "cb_10",
   "eligible_for_difficulty",
   "difficulty_method",
@@ -64,6 +67,9 @@
   "eligible_for_deputation",
   "deputation_method",
   "deputation",
+  "eligible_for_project_deployment_allowance",
+  "eligible_for_project_deployment_allowance_payment_method",
+  "valueproject_deployment_allowance",
   "cb_12",
   "eligible_for_officiating_allowance",
   "officiating_allowance_method",
@@ -84,9 +90,6 @@
   "eligible_for_fixed_allowance",
   "fixed_allowance_method",
   "fixed_allowance",
-  "eligible_for_talent_retention_allowance",
-  "eligible_talent_retention_method",
-  "talent_retention_allowance",
   "sb_other_benefits",
   "eligible_for_gis",
   "eligible_for_pf",
@@ -167,7 +170,6 @@
   {
    "fieldname": "company",
    "fieldtype": "Link",
-   "hidden": 1,
    "in_filter": 1,
    "label": "Company",
    "options": "Company"
@@ -834,25 +836,6 @@
    "label": "Eligible for Fixed Allowance"
   },
   {
-   "default": "0",
-   "fieldname": "eligible_for_talent_retention_allowance",
-   "fieldtype": "Check",
-   "label": "Eligible for Talent Retention Allowance"
-  },
-  {
-   "depends_on": "eligible_for_talent_retention_allowance",
-   "fieldname": "eligible_talent_retention_method",
-   "fieldtype": "Select",
-   "label": "Payment Method",
-   "options": "Percent\nLumpsum"
-  },
-  {
-   "depends_on": "eligible_for_talent_retention_allowance",
-   "fieldname": "talent_retention_allowance",
-   "fieldtype": "Currency",
-   "label": "Value"
-  },
-  {
    "depends_on": "eligible_for_fixed_allowance",
    "fieldname": "fixed_allowance_method",
    "fieldtype": "Select",
@@ -864,12 +847,58 @@
    "fieldname": "fixed_allowance",
    "fieldtype": "Currency",
    "label": "Value"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_project_deployment_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Project Deployment Allowance"
+  },
+  {
+   "default": "Percent",
+   "depends_on": "eligible_for_project_deployment_allowance",
+   "fieldname": "eligible_for_project_deployment_allowance_payment_method",
+   "fieldtype": "Select",
+   "label": "Eligible for Project Deployment Allowance Payment Method",
+   "options": "Percent\nLumpsum",
+   "print_hide": 1
+  },
+  {
+   "default": "30",
+   "depends_on": "eval:doc.eligible_for_project_deployment_allowance==1",
+   "fieldname": "valueproject_deployment_allowance",
+   "fieldtype": "Int",
+   "label": "Value(Project Deployment Allowance)",
+   "print_hide": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_underground_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Underground Allowance"
+  },
+  {
+   "default": "Percent",
+   "depends_on": "eligible_for_underground_allowance",
+   "fieldname": "eligible_for_underground_allowance_payment_method",
+   "fieldtype": "Select",
+   "label": "Eligible for Underground Allowance Payment Method",
+   "options": "Percent\nLumpsum",
+   "print_hide": 1
+  },
+  {
+   "default": "45",
+   "depends_on": "eval:doc.eligible_for_underground_allowance==1",
+   "fieldname": "valueunderground_allowance",
+   "fieldtype": "Int",
+   "label": "Value(Underground Allowance)",
+   "print_hide": 1
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2024-08-02 12:07:17.609868",
+ "modified": "2024-11-08 16:37:49.651044",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",

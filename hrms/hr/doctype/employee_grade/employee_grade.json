@@ -9,12 +9,15 @@
  "engine": "InnoDB",
  "field_order": [
   "default_salary_structure",
+  "default_leave_policy",
   "currency",
   "default_base_pay",
+  "government_grade",
   "column_break_vaoa",
   "sub_level",
   "gis",
   "dsa_per_day",
+  "sws_contribution",
   "pay_scale_section",
   "lower_limit",
   "column_break_tgfh",
@@ -28,7 +31,9 @@
   "column_break_adwe",
   "promote_to_grade",
   "allowances_section",
-  "fixed_allowance"
+  "fixed_allowance",
+  "column_break_zzpy",
+  "ltc"
  ],
  "fields": [
   {
@@ -139,11 +144,36 @@
    "fieldname": "fixed_allowance",
    "fieldtype": "Currency",
    "label": "Fixed Allowance"
+  },
+  {
+   "fieldname": "sws_contribution",
+   "fieldtype": "Data",
+   "label": "SWS Contribution"
+  },
+  {
+   "fieldname": "default_leave_policy",
+   "fieldtype": "Link",
+   "label": "Default Leave Policy",
+   "options": "Leave Policy"
+  },
+  {
+   "fieldname": "government_grade",
+   "fieldtype": "Data",
+   "label": "Government Grade"
+  },
+  {
+   "fieldname": "column_break_zzpy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ltc",
+   "fieldtype": "Currency",
+   "label": "LTC"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-22 21:35:17.936503",
+ "modified": "2024-11-04 14:08:11.302141",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Grade",

@@ -344,7 +344,25 @@ frappe.ui.form.on('Salary Structure', {
 	},
 	eligible_for_tswf:function(frm){
 		calculate_others(frm);
-	}
+	},
+	eligible_for_underground_allowance: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_project_deployment_allowance: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_project_deployment_allowance_payment_method: function(frm){
+		calculate_others(frm);
+	},
+	valueproject_deployment_allowance: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_underground_allowance_payment_method: function(frm){
+		calculate_others(frm);
+	},
+	valueunderground_allowance: function(frm){
+		calculate_others(frm);
+	},
 })
 
 // dynamically display checkboxes based on Salary Component's status

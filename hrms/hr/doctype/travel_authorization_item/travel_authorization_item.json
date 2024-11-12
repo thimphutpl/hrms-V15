@@ -13,6 +13,8 @@
   "till_date",
   "no_days",
   "from_place",
+  "dsa_rate",
+  "percent",
   "column_break_9",
   "to_place",
   "halt_at",
@@ -150,12 +152,22 @@
    "fieldtype": "Dynamic Link",
    "label": "Reference Name",
    "options": "reference_type"
+  },
+  {
+   "fieldname": "dsa_rate",
+   "fieldtype": "Currency",
+   "label": "DSA Rate"
+  },
+  {
+   "fieldname": "percent",
+   "fieldtype": "Percent",
+   "label": "Percent"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-10-11 12:46:54.447530",
+ "modified": "2024-10-31 16:47:47.081174",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization Item",

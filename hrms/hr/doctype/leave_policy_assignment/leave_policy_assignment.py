@@ -138,11 +138,12 @@ class LeavePolicyAssignment(Document):
 		# Earned Leaves and Compensatory Leaves are allocated by scheduler, initially allocate 0
 		if leave_details.is_compensatory:
 			new_leaves_allocated = 0
+			
 
-		elif leave_details.is_earned_leave:
-			new_leaves_allocated = self.get_leaves_for_passed_months(
-				annual_allocation, leave_details, date_of_joining
-			)
+		# elif leave_details.is_earned_leave:
+		# 	new_leaves_allocated = self.get_leaves_for_passed_months(
+		# 		annual_allocation, leave_details, date_of_joining
+		# 	)
 
 		else:
 			# calculate pro-rated leaves for other leave types
@@ -233,7 +234,7 @@ class LeavePolicyAssignment(Document):
 		)
 		current_date, from_date = _get_current_and_from_date()
 		months_passed = _get_months_passed(current_date, from_date, consider_current_month)
-
+	
 		if months_passed > 0:
 			new_leaves_allocated = _calculate_leaves_for_passed_months(consider_current_month)
 		else:
