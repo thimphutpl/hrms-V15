@@ -202,7 +202,7 @@ class IncrementEntry(Document):
 				grade= frappe.get_doc("Employee Grade", frappe.db.get_value("Employee",employee,"grade"))
 				payscale_minimum   = grade.lower_limit
 				payscale_increment_method = grade.increment_method
-				payscale_increment = grade.increment
+				payscale_increment = grade.increment_value
 				payscale_maximum   = grade.upper_limit 
 
 				# Calculating increment
@@ -238,7 +238,7 @@ def get_salary_structure(employee, effective_date):
 			and is_active = 'Yes'
 			and ifnull(to_date,'{1}') >= '{1}'
 			and from_date <= ifnull(to_date,'{1}') 
-			order by ifnull(to_date,'{1}'),from_date desc limit 1
+			order by ifnull(to_date,'{1}'), from_date desc limit 1
 		""".format(employee,str(effective_date)))
 
 	if sst:

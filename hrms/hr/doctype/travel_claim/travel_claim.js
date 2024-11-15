@@ -1,11 +1,6 @@
-// Copyright (c) 2024, Frappe Technologies Pvt. Ltd. and contributors
+// Copyright (c) 2016, Frappe Technologies Pvt. Ltd. and contributors
 // For license information, please see license.txt
 
-// frappe.ui.form.on("Travel Claim", {
-// 	refresh(frm) {
-
-// 	},
-// });
 cur_frm.add_fetch("employee", "branch", "branch");
 frappe.ui.form.on('Travel Claim', {
 	"items_on_form_rendered": function (frm, grid_row, cdt, cdn) {
@@ -145,6 +140,24 @@ function get_project_or_maintenance_cost_center(frm) {
 
 frappe.ui.form.on("Travel Claim Item", {
 	"form_render": function (frm, cdt, cdn) {
+		
+		frappe.model.set_value(cdt, cdn, "travel_authorization", frm.doc.ta);
+		frappe.model.set_value(cdt, cdn, "currency_exchange_date", frm.doc.ta_date);
+		frm.refresh_field("items");
+		var item = frappe.get_doc(cdt, cdn)
+		
+		if (item.idx!=0){
+			// console.log(frm.fields_dict['items'].grid.grid_rows_by_docname[cdn]);
+			frm.fields_dict['items'].grid.grid_rows_by_docname[cdn].docfields[3].read_only=0
+			frappe.model.set_value(cdt, cdn, "halt", 0)
+			
+
+		}
+		if (item.halt==0){
+			frm.fields_dict['items'].grid.grid_rows_by_docname[cdn].toggle_editable('to_place', true)
+			frm.fields_dict['items'].grid.grid_rows_by_docname[cdn].toggle_editable('from_place', true)
+		}
+		frm.refresh_field("items");
 		if (frm.doc.__islocal) {
 			var item = frappe.get_doc(cdt, cdn)
 			// if (item.halt == 0) {
@@ -203,6 +216,10 @@ frappe.ui.form.on("Travel Claim Item", {
 	},
 	"date": function (frm, cdt, cdn) {
 		update_days(frm, cdt, cdn);
+		var items = frappe.get_doc(cdt, cdn)
+		if(items.halt==0){
+			frappe.model.set_value(cdt, cdn, "till_date", items.date)
+		}
 	},
 	"till_date": function (frm, cdt, cdn) {
 		update_days(frm, cdt, cdn);
@@ -327,79 +344,79 @@ function do_update(frm, cdt, cdn) {
 		frappe.model.set_value(cdt, cdn, "amount", flt(amount));
 	}
 	//If there is visa fee
-	// if(item.visa_fees_currency != "BTN"){
-	// 	frappe.call({
-	// 		method: "hrms.hr.doctype.travel_authorization.travel_authorization.get_exchange_rate",
-	// 		args: {
-	// 			"from_currency": item.visa_fees_currency,
-	// 			"to_currency": "BTN",
-	// 			"date": item.currency_exchange_date
-	// 		},
-	// 		async: false,
-	// 		callback: function(vf){
-	// 			if(vf.message){
-	// 				frappe.model.set_value(cdt, cdn, "actual_amount", flt(vf.message)*flt(item.visa_fees) + flt(amount))	
-	// 				frappe.model.set_value(cdt, cdn, "amount", flt(vf.message)*flt(item.visa_fees) + flt(amount))
-	// 				amount = flt(vf.message)*flt(item.visa_fees) + flt(amount);
-	// 			}
+	if(item.visa_fees_currency != "BTN"){
+		frappe.call({
+			method: "hrms.hr.doctype.travel_authorization.travel_authorization.get_exchange_rate",
+			args: {
+				"from_currency": item.visa_fees_currency,
+				"to_currency": "BTN",
+				"date": item.currency_exchange_date
+			},
+			async: false,
+			callback: function(vf){
+				if(vf.message){
+					frappe.model.set_value(cdt, cdn, "actual_amount", flt(vf.message)*flt(item.visa_fees) + flt(amount))	
+					frappe.model.set_value(cdt, cdn, "amount", flt(vf.message)*flt(item.visa_fees) + flt(amount))
+					amount = flt(vf.message)*flt(item.visa_fees) + flt(amount);
+				}
 
-	// 		}
-	// 	})
-	// }
-	// else {
-	// 	frappe.model.set_value(cdt, cdn, "actual_amount", flt(item.visa_fees) + flt(amount))
-	// 	frappe.model.set_value(cdt, cdn, "amount", flt(item.visa_fees) + flt(amount))
-	// 	amount = flt(item.visa_fees) + flt(amount)
-	// }
+			}
+		})
+	}
+	else {
+		frappe.model.set_value(cdt, cdn, "actual_amount", flt(item.visa_fees) + flt(amount))
+		frappe.model.set_value(cdt, cdn, "amount", flt(item.visa_fees) + flt(amount))
+		amount = flt(item.visa_fees) + flt(amount)
+	}
 	//If there is passport fee
-	// if(item.passport_fees_currency != "BTN"){
-	// 	frappe.call({
-	// 		method: "hrms.hr.doctype.travel_authorization.travel_authorization.get_exchange_rate",
-	// 		args: {
-	// 			"from_currency": item.passport_fees_currency,
-	// 			"to_currency": "BTN",
-	// 			"date": item.currency_exchange_date
-	// 		},
-	// 		async: false,
-	// 		callback: function(vf){
-	// 			if(vf.message){
-	// 				frappe.model.set_value(cdt, cdn, "actual_amount", flt(vf.message)*flt(item.passport_fees) + flt(amount))	
-	// 				frappe.model.set_value(cdt, cdn, "amount", flt(vf.message)*flt(item.passport_fees) + flt(amount))
-	// 				amount = flt(vf.message)*flt(item.passport_fees) + flt(amount)
-	// 			}
+	if(item.passport_fees_currency != "BTN"){
+		frappe.call({
+			method: "hrms.hr.doctype.travel_authorization.travel_authorization.get_exchange_rate",
+			args: {
+				"from_currency": item.passport_fees_currency,
+				"to_currency": "BTN",
+				"date": item.currency_exchange_date
+			},
+			async: false,
+			callback: function(vf){
+				if(vf.message){
+					frappe.model.set_value(cdt, cdn, "actual_amount", flt(vf.message)*flt(item.passport_fees) + flt(amount))	
+					frappe.model.set_value(cdt, cdn, "amount", flt(vf.message)*flt(item.passport_fees) + flt(amount))
+					amount = flt(vf.message)*flt(item.passport_fees) + flt(amount)
+				}
 
-	// 		}
-	// 	})
-	// }
-	// else {
-	// 	frappe.model.set_value(cdt, cdn, "actual_amount", flt(item.passport_fees) + flt(amount))
-	// 	frappe.model.set_value(cdt, cdn, "amount", flt(item.passport_fees) + flt(amount))
-	// 	amount = flt(item.passport_fees) + flt(amount);
-	// }
+			}
+		})
+	}
+	else {
+		frappe.model.set_value(cdt, cdn, "actual_amount", flt(item.passport_fees) + flt(amount))
+		frappe.model.set_value(cdt, cdn, "amount", flt(item.passport_fees) + flt(amount))
+		amount = flt(item.passport_fees) + flt(amount);
+	}
 	//If there is incidental expenses
-	// if(item.incidental_fees_currency != "BTN"){
-	// 	frappe.call({
-	// 		method: "hrms.hr.doctype.travel_authorization.travel_authorization.get_exchange_rate",
-	// 		args: {
-	// 			"from_currency": item.incidental_fees_currency,
-	// 			"to_currency": "BTN",
-	// 			"date": item.currency_exchange_date
-	// 		},
-	// 		async: false,
-	// 		callback: function(vf){
-	// 			if(vf.message){
-	// 				frappe.model.set_value(cdt, cdn, "actual_amount", flt(vf.message)*flt(item.incidental_fees) + flt(amount))	
-	// 				frappe.model.set_value(cdt, cdn, "amount", flt(vf.message)*flt(item.incidental_fees) + flt(amount))
-	// 				amount = flt(vf.message)*flt(item.incidental_fees) + flt(amount);
-	// 			}
+	if(item.incidental_fees_currency != "BTN"){
+		frappe.call({
+			method: "hrms.hr.doctype.travel_authorization.travel_authorization.get_exchange_rate",
+			args: {
+				"from_currency": item.incidental_fees_currency,
+				"to_currency": "BTN",
+				"date": item.currency_exchange_date
+			},
+			async: false,
+			callback: function(vf){
+				if(vf.message){
+					frappe.model.set_value(cdt, cdn, "actual_amount", flt(vf.message)*flt(item.incidental_fees) + flt(amount))	
+					frappe.model.set_value(cdt, cdn, "amount", flt(vf.message)*flt(item.incidental_fees) + flt(amount))
+					amount = flt(vf.message)*flt(item.incidental_fees) + flt(amount);
+				}
 
-	// 		}
-	// 	})
-	// }
-	// else {
-	// 	frappe.model.set_value(cdt, cdn, "actual_amount", flt(item.incidental_fees) + flt(amount))
-	// 	frappe.model.set_value(cdt, cdn, "amount", flt(item.incidental_fees) + flt(amount))
-	// }
+			}
+		})
+	}
+	else {
+		frappe.model.set_value(cdt, cdn, "actual_amount", flt(item.incidental_fees) + flt(amount))
+		frappe.model.set_value(cdt, cdn, "amount", flt(item.incidental_fees) + flt(amount))
+	}
 	// frappe.model.set_value(cdt, cdn, "amount", format_currency(amount, item.currency))
 	refresh_field("amount");
 	refresh_field("actual_amount");
@@ -456,3 +473,20 @@ frappe.ui.form.on("Travel Claim", "after_save", function (frm, cdt, cdn) {
 		}
 	}
 });
+
+// frappe.ui.form.on('Travel Claim Item',{
+// 	date: function(frm, cdt, cdn){
+// 		update_auth(frm, cdt, cdn)	
+// 	}
+// })
+// function update_auth(frm, cdt, cdn){
+// 	var item = locals[cdt][cdn]
+// 	frappe.call({
+// 		method: "erpnext.hr.doctype.travel_authorization.travel_authorization.update_date_authorization",
+// 		args: {
+// 			"idIdx":item.idx,
+// 			"auth_date": item.date,
+// 			"ta_id": item.travel_authorization
+// 		}
+// 	})
+//  }

@@ -73,8 +73,8 @@ class TravelAuthorization(Document):
         notify_workflow_states(self)
 
     def on_update_after_submit(self):
-        if self.travel_claim:
-            frappe.throw("Cannot change once claim is created")
+        # if self.travel_claim:
+        #     frappe.throw("Cannot change once claim is created")
         self.validate_travel_dates(update=True)
         self.check_double_dates()
         self.check_leave_applications()
@@ -178,7 +178,7 @@ class TravelAuthorization(Document):
         if self.need_advance:
             if self.currency and flt(self.advance_amount_nu) > 0:
                 cost_center = frappe.db.get_value("Employee", self.employee, "cost_center")
-                advance_account = frappe.db.get_value("Company", self.company, "travel_advance_account")
+                advance_account = frappe.db.get_single_value("HR Accounts Settings", "employee_advance_travel")
                 expense_bank_account = get_bank_account(self.branch)
                 # expense_bank_account = frappe.db.get_value("Branch", self.branch, "expense_bank_account")
                 if not cost_center:
@@ -216,14 +216,12 @@ class TravelAuthorization(Document):
                     "cost_center": cost_center,
                     "debit_in_account_currency": flt(self.advance_amount_nu),
                     "debit": flt(self.advance_amount_nu),
-                    "business_activity": self.business_activity,
                     "is_advance": "Yes"
                 })
 
                 je.append("accounts", {
                     "account": expense_bank_account,
                     "cost_center": cost_center,
-                    "business_activity": self.business_activity,
                     "credit_in_account_currency": flt(self.advance_amount_nu),
                     "credit": flt(self.advance_amount_nu),
                 })
@@ -345,7 +343,6 @@ class TravelAuthorization(Document):
         return_day = 1
         full_dsa = 0
         for i in self.items:
-
             from_date = i.date
             to_date   = i.date if not i.till_date else i.till_date
             no_days   = date_diff(to_date, from_date) + 1
@@ -378,14 +375,14 @@ def make_travel_claim(source_name, target_doc=None):
             target.no_days = 1
             target.halt_at = None
             
-            
+        # frappe.throw(str(obj))
         target.currency = source_parent.currency
         target.currency_exchange_date = source_parent.posting_date
         target.within_the_dzongkhag=source_parent.within_the_dzongkhag
         
-        target.dsa = source_parent.dsa_rate
-        target.dsa_percent = source_parent.percent
-        target.country=source_parent.country
+        target.dsa = obj.dsa_rate
+        target.dsa_percent = obj.percent
+        target.country=obj.country
             
         if target.currency == "BTN":
             target.exchange_rate = 1

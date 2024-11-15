@@ -1,326 +1,580 @@
 {
- "actions": [],
- "allow_import": 1,
- "autoname": "naming_series:",
- "creation": "2022-01-17 18:36:51.450395",
- "doctype": "DocType",
- "editable_grid": 1,
- "engine": "InnoDB",
- "field_order": [
-  "naming_series",
-  "employee",
-  "employee_name",
-  "column_break_4",
-  "posting_date",
-  "company",
-  "department",
-  "currency_section",
-  "currency",
-  "column_break_crso",
-  "exchange_rate",
-  "section_break_8",
-  "purpose",
-  "column_break_11",
-  "advance_amount",
-  "paid_amount",
-  "pending_amount",
-  "claimed_amount",
-  "return_amount",
-  "section_break_7",
-  "column_break_18",
-  "advance_account",
-  "mode_of_payment",
-  "column_break_nhlv",
-  "repay_unclaimed_amount_from_salary",
-  "more_info_section",
-  "reference_type",
-  "status",
-  "column_break_kimx",
-  "reference_name",
-  "amended_from"
- ],
- "fields": [
-  {
-   "fieldname": "naming_series",
-   "fieldtype": "Select",
-   "label": "Series",
-   "options": "HR-EAD-.YYYY.-"
-  },
-  {
-   "fieldname": "employee",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Employee",
-   "options": "Employee",
-   "reqd": 1
-  },
-  {
-   "fetch_from": "employee.employee_name",
-   "fieldname": "employee_name",
-   "fieldtype": "Read Only",
-   "label": "Employee Name"
-  },
-  {
-   "fieldname": "column_break_4",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "Today",
-   "fieldname": "posting_date",
-   "fieldtype": "Date",
-   "in_list_view": 1,
-   "label": "Posting Date",
-   "reqd": 1
-  },
-  {
-   "fetch_from": "employee.department",
-   "fieldname": "department",
-   "fieldtype": "Link",
-   "label": "Department",
-   "options": "Department",
-   "read_only": 1
-  },
-  {
-   "fieldname": "section_break_8",
-   "fieldtype": "Section Break",
-   "label": "Purpose & Amount"
-  },
-  {
-   "fieldname": "purpose",
-   "fieldtype": "Small Text",
-   "in_list_view": 1,
-   "label": "Purpose",
-   "reqd": 1
-  },
-  {
-   "fieldname": "column_break_11",
-   "fieldtype": "Column Break"
-  },
-  {
-   "description": "Amount of expense",
-   "fieldname": "advance_amount",
-   "fieldtype": "Currency",
-   "in_list_view": 1,
-   "label": "Advance Amount",
-   "options": "currency",
-   "reqd": 1
-  },
-  {
-   "description": "Amount that has been paid against this advance",
-   "fieldname": "paid_amount",
-   "fieldtype": "Currency",
-   "label": "Paid Amount",
-   "no_copy": 1,
-   "options": "currency",
-   "read_only": 1
-  },
-  {
-   "description": "Amount claimed via Expense Claim",
-   "fieldname": "claimed_amount",
-   "fieldtype": "Currency",
-   "label": "Claimed Amount",
-   "no_copy": 1,
-   "options": "currency",
-   "read_only": 1
-  },
-  {
-   "fieldname": "section_break_7",
-   "fieldtype": "Section Break",
-   "label": "Accounting"
-  },
-  {
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "label": "Status",
-   "no_copy": 1,
-   "options": "Draft\nPaid\nUnpaid\nClaimed\nReturned\nPartly Claimed and Returned\nCancelled",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "employee.company",
-   "fieldname": "company",
-   "fieldtype": "Link",
-   "label": "Company",
-   "options": "Company",
-   "read_only": 1,
-   "reqd": 1
-  },
-  {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Employee Advance",
-   "print_hide": 1,
-   "read_only": 1
-  },
-  {
-   "fieldname": "column_break_18",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fetch_from": "company.default_employee_advance_account",
-   "fieldname": "advance_account",
-   "fieldtype": "Link",
-   "ignore_user_permissions": 1,
-   "label": "Advance Account",
-   "options": "Account",
-   "reqd": 1
-  },
-  {
-   "fieldname": "mode_of_payment",
-   "fieldtype": "Link",
-   "label": "Mode of Payment",
-   "options": "Mode of Payment"
-  },
-  {
-   "allow_on_submit": 1,
-   "description": "Amount returned by the employee after the advance is paid",
-   "fieldname": "return_amount",
-   "fieldtype": "Currency",
-   "label": "Returned Amount",
-   "no_copy": 1,
-   "options": "currency",
-   "read_only": 1
-  },
-  {
-   "default": "0",
-   "fieldname": "repay_unclaimed_amount_from_salary",
-   "fieldtype": "Check",
-   "label": "Repay Unclaimed Amount from Salary"
-  },
-  {
-   "depends_on": "eval:cur_frm.doc.employee",
-   "description": "Pending (unpaid) amount from previous advances",
-   "fieldname": "pending_amount",
-   "fieldtype": "Currency",
-   "label": "Pending Amount",
-   "no_copy": 1,
-   "options": "currency",
-   "read_only": 1
-  },
-  {
-   "depends_on": "eval:(doc.docstatus==1 || doc.employee)",
-   "fieldname": "currency",
-   "fieldtype": "Link",
-   "label": "Currency",
-   "options": "Currency",
-   "reqd": 1
-  },
-  {
-   "depends_on": "currency",
-   "fieldname": "exchange_rate",
-   "fieldtype": "Float",
-   "label": "Exchange Rate",
-   "precision": "9",
-   "print_hide": 1,
-   "reqd": 1
-  },
-  {
-   "fieldname": "column_break_nhlv",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "more_info_section",
-   "fieldtype": "Section Break",
-   "label": "More Info"
-  },
-  {
-   "fieldname": "column_break_kimx",
-   "fieldtype": "Column Break"
-  },
-  {
-   "collapsible": 1,
-   "fieldname": "currency_section",
-   "fieldtype": "Section Break",
-   "label": "Currency "
-  },
-  {
-   "fieldname": "column_break_crso",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "reference_type",
-   "fieldtype": "Link",
-   "label": "Reference Type",
-   "options": "DocType"
-  },
-  {
-   "fieldname": "reference_name",
-   "fieldtype": "Dynamic Link",
-   "label": "Reference Name",
-   "options": "reference_type"
-  }
- ],
- "is_submittable": 1,
- "links": [],
- "modified": "2024-08-19 11:52:07.641693",
- "modified_by": "Administrator",
- "module": "HR",
- "name": "Employee Advance",
- "naming_rule": "By \"Naming Series\" field",
- "owner": "Administrator",
- "permissions": [
-  {
-   "create": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Employee",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "amend": 1,
-   "cancel": 1,
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Expense Approver",
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  }
- ],
- "search_fields": "employee,employee_name",
- "sort_field": "modified",
- "sort_order": "DESC",
- "states": [
-  {
-   "color": "Red",
-   "title": "Draft"
-  },
-  {
-   "color": "Green",
-   "title": "Paid"
-  },
-  {
-   "color": "Orange",
-   "title": "Unpaid"
-  },
-  {
-   "color": "Blue",
-   "title": "Claimed"
-  },
-  {
-   "color": "Gray",
-   "title": "Returned"
-  },
-  {
-   "color": "Yellow",
-   "title": "Partly Claimed and Returned"
-  },
-  {
-   "color": "Red",
-   "title": "Cancelled"
-  }
- ],
- "title_field": "employee_name",
- "track_changes": 1
-}
+    "actions": [],
+    "allow_import": 1,
+    "autoname": "naming_series:",
+    "creation": "2022-01-17 18:36:51.450395",
+    "doctype": "DocType",
+    "editable_grid": 1,
+    "engine": "InnoDB",
+    "field_order": [
+     "naming_series",
+     "employee",
+     "employee_name",
+     "department",
+     "column_break_4",
+     "posting_date",
+     "advance_type",
+     "reference_type",
+     "reference",
+     "employee_group",
+     "grade",
+     "currency",
+     "exchange_rate",
+     "repay_unclaimed_amount_from_salary",
+     "advance_settled",
+     "section_break_8",
+     "basic_pay",
+     "net_pay",
+     "gross_pay",
+     "pending_amount",
+     "purpose",
+     "column_break_11",
+     "max_advance_limit",
+     "total_eligible_amount",
+     "total_advance",
+     "advance_amount",
+     "retained_amount",
+     "deduction_month",
+     "monthly_deduction",
+     "max_no_of_installment",
+     "max_months_limit",
+     "paid_amount",
+     "claimed_amount",
+     "return_amount",
+     "recovery_details_section",
+     "recovery_start_date",
+     "column_break_30",
+     "recovery_end_date",
+     "document",
+     "section_break_7",
+     "status",
+     "branch",
+     "company",
+     "amended_from",
+     "column_break_18",
+     "advance_account",
+     "cost_center",
+     "mode_of_payment",
+     "expenses_claimed",
+     "approver_details_section",
+     "advance_approver_name",
+     "column_break_42",
+     "advance_approver",
+     "advance_approver_designation",
+     "section_break_26",
+     "je_reference",
+     "salary_structure",
+     "salary_component",
+     "column_break_28",
+     "cr_journal"
+    ],
+    "fields": [
+     {
+      "fieldname": "naming_series",
+      "fieldtype": "Select",
+      "hidden": 1,
+      "label": "Series",
+      "options": "HR-EAD-.YYYY.-"
+     },
+     {
+      "fieldname": "employee",
+      "fieldtype": "Link",
+      "in_list_view": 1,
+      "in_standard_filter": 1,
+      "label": "Employee",
+      "options": "Employee",
+      "reqd": 1
+     },
+     {
+      "fetch_from": "employee.employee_name",
+      "fieldname": "employee_name",
+      "fieldtype": "Read Only",
+      "label": "Employee Name"
+     },
+     {
+      "fieldname": "column_break_4",
+      "fieldtype": "Column Break"
+     },
+     {
+      "default": "Today",
+      "fieldname": "posting_date",
+      "fieldtype": "Date",
+      "in_list_view": 1,
+      "label": "Posting Date",
+      "reqd": 1
+     },
+     {
+      "fetch_from": "employee.department",
+      "fieldname": "department",
+      "fieldtype": "Link",
+      "label": "Department",
+      "options": "Department",
+      "read_only": 1
+     },
+     {
+      "fieldname": "section_break_8",
+      "fieldtype": "Section Break",
+      "label": "Advance Amount Details"
+     },
+     {
+      "fieldname": "purpose",
+      "fieldtype": "Small Text",
+      "in_list_view": 1,
+      "label": "Purpose",
+      "reqd": 1
+     },
+     {
+      "fieldname": "column_break_11",
+      "fieldtype": "Column Break"
+     },
+     {
+      "fieldname": "advance_amount",
+      "fieldtype": "Currency",
+      "in_list_view": 1,
+      "label": "Advance Amount",
+      "options": "currency",
+      "reqd": 1
+     },
+     {
+      "depends_on": "eval:doc.advance_type != 'Salary Advance'",
+      "fieldname": "paid_amount",
+      "fieldtype": "Currency",
+      "label": "Paid Amount",
+      "no_copy": 1,
+      "options": "currency",
+      "read_only": 1
+     },
+     {
+      "allow_on_submit": 1,
+      "depends_on": "eval:doc.advance_type != 'Salary Advance'",
+      "fieldname": "claimed_amount",
+      "fieldtype": "Currency",
+      "label": "Claimed Amount",
+      "mandatory_depends_on": "eval:doc.advance_type != 'Salary Advance'",
+      "no_copy": 1,
+      "options": "currency",
+      "read_only": 1
+     },
+     {
+      "collapsible": 1,
+      "fieldname": "section_break_7",
+      "fieldtype": "Section Break",
+      "label": "Accounting Details"
+     },
+     {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "label": "Status",
+      "no_copy": 1,
+      "options": "Draft\nPaid\nUnpaid\nClaimed\nReturned\nPartly Claimed and Returned\nCancelled",
+      "read_only": 1
+     },
+     {
+      "fieldname": "company",
+      "fieldtype": "Link",
+      "label": "Company",
+      "options": "Company",
+      "reqd": 1
+     },
+     {
+      "fieldname": "amended_from",
+      "fieldtype": "Link",
+      "label": "Amended From",
+      "no_copy": 1,
+      "options": "Employee Advance",
+      "print_hide": 1,
+      "read_only": 1
+     },
+     {
+      "fieldname": "column_break_18",
+      "fieldtype": "Column Break"
+     },
+     {
+      "fieldname": "advance_account",
+      "fieldtype": "Link",
+      "ignore_user_permissions": 1,
+      "label": "Advance Account",
+      "options": "Account",
+      "reqd": 1
+     },
+     {
+      "fieldname": "mode_of_payment",
+      "fieldtype": "Link",
+      "hidden": 1,
+      "label": "Mode of Payment",
+      "options": "Mode of Payment"
+     },
+     {
+      "allow_on_submit": 1,
+      "depends_on": "eval:doc.advance_type != 'Salary Advance'",
+      "fieldname": "return_amount",
+      "fieldtype": "Currency",
+      "label": "Returned Amount",
+      "options": "currency",
+      "read_only": 1
+     },
+     {
+      "default": "0",
+      "fieldname": "repay_unclaimed_amount_from_salary",
+      "fieldtype": "Check",
+      "label": "Repay Unclaimed Amount from Salary"
+     },
+     {
+      "depends_on": "eval:cur_frm.doc.employee ",
+      "fieldname": "pending_amount",
+      "fieldtype": "Currency",
+      "hidden": 1,
+      "label": "Pending Amount",
+      "options": "currency",
+      "read_only": 1
+     },
+     {
+      "depends_on": "eval:(doc.docstatus==1 || doc.employee)",
+      "fieldname": "currency",
+      "fieldtype": "Link",
+      "label": "Currency",
+      "options": "Currency",
+      "reqd": 1
+     },
+     {
+      "depends_on": "currency",
+      "fieldname": "exchange_rate",
+      "fieldtype": "Float",
+      "label": "Exchange Rate",
+      "precision": "9",
+      "print_hide": 1,
+      "reqd": 1
+     },
+     {
+      "fetch_from": "employee.branch",
+      "fieldname": "branch",
+      "fieldtype": "Link",
+      "label": "Branch",
+      "options": "Branch",
+      "reqd": 1
+     },
+     {
+      "depends_on": "eval:doc.advance_type != \"Travel Advance\"",
+      "fieldname": "section_break_26",
+      "fieldtype": "Section Break",
+      "label": " Reference"
+     },
+     {
+      "fieldname": "reference_type",
+      "fieldtype": "Link",
+      "hidden": 1,
+      "label": "Reference Type",
+      "options": "DocType",
+      "read_only": 1
+     },
+     {
+      "fieldname": "column_break_28",
+      "fieldtype": "Column Break"
+     },
+     {
+      "depends_on": "eval:doc.advance_type == \"Travel Advance\"",
+      "fieldname": "reference",
+      "fieldtype": "Dynamic Link",
+      "label": "Reference",
+      "mandatory_depends_on": "eval:doc.advance_type == \"Travel Advance\"",
+      "options": "reference_type",
+      "read_only": 1
+     },
+     {
+      "fieldname": "advance_type",
+      "fieldtype": "Select",
+      "in_standard_filter": 1,
+      "label": "Advance Type",
+      "options": "\nSalary Advance\nMedical Advance\nOther Advance",
+      "reqd": 1
+     },
+     {
+      "depends_on": "eval:doc.advance_type == 'Salary Advance'",
+      "fetch_from": "employee.employee_group",
+      "fieldname": "employee_group",
+      "fieldtype": "Data",
+      "label": "Employee Group",
+      "read_only": 1
+     },
+     {
+      "depends_on": "eval:doc.advance_type == 'Salary Advance'",
+      "fetch_from": "employee.grade",
+      "fieldname": "grade",
+      "fieldtype": "Data",
+      "label": "Employee Grade",
+      "read_only": 1
+     },
+     {
+      "depends_on": "eval:doc.advance_type == 'Salary Advance'",
+      "fetch_from": "employee.cost_center",
+      "fieldname": "cost_center",
+      "fieldtype": "Data",
+      "label": "Cost Center",
+      "read_only": 1
+     },
+     {
+      "depends_on": "eval:doc.advance_type == 'Salary Advance'",
+      "fieldname": "basic_pay",
+      "fieldtype": "Currency",
+      "label": "Basic Pay",
+      "read_only": 1
+     },
+     {
+      "depends_on": "eval:doc.advance_type == 'Salary Advance'",
+      "fieldname": "net_pay",
+      "fieldtype": "Currency",
+      "label": "Net Pay",
+      "read_only": 1
+     },
+     {
+      "default": "1",
+      "depends_on": "eval:doc.advance_type == 'Salary Advance'",
+      "fieldname": "max_months_limit",
+      "fieldtype": "Int",
+      "hidden": 1,
+      "label": "Max No.of Months Allowed",
+      "read_only": 1
+     },
+     {
+      "depends_on": "eval:doc.advance_type == 'Salary Advance'",
+      "fieldname": "max_advance_limit",
+      "fieldtype": "Currency",
+      "label": "Maximum Advance Limit",
+      "read_only": 1
+     },
+     {
+      "depends_on": "eval:doc.advance_type == 'Salary Advance'",
+      "fieldname": "deduction_month",
+      "fieldtype": "Float",
+      "label": "No.of Installments",
+      "mandatory_depends_on": "eval:doc.advance_type == 'Salary Advance'",
+      "reqd": 1
+     },
+     {
+      "depends_on": "eval:doc.advance_type == 'Salary Advance'",
+      "fieldname": "recovery_start_date",
+      "fieldtype": "Date",
+      "label": "Recovery Start Date"
+     },
+     {
+      "depends_on": "eval:doc.advance_type == 'Salary Advance'",
+      "fieldname": "recovery_end_date",
+      "fieldtype": "Data",
+      "label": "Recovery End Date"
+     },
+     {
+      "depends_on": "eval:doc.advance_type == 'Salary Advance'",
+      "fieldname": "monthly_deduction",
+      "fieldtype": "Currency",
+      "label": "Monthly Deduction",
+      "read_only": 1
+     },
+     {
+      "depends_on": "eval:doc.advance_type == 'Salary Advance'",
+      "fieldname": "recovery_details_section",
+      "fieldtype": "Section Break",
+      "label": "Recovery Details"
+     },
+     {
+      "fieldname": "column_break_30",
+      "fieldtype": "Column Break"
+     },
+     {
+      "depends_on": "eval:doc.advance_type != \"Travel Advance\"",
+      "fieldname": "approver_details_section",
+      "fieldtype": "Section Break",
+      "label": "APPROVER DETAILS"
+     },
+     {
+      "fieldname": "advance_approver_name",
+      "fieldtype": "Link",
+      "label": "Approver Name",
+      "options": "Employee",
+      "read_only": 1
+     },
+     {
+      "fieldname": "column_break_42",
+      "fieldtype": "Column Break"
+     },
+     {
+      "fetch_from": "advance_approver_name.user_id",
+      "fieldname": "advance_approver",
+      "fieldtype": "Link",
+      "label": "Approver ",
+      "options": "User",
+      "read_only": 1
+     },
+     {
+      "fetch_from": "advance_approver_name.designation",
+      "fieldname": "advance_approver_designation",
+      "fieldtype": "Data",
+      "label": "Approver Designation",
+      "read_only": 1
+     },
+     {
+      "depends_on": "eval:doc.advance_type == 'Salary Advance'",
+      "fieldname": "max_no_of_installment",
+      "fieldtype": "Data",
+      "hidden": 1,
+      "label": "Max No of Installment",
+      "read_only": 1
+     },
+     {
+      "allow_on_submit": 1,
+      "depends_on": "eval:!cur_frm.is_new()",
+      "fieldname": "document",
+      "fieldtype": "Attach",
+      "ignore_user_permissions": 1,
+      "label": "Supporting Documents"
+     },
+     {
+      "depends_on": "eval:doc.advance_type == \"Salary Advance\";",
+      "fieldname": "salary_structure",
+      "fieldtype": "Link",
+      "label": "Salary Structure",
+      "options": "Salary Structure",
+      "read_only": 1
+     },
+     {
+      "depends_on": "eval:doc.advance_type == \"Salary Advance\";",
+      "fieldname": "salary_component",
+      "fieldtype": "Link",
+      "label": "Salary Component",
+      "options": "Salary Component",
+      "read_only": 1
+     },
+     {
+      "description": "<i>accumulated advance amount in a given recovery start and end date</i>",
+      "fieldname": "total_advance",
+      "fieldtype": "Currency",
+      "label": "Total Advance Balance",
+      "read_only": 1
+     },
+     {
+      "fieldname": "je_reference",
+      "fieldtype": "Data",
+      "label": "JE Reference",
+      "read_only": 1
+     },
+     {
+      "fieldname": "cr_journal",
+      "fieldtype": "Button",
+      "hidden": 1,
+      "label": "Create Journal Entry"
+     },
+     {
+      "allow_on_submit": 1,
+      "default": "0",
+      "fieldname": "expenses_claimed",
+      "fieldtype": "Check",
+      "label": "Expenses Claimed",
+      "read_only": 1
+     },
+     {
+      "allow_on_submit": 1,
+      "default": "0",
+      "depends_on": "eval:doc.advance_type == \"Salary Advance\"",
+      "fieldname": "advance_settled",
+      "fieldtype": "Check",
+      "label": "Advance Settled",
+      "read_only": 1
+     },
+     {
+      "fieldname": "retained_amount",
+      "fieldtype": "Currency",
+      "label": "Retained Amount",
+      "precision": "2",
+      "read_only": 1
+     },
+     {
+      "depends_on": "eval:doc.advance_type == 'Salary Advance'",
+      "fieldname": "gross_pay",
+      "fieldtype": "Currency",
+      "label": "Gross Pay",
+      "read_only": 1
+     },
+     {
+      "depends_on": "eval:doc.advance_type == 'Salary Advance'",
+      "fieldname": "total_eligible_amount",
+      "fieldtype": "Currency",
+      "label": "Total Eligible Amount"
+     }
+    ],
+    "is_submittable": 1,
+    "links": [],
+    "modified": "2024-11-05 16:17:01.300897",
+    "modified_by": "Administrator",
+    "module": "HR",
+    "name": "Employee Advance",
+    "naming_rule": "By \"Naming Series\" field",
+    "owner": "Administrator",
+    "permissions": [
+     {
+      "create": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "Employee",
+      "share": 1,
+      "submit": 1,
+      "write": 1
+     },
+     {
+      "amend": 1,
+      "cancel": 1,
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "Expense Approver",
+      "share": 1,
+      "submit": 1,
+      "write": 1
+     }
+    ],
+    "search_fields": "employee,employee_name",
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": [
+     {
+      "color": "Red",
+      "custom": 1,
+      "title": "Draft"
+     },
+     {
+      "color": "Green",
+      "custom": 1,
+      "title": "Paid"
+     },
+     {
+      "color": "Orange",
+      "custom": 1,
+      "title": "Unpaid"
+     },
+     {
+      "color": "Blue",
+      "custom": 1,
+      "title": "Claimed"
+     },
+     {
+      "color": "Gray",
+      "title": "Returned"
+     },
+     {
+      "color": "Yellow",
+      "title": "Partly Claimed and Returned"
+     },
+     {
+      "color": "Red",
+      "custom": 1,
+      "title": "Cancelled"
+     }
+    ],
+    "title_field": "employee_name",
+    "track_changes": 1
+   }

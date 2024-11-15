@@ -178,12 +178,12 @@ class PromotionEntry(Document):
 
 	def get_additional_details(self, employee, basic_pay, personal_pay):
 		emp = frappe.get_doc("Employee", employee)
-		current_increment = frappe.db.get_value("Employee Grade", emp.grade, "increment")
+		current_increment = frappe.db.get_value("Employee Grade", emp.grade, "increment_value")
 		new_grade = frappe.db.get_value("Employee Grade", emp.grade, "promotion_grade")
 		if not new_grade:
 			frappe.throw("Promote to Grade not set for Employee {}".format(employee))
 		new_lower_limit = frappe.db.get_value("Employee Grade", new_grade, "lower_limit")
-		new_increment = frappe.db.get_value("Employee Grade", new_grade, "increment")
+		new_increment = frappe.db.get_value("Employee Grade", new_grade, "increment_value")
 		new_upper_limit = frappe.db.get_value("Employee Grade", new_grade, "upper_limit")
 		# if personal_pay > 0:
 		# 	ratio = ((flt(basic_pay) + flt(personal_pay))-flt(new_lower_limit))/flt(new_increment)
@@ -374,11 +374,11 @@ def create_employee_promotion_for_employees(employees, args, publish_progress=Tr
 				row_two.fieldname = "designation"
 			# -----------------------Salary Details for Employee Promotion/Salary Fixation----------------#
 			old_lower_limit = frappe.db.get_value("Employee Grade", emp.employee_grade, "lower_limit")
-			old_increment = frappe.db.get_value("Employee Grade", emp.employee_grade, "increment")
+			old_increment = frappe.db.get_value("Employee Grade", emp.employee_grade, "increment_value")
 			old_upper_limit = frappe.db.get_value("Employee Grade", emp.employee_grade, "upper_limit")
 			new_grade = frappe.db.get_value("Employee Grade", emp.employee_grade, "promotion_grade")
 			new_lower_limit = frappe.db.get_value("Employee Grade", new_grade, "lower_limit")
-			new_increment = frappe.db.get_value("Employee Grade", new_grade, "increment")
+			new_increment = frappe.db.get_value("Employee Grade", new_grade, "increment_value")
 			new_upper_limit = frappe.db.get_value("Employee Grade", new_grade, "upper_limit")
 			ep.current_lower_limit = old_lower_limit
 			ep.current_increment = old_increment

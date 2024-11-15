@@ -135,7 +135,7 @@ def get_conditions(filters):
 			conditions += " and docstatus = docstatus"
 	elif filters.get("process_status") == "Submitted":
 			conditions += " and docstatus = 1"
-	elif filters.get("process_status") == "Un-Submitted":
+	elif filters.get("process_status") == "Draft":
 			conditions += " and docstatus = 0"
 	elif filters.get("process_status") == "Cancelled":
 			conditions += " and docstatus = 2"

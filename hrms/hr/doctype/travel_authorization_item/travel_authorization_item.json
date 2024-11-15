@@ -159,6 +159,7 @@
    "label": "DSA Rate"
   },
   {
+   "default": "100",
    "fieldname": "percent",
    "fieldtype": "Percent",
    "label": "Percent"
@@ -167,7 +168,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-10-31 16:47:47.081174",
+ "modified": "2024-11-14 14:27:43.615611",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization Item",

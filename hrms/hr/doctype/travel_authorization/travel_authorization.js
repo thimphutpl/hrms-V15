@@ -122,6 +122,10 @@ frappe.ui.form.on('Travel Authorization', {
 			frm.set_value("posting_date", frappe.datetime.get_today());
 		}
 
+		if(frm.doc.currency=="BTN"){
+			frm.set_value("exchange_rate", 1);
+		}
+
 		// frm.set_query("supervisor", function () {
 		// 	return {
 		// 		query: "hrms.hr.doctype.leave_application.leave_application.get_approvers",
