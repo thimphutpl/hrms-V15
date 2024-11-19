@@ -16,26 +16,18 @@ def get_column():
     return columns
 
 def get_data(filters):
-    cond = get_condition(filters)
-    current_user = frappe.session.user
-    user_roles = frappe.get_roles(current_user)
-    # if "Dashboard Manager Overall" in user_roles or "System Manager" in user_roles:
+    cond = get_conditions(filters)
     return frappe.db.sql("""
-		select company,count(name) from `tabEmployee` group by company {condition}
-		""".format(condition=cond))
-    # else:
-    #     company = frappe.db.sql('''
-    #                             select company from `tabEmployee` where user_id="{}"
-    #                             '''.format(current_user), as_dict=True)
-    #     if company:
-            
-    #         return frappe.db.sql("""
-    #         select company,count(name) from `tabEmployee` where company ="{condition}" group by company
-    #         """.format(condition=company[0]['company']))
+        SELECT company, COUNT(name) 
+        FROM `tabEmployee` 
+        WHERE 1=1 {condition} 
+        GROUP BY company
+    """.format(condition=cond))
     
-    
-def get_condition(filters):
-    conds = ""
-    if filters.company:
-        conds += "and company='{}'".format(filters.category)
-    return conds
+
+  
+def get_conditions(filters):
+	conditions = []
+	if filters and filters.get("department"):
+		conditions.append("department = '{}'".format(filters.get("department")))
+	return "AND {}".format(" AND ".join(conditions)) if conditions else ""
