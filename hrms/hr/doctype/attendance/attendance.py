@@ -52,7 +52,7 @@ class Attendance(Document):
 
 		# leaves can be marked for future dates
 		if (
-			self.status != "On Leave"
+			self.status not in ("On Leave", "Tour")
 			and not self.leave_application
 			and getdate(self.attendance_date) > getdate(nowdate())
 		):

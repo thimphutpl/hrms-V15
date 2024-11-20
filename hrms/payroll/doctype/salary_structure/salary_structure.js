@@ -363,6 +363,15 @@ frappe.ui.form.on('Salary Structure', {
 	valueunderground_allowance: function(frm){
 		calculate_others(frm);
 	},
+	eligible_for_housing_allowance:function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_housing_allowance_payment_method:function(frm){
+		calculate_others(frm);
+	},
+	valuehousing_allowance:function(frm){
+		calculate_others(frm);
+	},
 })
 
 // dynamically display checkboxes based on Salary Component's status

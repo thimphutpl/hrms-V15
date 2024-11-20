@@ -70,6 +70,9 @@
   "eligible_for_project_deployment_allowance",
   "eligible_for_project_deployment_allowance_payment_method",
   "valueproject_deployment_allowance",
+  "eligible_for_housing_allowance",
+  "eligible_for_housing_allowance_payment_method",
+  "valuehousing_allowance",
   "cb_12",
   "eligible_for_officiating_allowance",
   "officiating_allowance_method",
@@ -295,7 +298,7 @@
    "depends_on": "eval:doc.eligible_for_contract_allowance==1",
    "fieldname": "contract_allowance",
    "fieldtype": "Int",
-   "label": "Value(Contranct)",
+   "label": "Value(Contract)",
    "print_hide": 1
   },
   {
@@ -839,14 +842,14 @@
    "depends_on": "eligible_for_fixed_allowance",
    "fieldname": "fixed_allowance_method",
    "fieldtype": "Select",
-   "label": "Payment Method",
+   "label": "Eligible for Fixed Allowance Payment Method",
    "options": "Percent\nLumpsum"
   },
   {
    "depends_on": "eligible_for_fixed_allowance",
    "fieldname": "fixed_allowance",
    "fieldtype": "Currency",
-   "label": "Value"
+   "label": "Value(Fixed Allowance)"
   },
   {
    "default": "0",
@@ -893,12 +896,31 @@
    "fieldtype": "Int",
    "label": "Value(Underground Allowance)",
    "print_hide": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_housing_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Housing Allowance"
+  },
+  {
+   "depends_on": "eligible_for_housing_allowance",
+   "fieldname": "eligible_for_housing_allowance_payment_method",
+   "fieldtype": "Select",
+   "label": "Eligible for Housing Allowance Payment Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_housing_allowance",
+   "fieldname": "valuehousing_allowance",
+   "fieldtype": "Currency",
+   "label": "Value(Housing Allowance)"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2024-11-08 16:37:49.651044",
+ "modified": "2024-11-19 10:32:27.861501",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",

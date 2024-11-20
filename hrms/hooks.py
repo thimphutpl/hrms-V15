@@ -206,7 +206,7 @@ scheduler_events = {
 		"hrms.hr.doctype.daily_work_summary_group.daily_work_summary_group.trigger_emails",
 	],
 	"hourly_long": [
-		"hrms.hr.doctype.shift_type.shift_type.process_auto_attendance_for_all_shifts",
+		# "hrms.hr.doctype.shift_type.shift_type.process_auto_attendance_for_all_shifts",
 	],
 	"daily": [
 		"hrms.controllers.employee_reminders.send_birthday_reminders",
@@ -219,6 +219,7 @@ scheduler_events = {
 		"hrms.hr.doctype.leave_ledger_entry.leave_ledger_entry.process_expired_allocation",
 		"hrms.hr.utils.generate_leave_encashment",
 		# "hrms.hr.utils.allocate_earned_leaves",
+		"erpnext.accounts.report.gcoa_wise_report.gcoa_wise_report.create_transaction",
 	],
 	"weekly": ["hrms.controllers.employee_reminders.send_reminders_in_advance_weekly"],
 	"monthly": ["hrms.controllers.employee_reminders.send_reminders_in_advance_monthly"],

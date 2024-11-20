@@ -12,7 +12,7 @@ class MusterRollApplication(Document):
 		self.default_validations()
 	
 	def on_submit(self):
-		# self.validate_submitter()
+		self.validate_submitter()
 		self.check_status()
 		if self.from_branch and self.date_of_transfer:
 			self.update_mr_master()

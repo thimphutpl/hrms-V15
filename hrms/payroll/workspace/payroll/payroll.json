@@ -5,7 +5,7 @@
    "label": "Outgoing Salary"
   }
  ],
- "content": "[{\"id\":\"FH6qmkw8pM\",\"type\":\"onboarding\",\"data\":{\"onboarding_name\":\"Payroll\",\"col\":12}},{\"id\":\"pwFw12edpG\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Outgoing Salary\",\"col\":12}},{\"id\":\"7SPebC3Gku\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"7IxkAxGhyd\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dashboard\",\"col\":3}},{\"id\":\"o49J1a_f7S\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Salary Register\",\"col\":3}},{\"id\":\"GEbsZ6TIP4\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"7okF5vLMe0\",\"type\":\"card\",\"data\":{\"card_name\":\"Quick Links\",\"col\":4}},{\"id\":\"DvMXP7qqwr\",\"type\":\"card\",\"data\":{\"card_name\":\"Settings\",\"col\":4}}]",
+ "content": "[{\"id\":\"pwFw12edpG\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Outgoing Salary\",\"col\":12}},{\"id\":\"7SPebC3Gku\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"7IxkAxGhyd\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dashboard\",\"col\":3}},{\"id\":\"o49J1a_f7S\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Salary Register\",\"col\":3}},{\"id\":\"GEbsZ6TIP4\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"7okF5vLMe0\",\"type\":\"card\",\"data\":{\"card_name\":\"Quick Links\",\"col\":4}},{\"id\":\"DvMXP7qqwr\",\"type\":\"card\",\"data\":{\"card_name\":\"Settings\",\"col\":4}}]",
  "creation": "2020-05-27 19:54:23.405607",
  "custom_blocks": [],
  "docstatus": 0,
@@ -64,7 +64,7 @@
    "type": "Link"
   }
  ],
- "modified": "2024-10-17 14:32:56.031079",
+ "modified": "2024-11-20 15:00:51.826325",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Payroll",

@@ -97,6 +97,11 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		self.notify_approval_status()
 
 	def on_submit(self):
+		
+		if self.workflow_state == "Approved":
+			self.db_set("status", "Approved")
+		elif self.workflow_state == "Rejected":
+			self.db_set("status", "Rejected")
 		if self.status in ["Open", "Cancelled"]:
 			frappe.throw(_("Only Leave Applications with status 'Approved' and 'Rejected' can be submitted"))
 
@@ -894,10 +899,10 @@ def get_leave_balance_on(
 	:param to_date: future date to check for allocation expiry
 	:param consider_all_leaves_in_the_allocation_period: consider all leaves taken till the allocation end date
 	:param for_consumption: flag to check if leave balance is required for consumption or display
-	        eg: employee has leave balance = 10 but allocation is expiring in 1 day so employee can only consume 1 leave
-	        in this case leave_balance = 10 but leave_balance_for_consumption = 1
-	        if True, returns a dict eg: {'leave_balance': 10, 'leave_balance_for_consumption': 1}
-	        else, returns leave_balance (in this case 10)
+			eg: employee has leave balance = 10 but allocation is expiring in 1 day so employee can only consume 1 leave
+			in this case leave_balance = 10 but leave_balance_for_consumption = 1
+			if True, returns a dict eg: {'leave_balance': 10, 'leave_balance_for_consumption': 1}
+			else, returns leave_balance (in this case 10)
 	"""
 
 	if not to_date:

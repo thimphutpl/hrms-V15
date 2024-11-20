@@ -98,7 +98,7 @@ class TravelClaim(Document):
         #self.check_status()
         self.update_attendance()
         self.update_travel_authorization()
-        self.post_journal_entry()
+        # self.post_journal_entry()
         
 
         if self.supervisor_approval and self.hr_approval:
@@ -884,6 +884,7 @@ class TravelClaim(Document):
             #         tai.db_set("till_date",i.till_date)
             #     count_b += 1
             # count_a += 1
+        # frappe.throw(str(self.ta))
         auth_doc=frappe.get_doc("Travel Authorization", self.ta)
         for child_d in auth_doc.get_all_children():
             if child_d.doctype=='Travel Authorization Item':
@@ -907,21 +908,21 @@ class TravelClaim(Document):
             })
             doc.save()
         
-        for child_doc in self.get("items"):
-            doc=frappe.get_doc("Travel Authorization",self.ta)
-            doc.append("details",
-            {
-                "idx":child_doc.idx,
-                "date":child_doc.date,
-                "till_date":child_doc.till_date,
-                "halt":child_doc.halt,
-                "halt_at":child_doc.halt_at,
-                "temp_from_place":child_doc.from_place,
-                "temp_to_place":child_doc.to_place,
-                "no_days":child_doc.no_days,
-                # "country":child_doc.country
-            })
-            doc.save()
+        # for child_doc in self.get("items"):
+        #     doc=frappe.get_doc("Travel Authorization",self.ta)
+        #     doc.append("details",
+        #     {
+        #         "idx":child_doc.idx,
+        #         "date":child_doc.date,
+        #         "till_date":child_doc.till_date,
+        #         "halt":child_doc.halt,
+        #         "halt_at":child_doc.halt_at,
+        #         "temp_from_place":child_doc.from_place,
+        #         "temp_to_place":child_doc.to_place,
+        #         "no_days":child_doc.no_days,
+        #         # "docstatus":child_doc.docstatus
+        #     })
+        #     doc.save()
     ##
     # Allow only approved authorizations to be submitted
     ##

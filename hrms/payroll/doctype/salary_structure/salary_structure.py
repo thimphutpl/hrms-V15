@@ -52,11 +52,14 @@ class SalaryStructure(Document):
 				# 	frappe.throw(_('Salary Component <b>`{1}`</b> of type <b>`{2}`</b> cannot be added under <b>`{3}`</b> table. <br/> <b><u>Reference# : </u></b> <a href="#Form/Salary Structure/{0}">{0}</a>').format(
 				# 		self.name, i.salary_component, component_type, parentfield.title()), title="Invalid Salary Component")
 				# Checking duplicate entries
-				if i.salary_component in ('Basic Pay') and i.salary_component in dup:
-					frappe.throw(_("Row#{0} : Duplicate entries not allowed for component <b>{1}</b>.")
-								 .format(i.idx, i.salary_component), title="Duplicate Record Found")
-				else:
-					dup.update({i.salary_component: 1})
+				if i.salary_component is not None:
+					# frappe.throw(str("None type"))
+					if i.salary_component in ('Basic Pay') and i.salary_component in list(dup.keys()):
+						frappe.throw(_("Row#{0} : Duplicate entries not allowed for component <b>{1}</b>.")
+									.format(i.idx, i.salary_component), title="Duplicate Record Found")
+					else:
+						dup.update({i.salary_component: 1})
+				# frappe.throw(str(list(dup.keys())))
 				# Validate Loan details
 				# if parenttype == 'Deduction' and cint(is_loan_component):
 				# 	if not i.institution_name:

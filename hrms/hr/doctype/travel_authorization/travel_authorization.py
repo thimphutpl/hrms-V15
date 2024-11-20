@@ -63,8 +63,8 @@ class TravelAuthorization(Document):
         notify_workflow_states(self)
 
     def on_cancel(self):
-        if self.travel_claim:
-            frappe.throw("Cancel the Travel Claim before cancelling Authorization")
+        # if self.travel_claim:
+        #     frappe.throw("Cancel the Travel Claim before cancelling Authorization")
         #if not self.cancellation_reason:
         #	frappe.throw("Cancellation Reason is Mandatory when Cancelling Travel Authorization")
         self.cancel_attendance()	
@@ -112,6 +112,7 @@ class TravelAuthorization(Document):
     def validate_advance(self):
         self.advance_amount     = 0 if not self.need_advance else self.advance_amount
         #frappe.throw("hi")
+        # frappe.throw(str(self.estimated_amount))
         if self.advance_amount > self.estimated_amount * 0.9:
             frappe.throw("Advance Amount cannot be greater than 90% of Total Estimated Amount")
         self.advance_amount_nu  = 0 if not self.need_advance else self.advance_amount_nu

@@ -5,7 +5,7 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import DATE_FORMAT, flt, get_link_to_form, getdate, today
+from frappe.utils import DATE_FORMAT, flt, getdate, today
 
 
 class LeaveLedgerEntry(Document):
@@ -40,33 +40,43 @@ def validate_leave_allocation_against_leave_application(ledger):
 	if leave_application_records:
 		frappe.throw(
 			_("Leave allocation {0} is linked with the Leave Application {1}").format(
-				ledger.transaction_name,
-				", ".join(
-					get_link_to_form("Leave Application", application)
-					for application in leave_application_records
-				),
+				ledger.transaction_name, ", ".join(leave_application_records)
 			)
 		)
 
 
 def create_leave_ledger_entry(ref_doc, args, submit=True):
-	ledger = frappe._dict(
-		doctype="Leave Ledger Entry",
-		employee=ref_doc.employee,
-		employee_name=ref_doc.employee_name,
-		leave_type=ref_doc.leave_type,
-		transaction_type=ref_doc.doctype,
-		transaction_name=ref_doc.name,
-		is_carry_forward=0,
-		is_expired=0,
-		is_lwp=0,
-	)
-	ledger.update(args)
+	if ref_doc.doctype != "Bulk Leave Encashment":
+		ledger = frappe._dict(
+			doctype='Leave Ledger Entry',
+			employee=ref_doc.employee,
+			employee_name=ref_doc.employee_name,
+			leave_type=ref_doc.leave_type,
+			transaction_type=ref_doc.doctype,
+			transaction_name=ref_doc.name,
+			is_carry_forward=0,
+			is_expired=0,
+			is_lwp=0,
+			is_adjusted_leave=0,
+			leave_adjustment_id=None
+		)
+		ledger.update(args)
+	else:
+		ledger = frappe._dict(
+			doctype='Leave Ledger Entry',
+			leave_type=ref_doc.leave_type,
+			transaction_type=ref_doc.doctype,
+			transaction_name=ref_doc.name,
+			is_carry_forward=0,
+			is_expired=0,
+			is_lwp=0,
+			is_adjusted_leave=0,
+			leave_adjustment_id=None
+		)
+		ledger.update(args)
 
 	if submit:
-		doc = frappe.get_doc(ledger)
-		doc.flags.ignore_permissions = 1
-		doc.submit()
+		frappe.get_doc(ledger).submit()
 	else:
 		delete_ledger_entry(ledger)
 
@@ -134,7 +144,7 @@ def process_expired_allocation():
 	expire_allocation = frappe.db.sql(
 		"""
 		SELECT
-			leaves, to_date, from_date, employee, leave_type,
+			leaves, to_date, employee, leave_type,
 			is_carry_forward, transaction_name as name, transaction_type
 		FROM `tabLeave Ledger Entry` l
 		WHERE (NOT EXISTS
@@ -222,14 +232,10 @@ def expire_carried_forward_allocation(allocation):
 		args = frappe._dict(
 			transaction_name=allocation.name,
 			transaction_type="Leave Allocation",
-			leaves=leaves * -1,
+			leaves=allocation.leaves * -1,
 			is_carry_forward=allocation.is_carry_forward,
 			is_expired=1,
 			from_date=allocation.to_date,
 			to_date=allocation.to_date,
 		)
 		create_leave_ledger_entry(allocation, args)
-
-
-def on_doctype_update():
-	frappe.db.add_index("Leave Ledger Entry", ["transaction_type", "transaction_name"])

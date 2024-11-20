@@ -481,7 +481,6 @@ class PayrollEntry(Document):
 		return frappe.db.sql("""
 			select
 				t1.cost_center             as cost_center,
-				t1.business_activity       as business_activity,
 				(case
 					when sc.type = 'Earning' then sc.type
 					else ifnull(sc.clubbed_component,sc.name)
@@ -535,7 +534,7 @@ class PayrollEntry(Document):
 				(case when ifnull(sc.make_party_entry,0) = 1 then 'Payable' else 'Other' end),
 				(case when ifnull(sc.make_party_entry,0) = 1 then 'Employee' else 'Other' end),
 				(case when ifnull(sc.make_party_entry,0) = 1 then t1.employee else 'Other' end)
-			order by t1.cost_center, t1.business_activity, sc.type, sc.name
+			order by t1.cost_center, sc.type, sc.name
 		""".format(self.fiscal_year, self.month, salary_component_pf, self.name),as_dict=1)
 	
 	@frappe.whitelist()
@@ -560,7 +559,6 @@ class PayrollEntry(Document):
 		default_payable_account = company.get("salary_payable_account")
 		company_cc              = company.get("company_cost_center")
 		default_gpf_account     = company.get("employer_contribution_to_pf")
-		default_business_activity = get_default_ba()
 		salary_component_pf     = "PF"
 
 		if not default_bank_account:
@@ -583,10 +581,6 @@ class PayrollEntry(Document):
 					when sc.type = 'Deduction' and ifnull(sc.make_party_entry,0) = 0 then c.company_cost_center
 					else t1.cost_center
 				end)                       as cost_center,
-				(case
-					when sc.type = 'Deduction' and ifnull(sc.make_party_entry,0) = 0 then '{3}'
-					else t1.business_activity
-				end)                      as business_activity,
 				(case
 					when sc.type = 'Earning' then sc.type
 					else ifnull(sc.clubbed_component,sc.name)
@@ -635,10 +629,6 @@ class PayrollEntry(Document):
 					when sc.type = 'Deduction' and ifnull(sc.make_party_entry,0) = 0 then c.company_cost_center
 					else t1.cost_center
 				end),
-				(case
-					when sc.type = 'Deduction' and ifnull(sc.make_party_entry,0) = 0 then '{3}'
-					else t1.business_activity
-				end),
 				(case when sc.type = 'Earning' then sc.type else ifnull(sc.clubbed_component,sc.name) end),
 				sc.type,
 				(case when sc.type = 'Earning' then 0 else ifnull(sc.is_remittable,0) end),
@@ -647,8 +637,8 @@ class PayrollEntry(Document):
 				(case when ifnull(sc.make_party_entry,0) = 1 then 'Payable' else 'Other' end),
 				(case when ifnull(sc.make_party_entry,0) = 1 then 'Employee' else 'Other' end),
 				(case when ifnull(sc.make_party_entry,0) = 1 then t1.employee else 'Other' end)
-			order by t1.cost_center, t1.business_activity, sc.type, sc.name
-		""".format(self.fiscal_year, self.month, self.name, default_business_activity),as_dict=1)
+			order by t1.cost_center, sc.type, sc.name
+		""".format(self.fiscal_year, self.month, self.name),as_dict=1)
 
 		posting        = frappe._dict()
 		cc_wise_totals = frappe._dict()
@@ -661,7 +651,6 @@ class PayrollEntry(Document):
 				"credit_in_account_currency" if rec.component_type == 'Deduction' else "debit_in_account_currency": flt(rec.amount),
 				"against_account": default_payable_account,
 				"cost_center"    : rec.cost_center,
-				"business_activity" : rec.business_activity,
 				"party_check"    : 0,
 				"account_type"   : rec.account_type if rec.party_type == "Employee" else "",
 				"party_type"     : rec.party_type if rec.party_type == "Employee" else "",
@@ -684,7 +673,6 @@ class PayrollEntry(Document):
 								"account"       : r,
 								"debit_in_account_currency" : flt(i.amount),
 								"cost_center"   : i.cost_center,
-								"business_activity" : i.business_activity,
 								"party_check"   : 0,
 								"account_type"   : i.account_type if i.party_type == "Employee" else "",
 								"party_type"     : i.party_type if i.party_type == "Employee" else "",
@@ -698,7 +686,6 @@ class PayrollEntry(Document):
 							"account"       : r,
 							"debit_in_account_currency" : flt(rec.amount),
 							"cost_center"   : rec.cost_center,
-							"business_activity" : rec.business_activity,
 							"party_check"   : 0,
 							"account_type"   : rec.account_type if rec.party_type == "Employee" else "",
 							"party_type"     : rec.party_type if rec.party_type == "Employee" else "",
@@ -712,7 +699,6 @@ class PayrollEntry(Document):
 					"account"       : default_bank_account,
 					"credit_in_account_currency" : flt(remit_amount),
 					"cost_center"   : rec.cost_center,
-					"business_activity" : rec.business_activity,
 					"party_check"   : 0,
 					"reference_type": self.doctype,
 					"reference_name": self.name,
@@ -725,7 +711,6 @@ class PayrollEntry(Document):
 				"account"       : default_payable_account,
 				"debit_in_account_currency": flt(tot_payable_amt),
 				"cost_center"   : company_cc,
-				"business_activity": default_business_activity,
 				"party_check"   : 0,
 				"reference_type": self.doctype,
 				"reference_name": self.name,
@@ -735,7 +720,6 @@ class PayrollEntry(Document):
 				"account"       : default_bank_account,
 				"credit_in_account_currency": flt(tot_payable_amt),
 				"cost_center"   : company_cc,
-				"business_activity": default_business_activity,
 				"party_check"   : 0,
 				"reference_type": self.doctype,
 				"reference_name": self.name,
@@ -745,7 +729,6 @@ class PayrollEntry(Document):
 				"account"       : default_payable_account,
 				"credit_in_account_currency" : flt(tot_payable_amt),
 				"cost_center"   : company_cc,
-				"business_activity": default_business_activity,
 				"party_check"   : 0,
 				"reference_type": self.doctype,
 				"reference_name": self.name,
