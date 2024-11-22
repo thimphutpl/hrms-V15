@@ -259,8 +259,8 @@
    "type": "Link"
   }
  ],
- "modified": "2024-10-17 14:32:55.177453",
- "modified_by": "Administrator",
+ "modified": "2024-11-21 18:26:35.718209",
+ "modified_by": "kinzang.namgyal@cdcl.bt",
  "module": "HR",
  "name": "Travel & Expense Claims",
  "number_cards": [],
@@ -269,7 +269,7 @@
  "public": 1,
  "quick_lists": [],
  "roles": [],
- "sequence_id": 16.0,
+ "sequence_id": 6.0,
  "shortcuts": [
   {
    "color": "Grey",

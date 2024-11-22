@@ -224,8 +224,8 @@
    "type": "Link"
   }
  ],
- "modified": "2024-10-17 14:32:56.124022",
- "modified_by": "Administrator",
+ "modified": "2024-11-21 18:26:36.067370",
+ "modified_by": "kinzang.namgyal@cdcl.bt",
  "module": "Payroll",
  "name": "Salary Payout",
  "number_cards": [],
@@ -234,7 +234,7 @@
  "public": 1,
  "quick_lists": [],
  "roles": [],
- "sequence_id": 24.0,
+ "sequence_id": 9.0,
  "shortcuts": [],
  "title": "Salary Payout"
 }

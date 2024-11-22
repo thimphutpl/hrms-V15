@@ -125,7 +125,7 @@ class SalaryIncrement(Document):
 				grade= frappe.get_doc("Employee Grade", self.grade)
 				self.payscale_minimum   = grade.lower_limit
 				self.payscale_increment_method = grade.increment_method
-				self.payscale_increment = grade.increment
+				self.payscale_increment = grade.increment_value
 				self.payscale_maximum   = grade.upper_limit 
 
 				# Calculating increment

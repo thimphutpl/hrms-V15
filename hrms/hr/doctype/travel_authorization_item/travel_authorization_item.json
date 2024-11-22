@@ -15,6 +15,9 @@
   "from_place",
   "dsa_rate",
   "percent",
+  "currency",
+  "exchange_rate",
+  "amount_in_btn",
   "column_break_9",
   "to_place",
   "halt_at",
@@ -132,7 +135,7 @@
    "fieldname": "country",
    "fieldtype": "Link",
    "label": "Country",
-   "options": "Country"
+   "options": "DSA Out Country"
   },
   {
    "fieldname": "sb_project_maintenance",
@@ -163,12 +166,29 @@
    "fieldname": "percent",
    "fieldtype": "Percent",
    "label": "Percent"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "label": "Currency",
+   "options": "Currency"
+  },
+  {
+   "default": "1",
+   "fieldname": "exchange_rate",
+   "fieldtype": "Float",
+   "label": "Exchange rate"
+  },
+  {
+   "fieldname": "amount_in_btn",
+   "fieldtype": "Currency",
+   "label": "DSA Amount in BTN"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-11-14 14:27:43.615611",
+ "modified": "2024-11-21 11:59:02.738627",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization Item",

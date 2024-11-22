@@ -135,8 +135,8 @@
    "type": "Link"
   }
  ],
- "modified": "2024-10-17 14:32:56.269137",
- "modified_by": "Administrator",
+ "modified": "2024-11-21 18:26:36.188433",
+ "modified_by": "kinzang.namgyal@cdcl.bt",
  "module": "Payroll",
  "name": "Tax & Benefits",
  "number_cards": [],
@@ -145,7 +145,7 @@
  "public": 1,
  "quick_lists": [],
  "roles": [],
- "sequence_id": 25.0,
+ "sequence_id": 10.0,
  "shortcuts": [
   {
    "color": "Red",

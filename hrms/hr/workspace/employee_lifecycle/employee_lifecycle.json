@@ -139,8 +139,8 @@
    "type": "Link"
   }
  ],
- "modified": "2024-10-17 14:32:54.924979",
- "modified_by": "Administrator",
+ "modified": "2024-11-21 18:26:35.386627",
+ "modified_by": "kinzang.namgyal@cdcl.bt",
  "module": "HR",
  "name": "Employee Lifecycle",
  "number_cards": [],
@@ -149,7 +149,7 @@
  "public": 1,
  "quick_lists": [],
  "roles": [],
- "sequence_id": 14.0,
+ "sequence_id": 4.0,
  "shortcuts": [
   {
    "color": "Grey",

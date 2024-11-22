@@ -1,47 +1,58 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:country",
  "creation": "2024-10-11 12:27:25.934588",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "section_break_nd6x"
+  "country",
+  "first",
+  "rest",
+  "column_break_tjbh",
+  "currency",
+  "second"
  ],
  "fields": [
-    {
-        "fieldname": "country",
-        "fieldtype": "Data",
-        "label": "Country",
-        "unique": 1
-       },
-       {
-        "fieldname": "currency",
-        "fieldtype": "Link",
-        "label": "Currency",
-        "options": "Currency"
-       },
-       {
-        "fieldname": "dsa_rate",
-        "fieldtype": "Data",
-        "label": "DSA Rate"
-       },
-       {
-        "fieldname": "ceo",
-        "fieldtype": "Data",
-        "label": "CEO"
-       },
-       {
-        "fieldname": "others",
-        "fieldtype": "Data",
-        "label": "Others"
-       }
+  {
+   "fieldname": "country",
+   "fieldtype": "Data",
+   "label": "Place",
+   "unique": 1
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "label": "Currency",
+   "options": "Currency"
+  },
+  {
+   "fieldname": "column_break_tjbh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rest",
+   "fieldtype": "Currency",
+   "label": "Rest"
+  },
+  {
+   "fieldname": "first",
+   "fieldtype": "Currency",
+   "label": "CEO, E2"
+  },
+  {
+   "fieldname": "second",
+   "fieldtype": "Currency",
+   "label": "E3, M1"
+  }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-11 12:27:25.934588",
+ "modified": "2024-11-21 11:28:02.151610",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "DSA Out Country",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
@@ -57,7 +68,9 @@
    "write": 1
   }
  ],
+ "quick_entry": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

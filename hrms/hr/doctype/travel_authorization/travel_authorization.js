@@ -46,6 +46,8 @@ frappe.ui.form.on('Travel Authorization', {
 				};
 			});
 		}
+		
+		
 		if (cur_frm.doc.__islocal) {
 			//commented by Tandin Phuntsho: Reason:[The value of the Travel Authorization Item dissapears when an Exception is thrown ]
 			//frm.set_value("items", []);
@@ -134,6 +136,7 @@ frappe.ui.form.on('Travel Authorization', {
 		// 		}
 		// 	};
 		// });
+		
 
 		frm.set_query("employee", erpnext.queries.employee);
 	},
@@ -152,6 +155,7 @@ frappe.ui.form.on('Travel Authorization', {
 		frm.toggle_reqd("currency", frm.doc.need_advance == 1);
 		frm.toggle_reqd("advance_amount", frm.doc.need_advance == 1);
 		calculate_advance(frm);
+		
 	},
 	"advance_amount": function (frm) {
 		// if (frm.doc.advance_amount > frm.doc.estimated_amount * 0.9) {
@@ -226,6 +230,16 @@ frappe.ui.form.on("Travel Authorization Item", {
 		// 		frappe.model.set_value(cdt, cdn, "no_days", 1 + cint(frappe.datetime.get_day_diff(item.till_date, item.date)))
 		// 	}
 		// }
+		if(frm.doc.place_type=="In-Country"){
+			console.log(frm.doc.place_type)
+			frm.set_query('country', 'items', function(){
+				return{
+					filters:{
+						name: ['in', ['Bhutan']]
+					}
+				}
+			})
+		}
 		
 		var halt = frappe.meta.get_docfield("Travel Authorization Item", "halt", cur_frm.doc.name);
 		var halt_at = frappe.meta.get_docfield("Travel Authorization Item", "halt_at", cur_frm.doc.name);
@@ -259,6 +273,7 @@ frappe.ui.form.on("Travel Authorization Item", {
 		frm.refresh_field("items");
 		
 	},
+	
 	"date": function (frm, cdt, cdn) {
 		var item = locals[cdt][cdn];
 		frappe.call({
@@ -325,6 +340,9 @@ frappe.ui.form.on("Travel Authorization Item", {
 		}
 		frm.refresh_fields();
 		frm.refresh_field("items");
+		set_dsa_rate(frm,cdt,cdn);
+		frm.refresh_fields();
+		frm.refresh_field("items");
 	},
 
 	"till_date": function (frm, cdt, cdn) {
@@ -351,6 +369,11 @@ frappe.ui.form.on("Travel Authorization Item", {
 		frm.refresh_fields();
 		frm.refresh_field("items");
 	},
+	"exchange_rate": function (frm, cdt, cdn) {
+		set_dsa_rate(frm,cdt,cdn);
+		frm.refresh_fields();
+		frm.refresh_field("items");
+	},
 
 	"halt": function (frm, cdt, cdn) {
 		var item = locals[cdt][cdn]
@@ -372,6 +395,10 @@ frappe.ui.form.on("Travel Authorization Item", {
 			frappe.model.set_value(cdt, cdn, "till_date", item.temp_till_date || item.date);frappe.model.set_value(cdt, cdn, "no_days", 1 + cint(frappe.datetime.get_day_diff(item.till_date, item.date)))
 		}
 	},
+
+	"country": function(frm, cdt, cdn){
+		set_dsa_rate(frm,cdt,cdn);
+	}, 
 	items_remove: function(frm)
 		{
 		if(frm.doc.need_advance) {
@@ -379,7 +406,18 @@ frappe.ui.form.on("Travel Authorization Item", {
 		}
 	}
 });
-
+function set_dsa_rate(frm, cdt, cdn){
+	frappe.call({
+		method: "set_dsa_rate",
+		doc: frm.doc,
+		callback: function(r){
+		 
+		 frm.refresh_field("items");
+		 frm.refresh_field("items");
+		 frm.refresh_fields();
+		}
+	});
+}
 function calculate_advance(frm) {
 	frappe.call({
 					   method: "set_estimate_amount",
@@ -387,6 +425,7 @@ function calculate_advance(frm) {
 					   callback: function(r){
 						frm.refresh_fields();
 						frm.refresh_field("estimated_amount");
+						frm.refresh_field("amount_in_btn");
 					   }
 			   });
    }

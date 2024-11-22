@@ -64,8 +64,8 @@
    "type": "Link"
   }
  ],
- "modified": "2024-11-20 15:00:51.826325",
- "modified_by": "Administrator",
+ "modified": "2024-11-21 18:26:35.944844",
+ "modified_by": "kinzang.namgyal@cdcl.bt",
  "module": "Payroll",
  "name": "Payroll",
  "number_cards": [],
@@ -75,7 +75,7 @@
  "quick_lists": [],
  "restrict_to_domain": "",
  "roles": [],
- "sequence_id": 23.0,
+ "sequence_id": 8.0,
  "shortcuts": [
   {
    "label": "Dashboard",

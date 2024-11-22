@@ -116,9 +116,11 @@ frappe.ui.form.on('Travel Claim', {
 	},
 	"total_claim_amount": function (frm) {
 		frm.set_value("balance_amount", frm.doc.total_claim_amount + frm.doc.extra_claim_amount - frm.doc.advance_amount)
+		frm.refresh_field("balance_amount");
 	},
 	"extra_claim_amount": function (frm) {
 		frm.set_value("balance_amount", frm.doc.total_claim_amount + frm.doc.extra_claim_amount - frm.doc.advance_amount)
+		frm.refresh_field("balance_amount");
 	},
 	"get_travel_authorization": function (frm) {
 		get_travel_detail(frm);
@@ -309,17 +311,19 @@ function do_update(frm, cdt, cdn) {
 	} */
 	var amount = 0;
 	if(frm.doc.place_type == "In-Country"){
-		amount = flt((flt(item.dsa_percent) / 100 * flt(item.dsa)) + (flt(item.mileage_rate) * flt(item.distance)) + flt(item.porter_pony_charges) + flt(item.fare_amount)) 
+		amount = flt((flt(item.dsa_percent) / 100 * flt(item.dsa)*flt(item.no_days))  + (flt(item.mileage_rate)  * flt(item.distance)) + flt(item.porter_pony_charges) + flt(item.fare_amount)) 
 		if (item.halt == 1) {
 			amount = flt((flt(item.dsa_percent) / 100 * flt(item.dsa)) * flt(item.no_days))+flt(item.porter_pony_charges);
 		}
 	}
 	else if(frm.doc.place_type == "Out-Country"){
-		amount = flt((flt(item.dsa_percent) / 100 * flt(item.dsa)) + (flt(item.mileage_rate) * flt(item.distance)) + flt(item.fare_amount)); 
+		amount = flt((flt(item.dsa_percent) / 100 * flt(item.dsa)*flt(item.no_days)) + (flt(item.mileage_rate) * flt(item.distance)) + flt(item.fare_amount)); 
 		if (item.halt == 1) {
 			amount = flt((flt(item.dsa_percent) / 100 * flt(item.dsa)) * flt(item.no_days));
 		}
 	}
+	var mileage_amount=flt(item.mileage_rate)*flt(item.distance);
+	frappe.model.set_value(cdt, cdn, 'mileage_amount', flt(mileage_amount));
 	if (item.currency != "BTN") {
 		frappe.call({
 			method: "hrms.hr.doctype.travel_authorization.travel_authorization.get_exchange_rate",

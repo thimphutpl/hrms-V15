@@ -36,7 +36,6 @@
   "column_break_deeg",
   "if_sponsorship_is_others",
   "section_break_s22dq",
-  "within_the_dzongkhag",
   "items",
   "from_date",
   "to_date",
@@ -446,14 +445,6 @@
    "label": "Training Event Child Ref"
   },
   {
-   "default": "0",
-   "depends_on": "eval: doc.place_type==\"In-Country\"",
-   "fieldname": "within_the_dzongkhag",
-   "fieldtype": "Check",
-   "label": "Within Same Locality",
-   "no_copy": 1
-  },
-  {
    "fieldname": "section_break_s22dq",
    "fieldtype": "Section Break",
    "label": "Travel Claim"
@@ -478,6 +469,7 @@
    "options": "CDCL\nOthers"
   },
   {
+   "depends_on": "eval:doc.sponsorship!=\"CDCL\"",
    "fieldname": "if_sponsorship_is_others",
    "fieldtype": "Data",
    "label": "If sponsorship is others"
@@ -485,7 +477,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-10-31 16:45:32.454452",
+ "modified": "2024-11-21 12:29:28.951965",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",

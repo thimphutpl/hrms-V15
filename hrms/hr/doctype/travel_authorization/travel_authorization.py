@@ -113,7 +113,7 @@ class TravelAuthorization(Document):
         self.advance_amount     = 0 if not self.need_advance else self.advance_amount
         #frappe.throw("hi")
         # frappe.throw(str(self.estimated_amount))
-        if self.advance_amount > self.estimated_amount * 0.9:
+        if flt(self.advance_amount) > flt(flt(self.estimated_amount) * 0.9):
             frappe.throw("Advance Amount cannot be greater than 90% of Total Estimated Amount")
         self.advance_amount_nu  = 0 if not self.need_advance else self.advance_amount_nu
         self.advance_journal    = None if self.docstatus == 0 else self.advance_journal
@@ -314,28 +314,35 @@ class TravelAuthorization(Document):
                 frappe.sendmail(recipients=email, sender=None, subject=subject, message=message)
             except:
                 pass
-
-    # def set_dsa_rate(self):
+    @frappe.whitelist()
+    def set_dsa_rate(self):
         
-    #     if self.place_type=="In-Country":
-    #         if self.grade:
-    #             self.db_set("dsa_per_day", frappe.db.get_value("Employee Grade", self.grade, "dsa_per_day"))
-                
-                
-    #     elif self.place_type=="Out-Country":
-    #         if "India" in self.countrys:
-    #             roles=frappe.get_roles(self.owner)
-            
-    #             if "CEO" in roles:
-    #                 ex_country_dsa=flt(frappe.db.get_value("DSA Out Country", self.countrys, "ceo"))
-    #             else:
-    #                 ex_country_dsa=flt(frappe.db.get_value("DSA Out Country", self.countrys, "others"))
-    #         else:
-    #             ex_country_dsa=flt(frappe.db.get_value("DSA Out Country", self.countrys, "dsa_rate"))
-    #         currency_from=frappe.db.get_value("DSA Out Country", self.countrys, "currency")
-            
-    #         ex_country_dsa=ex_country_dsa*flt(get_exchange_rate(currency_from, "BTN", self.posting_date ))
-    #         self.db_set("dsa_per_day", ex_country_dsa)
+        grade=frappe.db.get_value("Employee", self.employee, "grade")
+        emp_type={
+            "first": ["CEO", "E2"],
+            "second": ["E3", "M1"]
+        }
+
+        if not grade:
+            frappe.throw("Set the Grade for the Employee {}".format(self.employee) )
+        
+        emp_grade="rest"
+        for key,val in emp_type.items():
+            if grade in val:
+                emp_grade=key
+
+        for item in self.items:
+            if item.country=="Bhutan":
+                item.dsa_rate=self.dsa_per_day
+                item.amount_in_btn=flt(item.exchange_rate)*flt(self.dsa_per_day)
+            else:
+                dsa_rate=frappe.db.get_value("DSA Out Country", item.country, emp_grade)
+                currency=frappe.db.get_value("DSA Out Country", item.country, "currency")
+                if not dsa_rate:
+                    frappe.throw("Set the DSA Out Country for {}".format(item.country))
+                item.dsa_rate=dsa_rate
+                item.currency=currency
+                item.amount_in_btn=flt(item.exchange_rate)*flt(dsa_rate)
 
       
     @frappe.whitelist()
@@ -343,12 +350,14 @@ class TravelAuthorization(Document):
         total_days = 0.0
         return_day = 1
         full_dsa = 0
-        for i in self.items:
+        doc=frappe.get_doc("Travel Authorization", self.name)
+        for i in doc.get_all_children():
             from_date = i.date
             to_date   = i.date if not i.till_date else i.till_date
             no_days   = date_diff(to_date, from_date) + 1
-            full_dsa+=flt(i.dsa_rate)*(flt(i.percent)/100)*flt(no_days)            
-        self.estimated_amount = flt(full_dsa) 
+            full_dsa+=flt(i.amount_in_btn)*(flt(i.percent)/100)*flt(no_days)*flt(i.exchange_rate)    
+        final=flt(full_dsa)-(flt(i.amount_in_btn)*flt(i.exchange_rate))    
+        self.estimated_amount = flt(final)
         
     @frappe.whitelist()
     def check_double_dates(self):
@@ -377,13 +386,14 @@ def make_travel_claim(source_name, target_doc=None):
             target.halt_at = None
             
         # frappe.throw(str(obj))
-        target.currency = source_parent.currency
+        target.currency = obj.currency
         target.currency_exchange_date = source_parent.posting_date
-        target.within_the_dzongkhag=source_parent.within_the_dzongkhag
+        # target.within_the_dzongkhag=source_parent.within_the_dzongkhag
         
         target.dsa = obj.dsa_rate
         target.dsa_percent = obj.percent
         target.country=obj.country
+        
             
         if target.currency == "BTN":
             target.exchange_rate = 1

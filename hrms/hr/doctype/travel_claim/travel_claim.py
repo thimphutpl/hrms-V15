@@ -29,31 +29,26 @@ class TravelClaim(Document):
                 
     def workflow_action(self):
         action = frappe.request.form.get('action') 
-        if action == "Apply" and self.travel_type!="Travel":
-            self.workflow_state="Waiting for Verification"
-            rcvpnt=frappe.db.get_value("Employee", frappe.db.get_single_value("HR Settings", "hr_verifier"), "user_id")
-            self.notify_reviewers(rcvpnt)
-        elif action== "Reapply" and self.travel_type!="Travel":
-            if self.workflow_state == "Waiting for Verification":
-                if frappe.session.user!=frappe.db.get_value("Employee", frappe.db.get_single_value("HR Settings", "hr_verifier"), "user_id"):
-                    frappe.throw(str("only {} can reject").format(frappe.db.get_value("Employee", frappe.db.get_single_value("HR Settings", "hr_verifier"), "user_id")))
-        elif action == "Approve" and self.workflow_state == "Approved":
-            #Get the user with Account User Role who are permitted to this selected branch
+        # if action == "Apply" and self.travel_type!="Travel":
+        #     self.workflow_state="Waiting for Verification"
+        #     # rcvpnt=frappe.db.get_value("Employee", frappe.db.get_single_value("HR Settings", "hr_verifier"), "user_id")
+        #     # self.notify_reviewers(rcvpnt)
+        # elif action== "Reapply" and self.travel_type!="Travel":
+        #     if self.workflow_state == "Waiting for Verification":
+        #         pass
+        #         # if frappe.session.user!=frappe.db.get_value("Employee", frappe.db.get_single_value("HR Settings", "hr_verifier"), "user_id"):
+        #         #     frappe.throw(str("only {} can reject").format(frappe.db.get_value("Employee", frappe.db.get_single_value("HR Settings", "hr_verifier"), "user_id")))
+        if action == "Approve" and self.workflow_state == "Approved":
+            # Get the user with Account User Role who are permitted to this selected branch
             recipients=[]
             for a in frappe.db.sql("""
                                 select u.name from `tabUser` u inner join  `tabHas Role` r
                                 on u.name = r.parent
                                 where r.role in ("Accounts User","Accounts Manager") 
-                                and u.name like "%bdb.bt"
-                                and exists(
-                                    select 1 from `tabAssign Branch` b inner join `tabBranch Item` i 
-                                    on b.name = i.parent 
-                                    where branch="{branch}" and b.user = u.name
-                                )
-                                group by u.name
                             """.format(branch=self.branch), as_dict=True):
                 recipients.append(a.parent)
-            self.notify_reviewers(recipients)
+            if recipients:
+                self.notify_reviewers(recipients)
     
     def notify_reviewers(self, recipients):
         parent_doc = frappe.get_doc(self.doctype, self.name)

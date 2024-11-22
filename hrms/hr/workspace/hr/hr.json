@@ -510,8 +510,8 @@
    "type": "Link"
   }
  ],
- "modified": "2024-10-31 15:57:27.292721",
- "modified_by": "sonam.choki@thimphutechpark.bt",
+ "modified": "2024-11-21 18:26:35.238202",
+ "modified_by": "kinzang.namgyal@cdcl.bt",
  "module": "HR",
  "name": "HR",
  "number_cards": [],
@@ -521,7 +521,7 @@
  "quick_lists": [],
  "restrict_to_domain": "",
  "roles": [],
- "sequence_id": 13.0,
+ "sequence_id": 3.0,
  "shortcuts": [
   {
    "format": "{} Open",
