@@ -188,7 +188,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Transfer Type",
-   "options": "\nPersonal Request\nManagement Transfer\nMutual Swipe\nIn the interest of company\nDisciplinary Transfer\nUpgraded and Transferred",
+   "options": "\nRegular Transfer\nProject Deployment\nDeputation or Temporary Transfer\nInternal Transfer\nShort Term Redeployment\nLong Term Redeployment\nTransfer on request\nDisciplinary Transfer",
    "reqd": 1
   },
   {
@@ -391,7 +391,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-11-18 11:20:34.569217",
+ "modified": "2024-11-23 12:06:21.487063",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Transfer",

@@ -11,16 +11,19 @@
   "standard_working_hours",
   "column_break_9",
   "retirement_age",
-  "return_day_dsa_percent",
   "reminders_section",
+  "send_birthday_reminders",
+  "enable_bulk_overtime_payment",
   "column_break_11",
   "send_work_anniversary_reminders",
-  "send_birthday_reminders",
+  "column_break_18",
   "send_holiday_reminders",
   "frequency",
-  "column_break_hyec",
-  "sender",
-  "sender_email",
+  "hra_settings_section",
+  "hra",
+  "column_break_16",
+  "lumpsum_amt",
+  "take_department_rating",
   "leave_and_expense_claim_settings",
   "send_leave_notification",
   "leave_approval_notification_template",
@@ -29,46 +32,156 @@
   "restrict_backdated_leave_application",
   "role_allowed_to_create_backdated_leave_application",
   "column_break_29",
+  "returen_day_dsa_percent",
   "expense_approver_mandatory_in_expense_claim",
   "show_leaves_of_all_department_members_in_calendar",
   "auto_leave_encashment",
-  "shift_settings_section",
-  "allow_multiple_shift_assignments",
   "hiring_settings_section",
   "check_vacancies",
   "send_interview_reminder",
   "interview_reminder_template",
   "remind_before",
+  "column_break_4",
   "send_interview_feedback_reminder",
   "feedback_reminder_notification_template",
-  "column_break_4",
-  "hiring_sender",
-  "hiring_sender_email",
   "employee_exit_section",
   "exit_questionnaire_web_form",
   "column_break_34",
   "exit_questionnaire_notification_template",
-  "attendance_settings_section",
-  "allow_employee_checkin_from_mobile_app",
-  "allow_geolocation_tracking",
+  "sign_and_seal_section",
+  "seal",
+  "overtime_settings_tab",
+  "overtime_limit_type",
+  "column_break_39",
+  "overtime_limit",
+  "sb_approver",
+  "hrgm",
+  "hr_approver",
+  "hr_verifier",
+  "cb_01",
+  "hrgm_name",
+  "hr_approver_name",
+  "hr_verifier_name",
+  "separation_clearance_approver_section",
+  "afd",
+  "ama",
+  "icthr",
+  "iad",
+  "ada",
+  "pc",
+  "sws",
+  "column_break_60",
+  "approver_name_afd",
+  "approver_name_ama",
+  "approver_name_icthr",
+  "approver_name_iad",
+  "approver_name_ada",
+  "approver_name_pc",
+  "approver_name_sws",
+  "tb_notifications",
+  "sb_encashment_settings",
+  "encashment_approval_notification_template",
+  "column_break_54",
+  "encashment_status_notification_template",
+  "section_break_56",
+  "material_request_approval_notification_template",
+  "column_break_58",
+  "material_request_status_notification_template",
+  "sb_employee_separation",
+  "employee_separation_approval_notification_template",
+  "column_break_62",
+  "employee_separation_status_notification_template",
+  "sb_overtime",
+  "overtime_approval_notification_template",
+  "cb_ns_01",
+  "overtime_status_notification_template",
+  "sb_employee_benefits",
+  "benefits_approval_notification_template",
+  "column_break_70",
+  "benefits_status_notification_template",
+  "sb_employee_transfer",
+  "employee_transfer_approval_notification_template",
+  "column_break_74",
+  "employee_transfer_status_notification_template",
+  "employee_advance_section",
+  "employee_advance_approval_notification_template",
+  "column_break_78",
+  "employee_advance_status_notification_template",
+  "asset_movement_settings_section",
+  "asset_movement_approval_notification_template",
+  "asset_movement_column",
+  "asset_movement_status_notification_template",
+  "repair_and_services_settings_section",
+  "repair_and_services_approval_notification_template",
+  "column_break_86",
+  "repair_and_services_status_notification_template",
+  "budget_reappropiation_settings_section",
+  "budget_reappropiation_approval_notification_template",
+  "column_break_90",
+  "budget_reappropiation_status_notification_template",
+  "vehicle_request_settings_section",
+  "vehicle_request_approval_notification_template",
+  "column_break_94",
+  "vehicle_request_status_notification_template",
+  "leave_application_settings_section",
+  "leave_application_approval_notification_template",
+  "column_break_106",
+  "leave_application_status_notification_template",
+  "travel_request_settings_section",
+  "travel_request_approval_notification_template",
+  "travel_request_supervisor_notification_template",
+  "travel_authorization_approval_notification_template",
+  "travel_authorization_supervisor_notification_template",
+  "travel_authorization_status_notification_template",
+  "travel_claim_approval_notification_template",
+  "travel_claim_supervisor_notification_template",
+  "travel_claim_status_notification_template",
+  "column_break_110",
+  "travel_request_status_notification_template",
+  "utility_bill_settings_section",
+  "utility_bill_approval_notification_template",
+  "column_break_114",
+  "utility_bill_status_notification_template",
+  "bank_payment_settings_section",
+  "bank_payment_approval_notification_template",
+  "column_break_118",
+  "bank_payment_status_notification_template",
+  "imprest_notification_settings_section",
+  "imprest_advance_approval_notification_template",
+  "imprest_recoup_approval_notification_template",
+  "column_break_137",
+  "imprest_advance_status_notification_template",
+  "imprest_recoup_status_notification_template",
   "enote_email_templates_section",
   "enote_approval_notification",
   "enote_copyto_notification",
-  "column_break_qkuh",
+  "column_break_139",
   "enote_status_notification",
   "enote_reviewer_notification",
-  "approver_settings_tab",
-  "hr_approver",
-  "hrgm",
-  "column_break_scpi",
-  "hr_approver_name",
-  "hrgm_name",
-  "overtime_settings_tab",
-  "overtime_limit_type",
-  "column_break_ligd",
-  "overtime_limit",
-  "travel_settings_tab",
-  "return_day_dsa"
+  "pms_section",
+  "target_set_up_status_notification_template",
+  "review_status_notification_template",
+  "evaluation_status_notification_template",
+  "pms_appeal_status_notification_template",
+  "pms_col",
+  "target_set_up_approval_notification_template",
+  "review_approval_notification_template",
+  "evaluation_approval_notification_template",
+  "pms_appeal_approval_notification_template",
+  "housing_clearance_approver_notification",
+  "sws_setting_tab",
+  "semso_deduction_from_salary_section",
+  "semso",
+  "column_break_77300",
+  "add_semso",
+  "column_break_8shme",
+  "remove_semso",
+  "tb_travel",
+  "return_day_dsa",
+  "training_dsa",
+  "dsa_30_to_90",
+  "dsa_90_plus",
+  "dsa_within_same_locality"
  ],
  "fields": [
   {
@@ -98,6 +211,10 @@
    "fieldname": "expense_approver_mandatory_in_expense_claim",
    "fieldtype": "Check",
    "label": "Expense Approver Mandatory In Expense Claim"
+  },
+  {
+   "fieldname": "column_break_18",
+   "fieldtype": "Column Break"
   },
   {
    "default": "1",
@@ -149,7 +266,7 @@
   },
   {
    "fieldname": "standard_working_hours",
-   "fieldtype": "Float",
+   "fieldtype": "Int",
    "label": "Standard Working Hours"
   },
   {
@@ -277,117 +394,7 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "sender",
-   "fieldtype": "Link",
-   "label": "Sender",
-   "options": "Email Account"
-  },
-  {
-   "depends_on": "eval:doc.sender",
-   "fetch_from": "sender.email_id",
-   "fieldname": "sender_email",
-   "fieldtype": "Data",
-   "label": "Sender Email",
-   "read_only": 1
-  },
-  {
-   "fieldname": "column_break_hyec",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "hiring_sender",
-   "fieldtype": "Link",
-   "label": "Sender",
-   "options": "Email Account"
-  },
-  {
-   "depends_on": "eval:doc.hiring_sender",
-   "fetch_from": "hiring_sender.email_id",
-   "fieldname": "hiring_sender_email",
-   "fieldtype": "Data",
-   "label": "Sender Email",
-   "read_only": 1
-  },
-  {
-   "default": "0",
-   "fieldname": "allow_multiple_shift_assignments",
-   "fieldtype": "Check",
-   "label": "Allow Multiple Shift Assignments for Same Date"
-  },
-  {
-   "fieldname": "shift_settings_section",
-   "fieldtype": "Section Break",
-   "label": "Shift Settings"
-  },
-  {
-   "default": "1",
-   "fieldname": "allow_employee_checkin_from_mobile_app",
-   "fieldtype": "Check",
-   "label": "Allow Employee Checkin from Mobile App"
-  },
-  {
-   "default": "0",
-   "fieldname": "allow_geolocation_tracking",
-   "fieldtype": "Check",
-   "label": "Allow Geolocation Tracking"
-  },
-  {
-   "fieldname": "attendance_settings_section",
-   "fieldtype": "Section Break",
-   "label": "Attendance Settings"
-  },
-  {
-   "fieldname": "enote_email_templates_section",
-   "fieldtype": "Section Break",
-   "label": "eNote Email Templates"
-  },
-  {
-   "fieldname": "enote_approval_notification",
-   "fieldtype": "Link",
-   "label": "eNote Approval Notification",
-   "options": "Email Template"
-  },
-  {
-   "fieldname": "enote_copyto_notification",
-   "fieldtype": "Link",
-   "label": "eNote CopyTo Notification",
-   "options": "Email Template"
-  },
-  {
-   "fieldname": "column_break_qkuh",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "enote_status_notification",
-   "fieldtype": "Link",
-   "label": "eNote Status Notification",
-   "options": "Email Template"
-  },
-  {
-   "fieldname": "enote_reviewer_notification",
-   "fieldtype": "Link",
-   "label": "eNote Reviewer Notification",
-   "options": "Email Template"
-  },
-  {
-   "fieldname": "approver_settings_tab",
-   "fieldtype": "Tab Break",
-   "label": "Approver Settings"
-  },
-  {
-   "fieldname": "hr_approver",
-   "fieldtype": "Link",
-   "label": "HR Approver",
-   "options": "Employee"
-  },
-  {
-   "fieldname": "hrgm",
-   "fieldtype": "Link",
-   "label": "HRGM",
-   "options": "Employee"
-  },
-  {
-   "fieldname": "return_day_dsa_percent",
+   "fieldname": "returen_day_dsa_percent",
    "fieldtype": "Percent",
    "label": "Return Day DSA Percent"
   },
@@ -403,7 +410,7 @@
    "options": "\nPer Day\nPer Week\nPer Month"
   },
   {
-   "fieldname": "column_break_ligd",
+   "fieldname": "column_break_39",
    "fieldtype": "Column Break"
   },
   {
@@ -412,7 +419,668 @@
    "label": "Overtime Limit In Hrs(Per Day)"
   },
   {
-   "fieldname": "travel_settings_tab",
+   "fieldname": "hr_approver",
+   "fieldtype": "Link",
+   "label": "HR Approver",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "hr_approver.employee_name",
+   "fieldname": "hr_approver_name",
+   "fieldtype": "Data",
+   "label": "HR Approver Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_approver",
+   "fieldtype": "Tab Break",
+   "label": "Approver Settings"
+  },
+  {
+   "fieldname": "tb_notifications",
+   "fieldtype": "Tab Break",
+   "label": "Notification Templates"
+  },
+  {
+   "fieldname": "sb_encashment_settings",
+   "fieldtype": "Section Break",
+   "label": "Leave Encashment Settings"
+  },
+  {
+   "fieldname": "encashment_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Encashment Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "encashment_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Encashment Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "sb_employee_separation",
+   "fieldtype": "Section Break",
+   "label": "Employee Separation Settings"
+  },
+  {
+   "fieldname": "employee_separation_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Employee Separation Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "employee_separation_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Employee Separation Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_bulk_overtime_payment",
+   "fieldtype": "Check",
+   "label": "Enable Bulk Overtime Payment"
+  },
+  {
+   "fieldname": "sb_overtime",
+   "fieldtype": "Section Break",
+   "label": "Overtime Notification Settings"
+  },
+  {
+   "fieldname": "overtime_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Overtime Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "overtime_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Overtime Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "cb_ns_01",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sb_employee_benefits",
+   "fieldtype": "Section Break",
+   "label": "Employee Benefit Settings"
+  },
+  {
+   "fieldname": "benefits_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Benefits Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "benefits_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Benefits Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "sb_employee_transfer",
+   "fieldtype": "Section Break",
+   "label": "Employee Transfer Notification"
+  },
+  {
+   "fieldname": "employee_transfer_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Employee Transfer Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "employee_transfer_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Employee Transfer Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "hrgm",
+   "fieldtype": "Link",
+   "label": "HRGM",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "hrgm.employee_name",
+   "fieldname": "hrgm_name",
+   "fieldtype": "Data",
+   "label": "HRGM Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb_01",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "employee_advance_section",
+   "fieldtype": "Section Break",
+   "label": "Employee Advance"
+  },
+  {
+   "fieldname": "employee_advance_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Employee Advance Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "employee_advance_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Employee Advance Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "asset_movement_column",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "asset_movement_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Asset Movement Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "asset_movement_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Asset Movement Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "material_request_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Material Request Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "material_request_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Material Request Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "column_break_54",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_56",
+   "fieldtype": "Section Break",
+   "label": "Material Request Settings"
+  },
+  {
+   "fieldname": "column_break_58",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_62",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_70",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_74",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_78",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "asset_movement_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Asset Movement Settings"
+  },
+  {
+   "fieldname": "repair_and_services_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Repair and Services Settings"
+  },
+  {
+   "fieldname": "repair_and_services_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Repair and Services Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "column_break_86",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "repair_and_services_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Repair and Services Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "budget_reappropiation_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Budget Reappropiation Settings"
+  },
+  {
+   "fieldname": "budget_reappropiation_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Budget Reappropiation Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "column_break_90",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "budget_reappropiation_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Budget Reappropiation Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "vehicle_request_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Vehicle Request Settings"
+  },
+  {
+   "fieldname": "vehicle_request_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Vehicle Request Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "column_break_94",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "vehicle_request_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Vehicle Request Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "leave_application_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Leave Application Settings"
+  },
+  {
+   "fieldname": "leave_application_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Leave Application Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "column_break_106",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "leave_application_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Leave Application Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "travel_request_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Travel Request Settings"
+  },
+  {
+   "fieldname": "travel_request_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Travel Request Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "column_break_110",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "travel_request_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Travel Request Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "utility_bill_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Utility Bill Settings"
+  },
+  {
+   "fieldname": "utility_bill_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Utility Bill Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "column_break_114",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "utility_bill_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Utility Bill Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "bank_payment_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Bank Payment Settings"
+  },
+  {
+   "fieldname": "bank_payment_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Bank Payment Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "column_break_118",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "bank_payment_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Bank Payment Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "hra_settings_section",
+   "fieldtype": "Section Break",
+   "label": "HRA Settings"
+  },
+  {
+   "description": "<i>HRA percent is defined in the HR Settings. If HRA amount is less than or equal to 3500, HRA amount is set to BTN 3500.</i>",
+   "fieldname": "hra",
+   "fieldtype": "Float",
+   "label": "House Rent Allowance(%)"
+  },
+  {
+   "fieldname": "column_break_16",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "lumpsum_amt",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "HRA Lumpsum Amount",
+   "reqd": 1
+  },
+  {
+   "fieldname": "separation_clearance_approver_section",
+   "fieldtype": "Section Break",
+   "label": "Separation Clearance Approver"
+  },
+  {
+   "fieldname": "column_break_60",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "icthr",
+   "fieldtype": "Link",
+   "label": "Human Resource & Administration",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "iad",
+   "fieldtype": "Link",
+   "label": "Internal Audit Division",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "icthr.employee_name",
+   "fieldname": "approver_name_icthr",
+   "fieldtype": "Data",
+   "label": "Approver Name (Human Resource & Administration Division)",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "iad.employee_name",
+   "fieldname": "approver_name_iad",
+   "fieldtype": "Data",
+   "label": "Approver Name (Internal Audit Division)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "afd",
+   "fieldtype": "Link",
+   "label": "Accounts & Finance Division",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "afd.employee_name",
+   "fieldname": "approver_name_afd",
+   "fieldtype": "Data",
+   "label": "Approver Name (Accounts & Finance Division)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "imprest_notification_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Imprest Notification Settings"
+  },
+  {
+   "fieldname": "imprest_advance_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Imprest Advance Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "imprest_recoup_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Imprest Recoup Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "column_break_137",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "imprest_advance_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Imprest Advance Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "imprest_recoup_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Imprest Recoup Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "travel_request_supervisor_notification_template",
+   "fieldtype": "Link",
+   "label": "Travel Request Supervisor Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "enote_approval_notification",
+   "fieldtype": "Link",
+   "label": "eNote Approval Notification",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "enote_copyto_notification",
+   "fieldtype": "Link",
+   "label": "eNote CopyTo Notification",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "enote_status_notification",
+   "fieldtype": "Link",
+   "label": "eNote Status Notification",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "sws",
+   "fieldtype": "Link",
+   "label": "SWS Treasurer",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "sws.employee_name",
+   "fieldname": "approver_name_sws",
+   "fieldtype": "Data",
+   "label": "Approver Name(SWS Treasurer)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "pms_section",
+   "fieldtype": "Section Break",
+   "label": "PMS "
+  },
+  {
+   "fieldname": "target_set_up_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Target Set Up Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "target_set_up_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Target Set Up Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "review_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Review Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "default": "0",
+   "fieldname": "pms_col",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "review_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Review Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "evaluation_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Evaluation Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "evaluation_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Evaluation Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "pms_appeal_status_notification_template",
+   "fieldtype": "Link",
+   "label": "PMS Appeal Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "pms_appeal_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "PMS Appeal Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "enote_email_templates_section",
+   "fieldtype": "Section Break",
+   "label": "eNote Email Templates"
+  },
+  {
+   "fieldname": "column_break_139",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "housing_clearance_approver_notification",
+   "fieldtype": "Link",
+   "label": "Housing Clearance Approver Notification",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "sign_and_seal_section",
+   "fieldtype": "Section Break",
+   "label": "Sign and Seal"
+  },
+  {
+   "fieldname": "seal",
+   "fieldtype": "Attach Image",
+   "label": "Finance Focal Seal"
+  },
+  {
+   "fieldname": "sws_setting_tab",
+   "fieldtype": "Tab Break",
+   "hidden": 1,
+   "label": "SWS Setting",
+   "read_only": 1
+  },
+  {
+   "fieldname": "semso_deduction_from_salary_section",
+   "fieldtype": "Section Break",
+   "label": "Semso Deduction From Salary"
+  },
+  {
+   "fieldname": "semso",
+   "fieldtype": "Percent",
+   "label": "Semso Deduction  Percent"
+  },
+  {
+   "fieldname": "column_break_77300",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "add_semso",
+   "fieldtype": "Button",
+   "label": "Add Semso"
+  },
+  {
+   "fieldname": "column_break_8shme",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "remove_semso",
+   "fieldtype": "Button",
+   "label": "Remove Semso"
+  },
+  {
+   "fieldname": "enote_reviewer_notification",
+   "fieldtype": "Link",
+   "label": "eNote Reviewer Notification",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "travel_authorization_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Travel Authorization Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "travel_authorization_supervisor_notification_template",
+   "fieldtype": "Link",
+   "label": "Travel Authorization Supervisor Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "travel_authorization_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Travel Authorization Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "travel_claim_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Travel Claim Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "travel_claim_supervisor_notification_template",
+   "fieldtype": "Link",
+   "label": "Travel Claim Supervisor Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "travel_claim_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Travel Claim Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "tb_travel",
    "fieldtype": "Tab Break",
    "label": "Travel Settings"
   },
@@ -422,27 +1090,88 @@
    "label": "Return Day DSA Percent"
   },
   {
-   "fieldname": "column_break_scpi",
-   "fieldtype": "Column Break"
+   "fieldname": "training_dsa",
+   "fieldtype": "Data",
+   "label": "Training DSA"
   },
   {
-   "fetch_from": "hr_approver.employee_name",
-   "fieldname": "hr_approver_name",
+   "fieldname": "dsa_30_to_90",
    "fieldtype": "Data",
-   "label": "HR Approver Name"
+   "label": "DSA (30 to 90) Percent"
   },
   {
-   "fetch_from": "hrgm.employee_name",
-   "fieldname": "hrgm_name",
+   "fieldname": "dsa_90_plus",
    "fieldtype": "Data",
-   "label": "HRGM Name"
+   "label": "DSA (90 plus) Percent"
+  },
+  {
+   "fieldname": "dsa_within_same_locality",
+   "fieldtype": "Data",
+   "label": "DSA Within Same Locality Percent"
+  },
+  {
+   "fieldname": "hr_verifier",
+   "fieldtype": "Link",
+   "label": "HR Verifier",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "hr_verifier.employee_name",
+   "fieldname": "hr_verifier_name",
+   "fieldtype": "Data",
+   "label": "HR Verifier Name"
+  },
+  {
+   "fieldname": "ada",
+   "fieldtype": "Link",
+   "label": "Asset Declaration Administrator",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "pc",
+   "fieldtype": "Link",
+   "label": "Procurement and Contracts",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "ama.employee_name",
+   "fieldname": "approver_name_ama",
+   "fieldtype": "Data",
+   "label": "Approver Name (Asset Management Section)",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "ada.employee_name",
+   "fieldname": "approver_name_ada",
+   "fieldtype": "Data",
+   "label": "Approver Name (Asset Declaration Administrator)"
+  },
+  {
+   "fetch_from": "pc.employee_name",
+   "fieldname": "approver_name_pc",
+   "fieldtype": "Data",
+   "label": "Approver Name(Procurement and Contracts)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ama",
+   "fieldtype": "Link",
+   "label": "Asset Management Section",
+   "options": "Employee"
+  },
+  {
+   "default": "0",
+   "description": "For PBVA",
+   "fieldname": "take_department_rating",
+   "fieldtype": "Check",
+   "label": "Take Department Rating"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-10-31 16:00:06.721359",
+ "modified": "2024-11-25 20:53:22.100868",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",

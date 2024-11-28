@@ -30,6 +30,13 @@
   "place_type",
   "col_break_mode",
   "mode_of_travel",
+  "training_information_section",
+  "course_name",
+  "training_venue",
+  "column_break_dzlm",
+  "type_of_training",
+  "bond_period_from_date",
+  "bond_period_to_date",
   "travel_details",
   "column_break_iirtw",
   "sponsorship",
@@ -473,11 +480,52 @@
    "fieldname": "if_sponsorship_is_others",
    "fieldtype": "Data",
    "label": "If sponsorship is others"
+  },
+  {
+   "depends_on": "eval:doc.travel_type==\"Training\"",
+   "fieldname": "training_information_section",
+   "fieldtype": "Section Break",
+   "label": "Training Information"
+  },
+  {
+   "fieldname": "course_name",
+   "fieldtype": "Data",
+   "label": "Course Name",
+   "mandatory_depends_on": "eval:doc.travel_type==\"Training\""
+  },
+  {
+   "fieldname": "training_venue",
+   "fieldtype": "Data",
+   "label": "Training Venue",
+   "mandatory_depends_on": "eval:doc.travel_type==\"Training\""
+  },
+  {
+   "fieldname": "column_break_dzlm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "type_of_training",
+   "fieldtype": "Select",
+   "label": "Type of Training",
+   "mandatory_depends_on": "eval:doc.travel_type==\"Training\"",
+   "options": "\nShort Term\nLong Term\nWorkshop\nSeminar"
+  },
+  {
+   "fieldname": "bond_period_from_date",
+   "fieldtype": "Date",
+   "label": "Bond Period From Date",
+   "mandatory_depends_on": "eval:doc.travel_type==\"Training\""
+  },
+  {
+   "fieldname": "bond_period_to_date",
+   "fieldtype": "Date",
+   "label": "Bond Period To Date",
+   "mandatory_depends_on": "eval:doc.travel_type==\"Training\""
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-11-21 12:29:28.951965",
+ "modified": "2024-11-27 15:25:45.232550",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",

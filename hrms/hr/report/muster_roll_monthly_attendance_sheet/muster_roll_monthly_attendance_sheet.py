@@ -48,7 +48,7 @@ def get_columns(filters):
         for day in range(filters["total_days_in_month"]):
                 columns.append(cstr(day + 1) + "::42")
 
-        columns += [_("Total Present") + ":Float:100", _("Total Absent") + ":Float:100"]
+        columns += [_("Total Present") + ":Float:100", _("Total Absent") + ":Float:100",_("Total Half") + ":Float:100"]
         return columns
 
 def get_attendance_list(conditions, filters):

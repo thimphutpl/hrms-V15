@@ -58,6 +58,7 @@
    "options": "\n01\n02\n03\n04\n05\n06\n07\n08\n09\n10\n11\n12"
   },
   {
+   "depends_on": "eval:doc.single_employee;",
    "fieldname": "section_break_8",
    "fieldtype": "Section Break",
    "label": "Select Employees"
@@ -164,7 +165,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-06-23 14:57:40.597200",
+ "modified": "2024-11-26 12:28:16.765355",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Promotion Entry",

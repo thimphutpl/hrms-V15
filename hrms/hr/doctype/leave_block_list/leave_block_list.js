@@ -97,3 +97,20 @@ frappe.ui.form.on("Leave Block List", {
 		d.show();
 	},
 });
+
+// frappe.ui.form.on("Leave Blocked User", {
+
+// 	"employee":  function (frm, cdt, cdn) {
+// 		var item = locals[cdt][cdn];
+// 		frappe.call({
+// 			method: "hrms.hr.doctype.leave_block_list.leave_block_list.add_in_emp",
+// 			args: {
+// 				employee: item.employee,
+// 				block_list: frm.doc.name
+// 			},
+// 			callback: function (r) {
+// 				// refresh_fields()
+// 			}
+// 		})
+// 	}
+// })

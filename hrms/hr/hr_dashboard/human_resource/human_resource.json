@@ -18,12 +18,8 @@
  ],
  "charts": [
   {
-   "chart": "Hiring vs Attrition Count",
-   "width": "Half"
-  },
-  {
    "chart": "Employees by Age",
-   "width": "Half"
+   "width": "Full"
   },
   {
    "chart": "Gender Diversity Ratio",
@@ -35,14 +31,18 @@
   },
   {
    "chart": "Employees by Grade",
-   "width": "Half"
+   "width": "Full"
   },
   {
    "chart": "Employees by Branch",
-   "width": "Half"
+   "width": "Full"
   },
   {
    "chart": "Designation Wise Employee Count",
+   "width": "Full"
+  },
+  {
+   "chart": "Hiring vs Attrition Count",
    "width": "Half"
   }
  ],
@@ -50,11 +50,11 @@
  "dashboard_name": "Human Resource",
  "docstatus": 0,
  "doctype": "Dashboard",
- "idx": 4,
+ "idx": 209,
  "is_default": 0,
  "is_standard": 1,
- "modified": "2024-09-03 13:58:26.273629",
- "modified_by": "lhendrup.dorji@thimphutechpark.bt",
+ "modified": "2024-11-28 12:25:42.902812",
+ "modified_by": "kinzang.namgyal@cdcl.bt",
  "module": "HR",
  "name": "Human Resource",
  "owner": "Administrator"

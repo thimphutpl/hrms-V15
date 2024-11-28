@@ -58,7 +58,7 @@ frappe.ui.form.on('Employee Transfer', {
 			frm.add_custom_button("Create Employee Benefits", function(){
 				frappe.model.open_mapped_doc({
 					method: "hrms.hr.doctype.employee_transfer.employee_transfer.make_employee_benefit",
-					frm: me.frm
+					frm: frm
 				})
 			});
 		}

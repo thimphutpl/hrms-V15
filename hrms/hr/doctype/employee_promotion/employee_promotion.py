@@ -19,11 +19,13 @@ class EmployeePromotion(Document):
 		# 	self.get_single_employee_promotion_details()
 
 	def before_submit(self):
+		
 		if getdate(self.promotion_date) > getdate():
 			frappe.throw(_("Employee Promotion cannot be submitted before Promotion Date "),
 				frappe.DocstatusTransitionError)
 		# return
-
+	
+	
 	def on_submit(self):
 		employee = frappe.get_doc("Employee", self.employee)
 		employee = update_employee_work_history(employee, self.promotion_details, date=self.promotion_date)
@@ -45,7 +47,7 @@ class EmployeePromotion(Document):
 			for a in self.promotion_details:
 				if a.property == "Grade":
 					employee.grade = a.current
-					new_pro_date = add_years(self.promotion_date,int(frappe.db.get_value("Employee Grade",a.new,"next_promotion_years")))
+					# new_pro_date = add_years(self.promotion_date,int(frappe.db.get_value("Employee Grade",a.new,"next_promotion_years")))
 					employee.promotion_due_date = self.promotion_date
 				if a.property == "Designation":
 					employee.designation = a.current

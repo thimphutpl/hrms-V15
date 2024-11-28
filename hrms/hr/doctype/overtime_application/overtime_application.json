@@ -30,6 +30,7 @@
   "total_amount",
   "column_break_14",
   "purpose",
+  "actual_amount",
   "section_break_13",
   "items",
   "section_break_11",
@@ -320,12 +321,18 @@
    "label": "Designation",
    "options": "Designation",
    "read_only": 1
+  },
+  {
+   "fieldname": "actual_amount",
+   "fieldtype": "Currency",
+   "label": "Net Amount",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-11-08 14:16:21.712102",
+ "modified": "2024-11-25 20:34:10.488896",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Overtime Application",

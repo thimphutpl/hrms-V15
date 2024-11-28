@@ -1,0 +1,296 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:CONAPP-{######}",
+ "creation": "2024-11-26 15:24:53.655033",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_y1v4",
+  "amended_from",
+  "section_break_lhha",
+  "posting_date",
+  "employee_information_section",
+  "employee",
+  "designation",
+  "grade",
+  "date_of_joining",
+  "column_break_xwvm",
+  "employee_name",
+  "division",
+  "section",
+  "unit",
+  "basic_salary",
+  "current_contract_section",
+  "start_date",
+  "column_break_aepf",
+  "end_date",
+  "employee_qualification_section",
+  "edu_qualification",
+  "performance_rating_for_three_recent_years_section",
+  "performance",
+  "average_rating",
+  "section_break_wokl",
+  "describe_your_present_job_responsibilities",
+  "describe_the_proposed_job_responsibilities_succinctly",
+  "i_certify",
+  "recommendation_of_the_supervisor_section",
+  "supervisor",
+  "supervisor_user",
+  "recommendation_date",
+  "recommended",
+  "remarks"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_y1v4",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Contract Renewal Application",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "employee_information_section",
+   "fieldtype": "Section Break",
+   "label": "Employee Information"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Employee",
+   "options": "Employee",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "employee.designation",
+   "fieldname": "designation",
+   "fieldtype": "Link",
+   "label": "Designation",
+   "options": "Designation",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.grade",
+   "fieldname": "grade",
+   "fieldtype": "Link",
+   "label": "Grade",
+   "options": "Employee Grade",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.contract_start_date",
+   "fieldname": "date_of_joining",
+   "fieldtype": "Date",
+   "label": "Date of Initial Appointment",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_xwvm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.division",
+   "fieldname": "division",
+   "fieldtype": "Link",
+   "label": "Division",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.section",
+   "fieldname": "section",
+   "fieldtype": "Link",
+   "label": "Section",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.unit",
+   "fieldname": "unit",
+   "fieldtype": "Link",
+   "label": "Unit",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fieldname": "basic_salary",
+   "fieldtype": "Data",
+   "label": "Basic Salary",
+   "read_only": 1
+  },
+  {
+   "fieldname": "current_contract_section",
+   "fieldtype": "Section Break",
+   "label": "Current Contract"
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Start Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_aepf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "End Date",
+   "reqd": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "employee_qualification_section",
+   "fieldtype": "Section Break",
+   "label": "Employee Qualification"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "performance_rating_for_three_recent_years_section",
+   "fieldtype": "Section Break",
+   "label": "Performance rating"
+  },
+  {
+   "fieldname": "average_rating",
+   "fieldtype": "Float",
+   "label": "Average Rating ",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_break_wokl",
+   "fieldtype": "Section Break",
+   "label": "Self Assessment"
+  },
+  {
+   "fieldname": "describe_your_present_job_responsibilities",
+   "fieldtype": "Small Text",
+   "label": "Describe your present job responsibilities",
+   "reqd": 1
+  },
+  {
+   "fieldname": "describe_the_proposed_job_responsibilities_succinctly",
+   "fieldtype": "Small Text",
+   "label": "Describe the proposed job responsibilities succinctly",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "description": "I certify that the above information and assessment are correct to the best of my knowledge. I understand that I am liable for further explanations and enquiry in the event above information are found to be incorrect. \n",
+   "fieldname": "i_certify",
+   "fieldtype": "Check",
+   "label": "I certify"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "recommendation_of_the_supervisor_section",
+   "fieldtype": "Section Break",
+   "label": "Recommendation of the Supervisor"
+  },
+  {
+   "fieldname": "supervisor",
+   "fieldtype": "Link",
+   "label": "Supervisor",
+   "options": "Employee",
+   "read_only": 1
+  },
+  {
+   "fieldname": "recommendation_date",
+   "fieldtype": "Date",
+   "label": "Recommendation Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks",
+   "mandatory_depends_on": "eval:doc.supervisor_user==frappe.session.user",
+   "read_only_depends_on": "eval:doc.supervisor_user!=frappe.session.user"
+  },
+  {
+   "fieldname": "edu_qualification",
+   "fieldtype": "Table",
+   "options": "Contract Qualification"
+  },
+  {
+   "fieldname": "performance",
+   "fieldtype": "Table",
+   "mandatory_depends_on": "eval:doc.supervisor_user==frappe.session.user",
+   "options": "Contract Summary",
+   "read_only_depends_on": "eval:doc.supervisor_user!=frappe.session.user"
+  },
+  {
+   "fieldname": "section_break_lhha",
+   "fieldtype": "Section Break",
+   "label": "Date"
+  },
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Posting Date",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "supervisor.user_id",
+   "fieldname": "supervisor_user",
+   "fieldtype": "Link",
+   "label": "Supervisor_user",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "recommended",
+   "fieldtype": "Select",
+   "label": "Recommended?",
+   "mandatory_depends_on": "eval:doc.supervisor_user==frappe.session.user",
+   "options": "\nYes\nNo",
+   "read_only_depends_on": "eval:doc.supervisor_user!=frappe.session.user"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2024-11-27 12:09:07.820443",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Contract Renewal Application",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

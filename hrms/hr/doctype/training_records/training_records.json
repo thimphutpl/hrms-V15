@@ -1,0 +1,70 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-11-27 11:56:16.486384",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "from_date",
+  "to_date",
+  "training_name",
+  "training_venue",
+  "type_of_training",
+  "bond_period_from_date",
+  "bond_period_to_date"
+ ],
+ "fields": [
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "From Date"
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "To Date"
+  },
+  {
+   "fieldname": "training_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Course Name"
+  },
+  {
+   "fieldname": "training_venue",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Training Venue"
+  },
+  {
+   "fieldname": "type_of_training",
+   "fieldtype": "Select",
+   "label": "Type of Training"
+  },
+  {
+   "fieldname": "bond_period_from_date",
+   "fieldtype": "Date",
+   "label": "Bond Period From Date"
+  },
+  {
+   "fieldname": "bond_period_to_date",
+   "fieldtype": "Date",
+   "label": "Bond Period To Date"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-11-27 12:20:13.115039",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Training Records",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

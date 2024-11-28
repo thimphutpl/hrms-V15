@@ -18,6 +18,9 @@ class LeaveBlockList(Document):
 			if d.block_date in dates:
 				frappe.msgprint(_("Date is repeated") + ":" + d.block_date, raise_exception=1)
 			dates.append(d.block_date)
+	
+	def on_submit(self):
+		self.check()
 
 	@frappe.whitelist()
 	def set_weekly_off_dates(self, start_date, end_date, days, reason):
@@ -40,6 +43,13 @@ class LeaveBlockList(Document):
 			start_date += timedelta(days=1)
 
 		return date_list
+
+	def check(self):
+		for user in self.blocked_user:
+			doc = frappe.get_doc("Employee", user.employee)
+			doc.leave_block_list = self.name
+			doc.save()
+
 
 
 def get_applicable_block_dates(
@@ -79,12 +89,33 @@ def get_applicable_block_lists(employee=None, company=None, all_lists=False, lea
 
 	if employee:
 		# per department
-		department = frappe.db.get_value("Employee", employee, "department")
-		if department:
+		division = frappe.db.get_value("Employee", employee, "division")
+		section = frappe.db.get_value("Employee", employee, "section")
+		unit = frappe.db.get_value("Employee", employee, "unit")
+		
+
+		if division:
 			block_list = frappe.db.get_value("Department", department, "leave_block_list")
 			block_list_leave_type = frappe.db.get_value("Leave Block List", block_list, "leave_type")
 			if not block_list_leave_type or not leave_type or block_list_leave_type == leave_type:
 				add_block_list([block_list])
+		
+		if section:
+			block_list = frappe.db.get_value("Department", section, "leave_block_list")
+			block_list_leave_type = frappe.db.get_value("Leave Block List", block_list, "leave_type")
+			if not block_list_leave_type or not leave_type or block_list_leave_type == leave_type:
+				add_block_list([block_list])
+
+		if unit:
+			block_list = frappe.db.get_value("Department", unit, "leave_block_list")
+			block_list_leave_type = frappe.db.get_value("Leave Block List", block_list, "leave_type")
+			if not block_list_leave_type or not leave_type or block_list_leave_type == leave_type:
+				add_block_list([block_list])
+
+		block_list = frappe.db.get_value("Employee", employee, "leave_block_list")
+		block_list_leave_type = frappe.db.get_value("Leave Block List", block_list, "leave_type")
+		if not block_list_leave_type or not leave_type or block_list_leave_type == leave_type:
+			add_block_list([block_list])
 
 	return list(set(block_lists))
 
@@ -95,3 +126,9 @@ def is_user_in_allow_list(block_list):
 		{"parent": block_list, "allow_user": frappe.session.user},
 		"allow_user",
 	)
+
+# @frappe.whitelist()
+# def add_in_emp(employee, block_list):
+# 	doc = frappe.get_doc("Employee", employee)
+# 	doc.leave_block_list= block_list
+# 	doc.save()

@@ -266,6 +266,9 @@ class SalaryStructure(Document):
 						elif frappe.db.exists("Salary Component", {"name": ed_item.salary_component, "is_pf_deductible": 1}):
 							basic_pay_arrears += flt(ed_item.amount)
 						total_earning += round(amount)
+
+						if ed_item.salary_component == 'Basic Pay Arrear':
+							basic_pay_arrears += flt(ed_item.amount)
 					else:
 						''' Ver.3.0.191212 Begins '''
 						# Following line commented and subsequent if condition added by SHIV on 2019/12/12
@@ -301,7 +304,7 @@ class SalaryStructure(Document):
 							if m['based_on'] == 'Pay Scale Lower Limit':
 								calc_amt = flt(payscale_lower_limit)*flt(self.get(m['field_value']))*0.01
 							else:
-								calc_amt = flt(basic_pay)*flt(self.get(m['field_value']))*0.01
+								calc_amt = (flt(basic_pay)+flt(basic_pay_arrears))*flt(self.get(m['field_value']))*0.01
 						else:
 							
 							calc_amt = flt(self.get(m['field_value']))
@@ -323,6 +326,7 @@ class SalaryStructure(Document):
 						calc_amt = roundoff(gis_amt)
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
 					elif self.get(m['field_name']) and m['name'] == 'PF':
+						# frappe.throw(str(basic_pay_arrears))
 						pf_amt = (flt(basic_pay)+flt(basic_pay_arrears))*flt(settings.get("employee_pf"))*0.01
 						calc_amt = roundoff(pf_amt)
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})

@@ -28,7 +28,16 @@ class PromotionEntry(Document):
 		self.check_increment_cycle()
 
 	def on_submit(self):
+		if self.month_name != "July":
+			self.check_increment()
 		self.create_employee_promotions()
+	
+	def check_increment(self):
+		for item in self.employees:
+			emp=frappe.db.sql("Select ied.employee from `tabIncrement Entry` ie join `tabIncrement Employee Detail` ied on ied.parent=ie.name where ied.employee='{}' and ie.fiscal_year='{}'".format(item.employee, self.fiscal_year), as_dict=True)
+			if not emp:
+				frappe.throw("You cannot do Promotion without Increment Entry for employee '{}'".format(item.employee))
+
 
 	def before_submit(self):
 		self.check_increment_cycle()
@@ -169,8 +178,8 @@ class PromotionEntry(Document):
 						personal_pay = flt(personal_pay[0].amount,2)
 					else:
 						personal_pay = 0
-					new_grade, new_basic_pay = self.get_additional_details(e.employee, salary_structure[0].amount, personal_pay)
-					emp.append({"employee":e.employee, "employee_name": e.employee_name, "department": e.department, "designation": e.designation, "employee_grade": e.employee_grade, "current_basic_pay": salary_structure[0].amount, "new_basic_pay": new_basic_pay, "new_employee_grade": new_grade})		
+					new_grade, new_basic_pay, new_promot_date = self.get_additional_details(e.employee, salary_structure[0].amount, personal_pay)
+					emp.append({"employee":e.employee, "employee_name": e.employee_name, "department": e.department, "designation": e.designation, "employee_grade": e.employee_grade, "current_basic_pay": salary_structure[0].amount, "new_basic_pay": new_basic_pay, "new_employee_grade": new_grade, "next_promotion_date":new_promot_date})		
 		# it = iter(emp)
 		# emp_dict = dict(zip(it, it))
 		# frappe.msgprint(str(emp))
@@ -180,6 +189,9 @@ class PromotionEntry(Document):
 		emp = frappe.get_doc("Employee", employee)
 		current_increment = frappe.db.get_value("Employee Grade", emp.grade, "increment_value")
 		new_grade = frappe.db.get_value("Employee Grade", emp.grade, "promotion_grade")
+		years_to_add = flt(frappe.db.get_value("Employee Grade", new_grade, "noof_years_for_next_promotion"))
+		old_promo_date = emp.promotion_due_date
+		new_promot_date = add_to_date(old_promo_date, years=years_to_add)
 		if not new_grade:
 			frappe.throw("Promote to Grade not set for Employee {}".format(employee))
 		new_lower_limit = frappe.db.get_value("Employee Grade", new_grade, "lower_limit")
@@ -207,7 +219,7 @@ class PromotionEntry(Document):
 		# 			break
 		# else:
 		amount = new_basic_increment
-		return new_grade, amount
+		return new_grade, amount, new_promot_date
 
 	@frappe.whitelist()
 	def fill_employee_details(self):

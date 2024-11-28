@@ -1,0 +1,65 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-11-24 16:36:42.638342",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "question",
+  "strongly_disagree",
+  "disagree",
+  "agree",
+  "strongly_agree"
+ ],
+ "fields": [
+  {
+   "fieldname": "question",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Question",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "strongly_disagree",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Strongly Disagree"
+  },
+  {
+   "default": "0",
+   "fieldname": "disagree",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Disagree"
+  },
+  {
+   "default": "0",
+   "fieldname": "agree",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Agree"
+  },
+  {
+   "default": "0",
+   "fieldname": "strongly_agree",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Strongly Agree"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-11-24 16:36:49.500102",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Supervisor",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

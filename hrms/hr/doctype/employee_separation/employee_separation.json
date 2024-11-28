@@ -8,21 +8,38 @@
  "field_order": [
   "employee",
   "employee_name",
+  "resignation_letter_date",
+  "reason_for_separation",
+  "boarding_status",
+  "notify_users_by_email",
+  "column_break_7",
+  "types_of_separation",
+  "serve_notice_period",
+  "employee_separation_template",
+  "project",
   "department",
   "designation",
   "employee_grade",
-  "column_break_7",
-  "company",
-  "boarding_status",
-  "resignation_letter_date",
-  "boarding_begins_on",
-  "project",
   "table_for_activity",
-  "employee_separation_template",
   "activities",
-  "notify_users_by_email",
+  "sb_employee_benefit_claim",
+  "employee_benefit_claim_status",
+  "cb_eb_01",
+  "benefit_claim_reference",
   "section_break_14",
   "exit_interview",
+  "section_break_23",
+  "clearance_acquired",
+  "sb_approver",
+  "approver",
+  "approver_name",
+  "approver_designation",
+  "section_break_28",
+  "resignation",
+  "superannuation",
+  "workflow_state",
+  "additional_information_section",
+  "company",
   "amended_from"
  ],
  "fields": [
@@ -30,33 +47,27 @@
    "fieldname": "employee",
    "fieldtype": "Link",
    "label": "Employee",
-   "options": "Employee",
-   "reqd": 1
+   "options": "Employee"
   },
   {
    "fetch_from": "employee.employee_name",
    "fieldname": "employee_name",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Employee Name",
-   "read_only": 1
+   "label": "Employee Name"
   },
   {
-   "fetch_from": "employee.resignation_letter_date",
    "fieldname": "resignation_letter_date",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "label": "Resignation Letter Date",
-   "read_only": 1
+   "label": "Resignation Letter Date"
   },
   {
    "allow_on_submit": 1,
-   "default": "Pending",
    "fieldname": "boarding_status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Pending\nIn Process\nCompleted",
-   "read_only": 1
+   "options": "\nPending\nIn Process\nCompleted"
   },
   {
    "allow_on_submit": 1,
@@ -72,6 +83,7 @@
   {
    "fieldname": "employee_separation_template",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Employee Separation Template",
    "options": "Employee Separation Template"
   },
@@ -80,8 +92,7 @@
    "fieldname": "company",
    "fieldtype": "Link",
    "label": "Company",
-   "options": "Company",
-   "reqd": 1
+   "options": "Company"
   },
   {
    "fieldname": "project",
@@ -96,8 +107,7 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Department",
-   "options": "Department",
-   "read_only": 1
+   "options": "Department"
   },
   {
    "fetch_from": "employee.designation",
@@ -105,26 +115,24 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Designation",
-   "options": "Designation",
-   "read_only": 1
+   "options": "Designation"
   },
   {
    "fetch_from": "employee.grade",
    "fieldname": "employee_grade",
    "fieldtype": "Link",
    "label": "Employee Grade",
-   "options": "Employee Grade",
-   "read_only": 1
+   "options": "Employee Grade"
   },
   {
    "fieldname": "table_for_activity",
-   "fieldtype": "Section Break",
-   "label": "Separation Activities"
+   "fieldtype": "Section Break"
   },
   {
    "allow_on_submit": 1,
    "fieldname": "activities",
    "fieldtype": "Table",
+   "hidden": 1,
    "label": "Activities",
    "options": "Employee Boarding Activity"
   },
@@ -147,18 +155,124 @@
    "read_only": 1
   },
   {
-   "fieldname": "boarding_begins_on",
-   "fieldtype": "Date",
-   "label": "Separation Begins On",
+   "fieldname": "workflow_state",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Workflow State",
+   "options": "Workflow State",
+   "read_only": 1
+  },
+  {
+   "fieldname": "types_of_separation",
+   "fieldtype": "Select",
+   "label": "Types of Separation",
+   "options": "\nVoluntary Resignation\nSuperannuation\nCompulsory Retirement\nLay-off or Early Retirement Scheme\nEnd of Contract\nTermination"
+  },
+  {
+   "fieldname": "serve_notice_period",
+   "fieldtype": "Select",
+   "label": "Serve Notice Period",
+   "options": "\nYes\nNo",
    "reqd": 1
+  },
+  {
+   "fieldname": "reason_for_separation",
+   "fieldtype": "Small Text",
+   "label": "Reason for Separation"
+  },
+  {
+   "fieldname": "sb_approver",
+   "fieldtype": "Section Break",
+   "label": "Approver Details"
+  },
+  {
+   "fieldname": "approver",
+   "fieldtype": "Link",
+   "label": "Approver",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "approver_name",
+   "fieldtype": "Data",
+   "label": "Approver Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "approver_designation",
+   "fieldtype": "Data",
+   "label": "Approver Designation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_employee_benefit_claim",
+   "fieldtype": "Section Break",
+   "label": "Employee Benefit Claim"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "Not Claimed",
+   "fieldname": "employee_benefit_claim_status",
+   "fieldtype": "Select",
+   "label": "Employee Benefit Claim Status",
+   "options": "Not Claimed\nClaimed",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb_eb_01",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "benefit_claim_reference",
+   "fieldtype": "Data",
+   "label": "Employee Benefit Claim ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_28",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "resignation",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Resignation"
+  },
+  {
+   "default": "0",
+   "fieldname": "superannuation",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Superannuation"
+  },
+  {
+   "fieldname": "additional_information_section",
+   "fieldtype": "Section Break",
+   "label": "ADDITIONAL INFORMATION"
+  },
+  {
+   "fieldname": "section_break_23",
+   "fieldtype": "Section Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "clearance_acquired",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Clearance Aquired",
+   "read_only": 1
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2021-07-30 14:03:51.218791",
+ "modified": "2024-11-23 17:11:42.105550",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Separation",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {
@@ -180,6 +294,7 @@
  "quick_entry": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
+ "states": [],
  "title_field": "employee_name",
  "track_changes": 1
 }

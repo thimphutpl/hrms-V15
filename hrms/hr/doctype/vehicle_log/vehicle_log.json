@@ -1,136 +1,164 @@
 {
  "actions": [],
- "autoname": "autoincrement",
+ "autoname": "hash",
  "creation": "2016-09-03 14:14:51.788550",
  "doctype": "DocType",
  "document_type": "Document",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-    "date",
-    "section_break_2",
-    "from_place",
-    "from_time",
-    "column_break_4",
-    "to_place",
-    "to_time",
-    "column_break_8",
-    "purpose",
-    "section_break_10",
-    "initial_km",
-    "column_break_12",
-    "final_km",
-    "column_break_14",
-    "total_km_run",
-    "column_break_16",
-    "total_consumption"
-   ],
-   "fields": [
-    {
-     "fieldname": "date",
-     "fieldtype": "Date",
-     "in_list_view": 1,
-     "label": "Date",
-     "reqd": 1
-    },
-    {
-     "fieldname": "section_break_2",
-     "fieldtype": "Section Break"
-    },
-    {
-     "fieldname": "from_place",
-     "fieldtype": "Data",
-     "label": "From Place",
-     "reqd": 1
-    },
-    {
-     "fieldname": "from_time",
-     "fieldtype": "Time",
-     "label": "From Time"
-    },
-    {
-     "fieldname": "column_break_4",
-     "fieldtype": "Column Break"
-    },
-    {
-     "fieldname": "to_place",
-     "fieldtype": "Data",
-     "label": "To Place",
-     "reqd": 1
-    },
-    {
-     "fieldname": "to_time",
-     "fieldtype": "Time",
-     "label": "To Time"
-    },
-    {
-     "fieldname": "column_break_8",
-     "fieldtype": "Column Break"
-    },
-    {
-     "allow_on_submit": 1,
-     "fieldname": "purpose",
-     "fieldtype": "Text",
-     "in_list_view": 1,
-     "label": "Purpose",
-     "reqd": 1
-    },
-    {
-     "fieldname": "section_break_10",
-     "fieldtype": "Section Break"
-    },
-    {
-     "allow_on_submit": 1,
-     "default": "0",
-     "fieldname": "initial_km",
-     "fieldtype": "Float",
-     "in_list_view": 1,
-     "label": "Initial KM",
-     "precision": "2",
-     "reqd": 1
-    },
-    {
-     "fieldname": "column_break_12",
-     "fieldtype": "Column Break"
-    },
-    {
-     "allow_on_submit": 1,
-     "default": "0",
-     "fieldname": "final_km",
-     "fieldtype": "Float",
-     "in_list_view": 1,
-     "label": "Final KM ",
-     "precision": "2",
-     "reqd": 1
-    },
-    {
-     "fieldname": "column_break_14",
-     "fieldtype": "Column Break"
-    },
-    {
-     "fieldname": "total_km_run",
-     "fieldtype": "Float",
-     "label": "Total KM Run",
-     "precision": "2",
-     "read_only": 1
-    },
-    {
-     "fieldname": "column_break_16",
-     "fieldtype": "Column Break"
-    },
-    {
-     "fieldname": "total_consumption",
-     "fieldtype": "Float",
-     "label": "Total Consumption"
-    }
-   ],
+  "date",
+  "column_break_ktro",
+  "operator",
+  "column_break_fuml",
+  "driver_name",
+  "section_break_2",
+  "work_time",
+  "from_place",
+  "from_time",
+  "from_km_reading",
+  "column_break_4",
+  "idle_time",
+  "to_place",
+  "to_time",
+  "to_km_reading",
+  "section_break_abcw",
+  "pol_issued",
+  "time",
+  "distance",
+  "column_break_ofms",
+  "purpose"
+ ],
+ "fields": [
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "from_place",
+   "fieldtype": "Data",
+   "label": "From Place",
+   "reqd": 1
+  },
+  {
+   "fieldname": "from_time",
+   "fieldtype": "Time",
+   "label": "From Time"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "to_place",
+   "fieldtype": "Data",
+   "label": "To Place",
+   "reqd": 1
+  },
+  {
+   "fieldname": "to_time",
+   "fieldtype": "Time",
+   "label": "To Time"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "purpose",
+   "fieldtype": "Text",
+   "in_list_view": 1,
+   "label": "Purpose",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_ktro",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "operator",
+   "fieldtype": "Link",
+   "label": "Operator",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "column_break_fuml",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "operator.employee_name",
+   "fieldname": "driver_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Driver Name",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "work_time",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Work Time (Hours)",
+   "precision": "1",
+   "reqd": 1
+  },
+  {
+   "fieldname": "from_km_reading",
+   "fieldtype": "Data",
+   "label": "From KM Reading"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "idle_time",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Idle Time (Hours)",
+   "precision": "1",
+   "reqd": 1
+  },
+  {
+   "fieldname": "to_km_reading",
+   "fieldtype": "Data",
+   "label": "To KM Reading"
+  },
+  {
+   "fieldname": "section_break_abcw",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "pol_issued",
+   "fieldtype": "Data",
+   "label": "HSD Issued"
+  },
+  {
+   "fieldname": "time",
+   "fieldtype": "Data",
+   "label": "Time",
+   "read_only": 1
+  },
+  {
+   "fieldname": "distance",
+   "fieldtype": "Data",
+   "label": "Distance",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_ofms",
+   "fieldtype": "Column Break"
+  }
+ ],
  "istable": 1,
  "links": [],
- "modified": "2024-07-23 11:22:07.496855",
+ "modified": "2024-11-23 16:57:56.586018",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Vehicle Log",
- "naming_rule": "Autoincrement",
+ "naming_rule": "Random",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "modified",

@@ -1,0 +1,13 @@
+{
+ "creation": "2024-11-27 18:19:04.896409",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart Source",
+ "idx": 1,
+ "modified": "2024-11-28 10:31:34.174829",
+ "modified_by": "kinzang.namgyal@cdcl.bt",
+ "module": "HR",
+ "name": "Project Manpower",
+ "owner": "kinzang.namgyal@cdcl.bt",
+ "source_name": "Project Manpower",
+ "timeseries": 0
+}

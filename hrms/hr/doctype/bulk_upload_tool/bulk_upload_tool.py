@@ -142,9 +142,9 @@ class BulkUploadTool(Document):
 						#frappe.throw(month_str)
 						year = row[5]
 						date_str = f"{year}-{month_str}-{day}"
-						
+						#frappe.throw(employee)
 						pay_details = get_pay_details(employee,year,month_str)
-						#frappe.throw(employee,str(pay_details))
+						#frappe.throw(str(pay_details))
 						if not pay_details:
 							frappe.throw("Wage Details is not defined")
 						status = ''
@@ -160,12 +160,14 @@ class BulkUploadTool(Document):
 
 						old = frappe.db.get_value("Muster Roll Attendance", {"mr_employee": str(row[3]).strip('\''), "date": date_str, "docstatus": 1}, ["status", "name"], as_dict=1)
 						if old:
+							#frappe.throw("kkk")
 							doc = frappe.get_doc("Muster Roll Attendance", old.name)
 							doc.db_set('status', status if status in ('Present', 'Absent','Half Day') else doc.status)
 							doc.db_set('branch', row[0])
 							doc.db_set('cost_center', row[1])
 							doc.db_set('unit', row[2])
 						if not old and status in ('Present', 'Absent','Half Day'):
+							#frappe.throw(str(row[3]).strip('\''))
 							doc = frappe.new_doc("Muster Roll Attendance")
 							doc.status = status
 							doc.branch = row[0]
@@ -209,36 +211,124 @@ class BulkUploadTool(Document):
 			pass
 		return {"messages": ret, "error": error}
 
+# @frappe.whitelist()
+# def download_template(file_type, branch, month, fiscal_year, upload_type, unit):
+# 	#frappe.throw("pl")
+# 	data = frappe._dict(frappe.local.form_dict)
+# 	if upload_type == "Overtime":
+# 		writer = get_template_overtime(branch, month, fiscal_year)
+# 		doctype = "Muster Roll Overtime Entry"
+# 	else:
+# 		writer = get_template(branch, month, fiscal_year)
+# 		doctype = "Muster Roll Attendance"	
+	
+# 	for d in get_mr_data(branch, month, fiscal_year, unit):
+# 		row = []
+# 		row.append(d.branch)
+# 		row.append(d.cost_center)
+# 		row.append(d.unit)
+# 		row.append(d.name)
+# 		row.append(d.person_name)
+# 		row.append(d.fiscal_year)
+# 		row.append(d.month)
+
+# 		writer.writerow(row)
+	
+
+# 	if file_type == "CSV":
+# 		# download csv file
+# 		frappe.response["result"] = cstr(writer.getvalue())
+# 		frappe.response["type"] = "csv"
+# 		frappe.response["doctype"] = doctype
+# 	else:
+# 		build_response_as_excel(writer,doctype)
 @frappe.whitelist()
 def download_template(file_type, branch, month, fiscal_year, upload_type, unit):
-	#frappe.throw("pl")
+	month_num = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].index(month) + 1
+	month_num_str = str(month_num) if cint(month_num) > 9 else str("0" + str(month_num))
+	total_days = monthrange(cint(fiscal_year), cint(month_num_str))[1]
+	start_date = str(fiscal_year) + '-' + str(month_num_str) + '-' + str('01')
+	end_date   = str(fiscal_year) + '-' + str(month_num_str) + '-' + str(total_days)
+	#frappe.throw(total_days)
+    #Retrieve the form data
 	data = frappe._dict(frappe.local.form_dict)
+
+    # Determine the upload type
 	if upload_type == "Overtime":
 		writer = get_template_overtime(branch, month, fiscal_year)
 		doctype = "Muster Roll Overtime Entry"
+		for d in get_mr_data(branch, month, fiscal_year, unit):
+			row = []
+			row.append(d.branch)
+			row.append(d.cost_center)
+			row.append(d.unit)
+			row.append(d.name)
+			row.append(d.person_name)
+			row.append(d.fiscal_year)
+			row.append(d.month)
+			attendance_query = """        SELECT mr_employee, branch,
+               DAY(date) AS day_of_date,
+               SUM(IFNULL(number_of_hours, 0)) AS number_of_hours,
+               SUM(IFNULL(number_of_hours_special, 0)) AS number_of_hours_special
+               FROM `tabMuster Roll Overtime Entry` WHERE branch = %s AND mr_employee = %s AND date BETWEEN %s AND %s
+			   group by mr_employee, day_of_date
+			   """
+
+			attendance_data = frappe.db.sql(
+            	attendance_query, (branch, d.name,start_date,end_date), as_dict=True
+			)
+			for att in attendance_data:
+				row.extend([
+				att.number_of_hours_regular,         # Regular hours
+				att.number_of_hours_special  # Special hours
+			])
+
+			writer.writerow(row)						   
 	else:
 		writer = get_template(branch, month, fiscal_year)
-		doctype = "Muster Roll Attendance"	
-	
-	for d in get_mr_data(branch, month, fiscal_year, unit):
-		row = []
-		row.append(d.branch)
-		row.append(d.cost_center)
-		row.append(d.unit)
-		row.append(d.name)
-		row.append(d.person_name)
-		row.append(d.fiscal_year)
-		row.append(d.month)
-		writer.writerow(row)
-	
+		doctype = "Muster Roll Attendance"
+		for d in get_mr_data(branch, month, fiscal_year, unit):
+			row = []
+			row.append(d.branch)
+			row.append(d.cost_center)
+			row.append(d.unit)
+			row.append(d.name)
+			row.append(d.person_name)
+			row.append(d.fiscal_year)
+			row.append(d.month)
 
+        # Fetch additional attendance data for the employee in the given month
+			attendance_query = """
+           	 SELECT
+                	mr_employee,
+                	DAY(date) as day_of_date,
+                	CASE
+                    	WHEN status = 'Present' THEN 'P'
+                    	WHEN status = 'Absent' THEN 'A'
+                    	WHEN status = 'Half Day' THEN 'H'
+                    	ELSE status
+                	END AS status
+            	FROM `tabMuster Roll Attendance`
+            	WHERE branch = %s AND mr_employee = %s AND date BETWEEN %s AND %s
+            
+        	"""
+			attendance_data = frappe.db.sql(
+            	attendance_query, (branch, d.name,start_date,end_date), as_dict=True
+			)
+
+        # Add attendance statuses to the row
+			attendance_by_day = [att.status for att in attendance_data]
+			row.extend(attendance_by_day)
+			writer.writerow(row)
+
+    # File download logic
 	if file_type == "CSV":
-		# download csv file
 		frappe.response["result"] = cstr(writer.getvalue())
 		frappe.response["type"] = "csv"
 		frappe.response["doctype"] = doctype
 	else:
-		build_response_as_excel(writer,doctype)
+		build_response_as_excel(writer, doctype)
+
 
 def build_response_as_excel(writer, doctype):
 	filename = frappe.generate_hash("", 10)

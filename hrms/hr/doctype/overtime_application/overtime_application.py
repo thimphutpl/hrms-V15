@@ -3,10 +3,10 @@
 
 import frappe
 from frappe import _
-from frappe.utils import getdate,flt,cint,today,add_to_date
+from frappe.utils import getdate,flt,cint,today,add_to_date,time_diff_in_hours,nowdate
 from frappe.model.document import Document
 from erpnext.custom_workflow import validate_workflow_states, notify_workflow_states
-
+from datetime import datetime
 class OvertimeApplication(Document):
 	def validate(self):
 		# validate_workflow_states(self)
@@ -39,6 +39,16 @@ class OvertimeApplication(Document):
 		total_amount = 0
 		total_hours = 0
 		for i in self.get("items"):
+			if i.is_holiday:
+				i.is_late_night_ot = 0
+			i.rate = self.rate
+			if i.is_late_night_ot or i.is_holiday:
+				i.number_of_hours    = flt(time_diff_in_hours(i.to_date, i.from_date),2)
+				i.amount             = flt(i.number_of_hours) * flt(flt(i.rate) * 1.5)
+			else:
+				i.number_of_hours    = flt(time_diff_in_hours(i.to_date, i.from_date),2)
+				i.amount             = flt(i.number_of_hours) * flt(i.rate)
+				
 			total_hours += flt(i.number_of_hours)
 			# if flt(i.number_of_hours) > flt(overtime_limit):
 			# 	frappe.throw(_("Row#{}: Number of Hours cannot be more than {} hours").format(i.idx, overtime_limit))
@@ -49,7 +59,7 @@ class OvertimeApplication(Document):
 			# 	month_start_date = add_to_date(i.to_date, months=-1)
 			# elif overtime_limit_type == "Per Year":
 			# 	month_start_date = add_to_date(i.to_date, years=-1)
-			i.amount = flt(i.rate) * flt(i.number_of_hours)
+			# i.amount = flt(i.rate) * flt(i.number_of_hours)
 			total_amount += i.amount
 		self.actual_hours = flt(total_hours)
 		# if flt(total_hours) > flt(overtime_limit):
@@ -59,6 +69,7 @@ class OvertimeApplication(Document):
 		# else:
 		self.total_hours = flt(self.actual_hours)
 		self.total_amount = round(total_amount,0)
+		self.actual_amount = round(total_amount,0)
 
 	def on_cancel(self):
 		# notify_workflow_states(self)
@@ -101,26 +112,26 @@ class OvertimeApplication(Document):
 
 	# Dont allow duplicate dates
 	def validate_dates(self):				
+		self.posting_date = nowdate()
+				  
 		for a in self.items:
-			if not a.from_date or not a.to_date:
-				frappe.throw(_("Row#{} : Date cannot be blank").format(a.idx), title="Invalid Date")
-			elif getdate(a.to_date) > getdate(today()) or getdate(a.to_date) > getdate(today()):
-				frappe.throw(_("Row#{} : Future dates are not accepted").format(a.idx))
+			if not a.date:
+				frappe.throw(_("Row#{0} : Date cannot be blank").format(a.idx),title="Invalid Date")
 
+			if str(a.date) > str(nowdate()):
+				frappe.throw(_("Row#{0} : Future dates are not accepted").format(a.idx), title="Invalid Date")
+
+			#Validate if time interval falls between another time interval for the same date   
 			for b in self.items:
-				if (a.from_date == b.from_date and a.idx != b.idx) or (a.to_date == b.to_date and a.idx != b.idx):
-					frappe.throw(_("Duplicate Dates in rows {}, {}").format(str(a.idx),str(b.idx)))
-				elif (a.from_date >= b.from_date and a.from_date <= b.to_date) and a.idx != b.idx:
-					frappe.throw(_("Row#{}: From Date/Time is overlapping with Row#{}").format(a.idx, b.idx))
-				elif (a.to_date >= b.from_date and a.to_date <= b.to_date) and a.idx != b.idx:
-					frappe.throw(_("Row#{}: To Date/Time is overlapping with Row#{}").format(a.idx, b.idx))
-
-			# check if the dates are already claimed
-			for i in frappe.db.sql(""" select oa.name from `tabOvertime Application` oa, `tabOvertime Application Item` oai 
-						where oa.employee = %(employee)s and oai.parent = oa.name and oa.name != %(name)s and oa.docstatus < 2
-						and %(from_date)s <= oai.to_date and %(to_date)s >= oai.from_date
-					""", {"employee": self.employee, "name": self.name, "from_date": a.from_date, "to_date": a.to_date}, as_dict=True):
-				frappe.throw(_("Row#{}: Dates are overlapping with another request {}").format(a.idx, frappe.get_desk_link("Overtime Application", i.name)))
+				if a.date == b.date and a.idx != b.idx:
+					time_format = "%H:%M:%S"
+					start1 = datetime.strptime(a.from_time, time_format)
+					end1 = datetime.strptime(a.to_time, time_format)
+					start2 = datetime.strptime(b.from_time, time_format)
+					end2 = datetime.strptime(b.to_time, time_format)
+					#frappe.throw("{}, {}, {} and {},{},{}".format(start2,start1,end2,start2,end1,end2))
+					if start2 <= start1 <= end2 or start2 <= end1 <= end2:
+						frappe.throw("Duplicate Dates in row " + str(a.idx) + " and " + str(b.idx))
 
 def get_permission_query_conditions(user):
 	if not user: user = frappe.session.user

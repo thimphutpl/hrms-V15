@@ -28,6 +28,15 @@ frappe.ui.form.on('Muster Roll Application', {
 				}
 			};
 		});
+		// frm.fields_dict['items'].grid.get_field('CHILD_FIELD_NAME_TO_BE_FILTERED').get_query = function(doc, cdt, cdn) {
+		// 	var child = locals[cdt][cdn];
+		// 	//console.log(child);
+		// 	return {    
+		// 		filters:[
+		// 			['IS_IT_OK_FIELD', '=', child.CHECKBOX_FIELD]
+		// 		]
+		// 	}
+		// }
 		frm.set_query("section", function() {
 			return {
 				"filters": {
@@ -39,6 +48,15 @@ frappe.ui.form.on('Muster Roll Application', {
 				}
 			};
 		});
+		frm.fields_dict['items'].grid.get_field('bank_branch').get_query = function(doc, cdt, cdn) {
+			var child = locals[cdt][cdn];
+			console.log("pl");
+			return {    
+				filters:[
+					['financial_institution', '=', child.bank]
+				]
+			}
+		}
 	},
 	onload: function(frm) {
 		if (!frm.doc.posting_date) {
@@ -108,18 +126,18 @@ frappe.ui.form.on('Muster Roll Application Item', {
 		var child  = locals[cdt][cdn];
 		frappe.call({
 			method: "frappe.client.get_value",
-			args: {doctype: "Muster Roll Employee", fieldname: ["person_name", "rate_per_day", "rate_per_hour","rate_per_normal"],
+			args: {doctype: "Muster Roll Employee", fieldname: ["person_name", "rate_per_day", "rate_per_hour_overtime","rate_per_hour_normal"],
 				filters: {
 					name: child.existing_cid
 				}},
 			callback: function(r){
 				frappe.model.set_value(cdt, cdn, "person_name", r.message.person_name);
 				frappe.model.set_value(cdt, cdn, "rate_per_day", r.message.rate_per_day);
-				frappe.model.set_value(cdt, cdn, "rate_per_hour", r.message.rate_per_hour);
+				frappe.model.set_value(cdt, cdn, "rate_per_hour", r.message.rate_per_hour_overtime);
 				frappe.model.set_value(cdt, cdn, "rate_per_hour_normal", r.message.rate_per_hour_normal);
 			}
 
 		})
-	},	
+	},
+	
 })
-

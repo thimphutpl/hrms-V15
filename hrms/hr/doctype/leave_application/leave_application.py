@@ -340,11 +340,13 @@ class LeaveApplication(Document, PWANotificationsMixin):
 			all_lists=True,
 			leave_type=self.leave_type,
 		)
+		# frappe.throw(str(block_dates))
 
 		if block_dates:
-			frappe.msgprint(_("Warning: Leave application contains following block dates") + ":")
-			for d in block_dates:
-				frappe.msgprint(formatdate(d.block_date) + ": " + d.reason)
+			frappe.throw(_("Leave application contains the block date:'{}' for the reason: '{}'".format(block_dates[0].block_date, block_dates[0].reason)))
+			# frappe.msgprint(_("Warning: Leave application contains following block dates") + ":")
+			# for d in block_dates:
+			# 	frappe.msgprint(formatdate(d.block_date) + ": " + d.reason)
 
 	def validate_block_days(self):
 		block_dates = get_applicable_block_dates(
