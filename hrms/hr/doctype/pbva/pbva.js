@@ -152,15 +152,15 @@ function calculate_tax(gross_amt) {
 
 function calculate_pbva_percent(employee) {
 	var percent = "";
-	cur_frm.call({
-		method: "erpnext.hr.doctype.pbva.pbva.get_pbva_percent",
-		args: { "employee": employee, },
-		async: false,
-		callback: function(r) {
-			if(r.message) {
-				percent = String(r.message);
-			}
-		}
-	})
+	// cur_frm.call({
+	// 	method: "erpnext.hr.doctype.pbva.pbva.get_pbva_percent",
+	// 	args: { "employee": employee, },
+	// 	async: false,
+	// 	callback: function(r) {
+	// 		if(r.message) {
+	// 			percent = String(r.message);
+	// 		}
+	// 	}
+	// })
 	return percent;
 }

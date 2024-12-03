@@ -95,7 +95,7 @@ def get_applicable_block_lists(employee=None, company=None, all_lists=False, lea
 		
 
 		if division:
-			block_list = frappe.db.get_value("Department", department, "leave_block_list")
+			block_list = frappe.db.get_value("Department", division, "leave_block_list")
 			block_list_leave_type = frappe.db.get_value("Leave Block List", block_list, "leave_type")
 			if not block_list_leave_type or not leave_type or block_list_leave_type == leave_type:
 				add_block_list([block_list])

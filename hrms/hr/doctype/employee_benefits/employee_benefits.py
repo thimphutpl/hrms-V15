@@ -22,6 +22,8 @@ class EmployeeBenefits(Document):
 		if not self.employee_separation_id  and not self.employee_transfer_id and self.purpose != "Upgradation":
 			frappe.throw("This document should be created through either Employee Separation or Employee Transfer")
 		'''
+		# if self.purpose == "Separation":
+		# 	emp_sep_cle=frappe.db.sql("select name from `tabEmployee Separation Clearance")
 		self.validate_gratuity()
 		self.check_duplicates()
 		self.validate_benefits()
@@ -196,7 +198,7 @@ class EmployeeBenefits(Document):
 		je.remark = str(self.purpose) + 'Benefit payments for ' + str(self.employee_name) + "("+str(self.employee)+")"
 
 		expense_bank_account = get_bank_account(self.branch)
-		tax_account = frappe.db.get_value("Company", self.company, "salary_tax_account")
+		tax_account = frappe.db.get_single_value("HR Accounts Settings", "salary_tax_account")
 		
 		total_amount = tax_amount = 0
 		# Benefits
@@ -264,7 +266,7 @@ class EmployeeBenefits(Document):
 			})
 
 		# Credit Account
-		payable_account = frappe.db.get_value("Company", self.company, "salary_payable_account")
+		payable_account = frappe.db.get_single_value("HR Accounts Settings", "salary_payable_account")
 
 		if flt(total_amount):
 			je.append("accounts", {

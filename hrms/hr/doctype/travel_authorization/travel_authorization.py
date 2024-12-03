@@ -381,7 +381,7 @@ class TravelAuthorization(Document):
 			from_date = i.date
 			to_date   = i.date if not i.till_date else i.till_date
 			no_days   = date_diff(to_date, from_date) + 1
-			full_dsa+=flt(i.amount_in_btn)*(flt(i.percent)/100)*flt(no_days)*flt(i.exchange_rate)    
+			full_dsa+=flt(i.amount_in_btn)*(flt(i.percent)/100)*flt(no_days)
 		final=flt(full_dsa)-(flt(i.amount_in_btn)) 
 		self.estimated_amount = flt(final)
 		

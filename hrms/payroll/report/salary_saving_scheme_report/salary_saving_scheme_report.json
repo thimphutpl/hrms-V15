@@ -9,7 +9,7 @@
  "filters": [],
  "idx": 0,
  "is_standard": "Yes",
- "letter_head": "SMCL Letter Head",
+ "letter_head": "cdcl_default",
  "modified": "2023-01-30 15:48:31.633096",
  "modified_by": "Administrator",
  "module": "Payroll",
@@ -28,9 +28,6 @@
   },
   {
    "role": "HR Manager"
-  },
-  {
-   "role": "Employee Self Service"
   },
   {
    "role": "Accounts Manager"

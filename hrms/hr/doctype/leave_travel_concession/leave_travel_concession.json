@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "format:LTC{####}",
  "creation": "2024-11-23 17:12:53.151402",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -134,10 +135,11 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-11-23 17:12:53.151402",
+ "modified": "2024-12-02 11:04:58.595141",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Travel Concession",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {

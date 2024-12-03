@@ -38,6 +38,11 @@ class PBVA(Document):
 				if d.amount == 0:
 					to_remove.append(d)
 			[self.remove(d) for d in to_remove]
+		i=1
+		if self.items:
+			for d in self.items:
+				d.idx=i
+				i+=1
 
 	def validate_duplicate(self):
 		doc = frappe.db.sql("select name from tabPBVA where docstatus != 2 and fiscal_year = \'"+str(self.fiscal_year)+"\' and name != \'"+str(self.name)+"\'")		
@@ -66,7 +71,7 @@ class PBVA(Document):
 		je.title = "PBVA for " + self.branch + "(" + self.name + ")"
 		je.voucher_type = 'Bank Entry'
 		je.naming_series = 'Bank Payment Voucher'
-		je.remark = 'PBVA payment against : ' + self.name;
+		je.remark = 'PBVA payment against : ' + self.name
 		je.posting_date = self.posting_date
 		je.branch = self.branch
 
@@ -89,7 +94,6 @@ class PBVA(Document):
 					"reference_type": self.doctype,
 					"reference_name": self.name,
 					"cost_center": values[0],
-					"business_activity": values[1],
 					"debit_in_account_currency": flt(cc_amount[key]['amount']),
 					"debit": flt(cc_amount[key]['amount']),
 				})
@@ -100,20 +104,19 @@ class PBVA(Document):
 					"credit_in_account_currency": flt(cc_amount[key]['balance_amount']),
 					"credit": flt(cc_amount[key]['balance_amount']),
 					"reference_type": self.doctype,
-					"business_activity": values[1],
 					"reference_name": self.name,
 				})
+			if flt(cc_amount[key]['tax'])>0:
 			
-			je.append("accounts", {
-					"account": tax_account,
-					"cost_center": values[0],
-					"business_activity": values[1],
-					"credit_in_account_currency": flt(cc_amount[key]['tax']),
-					"credit": flt(cc_amount[key]['tax']),
-					"reference_type": self.doctype,
-					"reference_name": self.name,
-					"party_check": 0
-				})
+				je.append("accounts", {
+						"account": tax_account,
+						"cost_center": values[0],
+						"credit_in_account_currency": flt(cc_amount[key]['tax']),
+						"credit": flt(cc_amount[key]['tax']),
+						"reference_type": self.doctype,
+						"reference_name": self.name,
+						"party_check": 0
+					})
 		je.insert()
 
 		self.db_set("journal_entry", je.name)
@@ -130,8 +133,8 @@ class PBVA(Document):
 	def get_pbva_details(self):
 		if not self.fiscal_year:
 			frappe.throw("Fiscal Year is Mandatory")
-		if self.pbva_percent <= 0:
-			frappe.throw("PBVA percent cannot be 0 or less than 0")
+		# if self.pbva_percent <= 0:
+		# 	frappe.throw("PBVA percent cannot be 0 or less than 0")
 		#start, end = frappe.db.get_value("Fiscal Year", self.fiscal_year, ["year_start_date", "year_end_date"])
 		start = str(self.fiscal_year)+'-01-01'
 		end   = str(self.fiscal_year)+'-12-31'
@@ -148,6 +151,8 @@ class PBVA(Document):
 					e.salary_mode,
 					e.bank_name,
 					e.bank_ac_no,
+					e.cost_center,
+					e.grade,
 					datediff(least(ifnull(e.relieving_date,'9999-12-31'),'{2}'),
 					greatest(e.date_of_joining,'{1}'))+1 days_worked,
 					(
@@ -194,43 +199,25 @@ class PBVA(Document):
 						from `tabSalary Slip Item` ssi, `tabSalary Structure` ss
 						where ssi.parent = sl.name
 						and ss.name = ssi.salary_structure
-						and ss.eligible_for_pbva = 1)) as total_basic_pay,
-					((
-						select
-							sum(sd.amount)
-						from `tabSalary Detail` sd, `tabSalary Slip` sl
-						where sd.parent = sl.name
-						and sl.employee = e.name
-						and sd.salary_component = 'Basic Pay'
-						and sl.docstatus = 1
-						and sl.fiscal_year = {0}
-						and (sd.salary_component = 'Basic Pay'
-						or exists(select 1 from `tabSalary Component` sc
-						where sc.name = sd.salary_component
-						and sc.is_pf_deductible = 1
-						and sc.type = 'Earning'))
-						and exists(select 1
-						from `tabSalary Slip Item` ssi, `tabSalary Structure` ss
-						where ssi.parent = sl.name
-						and ss.name = ssi.salary_structure
-						and ss.eligible_for_pbva = 1))/100*{5}) as amount
-				from tabEmployee e
-				where (
-					('{3}' = 'Active' and e.date_of_joining <= '{2}' and ifnull(e.relieving_date,'9999-12-31') > '{2}')
-					or
-					('{3}' = 'Left' and ifnull(e.relieving_date,'9999-12-31') between '{1}' and '{2}')
-					or
-					('{3}' = 'All' and e.date_of_joining <= '{2}' and ifnull(e.relieving_date,'9999-12-31') >= '{1}'))
-					and not exists(
-								select 1
-									from `tabPBVA Details` bd, `tabPBVA` b
-									where b.fiscal_year = '{0}'
-									and b.name <> '{4}'
-									and bd.parent = b.name
-									and bd.employee = e.employee
-									and b.docstatus in (0,1))
-									order by e.branch
-						""".format(self.fiscal_year, start, end, self.employee_status, self.name, self.pbva_percent)
+						and ss.eligible_for_pbva = 1)) as total_basic_pay
+						from tabEmployee e
+						where (
+								('{3}' = 'Active' and e.date_of_joining <= '{2}' and ifnull(e.relieving_date,'9999-12-31') > '{2}')
+								or
+								('{3}' = 'Left' and ifnull(e.relieving_date,'9999-12-31') between '{1}' and '{2}')
+								or
+								('{3}' = 'All' and e.date_of_joining <= '{2}' and ifnull(e.relieving_date,'9999-12-31') >= '{1}')
+							)
+							and not exists(
+										select 1
+											from `tabPBVA Details` bd, `tabPBVA` b
+											where b.fiscal_year = '{0}'
+											and b.name <> '{4}'
+											and bd.parent = b.name
+											and bd.employee = e.employee
+											and b.docstatus in (0,1))
+											order by e.branch
+						""".format(self.fiscal_year, start, end, self.employee_status, self.name)
 		
 		entries = frappe.db.sql(query, as_dict=True)
 		self.set('items', [])
@@ -241,17 +228,35 @@ class PBVA(Document):
 		for d in entries:
 			# d.amount = 0
 			row = self.append('items', {})
-			if frappe.db.get_single_value("HR Settings", "take_department_rating") == 1:
-				d.unit_rating = frappe.db.get_value(
-						"Performance Evaluation",
-						{
-							"employee": frappe.db.get_value("Department", d.department, "approver"),
-							"pms_calendar": self.fiscal_year
-						},
-						"final_score"
-				)
+
+			unit=frappe.db.get_value("Employee", d.employee, "unit")
+			section=frappe.db.get_value("Employee", d.employee, "section")
+			division=frappe.db.get_value("Employee", d.employee, "division")
+			unit_rating=0
+			if unit:
+				unit_rating = frappe.db.get_value("Department",unit,"department_rating")
+			elif section:
+				unit_rating = frappe.db.get_value("Department",section,"department_rating")
+			elif division:
+				unit_rating = frappe.db.get_value("Department",division,"department_rating")
 			else:
-				d.unit_rating = self.company_achievement
+				frappe.throw("Employee doesn't have Unit, Section and Division")
+			
+			d.unit_rating=unit_rating
+
+			
+			# if frappe.db.get_single_value("HR Settings", "take_department_rating") == 1:
+			# 	d.unit_rating = frappe.db.get_value(
+			# 			"Performance Evaluation",
+			# 			{
+			# 				"employee": frappe.db.get_value("Department", d.department, "approver"),
+			# 				"pms_calendar": self.fiscal_year
+			# 			},
+			# 			"final_score"
+			# 	)
+			# else:
+			# 	d.unit_rating = self.company_achievement
+
 			employee_rating =frappe.db.sql("""
                                     select count(name) as nos, sum(final_score) as final_score
                                     from `tabPerformance Evaluation` where docstatus = 1 and employee = '{}'
@@ -260,20 +265,42 @@ class PBVA(Document):
 			
 			 
 			emp_group=frappe.db.get_value("Employee", d.employee, "employee_group") 
-			if frappe.db.get_value("Employee Group", emp_group, "employee_pf")== 0:
-				if not d.unit_rating or d.unit_rating == 0 and frappe.db.get_single_value("HR Settings", "take_department_rating") == 1:
-					d.unit_rating = flt(frappe.db.get_value("Department", d.department, "unit_rating"))
-				d.unit_rating = 0 if not d.unit_rating else d.unit_rating * 0.5
+
+			# if frappe.db.get_value("Employee Group", emp_group, "employee_pf")== 0:
+			# if not d.unit_rating or d.unit_rating == 0 and frappe.db.get_single_value("HR Settings", "take_department_rating") == 1:
+			# 	d.unit_rating = flt(frappe.db.get_value("Department", d.department, "unit_rating"))
+
+			d.unit_rating = 0 if not d.unit_rating else d.unit_rating * 0.5
+			d.employee_rating = 0
+
+			if employee_rating:
+				d.employee_rating = employee_rating[0].final_score
+
+			if not d.employee_rating:
 				d.employee_rating = 0
-				if employee_rating:
-					d.employee_rating = employee_rating[0].final_score
-				if not d.employee_rating:
-					d.employee_rating = 0
-				d.employee_rating = d.employee_rating * 0.5
-				d.total_rating = d.unit_rating+d.employee_rating
-				d.pbva_percent = flt((d.total_rating/95)*(self.pbva_percent),3)
+
+			d.employee_rating = d.employee_rating * 0.5
+
+			d.total_rating = d.unit_rating+d.employee_rating
+
+			is_ceo=frappe.db.get_value("Employee", d.employee, "designation")=="Chief Executive Officer"
+
+			
+			if is_ceo:
+				d.unit_rating=flt(self.company_achievement)*flt(0.5)
+				d.employee_rating=flt(self.ceos_leadership_rating)*flt(0.5)
+				d.total_rating=(flt(self.company_achievement)*flt(0.8))+(flt(self.ceos_leadership_rating)*flt(0.2))
+				emp_ceip=frappe.db.get_single_value("HR Settings", "ceo_pbva_percent")
+				
 			else:
-				d.pbva_percent = flt(frappe.db.get_value("Employee Group", emp_group, "employee_pf"),3)
+				emp_ceip=frappe.db.get_single_value("HR Settings", "rest_pbva_percent")
+
+
+			d.pbva_percent = flt((d.total_rating/95)*flt(flt(emp_ceip)/100))*100
+			# d.pbva_percent = flt((d.total_rating/95)*(self.pbva_percent),3)
+			# else:
+			# 	d.pbva_percent = flt(frappe.db.get_value("Employee Group", emp_group, "employee_pf"),3)
+
 			d.total_basic_pay = 0 if not d.total_basic_pay else d.total_basic_pay
 			if str(d.date_of_joining).split("-")[0] == str(self.fiscal_year) and flt(str(d.date_of_joining).split("-")[1]) < 10:
 				d.days_worked = date_diff(datetime.strptime(str(self.fiscal_year)+"-12-31", "%Y-%m-%d").date(), datetime.strptime(str(self.fiscal_year)+"-"+str(int(str(d.date_of_joining).split("-")[1])+3)+"-"+str(d.date_of_joining).split("-")[2], "%Y-%m-%d").date())+1
@@ -289,10 +316,35 @@ class PBVA(Document):
 				d.amount = flt(flt(flt(d.pbva_percent/100)*d.total_basic_pay),2)
 			row.update(d)
 			
-@frappe.whitelist()
-def get_pbva_percent(employee):
-	group = frappe.db.get_value("Employee", employee, "employee_group")
-	if group in ("Chief Executive Officer", "Executive"):
-		return "above"
-	else:
-		return "below"
+# @frappe.whitelist()
+# def get_pbva_percent(employee):
+# 	group = frappe.db.get_value("Employee", employee, "employee_group")
+# 	if group in ("Chief Executive Officer", "Executive"):
+# 		return "above"
+# 	else:
+# 		return "below"
+
+
+					# ((
+					# 	select
+					# 		sum(sd.amount)
+					# 	from `tabSalary Detail` sd, `tabSalary Slip` sl
+					# 	where sd.parent = sl.name
+					# 	and sl.employee = e.name
+					# 	and sd.salary_component = 'Basic Pay'
+					# 	and sl.docstatus = 1
+					# 	and sl.fiscal_year = {0}
+					# 	and (sd.salary_component = 'Basic Pay'
+					# 	or exists(select 1 from `tabSalary Component` sc
+					# 	where sc.name = sd.salary_component
+					# 	and sc.is_pf_deductible = 1
+					# 	and sc.type = 'Earning'))
+					# 	and exists
+					# 	(
+					# 		select 1
+					# 		from `tabSalary Slip Item` ssi, `tabSalary Structure` ss
+					# 		where ssi.parent = sl.name
+					# 		and ss.name = ssi.salary_structure
+					# 		and ss.eligible_for_pbva = 1
+					# 	)
+					# )/100*{5}) as amount

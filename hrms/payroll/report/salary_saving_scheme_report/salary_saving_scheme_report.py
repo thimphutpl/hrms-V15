@@ -31,8 +31,8 @@ def get_columns(data):
 		_("Cost Center") + ":Link/Cost Center:120", 
 		_("Branch") + ":Link/Branch:120",
 		_("Department") + ":Link/Department:120",
-		_("Division") + ":Link/Division:120",
-		_("Section") + ":Link/Section:120", 
+		_("Division") + ":Link/Department:120",
+		_("Section") + ":Link/Department:120", 
 		_("Year") + "::80", 
 		_("Month") + "::80"
 	]

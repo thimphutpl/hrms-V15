@@ -111,14 +111,14 @@ def get_columns(data):
 			"fieldname": "division",
 			"label": "Division",
 			"fieldtype": "Link",
-			"options": "Division",
+			"options": "Department",
 			"width": 120
 		},
 		{
 			"fieldname": "section",
 			"label": "Section",
 			"fieldtype": "Link",
-			"options": "Section",
+			"options": "Department",
 			"width": 120
 		},
 		{

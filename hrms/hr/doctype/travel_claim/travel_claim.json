@@ -358,8 +358,7 @@
    "description": "File size should be below 5MB",
    "fieldname": "tour_report",
    "fieldtype": "Attach",
-   "label": "Tour Report",
-   "reqd": 1
+   "label": "Tour Report"
   },
   {
    "fieldname": "column_break_30",
@@ -581,7 +580,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-11-21 12:30:05.939492",
+ "modified": "2024-12-03 11:11:12.237572",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim",

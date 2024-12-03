@@ -19,7 +19,7 @@ def get_data( filters=None):
 	#Leave Encashment 
 	data += get_leave_encashment(filters)
 	#Bonus
-	data += get_bonus(filters)
+	# data += get_bonus(filters)
 	#PVBA
 	data += get_pbva(filters)
 	#salary arrear

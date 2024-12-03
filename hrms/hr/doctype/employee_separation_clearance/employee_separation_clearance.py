@@ -37,6 +37,9 @@ class EmployeeSeparationClearance(Document):
 			else:
 				self.workflow_state = "Waiting for Verification"
 		
+		if action =="Forward":
+			self.verifyUpdate()
+		
 		if action == "Approve":
 			self.verifyUpdate()
 		
@@ -48,6 +51,7 @@ class EmployeeSeparationClearance(Document):
 	
 	def verifyUpdate(self):
 		user = frappe.session.user
+		
 		if user== self.iad:
 			self.iad_clearance=1
 		if user == self.icthr:
@@ -142,7 +146,7 @@ class EmployeeSeparationClearance(Document):
 
 	def on_cancel(self):
 		self.update_reference()
-		self.notifiy_employee()
+		self.notify_employee()
 			
 	def check_signatures(self):
 		if self.supervisor_clearance == 0:

@@ -181,7 +181,10 @@
   "training_dsa",
   "dsa_30_to_90",
   "dsa_90_plus",
-  "dsa_within_same_locality"
+  "dsa_within_same_locality",
+  "pbva_settings_tab",
+  "ceo_pbva_percent",
+  "rest_pbva_percent"
  ],
  "fields": [
   {
@@ -1165,13 +1168,28 @@
    "fieldname": "take_department_rating",
    "fieldtype": "Check",
    "label": "Take Department Rating"
+  },
+  {
+   "fieldname": "pbva_settings_tab",
+   "fieldtype": "Tab Break",
+   "label": "PBVA Settings"
+  },
+  {
+   "fieldname": "ceo_pbva_percent",
+   "fieldtype": "Percent",
+   "label": "CEO PBVA Percent"
+  },
+  {
+   "fieldname": "rest_pbva_percent",
+   "fieldtype": "Percent",
+   "label": "Rest PBVA Percent"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-11-25 20:53:22.100868",
+ "modified": "2024-12-03 17:03:13.002073",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",

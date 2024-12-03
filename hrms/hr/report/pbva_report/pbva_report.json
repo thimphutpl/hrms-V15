@@ -1,0 +1,30 @@
+{
+ "add_total_row": 0,
+ "columns": [],
+ "creation": "2024-12-03 17:19:56.086048",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": "cdcl_default",
+ "letterhead": null,
+ "modified": "2024-12-03 17:19:56.086048",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "PBVA Report",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "PBVA",
+ "report_name": "PBVA Report",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "HR Manager"
+  }
+ ]
+}

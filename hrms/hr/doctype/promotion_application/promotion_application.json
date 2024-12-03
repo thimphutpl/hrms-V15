@@ -1,0 +1,303 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:PROMOAPP-{######}",
+ "creation": "2024-11-30 15:15:45.713884",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_lhha",
+  "posting_date",
+  "employee_information_section",
+  "employee",
+  "designation",
+  "grade",
+  "date_of_joining",
+  "column_break_xwvm",
+  "employee_name",
+  "division",
+  "section",
+  "unit",
+  "basic_salary",
+  "promotion_detail_section",
+  "last_date_of_promotion",
+  "column_break_bbbf",
+  "proposed_grade",
+  "proposed_designation",
+  "employee_qualification_section",
+  "edu_qualification",
+  "extraordinary_leave_availed_section",
+  "eol_leaves",
+  "performance_rating_for_years_section",
+  "pms_rating",
+  "describe_the_present_job_responsibilities_section",
+  "responsibilities",
+  "employee_achievements_section",
+  "achievements",
+  "recommendation_of_the_supervisor_section",
+  "recommendation_of_hod",
+  "hod",
+  "hod_user",
+  "column_break_xlsu",
+  "supervisor",
+  "amended_from"
+
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_lhha",
+   "fieldtype": "Section Break",
+   "label": "Date"
+  },
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Posting Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "employee_information_section",
+   "fieldtype": "Section Break",
+   "label": "Employee Information"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Employee",
+   "options": "Employee",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "employee.designation",
+   "fieldname": "designation",
+   "fieldtype": "Link",
+   "label": "Designation",
+   "options": "Designation",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.grade",
+   "fieldname": "grade",
+   "fieldtype": "Link",
+   "label": "Grade",
+   "options": "Employee Grade",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.date_of_joining",
+   "fieldname": "date_of_joining",
+   "fieldtype": "Date",
+   "label": "Date of Joining",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_xwvm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.division",
+   "fieldname": "division",
+   "fieldtype": "Link",
+   "label": "Division",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.section",
+   "fieldname": "section",
+   "fieldtype": "Link",
+   "label": "Section",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.unit",
+   "fieldname": "unit",
+   "fieldtype": "Link",
+   "label": "Unit",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fieldname": "basic_salary",
+   "fieldtype": "Data",
+   "label": "Basic Salary",
+   "read_only": 1
+  },
+  {
+   "fieldname": "promotion_detail_section",
+   "fieldtype": "Section Break",
+   "label": "Promotion Detail"
+  },
+  {
+   "fieldname": "last_date_of_promotion",
+   "fieldtype": "Date",
+   "label": "Last Date of Promotion",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_bbbf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "proposed_grade",
+   "fieldtype": "Link",
+   "label": "Proposed Grade",
+   "options": "Employee Grade",
+   "reqd": 1
+  },
+  {
+   "fieldname": "proposed_designation",
+   "fieldtype": "Link",
+   "label": "Proposed Designation",
+   "options": "Designation",
+   "reqd": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "employee_qualification_section",
+   "fieldtype": "Section Break",
+   "label": "Employee Qualification",
+   "read_only": 1
+  },
+  {
+   "fieldname": "edu_qualification",
+   "fieldtype": "Table",
+   "options": "Contract Qualification",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "extraordinary_leave_availed_section",
+   "fieldtype": "Section Break",
+   "label": "Extraordinary Leave Availed",
+   "read_only": 1
+  },
+  {
+   "fieldname": "eol_leaves",
+   "fieldtype": "Table",
+   "options": "Promotion Leave Details",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "performance_rating_for_years_section",
+   "fieldtype": "Section Break",
+   "label": "Performance Rating For Years",
+   "read_only": 1
+  },
+  {
+   "fieldname": "pms_rating",
+   "fieldtype": "Table",
+   "options": "Promotion PMS Rating",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "describe_the_present_job_responsibilities_section",
+   "fieldtype": "Section Break",
+   "label": "Describe the present job responsibilities "
+  },
+  {
+   "fieldname": "responsibilities",
+   "fieldtype": "Table",
+   "options": "Promotion Employee Responsibilities",
+   "reqd": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "employee_achievements_section",
+   "fieldtype": "Section Break",
+   "label": "Employee Achievements"
+  },
+  {
+   "fieldname": "achievements",
+   "fieldtype": "Table",
+   "options": "Promotion Employee Achievements",
+   "reqd": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "recommendation_of_the_supervisor_section",
+   "fieldtype": "Section Break",
+   "label": "Recommendation of the Supervisor"
+  },
+  {
+   "depends_on": "eval:doc.hod_user==frappe.session.user",
+   "fieldname": "recommendation_of_hod",
+   "fieldtype": "Small Text",
+   "label": "Recommendation of HoD"
+  },
+  {
+   "fieldname": "hod",
+   "fieldtype": "Link",
+   "label": "HoD ",
+   "options": "Employee",
+   "read_only": 1
+  },
+  {
+   "fieldname": "hod_user",
+   "fieldtype": "Link",
+   "label": "HOD User",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_xlsu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "supervisor",
+   "fieldtype": "Link",
+   "label": "Supervisor",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+    "fieldname": "amended_from",
+    "fieldtype": "Link",
+    "label": "Amended From",
+    "no_copy": 1,
+    "options": "Contract Renewal Application",
+    "print_hide": 1,
+    "read_only": 1,
+    "search_index": 1
+   }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2024-11-30 15:19:21.054926",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Promotion Application",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
