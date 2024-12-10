@@ -26,6 +26,7 @@ class TravelClaim(Document):
 			self.update_training_event()
 		if self.workflow_state not in ("Claimed","Cancelled"):
 			notify_workflow_states(self)
+		# self.validate_travel_auth()
 				
 	def workflow_action(self):
 		action = frappe.request.form.get('action') 
@@ -91,9 +92,9 @@ class TravelClaim(Document):
 		#self.get_status()
 		#self.validate_submitter()
 		#self.check_status()
-		self.update_attendance()
-		self.update_travel_authorization()
-		# self.post_journal_entry()
+		# self.update_attendance()
+		# self.update_travel_authorization()
+		self.post_journal_entry()
 		
 
 		if self.supervisor_approval and self.hr_approval:
@@ -105,6 +106,23 @@ class TravelClaim(Document):
 		# if self.for_maintenance_project:
 		#     self.update_project_and_maintenance()
 		#     self.update_project_and_maintenance_cost()
+	def validate_travel_auth(self):
+		auth_doc=frappe.get_doc("Travel Authorization", self.ta)
+		travel_auth_dates=[]
+		travel_claim_dates=[]
+		for row in auth_doc.items:
+			travel_auth_dates.append([row.date, row.till_date])
+
+		for row in self.items:
+			travel_claim_dates.append([getdate(row.date), getdate(row.till_date)])
+
+		if len(travel_auth_dates)!=len(travel_claim_dates):
+			frappe.throw("You cannot add or delete travel claim items")
+		# frappe.throw(str(travel_claim_dates))
+		for i in range(len(travel_auth_dates)):
+			if travel_auth_dates[i][0]!=travel_claim_dates[i][0] and travel_auth_dates[i][1]!=travel_claim_dates[i][1]:
+				frappe.throw("Row {} of Travel Claim does not match that of Travel Auth".format(i))
+
 
 	def update_attendance(self):
 		auth_doc=frappe.get_doc("Travel Authorization", self.ta)
@@ -720,7 +738,7 @@ class TravelClaim(Document):
 			else:
 				gl_account = "meeting_and_seminars_out_account"
 		expense_account = frappe.db.get_single_value("HR Accounts Settings", gl_account)
-		payable_account = frappe.db.get_value("Company", self.company, "default_expense_claim_payable_account")
+		payable_account = frappe.db.get_single_value("HR Accounts Settings", 'travel_claim_payable')
 		if not expense_account:
 			frappe.throw("Setup Travel/Training Accounts in HR Accounts Settings")
 		advance_je = frappe.db.get_value("Travel Authorization", self.ta, "need_advance")

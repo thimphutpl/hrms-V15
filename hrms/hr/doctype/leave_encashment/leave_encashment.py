@@ -83,7 +83,7 @@ class LeaveEncashment(Document):
 					"reference_name": self.name,
 					"cost_center": self.cost_center,
 			})
-		payable_account= frappe.db.get_single_value("HR Accounts Settings", "salary_payable_account")
+		payable_account= frappe.db.get_single_value("HR Accounts Settings", "leave_encashment_payable")
 		# payable_account = frappe.db.get_value("Company",self.company, "default_expense_claim_payable_account") #Added by Thukten
 		if flt(self.payable_amount) > 0:
 			je.append("accounts", {
@@ -121,7 +121,7 @@ class LeaveEncashment(Document):
 				"party_type": "Employee",
 				"party": self.employee,
 		})
-		payable_account= frappe.db.get_single_value("HR Accounts Settings", "salary_payable_account")
+		payable_account= frappe.db.get_single_value("HR Accounts Settings", "leave_encashment_payable")
 		# payable_account = frappe.db.get_value("Company",self.company, "default_expense_claim_payable_account") #Added by Thukten
 		if flt(self.payable_amount) > 0:
 			jebp.append("accounts", {
@@ -151,7 +151,7 @@ class LeaveEncashment(Document):
 		self.create_leave_ledger_entry(submit=False)
 		self.check_journal_entry()
 
-	def check_journal_entry():
+	def check_journal_entry(self):
 		if self.journal_entry:
 			for je in str(self.journal_entry).split(", "):
 				if frappe.db.get_value("Journal Entry", je, "docstatus") < 2:
@@ -161,8 +161,10 @@ class LeaveEncashment(Document):
 		cost_center = frappe.get_value("Employee", self.employee, "cost_center")
 		branch = frappe.get_value("Employee", self.employee, "branch")
 		company =frappe.get_value("Employee", self.employee, "company")
-		default_payable_account = frappe.get_cached_value("Company", company, "default_expense_claim_payable_account")
-		taxt_account_head = frappe.get_cached_value("Company", company, "salary_tax_account")
+		# default_payable_account = frappe.get_cached_value("Company", company, "default_expense_claim_payable_account")
+		default_payable_account=frappe.db.get_single_value("HR Accounts Settings", "leave_encashment_account")
+		taxt_account_head = frappe.db.get_single_value("HR Accounts Settings", "salary_tax_account")
+		# taxt_account_head = frappe.get_cached_value("Company", company, "salary_tax_account")
 
 		expense_claim 					= frappe.new_doc("Expense Claim")
 		expense_claim.flags.ignore_mandatory = True

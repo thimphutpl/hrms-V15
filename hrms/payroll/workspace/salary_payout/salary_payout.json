@@ -234,7 +234,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "GIS Report",
    "link_count": 0,
    "link_to": "GIS Report",
@@ -244,7 +244,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "PF Report",
    "link_count": 0,
    "link_to": "PF Report",
@@ -254,7 +254,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Loan Report",
    "link_count": 0,
    "link_to": "Loan Report",
@@ -264,7 +264,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Summarized Salary Report",
    "link_count": 0,
    "link_to": "Summarized Salary Report",
@@ -274,7 +274,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Alimony",
    "link_count": 0,
    "link_to": "Alimony",
@@ -284,7 +284,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Salary Payable Report",
    "link_count": 0,
    "link_to": "Salary Payable Report",
@@ -294,7 +294,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Salary Saving Scheme Report",
    "link_count": 0,
    "link_to": "Salary Saving Scheme Report",
@@ -304,7 +304,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Earning Report",
    "link_count": 0,
    "link_to": "Earning Report",
@@ -314,7 +314,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Monthly Salary Register",
    "link_count": 0,
    "link_to": "Monthly Salary Register",
@@ -324,7 +324,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Salary Tax and Health Report",
    "link_count": 0,
    "link_to": "Tax and Health Report",
@@ -334,7 +334,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Salary Increment",
    "link_count": 0,
    "link_to": "Salary Increment",
@@ -344,7 +344,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Other Recoveries",
    "link_count": 0,
    "link_to": "Other Recoveries",
@@ -354,7 +354,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "House Rent Report",
    "link_count": 0,
    "link_to": "House Rent Report",
@@ -364,7 +364,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Staff Welfare Scheme",
    "link_count": 0,
    "link_to": "Staff Welfare Scheme",
@@ -374,7 +374,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Adhoc Recoveries",
    "link_count": 0,
    "link_to": "Adhoc Recoveries",
@@ -394,7 +394,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Eastern SWS",
    "link_count": 0,
    "link_to": "Eastern SWS",
@@ -404,7 +404,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Western SWS",
    "link_count": 0,
    "link_to": "Western SWS",
@@ -414,7 +414,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Central SWS",
    "link_count": 0,
    "link_to": "Central SWS",
@@ -423,7 +423,7 @@
    "type": "Link"
   }
  ],
- "modified": "2024-12-02 16:20:19.794104",
+ "modified": "2024-12-04 21:28:14.923161",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Payout",

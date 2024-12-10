@@ -30,6 +30,10 @@
   "column_break_16",
   "amended_from",
   "je_ref",
+  "section_break_bauj",
+  "reviewer",
+  "reviewed",
+  "last_review",
   "sb_supervisor_details",
   "supervisor_name",
   "supervisor_designation",
@@ -212,15 +216,40 @@
    "fieldtype": "Data",
    "label": "Journal Entry References",
    "read_only": 1
+  },
+  {
+   "fieldname": "section_break_bauj",
+   "fieldtype": "Section Break",
+   "label": "Reviewers"
+  },
+  {
+   "fieldname": "reviewer",
+   "fieldtype": "Table",
+   "options": "SWS Reviewer List"
+  },
+  {
+   "default": "0",
+   "fieldname": "reviewed",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Reviewed"
+  },
+  {
+   "default": "0",
+   "fieldname": "last_review",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Last Review"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-11-24 21:59:19.114802",
+ "modified": "2024-12-04 22:35:33.923933",
  "modified_by": "Administrator",
  "module": "SWS",
  "name": "SWS Application",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {

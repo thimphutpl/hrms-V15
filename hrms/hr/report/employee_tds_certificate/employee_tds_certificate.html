@@ -1,0 +1,59 @@
+
+<h3 class="text-center">Construction Development Corporation Limited</h3>
+<h4 class="text-center">{%= __(report.report_name) %} for the Year: {%= filters.fiscal_year %}</h4>
+
+<table style="width: 100%;">
+	<tr>
+		<td>Widthholding Agency:</td><td style="text-align: left"><strong>Construction Development Corporation Limited</strong></td>
+		<td>Agency TPN: </td><td><strong>CAC00045</strong></td>
+	</tr>
+	<tr>
+		<td>Employee ID:</td><td><strong>{%= filters.employee %}:{%= filters.e_name %}</strong></td>
+		<td>TPN No: </td><td><strong>{%= filters.tpn %}</strong></td>
+	</tr>
+	<tr>
+		<td>Branch:</td><td><strong>{%= filters.branch %}</strong></td>
+		<td>Citizen ID: </td><td><strong>{%= filters.cid %}</strong></td>
+	</tr>
+</table>
+<hr>
+<table class="table table-bordered">
+	<thead style="font-weight: bold; color: black;">
+		<tr>
+			{% for(var i=0, l=report.columns.length; i<l; i++) { %}
+				<th class="text-right">{%= report.columns[i].label %}</th>
+			{% } %}
+		</tr>
+	</thead>
+	<tbody>
+		{% for(var j=0, k=data.length; j<k; j++) { %}
+			{%
+				var row = data[j];
+			%}
+			<tr>
+				{% for(var i=0, l=report.columns.length; i<l; i++) { %}
+					<td class="text-right">
+						{% var fieldname = report.columns[i].fieldname; %}
+						{% if (!is_null(row[fieldname])) { %}
+							{% if (i > 1 && i < 10) { %}
+								{%= parseFloat(row[fieldname]).toFixed(2) %}
+							{% } else { %}
+								{%= row[fieldname] %}
+							{% } %}
+						{% } %}
+					</td>
+				{% } %}
+			</tr>
+		{% } %}
+	</tbody>
+</table>
+<p>*Note: Allowances include LTC Payment.</p>
+<div>
+I hereby certify that the information given in this certificate is true and correct to the best of my knowledge. In case any information is found untrue and false, I shall be liable for fines and penalities as per chapter 5, General Provisions of the Income Tax Act of the Kindom of Bhutan, 2001
+</div>
+<div style="margin-top: 100px; text-align: center;">
+	<img src = "{{filters.seal}}" height = "200" width = "250" style="margin-left: 20px;transform: rotate(4deg)"></img><br>
+	Name and Signature of Disbursing Officer
+</div>
+<!-- test -->
+

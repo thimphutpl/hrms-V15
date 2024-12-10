@@ -1,0 +1,67 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-12-04 21:54:21.304336",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "reviewer",
+  "reviewer_id",
+  "reviewer_name",
+  "reviewed",
+  "remarks"
+ ],
+ "fields": [
+  {
+   "fieldname": "reviewer",
+   "fieldtype": "Link",
+   "label": "Reviewer",
+   "options": "Employee",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "reviewer.user_id",
+   "fieldname": "reviewer_id",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Reviewer ID",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "reviewer.employee_name",
+   "fieldname": "reviewer_name",
+   "fieldtype": "Data",
+   "label": "Reviewer Name",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "reviewed",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Reviewed",
+   "read_only_depends_on": "eval:doc.reviewer_id!=frappe.session.user"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Remarks",
+   "read_only_depends_on": "eval:doc.reviewer_id!=frappe.session.user"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-12-04 22:19:48.264456",
+ "modified_by": "Administrator",
+ "module": "SWS",
+ "name": "SWS Reviewer List",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

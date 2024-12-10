@@ -20,16 +20,48 @@ frappe.ui.form.on('SWS Application', {
 				}
 			}
 		})
+	},
+	employee: function(frm){
+		frappe.call({
+			method: "get_reviewers",
+			doc: frm.doc,
+			callback: function(r){
+				frm.refresh_field("reviewer")
+			}
+		})
 	}
 });
 frappe.ui.form.on('SWS Application Item', {
 	reference_document: function(frm,cdt, cdn){
+		// console.log(frm.fields_dict['items'].grid.grid_rows_by_docname[cdn])
 		var row = locals[cdt][cdn];
+		var options = []
+		frappe.call({
+			method: "get_child_doc_names",
+			doc: frm.doc,
+			args: {
+				"parent_name": row.reference_document
+			},
+			callback: function(r){
+				
+				if(r.message){
+					frm.fields_dict.items.grid.update_docfield_property("select_item","options",r.message);
+					frm.refresh_field("select_item");
+					console.log(r.message)
+				}
+				
+			}
+		})
+	},
+	select_item: function(frm, cdt, cdn){
+		var row = locals[cdt][cdn];
+		console.log(row.select_item);
+
 		frappe.call({
 			method: "get_member_details",
 			doc: frm.doc,
 			args: {
-				"name": row.reference_document
+				"name": row.select_item
 			},
 			callback: function(r){
 				if(r.message){
@@ -52,10 +84,9 @@ frappe.ui.form.on('SWS Application Item', {
 				}
 				frappe.call({
 						method: "hrms.sws.doctype.sws_application.sws_application.get_event_amount",
-						args: {"sws_event":row.sws_event, "reference":row.reference_document, "employee":frm.doc.employee},
+						args: {"sws_event":row.sws_event, "reference":row.select_item, "employee":frm.doc.employee},
 						callback: function(r){
 								if(r.message){
-										console.log(r.message)
 										frappe.model.set_value(cdt, cdn, "claim_amount", r.message[0]['amount']);
 										frappe.model.set_value(cdt, cdn, "amount", r.message[0]['amount']);
 										frm.refresh_field("claim_amount");
@@ -63,19 +94,19 @@ frappe.ui.form.on('SWS Application Item', {
 								}
 						}
 				})
-	},
+	}
 });
 
 cur_frm.fields_dict['items'].grid.get_field('reference_document').get_query = function(frm, cdt, cdn) {
 	if (!frm.employee) {
 				frm.employee = "dhskhfgskhfgsfhksfsjhbaf"
 		}
+		
 		return {
-				query : "erpnext.controllers.queries.filter_sws_member_item",
+				// query : "hrms.sws.doctype.sws_application.sws_application.filter_sws_member_item",
 				filters: {
 						"employee": frm.employee,
 						"docstatus": 1,
-						"status": "Active"
 				}
 		}
 }

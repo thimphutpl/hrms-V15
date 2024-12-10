@@ -181,6 +181,7 @@ class MusterRollApplication(Document):
 						"rate_per_hour_normal": a.rate_per_hour,
 						"company": self.company,
 						"bank_account_type": a.bank_account_type,
+						"nationality":a.nationality,
 					}
 
 					if a.is_existing == 1:

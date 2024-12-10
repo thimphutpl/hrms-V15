@@ -368,6 +368,10 @@ def get_template(branch, month, fiscal_year):
 
 	if not frappe.has_permission("Muster Roll Overtime Entry", "create"):
 		raise frappe.PermissionError
+	writer = UnicodeWriter()
+	writer.writerow(["Notes:"])
+	writer.writerow(["Please do not change the template headings"])
+	writer.writerow(["Status should be P if Present, A if Absent and H is Half Day "])
 	month_in_number = frappe._dict({
 									"Jan":1,
 									"Feb":2,
@@ -391,7 +395,7 @@ def get_template(branch, month, fiscal_year):
 	for day in range(cint(total_days)):
 		##if doctype == "Muster Roll Attendance":
         
-			fields.append(f"{month}_{day + 1}")
+			fields.append(f"{day + 1}")
         
 		#elif doctype == "Muster Roll Overtime Entry":
        
@@ -399,15 +403,15 @@ def get_template(branch, month, fiscal_year):
 			#fields.append(f"{day + 1}_SH")
 		
 		
-	writer = UnicodeWriter()
+	#writer = UnicodeWriter()
 	writer.writerow(fields)
 
 	return writer
 
 def get_template_overtime(branch, month, fiscal_year):
 
-	if not frappe.has_permission("Muster Roll Overtime Entry", "create"):
-		raise frappe.PermissionError
+	# if not frappe.has_permission("Muster Roll Overtime Entry", "create"):
+	# 	raise frappe.PermissionError
 	month_in_number = frappe._dict({
 									"Jan":1,
 									"Feb":2,

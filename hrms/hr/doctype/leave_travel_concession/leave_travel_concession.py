@@ -160,6 +160,7 @@ class LeaveTravelConcession(Document):
 					if flt(d.amount) > 15000:
 						d.amount = 15000
 				row = self.append('items', {})
+				
 				row.update(d)
 
 

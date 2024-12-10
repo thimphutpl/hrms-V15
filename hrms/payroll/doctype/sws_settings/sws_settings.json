@@ -20,7 +20,10 @@
   "html_nonimmediate",
   "cont_type_nonimmediate",
   "cont_nonimmediate",
-  "nonimmediate"
+  "nonimmediate",
+  "reviewer_setting_tab",
+  "reviewers_section",
+  "reviewer"
  ],
  "fields": [
   {
@@ -103,12 +106,27 @@
    "fieldname": "max_contribution",
    "fieldtype": "Currency",
    "label": "Max. Contribution/month"
+  },
+  {
+   "fieldname": "reviewer_setting_tab",
+   "fieldtype": "Tab Break",
+   "label": "Reviewer Setting"
+  },
+  {
+   "fieldname": "reviewers_section",
+   "fieldtype": "Section Break",
+   "label": "Reviewers"
+  },
+  {
+   "fieldname": "reviewer",
+   "fieldtype": "Table",
+   "options": "SWS Reviewer Setting Item"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-11-24 21:52:27.595186",
+ "modified": "2024-12-04 22:05:14.654963",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "SWS Settings",

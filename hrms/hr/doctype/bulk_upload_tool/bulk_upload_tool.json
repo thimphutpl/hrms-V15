@@ -97,7 +97,8 @@
   {
    "fieldname": "import_file",
    "fieldtype": "Attach",
-   "label": "Import File"
+   "label": "Import File",
+   "reqd": 1
   },
   {
    "fieldname": "upload_html",
@@ -133,7 +134,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-11-21 11:28:13.544121",
+ "modified": "2024-12-09 11:11:58.994321",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Bulk Upload Tool",

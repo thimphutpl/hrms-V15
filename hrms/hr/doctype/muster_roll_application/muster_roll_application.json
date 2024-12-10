@@ -16,11 +16,12 @@
   "cost_center",
   "project",
   "section_break_9",
+  "column_break_kttl",
+  "posting_date",
   "requested_by",
   "column_break_11",
-  "posting_date",
-  "column_break_13",
   "approver",
+  "column_break_13",
   "approver_name",
   "section_break_12",
   "from_project",
@@ -206,12 +207,17 @@
    "hidden": 1,
    "label": "From Unit",
    "options": "Department"
+  },
+  {
+   "fieldname": "column_break_kttl",
+   "fieldtype": "Column Break",
+   "hidden": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-02 16:35:47.657259",
+ "modified": "2024-12-05 19:17:05.796272",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Muster Roll Application",

@@ -147,6 +147,7 @@ class SWSMembership(Document):
 
 		doc.save(ignore_permissions=True)
 
+
 @frappe.whitelist()
 def get_sws_contribution(employee, ason_date=getdate()):
 	immediate_cont 	  = 0
@@ -201,3 +202,18 @@ def get_permission_query_conditions(user):
 				where `tabEmployee`.name = `tabSWS Membership`.employee
 				and `tabEmployee`.user_id = '{user}')
 	)""".format(user=user)
+
+
+@frappe.whitelist()
+def get_member_details( name):
+	if not name:
+		frappe.msgprint("Please select Reference Document first")
+	relationship = cid_no = full_name = None
+	data =  frappe.db.sql("""
+					select relationship, cid_no, full_name from `tabSWS Membership Item` where name = '{}'
+					""".format(name),as_dict=1)
+	if len(data) > 0:
+		relationship = data[0].relationship
+		cid_no = data[0].cid_no
+		full_name = data[0].full_name
+	return relationship, cid_no, full_name
