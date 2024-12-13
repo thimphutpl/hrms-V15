@@ -39,7 +39,8 @@
   "supervisor_user",
   "recommendation_date",
   "recommended",
-  "remarks"
+  "remarks",
+  "workflow_state"
  ],
  "fields": [
   {
@@ -264,12 +265,19 @@
    "mandatory_depends_on": "eval:doc.supervisor_user==frappe.session.user",
    "options": "\nYes\nNo",
    "read_only_depends_on": "eval:doc.supervisor_user!=frappe.session.user"
+  },
+  {
+   "fieldname": "workflow_state",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Workflow State",
+   "options": "Workflow State"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-11-27 12:09:07.820443",
+ "modified": "2024-12-13 16:13:03.437556",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Contract Renewal Application",
