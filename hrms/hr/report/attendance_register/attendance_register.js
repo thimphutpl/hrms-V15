@@ -10,10 +10,17 @@ frappe.query_reports["Attendance Register"] = {
 			"reqd": 1
 		},
 		{
+			"fieldname":"based_on",
+			"label": __("Average"),
+			"fieldtype": "Select",
+			"options": "\nAverage",
+			"reqd": 0
+		},
+		{
 			"fieldname":"month",
 			"label": __("Month"),
 			"fieldtype": "Select",
-			"options": "Jan\nFeb\nMar\nApr\nMay\nJun\nJul\nAug\nSep\nOct\nNov\nDec",
+			"options": "\nJan\nFeb\nMar\nApr\nMay\nJun\nJul\nAug\nSep\nOct\nNov\nDec",
 			"default": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov",
 				"Dec"][frappe.datetime.str_to_obj(frappe.datetime.get_today()).getMonth()],
 		},

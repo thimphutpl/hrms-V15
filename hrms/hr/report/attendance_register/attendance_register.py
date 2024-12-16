@@ -21,7 +21,7 @@ def execute(filters=None):
 		if not emp_det:
 			continue
 
-		row = [emp_det.person_name, emp_det.id_card]
+		row = [emp_det.person_name, emp_det.id_card, emp_det.nationality]
 
 		total_p = total_a = 0.0
 		for day in range(filters["total_days_in_month"]):
@@ -43,7 +43,9 @@ def execute(filters=None):
 
 def get_columns(filters):
 	columns = [
-		_("Name") + "::140", _("CID")+ "::120"
+		_("Name") + "::140", 
+		_("CID")+ ":Link/Muster Roll Employee:120",
+		_("Nationality")+ "::100"
 	]
 
 	for day in range(filters["total_days_in_month"]):
@@ -80,7 +82,7 @@ def get_conditions(filters):
 def get_employee_details(employee_type):
 	emp_map = frappe._dict()
 	if employee_type == "Muster Roll Employee":
-		for d in frappe.db.sql("""select name, person_name, id_card
+		for d in frappe.db.sql("""select name, person_name, id_card, nationality
 			from `tabMuster Roll Employee`""", as_dict=1):
 			emp_map.setdefault(d.name, d)
 
