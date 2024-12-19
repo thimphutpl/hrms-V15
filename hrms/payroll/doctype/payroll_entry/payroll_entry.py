@@ -624,7 +624,7 @@ class PayrollEntry(Document):
 		# default_bank_account = get_bank_account(self.processing_branch)
 		default_payable_account = company.get("default_payroll_payable_account")
 		company_cc              = company.get("cost_center")
-		default_gpf_account     = company.get("custom_employer_contribution_to_pf")
+		default_gpf_account     = company.get("employer_contribution_to_pf")
 		salary_component_pf     = "PF"
 
 		if not default_bank_account:

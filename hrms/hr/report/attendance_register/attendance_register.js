@@ -9,13 +9,13 @@ frappe.query_reports["Attendance Register"] = {
 			"fieldtype": "Select",
 			"reqd": 1
 		},
-		{
-			"fieldname":"based_on",
-			"label": __("Average"),
-			"fieldtype": "Select",
-			"options": "\nAverage",
-			"reqd": 0
-		},
+		// {
+		// 	"fieldname":"based_on",
+		// 	"label": __("Average"),
+		// 	"fieldtype": "Select",
+		// 	"options": "\nAverage",
+		// 	"reqd": 0
+		// },
 		{
 			"fieldname":"month",
 			"label": __("Month"),

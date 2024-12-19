@@ -146,7 +146,7 @@ class BulkUploadTool(Document):
 						pay_details = get_pay_details(employee,year,month_str)
 						#frappe.throw(str(pay_details))
 						if not pay_details:
-							frappe.throw("Wage Details is not defined")
+							frappe.throw(f"Wage Details is not defined for {employee}")
 						status = ''
 						if str(day_value) in ("P", "p", "1"):
 							status = 'Present'
