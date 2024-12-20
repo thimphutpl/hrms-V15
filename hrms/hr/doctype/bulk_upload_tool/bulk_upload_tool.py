@@ -369,9 +369,9 @@ def get_template(branch, month, fiscal_year):
 	if not frappe.has_permission("Muster Roll Overtime Entry", "create"):
 		raise frappe.PermissionError
 	writer = UnicodeWriter()
-	writer.writerow(["Notes:"])
-	writer.writerow(["Please do not change the template headings"])
-	writer.writerow(["Status should be P if Present, A if Absent and H is Half Day "])
+	writer.writerow([f"Notes:"])
+	writer.writerow([f"Please do not change the template headings"])
+	writer.writerow([f"Status should be P if Present, A if Absent and H is Half Day"])
 	month_in_number = frappe._dict({
 									"Jan":1,
 									"Feb":2,

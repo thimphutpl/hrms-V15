@@ -95,7 +95,7 @@ def get_conditions(filters):
 	if not filters.get("year"):
 		msgprint(_("Please select month and year"), raise_exception=1)
 
-	filters["total_days_in_month"] = 31 #monthrange(cint(filters.year), filters.month)[1]
+	# filters["total_days_in_month"] = 31 #monthrange(cint(filters.year), filters.month)[1]
 
 	if filters.get('month'):
 		filters["month"] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov",
