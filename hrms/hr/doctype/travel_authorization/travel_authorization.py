@@ -377,12 +377,13 @@ class TravelAuthorization(Document):
 		return_day = 1
 		full_dsa = 0
 		# doc=frappe.get_doc("Travel Authorization", self.name)
+
 		for i in self.items:
 			from_date = i.date
 			to_date   = i.date if not i.till_date else i.till_date
 			no_days   = date_diff(to_date, from_date) + 1
 			full_dsa+=flt(i.amount_in_btn)*(flt(i.percent)/100)*flt(no_days)
-		final=flt(full_dsa)-(flt(i.amount_in_btn)) 
+		final=flt(full_dsa)
 		self.estimated_amount = flt(final)
 		
 	@frappe.whitelist()

@@ -17,6 +17,8 @@ from frappe.utils import (
 	get_link_to_form,
 	getdate,
 	nowdate,
+	add_to_date
+	
 )
 
 from erpnext.buying.doctype.supplier_scorecard.supplier_scorecard import daterange
@@ -831,22 +833,36 @@ def get_number_of_leave_days(
 ) -> float:
 	"""Returns number of leave days between 2 dates after considering half day and holidays
 	(Based on the include_holiday setting in Leave Type)"""
-	number_of_days = 0
-	if cint(half_day) == 1:
-		if getdate(from_date) == getdate(to_date):
-			number_of_days = 0.5
-		elif half_day_date and getdate(from_date) <= getdate(half_day_date) <= getdate(to_date):
-			number_of_days = date_diff(to_date, from_date) + 0.5
-		else:
-			number_of_days = date_diff(to_date, from_date) + 1
-	else:
-		number_of_days = date_diff(to_date, from_date) + 1
+	
+  
+	no_days=date_diff(to_date, from_date)+1
+	
+	final=float(no_days)
 
-	if not frappe.db.get_value("Leave Type", leave_type, "include_holiday"):
-		number_of_days = flt(number_of_days) - flt(
-			get_holidays(employee, from_date, to_date, holiday_list=holiday_list)
-		)
-	return number_of_days
+	if leave_type not in ("Earned Leave", "Casual Leave"):
+		return final 
+		
+	total_days=0
+	is_sat=frappe.db.get_value("Holiday List", get_holiday_list_for_employee(employee), "saturday_half")
+	cur_date=from_date
+		
+	for i in range(0, no_days):
+		for holiday in frappe.db.sql("select * from `tabHoliday` where parent='{}'".format(get_holiday_list_for_employee(employee)), as_dict=1):
+			hol_date=getdate(cur_date)
+			if holiday.holiday_date==hol_date:
+				if holiday.holiday_date.weekday()==5 and ("saturday" in holiday.description.lower()):
+					if is_sat==1:
+						final-=0.5  
+					else:
+						final-=1
+				else:
+					final-=1
+		cur_date=add_to_date(getdate(cur_date), days=1, as_string=True)
+
+	if int(half_day)==1:
+		final-=0.5
+			
+	return final
 
 
 @frappe.whitelist()

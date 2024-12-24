@@ -159,7 +159,8 @@
   {
    "fieldname": "dsa_rate",
    "fieldtype": "Currency",
-   "label": "DSA Rate"
+   "label": "DSA Rate",
+   "read_only": 1
   },
   {
    "default": "100",
@@ -182,13 +183,14 @@
   {
    "fieldname": "amount_in_btn",
    "fieldtype": "Currency",
-   "label": "DSA Amount in BTN"
+   "label": "DSA Amount in BTN",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-11-21 11:59:02.738627",
+ "modified": "2024-12-23 16:24:36.656135",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization Item",
