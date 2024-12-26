@@ -1,0 +1,277 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "OAP.####",
+ "creation": "2024-12-11 10:30:38.322624",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "person_name",
+  "gender",
+  "village",
+  "designation",
+  "column_break_lank",
+  "id_card",
+  "gewog",
+  "column_break_wbem",
+  "status",
+  "dzongkhag",
+  "section_break_xbbv",
+  "date_of_joining",
+  "blood_group",
+  "column_break_jrwz",
+  "branch",
+  "project",
+  "column_break_kpvy",
+  "cost_center",
+  "section_break_heqv",
+  "salary",
+  "bank",
+  "column_break_lybk",
+  "rate_per_day",
+  "rate_per_hour",
+  "account_no",
+  "gratuity_fund",
+  "column_break_rcgv",
+  "tpn_number",
+  "date_of_separation",
+  "internal_work_history_section",
+  "internal_work_history",
+  "section_break_uika",
+  "user_id",
+  "column_break_eoja",
+  "company",
+  "date_of_transfer"
+ ],
+ "fields": [
+  {
+   "fieldname": "gender",
+   "fieldtype": "Select",
+   "label": "Gender",
+   "options": "\nMale\nFemale\nNA"
+  },
+  {
+   "fieldname": "village",
+   "fieldtype": "Link",
+   "label": "Village",
+   "options": "Village"
+  },
+  {
+   "fieldname": "designation",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Designation"
+  },
+  {
+   "fieldname": "id_card",
+   "fieldtype": "Data",
+   "label": "ID Card"
+  },
+  {
+   "fetch_from": "village.gewog",
+   "fieldname": "gewog",
+   "fieldtype": "Link",
+   "label": "Gewog",
+   "options": "Gewog",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_lank",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Active\nLeft"
+  },
+  {
+   "fetch_from": "village.dzongkhag",
+   "fieldname": "dzongkhag",
+   "fieldtype": "Link",
+   "label": "Dzongkhag",
+   "options": "Dzongkhag",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_xbbv",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "date_of_joining",
+   "fieldtype": "Date",
+   "label": "Date of Joining"
+  },
+  {
+   "fieldname": "blood_group",
+   "fieldtype": "Link",
+   "label": "Blood Group",
+   "options": "Blood Group"
+  },
+  {
+   "fetch_from": "project.branch",
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Branch",
+   "options": "Branch",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_jrwz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "label": "Project",
+   "options": "Project"
+  },
+  {
+   "fieldname": "column_break_kpvy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "branch.cost_center",
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_heqv",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "bank",
+   "fieldtype": "Link",
+   "label": "Bank",
+   "options": "Financial Institution"
+  },
+  {
+   "fieldname": "rate_per_day",
+   "fieldtype": "Currency",
+   "label": "Rate Per Day",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_lybk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rate_per_hour",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Rate Per Hour"
+  },
+  {
+   "fieldname": "account_no",
+   "fieldtype": "Data",
+   "label": "Account No."
+  },
+  {
+   "fieldname": "gratuity_fund",
+   "fieldtype": "Currency",
+   "label": "Gratuity Fund",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_rcgv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tpn_number",
+   "fieldtype": "Data",
+   "label": "TPN Number"
+  },
+  {
+   "depends_on": "eval:doc.status==\"Left\"",
+   "fieldname": "date_of_separation",
+   "fieldtype": "Date",
+   "label": "Date of Separation"
+  },
+  {
+   "fieldname": "internal_work_history_section",
+   "fieldtype": "Section Break",
+   "label": "INTERNAL WORK HISTORY"
+  },
+  {
+   "fieldname": "internal_work_history",
+   "fieldtype": "Table",
+   "options": "Employee Internal Work History",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_uika",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "user_id",
+   "fieldtype": "Link",
+   "label": "User Id",
+   "options": "User"
+  },
+  {
+   "fieldname": "column_break_eoja",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "depends_on": "eval:doc.status=='Left'",
+   "fieldname": "date_of_transfer",
+   "fieldtype": "Date",
+   "label": "Date of Transfer"
+  },
+  {
+   "fieldname": "person_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Full Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "salary",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Salary Per Month",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_wbem",
+   "fieldtype": "Column Break",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-12-19 14:56:38.637974",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Open Air Prisoner",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

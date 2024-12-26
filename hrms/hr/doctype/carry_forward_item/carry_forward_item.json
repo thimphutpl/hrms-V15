@@ -1,0 +1,78 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-12-12 09:53:45.412341",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "employee",
+  "column_break_gtro",
+  "employee_name",
+  "column_break_cahm",
+  "leaves_allocated",
+  "column_break_tlba",
+  "leaves_taken",
+  "column_break_hwfr",
+  "leave_balance"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Link",
+   "label": "Employee Name",
+   "options": "Employee",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_gtro",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "leaves_allocated",
+   "fieldtype": "Float",
+   "label": "Leaves Allocated"
+  },
+  {
+   "fieldname": "leaves_taken",
+   "fieldtype": "Float",
+   "label": "Leaves Taken"
+  },
+  {
+   "fieldname": "column_break_cahm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_tlba",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "leave_balance",
+   "fieldtype": "Float",
+   "label": "Leave Balance"
+  },
+  {
+   "fieldname": "column_break_hwfr",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-12-12 09:58:02.700329",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Carry Forward Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

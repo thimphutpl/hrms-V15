@@ -25,6 +25,10 @@ frappe.ui.form.on("Employee Attendance Tool", {
 		frm.trigger("load_employees");
 	},
 
+	employment_type(frm) {
+		frm.trigger("load_employees");
+	},
+
 	status(frm) {
 		frm.trigger("set_primary_action");
 	},
@@ -47,6 +51,7 @@ frappe.ui.form.on("Employee Attendance Tool", {
 					department: frm.doc.department,
 					branch: frm.doc.branch,
 					company: frm.doc.company,
+					employment_type: frm.doc.employment_type,
 				},
 			})
 			.then((r) => {

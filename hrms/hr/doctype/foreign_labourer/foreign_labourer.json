@@ -1,0 +1,159 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "FL.YY.####",
+ "creation": "2024-12-11 11:14:09.447137",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "full_name",
+  "branch",
+  "date_of_separation",
+  "column_break_mthl",
+  "permit_no",
+  "cost_center",
+  "date_of_joining",
+  "labour_contractor",
+  "column_break_qrsc",
+  "status",
+  "gender",
+  "address",
+  "internal_work_history_section",
+  "internal_work_history",
+  "date_of_transfer",
+  "status_details_section",
+  "status_details"
+ ],
+ "fields": [
+  {
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Full Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Branch",
+   "options": "Branch",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.status == \"Left\"",
+   "fieldname": "date_of_separation",
+   "fieldtype": "Date",
+   "label": "Date of Separation"
+  },
+  {
+   "fieldname": "column_break_mthl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "branch.cost_center",
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center",
+   "read_only": 1
+  },
+  {
+   "fieldname": "date_of_joining",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date Of Joining",
+   "reqd": 1
+  },
+  {
+   "fieldname": "labour_contractor",
+   "fieldtype": "Data",
+   "label": "Labour Contractor"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "\nAt-Site\nIn-Quarantine\nTo-Quarantine\nPending Approvals\nLeft",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_qrsc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "gender",
+   "fieldtype": "Select",
+   "label": "Gender",
+   "options": "\nMale\nFemale",
+   "reqd": 1
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Small Text",
+   "label": "Address"
+  },
+  {
+   "fieldname": "internal_work_history_section",
+   "fieldtype": "Section Break",
+   "label": "INTERNAL WORK HISTORY"
+  },
+  {
+   "fieldname": "internal_work_history",
+   "fieldtype": "Table",
+   "label": "Work History",
+   "options": "Employee Internal Work History",
+   "read_only": 1
+  },
+  {
+   "fieldname": "date_of_transfer",
+   "fieldtype": "Date",
+   "hidden": 1,
+   "label": "Date of Transfer"
+  },
+  {
+   "fieldname": "status_details_section",
+   "fieldtype": "Section Break",
+   "label": "Status Details"
+  },
+  {
+   "depends_on": "status",
+   "fieldname": "status_details",
+   "fieldtype": "Table",
+   "label": "Status Details",
+   "options": "Foreign Labourer Details"
+  },
+  {
+   "fieldname": "permit_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Work Permit No",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-12-25 17:34:15.812841",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Foreign Labourer",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

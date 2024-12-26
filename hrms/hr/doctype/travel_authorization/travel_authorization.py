@@ -13,8 +13,10 @@ from frappe.model.mapper import get_mapped_doc
 from datetime import timedelta
 from erpnext.custom_workflow import validate_workflow_states, notify_workflow_states
 from erpnext.accounts.doctype.accounts_settings.accounts_settings import get_bank_account
+ 
 
 class TravelAuthorization(Document):
+	 
 	def validate(self):
 		self.branch = frappe.db.get_value("Employee", self.employee, "branch")
 		self.cost_center = frappe.db.get_value("Employee", self.employee, "cost_center")
@@ -32,6 +34,25 @@ class TravelAuthorization(Document):
 		if self.training_event:
 			self.update_training_event()
 
+
+	
+
+
+	# def check_workflow_status(self):
+	# 	if self.workflow_state == "Approved" and self.need_advance == 1 and not self.advance_journal:
+	# 		# Check if the current user has any of the specified roles
+	# 		user_roles = frappe.get_roles()
+	# 		if any(role in user_roles for role in ["HR User", "Accounts User"]):
+	# 			try:
+	# 				self.check_advance()
+	# 			except Exception as e:
+	# 				# Handle exception and notify the user
+	# 				frappe.msgprint(_("Error creating JV: {0}".format(str(e))))
+	# 				self.db_set('docstatus', 0)  # Set docstatus back to Draft
+	# 				frappe.db.rollback()  # Revert database changes
+	# 				return  # Exit the method gracefully
+
+
 	def on_update(self):
 		# self.set_dsa_rate()
 		self.validate_travel_dates()
@@ -42,8 +63,10 @@ class TravelAuthorization(Document):
 		self.create_copy()
 
 	def on_submit(self):
+		self.post_advance_jv()
 		self.validate_travel_dates(update=True)
 		self.check_status()
+		# self.check_workflow_status()
 		self.create_attendance()
 		if self.travel_type=="Training":
 			self.update_training_records()
@@ -144,7 +167,7 @@ class TravelAuthorization(Document):
 		self.advance_amount_nu  = 0 if not self.need_advance else self.advance_amount_nu
 		self.advance_journal    = None if self.docstatus == 0 else self.advance_journal
 
-	@frappe.whitelist()
+	# @frappe.whitelist()
 	def post_advance_jv(self):
 		self.check_advance()
 
@@ -253,7 +276,7 @@ class TravelAuthorization(Document):
 					"credit": flt(self.advance_amount_nu),
 				})
 				
-				je.insert(ignore_permissions=True)
+				je.insert()
 				
 				#Set a reference to the advance journal entry
 				self.db_set("advance_journal", je.name)
@@ -306,8 +329,9 @@ class TravelAuthorization(Document):
 					)
 			""".format(travel_authorization = self.name, employee = self.employee), as_dict=True)
 			for t in tas:
-				frappe.throw("Row#{}: The dates in your current Travel Authorization have already been claimed in {} between {} and {}"\
-					.format(t.idx, frappe.get_desk_link("Travel Authorization", t.name), t.date, t.till_date))
+				pass
+				# frappe.throw("Row#{}: The dates in your current Travel Authorization have already been claimed in {} between {} and {}"\
+				# 	.format(t.idx, frappe.get_desk_link("Travel Authorization", t.name), t.date, t.till_date))
 
 
 	##

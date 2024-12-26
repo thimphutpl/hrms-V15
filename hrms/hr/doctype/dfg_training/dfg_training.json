@@ -1,0 +1,48 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-12-10 11:30:48.011495",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "trainings",
+  "from_date",
+  "column_break_ylag",
+  "to_date"
+ ],
+ "fields": [
+  {
+   "fieldname": "trainings",
+   "fieldtype": "Select",
+   "label": "Trainings",
+   "options": "\nGeneral Construction Services\nBarbending\nMasonry\nCarpentry\nPlumbing\nBio-Aesthetic and Landscaping"
+  },
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "label": "From Date"
+  },
+  {
+   "fieldname": "column_break_ylag",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "label": "To Date"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-12-10 11:36:00.409848",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "DFG Training",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

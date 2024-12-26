@@ -28,9 +28,6 @@
   "afd",
   "afd_clearance",
   "afd_remarks",
-  "ada",
-  "ada_clearance",
-  "ada_remarks",
   "column_break_29",
   "ams",
   "ams_clearance",
@@ -38,9 +35,6 @@
   "icthr",
   "icthr_clearance",
   "icthr_remarks",
-  "iad",
-  "iad_clearance",
-  "iad_remarks",
   "pc",
   "pc_clearance",
   "pc_remarks",
@@ -213,21 +207,20 @@
    "fieldname": "supervisor_clearance",
    "fieldtype": "Check",
    "label": "Clearance Acquired (Supervisor)",
-   "mandatory_depends_on": "frappe.session.user == doc.supervisor",
-   "read_only": 1
+   "read_only": 1,
+   "read_only_depends_on": "eval:frappe.session.user != doc.supervisor"
   },
   {
    "depends_on": "eval:doc.supervisor==frappe.session.user",
    "fieldname": "supervisor_remarks",
    "fieldtype": "Small Text",
    "label": "Supervisor's Remarks",
-   "mandatory_depends_on": "eval:frappe.session.user == doc.supervisor",
-   "read_only_depends_on": "eval:frappe.session.user != doc.supervisor"
+   "mandatory_depends_on": "eval:frappe.session.user == doc.supervisor"
   },
   {
    "fieldname": "afd",
    "fieldtype": "Link",
-   "label": "Finance & Investment Division",
+   "label": "Finance Section",
    "options": "User",
    "read_only": 1
   },
@@ -235,22 +228,21 @@
    "default": "0",
    "fieldname": "afd_clearance",
    "fieldtype": "Check",
-   "label": "Clearance Acquired (Finance & Investment Division)",
-   "mandatory_depends_on": "eval:frappe.session.user == doc.afd",
-   "read_only": 1
+   "label": "Clearance Acquired (Finance Section)",
+   "read_only": 1,
+   "read_only_depends_on": "eval:frappe.session.user != doc.afd"
   },
   {
    "depends_on": "eval:doc.afd==frappe.session.user",
    "fieldname": "afd_remarks",
    "fieldtype": "Small Text",
-   "label": "Finance & Investment Division Remarks",
-   "mandatory_depends_on": "eval:frappe.session.user == doc.afd",
+   "label": "Finance Section Remarks",
    "read_only_depends_on": "eval:frappe.session.user != doc.afd"
   },
   {
    "fieldname": "icthr",
    "fieldtype": "Link",
-   "label": "Human Resource & Administration",
+   "label": "HR Approver",
    "options": "User",
    "read_only": 1
   },
@@ -258,68 +250,23 @@
    "default": "0",
    "fieldname": "icthr_clearance",
    "fieldtype": "Check",
-   "label": "Clearance Acquired (Human Resource & Administration)",
+   "label": "Clearance Acquired (HR Approver)",
    "mandatory_depends_on": "eval:frappe.session.user == doc.icthr",
-   "read_only": 1
+   "read_only": 1,
+   "read_only_depends_on": "eval:frappe.session.user != doc.icthr"
   },
   {
    "depends_on": "eval:doc.icthr==frappe.session.user",
    "fieldname": "icthr_remarks",
    "fieldtype": "Small Text",
-   "label": "Human Resource & Administration Remarks",
+   "label": "HR Remarks",
    "mandatory_depends_on": "eval:frappe.session.user == doc.icthr",
    "read_only_depends_on": "eval:frappe.session.user != doc.icthr"
   },
   {
-   "fieldname": "iad",
-   "fieldtype": "Link",
-   "label": "Internal Audit Division",
-   "options": "User",
-   "read_only": 1
-  },
-  {
-   "default": "0",
-   "fieldname": "iad_clearance",
-   "fieldtype": "Check",
-   "label": "Clearance Acquired(Internal Audit Division)",
-   "mandatory_depends_on": "eval:frappe.session.user == doc.iad",
-   "read_only": 1
-  },
-  {
-   "depends_on": "eval:doc.iad==frappe.session.user",
-   "fieldname": "iad_remarks",
-   "fieldtype": "Small Text",
-   "label": "Internal Audit Division Remarks",
-   "mandatory_depends_on": "eval:frappe.session.user == doc.iad",
-   "read_only_depends_on": "eval:frappe.session.user != doc.iad"
-  },
-  {
-   "fieldname": "ada",
-   "fieldtype": "Link",
-   "label": "Asset Declaration Administrator",
-   "options": "User",
-   "read_only": 1
-  },
-  {
-   "default": "0",
-   "fieldname": "ada_clearance",
-   "fieldtype": "Check",
-   "label": "Clearance Acquired(Asset Declaration Administrator)",
-   "mandatory_depends_on": "eval:frappe.session.user == doc.ada",
-   "read_only": 1
-  },
-  {
-   "depends_on": "eval:doc.ada==frappe.session.user",
-   "fieldname": "ada_remarks",
-   "fieldtype": "Small Text",
-   "label": "Asset Declaration Administrator Remarks",
-   "mandatory_depends_on": "eval:frappe.session.user == doc.ada",
-   "read_only_depends_on": "eval:frappe.session.user != doc.ada"
-  },
-  {
    "fieldname": "ams",
    "fieldtype": "Link",
-   "label": "Asset Management Section",
+   "label": "ERP Approver",
    "options": "User",
    "read_only": 1
   },
@@ -327,13 +274,13 @@
    "depends_on": "eval:doc.ams==frappe.session.user",
    "fieldname": "sms_remarks",
    "fieldtype": "Small Text",
-   "label": "Asset Management Section Remarks",
+   "label": "ERP Remarks",
    "mandatory_depends_on": "eval:doc.ams==frappe.session.user"
   },
   {
    "fieldname": "pc",
    "fieldtype": "Link",
-   "label": "Procurement and Contracts",
+   "label": "ADM Approver",
    "options": "User",
    "read_only": 1
   },
@@ -341,15 +288,16 @@
    "default": "0",
    "fieldname": "pc_clearance",
    "fieldtype": "Check",
-   "label": "Clearance Acquired(Procurement and Contracts)",
+   "label": "Clearance Acquired(ADM Approver)",
    "mandatory_depends_on": "eval:frappe.session.user == doc.pc",
-   "read_only": 1
+   "read_only": 1,
+   "read_only_depends_on": "eval:frappe.session.user != doc.pc"
   },
   {
    "depends_on": "eval:frappe.session.user == doc.pc",
    "fieldname": "pc_remarks",
    "fieldtype": "Small Text",
-   "label": "Procurement and Contracts Remarks",
+   "label": "ADM Approver Remarks",
    "mandatory_depends_on": "eval:frappe.session.user == doc.pc",
    "read_only_depends_on": "eval:frappe.session.user != doc.pc"
   },
@@ -357,15 +305,16 @@
    "default": "0",
    "fieldname": "ams_clearance",
    "fieldtype": "Check",
-   "label": "Clearance Acquired (Clearance Acquired (Store & Procurement Division))",
+   "label": "Clearance Acquired (ERP Approver)",
    "mandatory_depends_on": "eval:doc.ams==frappe.session.user",
-   "read_only": 1
+   "read_only": 1,
+   "read_only_depends_on": "eval:doc.ams!=frappe.session.user"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-03 15:35:20.900399",
+ "modified": "2024-12-26 12:32:08.069915",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Separation Clearance",
@@ -381,6 +330,29 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Employee",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Approver",
    "share": 1,
    "submit": 1,
    "write": 1

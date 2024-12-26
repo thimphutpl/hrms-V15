@@ -2,12 +2,14 @@
  "actions": [],
  "allow_import": 1,
  "allow_rename": 1,
- "autoname": "Prompt",
+ "autoname": "field:employee_subgroup",
  "creation": "2018-04-13 16:14:24.174138",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "employee_group",
+  "employee_subgroup",
   "default_salary_structure",
   "default_leave_policy",
   "currency",
@@ -169,15 +171,27 @@
    "fieldtype": "Link",
    "label": "Promote To Grade",
    "options": "Employee Grade"
+  },
+  {
+   "fieldname": "employee_group",
+   "fieldtype": "Link",
+   "label": "Employee Group",
+   "options": "Employee Group"
+  },
+  {
+   "fieldname": "employee_subgroup",
+   "fieldtype": "Data",
+   "label": "Employee Grade",
+   "unique": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-11-15 10:32:16.437182",
+ "modified": "2024-12-10 10:28:29.096483",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Grade",
- "naming_rule": "Set by user",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {

@@ -1,0 +1,319 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "field:person_name",
+ "creation": "2024-12-10 11:17:49.725428",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "person_name",
+  "dessung_id",
+  "village",
+  "active",
+  "column_break_qfby",
+  "id_card",
+  "dob",
+  "gewog",
+  "column_break_tpjc",
+  "status",
+  "qualification",
+  "dzongkhag",
+  "section_break_wksb",
+  "date_of_joining",
+  "gender",
+  "designation",
+  "column_break_wwka",
+  "branch",
+  "phone",
+  "column_break_epkz",
+  "cost_center",
+  "blood_group",
+  "section_break_mmca",
+  "column_break_jybd",
+  "salary",
+  "rate_per_day",
+  "bank",
+  "column_break_xawc",
+  "rate_per_hour",
+  "account_no",
+  "column_break_qycz",
+  "gratuity_fund",
+  "tpn_number",
+  "date_of_separation",
+  "internal_work_history_section",
+  "internal_work_history",
+  "dfg_training_section",
+  "training",
+  "section_break_szwr",
+  "user_id",
+  "column_break_glmn",
+  "company",
+  "date_of_transfer"
+ ],
+ "fields": [
+  {
+   "fieldname": "dessung_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Dessung ID",
+   "reqd": 1
+  },
+  {
+   "fieldname": "village",
+   "fieldtype": "Link",
+   "label": "Village",
+   "options": "Village"
+  },
+  {
+   "fieldname": "column_break_qfby",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "id_card",
+   "fieldtype": "Data",
+   "label": "ID Card"
+  },
+  {
+   "fetch_from": "village.gewog",
+   "fieldname": "gewog",
+   "fieldtype": "Link",
+   "label": "Gewog",
+   "options": "Gewog",
+   "read_only": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Active\nLeft"
+  },
+  {
+   "fieldname": "column_break_tpjc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "qualification",
+   "fieldtype": "Data",
+   "label": "Qualification"
+  },
+  {
+   "fetch_from": "village.dzongkhag",
+   "fieldname": "dzongkhag",
+   "fieldtype": "Link",
+   "label": "Dzongkhag",
+   "options": "Dzongkhag",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_wksb",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "date_of_joining",
+   "fieldtype": "Date",
+   "label": "Date of Joining"
+  },
+  {
+   "fieldname": "gender",
+   "fieldtype": "Select",
+   "label": "Gender",
+   "options": "\nMale\nFemale"
+  },
+  {
+   "fieldname": "designation",
+   "fieldtype": "Data",
+   "label": "Designation"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "Branch",
+   "options": "Branch",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_wwka",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "branch.cost_center",
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center",
+   "read_only": 1
+  },
+  {
+   "fieldname": "blood_group",
+   "fieldtype": "Link",
+   "label": "Blood Group",
+   "options": "Blood Group"
+  },
+  {
+   "fieldname": "column_break_epkz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_mmca",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "bank",
+   "fieldtype": "Link",
+   "label": "Bank",
+   "options": "Financial Institution"
+  },
+  {
+   "fieldname": "column_break_xawc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rate_per_hour",
+   "fieldtype": "Currency",
+   "label": "Rate Per Hour",
+   "read_only": 1
+  },
+  {
+   "fieldname": "account_no",
+   "fieldtype": "Data",
+   "label": "Account No."
+  },
+  {
+   "fieldname": "column_break_qycz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "gratuity_fund",
+   "fieldtype": "Currency",
+   "label": "Gratuity Fund",
+   "read_only": 1
+  },
+  {
+   "fieldname": "tpn_number",
+   "fieldtype": "Data",
+   "label": "TPN Number"
+  },
+  {
+   "depends_on": "eval:doc.status==\"Left\"",
+   "fieldname": "date_of_separation",
+   "fieldtype": "Date",
+   "label": "Date of Separation"
+  },
+  {
+   "fieldname": "internal_work_history_section",
+   "fieldtype": "Section Break",
+   "label": "INTERNAL WORK HISTORY"
+  },
+  {
+   "fieldname": "internal_work_history",
+   "fieldtype": "Table",
+   "options": "Employee Internal Work History",
+   "read_only": 1
+  },
+  {
+   "fieldname": "dfg_training_section",
+   "fieldtype": "Section Break",
+   "label": "DFG Training"
+  },
+  {
+   "fieldname": "training",
+   "fieldtype": "Table",
+   "options": "DFG Training"
+  },
+  {
+   "fieldname": "section_break_szwr",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "user_id",
+   "fieldtype": "Link",
+   "label": "User Id",
+   "options": "User"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "date_of_transfer",
+   "fieldtype": "Date",
+   "hidden": 1,
+   "label": "Date of Transfer"
+  },
+  {
+   "fieldname": "column_break_glmn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "person_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Full Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "active",
+   "fieldtype": "Check",
+   "label": "In Action"
+  },
+  {
+   "fieldname": "dob",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date Of Birth",
+   "reqd": 1
+  },
+  {
+   "fieldname": "phone",
+   "fieldtype": "Data",
+   "label": "Phone Number"
+  },
+  {
+   "fieldname": "salary",
+   "fieldtype": "Currency",
+   "label": "Soelra Per Month",
+   "reqd": 1
+  },
+  {
+   "fieldname": "rate_per_day",
+   "fieldtype": "Currency",
+   "label": "Soelra Per Day"
+  },
+  {
+   "fieldname": "column_break_jybd",
+   "fieldtype": "Column Break",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-12-20 15:15:37.045057",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "DFG",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

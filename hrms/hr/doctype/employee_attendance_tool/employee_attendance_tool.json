@@ -12,6 +12,8 @@
   "department",
   "column_break_3",
   "branch",
+  "column_break_tgwc",
+  "employment_type",
   "unmarked_attendance_section",
   "employees_html",
   "attendance_details_section",
@@ -107,12 +109,14 @@
    "default": "0",
    "fieldname": "late_entry",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Late Entry"
   },
   {
    "default": "0",
    "fieldname": "early_exit",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Early Exit"
   },
   {
@@ -122,14 +126,25 @@
   {
    "fieldname": "shift",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Shift",
    "options": "Shift Type"
+  },
+  {
+   "fieldname": "employment_type",
+   "fieldtype": "Link",
+   "label": "Employment Type",
+   "options": "Employment Type"
+  },
+  {
+   "fieldname": "column_break_tgwc",
+   "fieldtype": "Column Break"
   }
  ],
  "hide_toolbar": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-02-28 14:13:59.849205",
+ "modified": "2024-12-23 17:14:45.414426",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Attendance Tool",

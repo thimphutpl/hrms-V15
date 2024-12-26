@@ -556,18 +556,22 @@ class PayrollEntry(Document):
 		company = frappe.db.get("Company", self.company)
 		default_bank_account    = frappe.db.get_value("Branch", self.processing_branch,"expense_bank_account")
 		# default_bank_account = get_bank_account(self.processing_branch)
-		default_payable_account = company.get("salary_payable_account")
+		default_payable_account = frappe.db.get_single_value("HR Accounts Settings","salary_payable_account")
+		# company.get("salary_payable_account")
 		company_cc              = company.get("company_cost_center")
-		default_gpf_account     = company.get("employer_contribution_to_pf")
+		default_gpf_account     = frappe.db.get_single_value("HR Accounts Settings","employee_contribution_pf")
+		# company.get("employer_contribution_to_pf")
 		salary_component_pf     = "PF"
 
 		if not default_bank_account:
-			frappe.throw(_("Please set default <b>Expense Bank Account</b> for processing branch {}")\
-				.format(frappe.get_desk_link("Branch", self.processing_branch)))
+			pass
+			# frappe.throw(_("Please set default <b>Expense Bank Account</b> for processing branch {}")\
+				# .format(frappe.get_desk_link("Branch", self.processing_branch)))
 		elif not default_payable_account:
-			frappe.throw(_("Please set default <b>Salary Payable Account</b> for the Company"))
-		elif not company_cc:
-			frappe.throw(_("Please set <b>Default Cost Center</b> for the Company"))
+			pass
+			# frappe.throw(_("Please set default <b>Salary Payable Account</b> for the Company"))
+		# elif not company_cc:
+		# 	frappe.throw(_("Please set <b>Default Cost Center</b> for the Company"))
 		elif not default_gpf_account:
 			frappe.throw(_("Please set account for <b>Employer Contribution to PF</b> for the Company"))
 
@@ -575,12 +579,130 @@ class PayrollEntry(Document):
 		#cond = self.get_filter_condition()
 		
 		# Salary Details
+		# query = """
+		# 	select t1.cost_center as cost_center,
+		# 		case
+		# 			when sc.type = 'Earning' then sc.type
+		# 			else ifnull(sc.clubbed_component,sc.name)
+		# 		end as salary_component,
+		# 		sc.type as component_type,
+		# 		case
+		# 			when sc.type = 'Earning' then 0
+		# 			else ifnull(sc.is_remittable,0)
+		# 		end as is_remittable,
+		# 		sca.account as gl_head,
+		# 		sum(ifnull(sd.amount,0)) as amount,
+		# 		case
+		# 			when ifnull(sc.make_party_entry,0) = 1 then 'Payable'
+		# 			else 'Other'
+		# 		end as account_type,
+		# 		case
+		# 			when ifnull(sc.make_party_entry,0) = 1 then 'Employee'
+		# 			else 'Other'
+		# 		end as party_type,
+		# 		case
+		# 			when ifnull(sc.make_party_entry,0) = 1 then t1.employee
+		# 			else 'Other'
+		# 		end as party
+		# 	 from
+		# 		`tabSalary Slip`  as t1,
+		# 		`tabSalary Detail` sd,
+		# 		`tabSalary Component` sc,
+		# 		`tabSalary Component Account` sca,
+		# 		`tabCompany` c
+		# 	where t1.fiscal_year = '{0}'
+		# 	  and t1.month       = '{1}'
+		# 	  and t1.docstatus   = 1
+		# 	  and sd.parent      = t1.name
+		# 	  and sc.name        = sd.salary_component
+		# 	  and sca.parent = sc.name
+		# 	  and sca.company	 = t1.company
+		# 	  and c.name         = t1.company
+		# 	  and t1.payroll_entry = '{2}'
+		# 	  and sd.amount > 0
+		# 	  and exists(select 1
+		# 				from `tabPayroll Employee Detail` ped
+		# 				where ped.parent = t1.payroll_entry
+		# 				and ped.employee = t1.employee)
+		# 	group by 
+		# 		t1.cost_center
+		# 		(case when sc.type = 'Earning' then sc.type else ifnull(sc.clubbed_component,sc.name) end),
+		# 		sc.type,
+		# 		(case when sc.type = 'Earning' then 0 else ifnull(sc.is_remittable,0) end),
+		# 		sca.account,
+		# 		sca.company,
+		# 		(case when ifnull(sc.make_party_entry,0) = 1 then 'Payable' else 'Other' end),
+		# 		(case when ifnull(sc.make_party_entry,0) = 1 then 'Employee' else 'Other' end),
+		# 		(case when ifnull(sc.make_party_entry,0) = 1 then t1.employee else 'Other' end)
+		# 	order by t1.cost_center, sc.type, sc.name
+		# """.format(self.fiscal_year, self.month, self.name)
+		# frappe.throw(query)
+
+
+		# cc = """
+		# 	select t1.cost_center as cost_center,
+		# 		(case
+		# 			when sc.type = 'Earning' then sc.type
+		# 			else ifnull(sc.clubbed_component,sc.name)
+		# 		end) as salary_component,
+		# 		sc.type as component_type,
+		# 		(case
+		# 			when sc.type = 'Earning' then 0
+		# 			else ifnull(sc.is_remittable,0)
+		# 		end) as is_remittable,
+		# 		sca.account as gl_head,
+		# 		sum(ifnull(sd.amount,0)) as amount,
+		# 		(case
+		# 			when ifnull(sc.make_party_entry,0) = 1 then 'Payable'
+		# 			else 'Other'
+		# 		end) as account_type,
+		# 		(case
+		# 			when ifnull(sc.make_party_entry,0) = 1 then 'Employee'
+		# 			else 'Other'
+		# 		end) as party_type,
+		# 		(case
+		# 			when ifnull(sc.make_party_entry,0) = 1 then t1.employee
+		# 			else 'Other'
+		# 		end) as party
+		# 	from
+		# 		`tabSalary Slip` as t1,
+		# 		`tabSalary Detail` sd,
+		# 		`tabSalary Component` sc,
+		# 		`tabSalary Component Account` sca,
+		# 		`tabCompany` c
+		# 	where t1.fiscal_year = '{0}'
+		# 	and t1.month = '{1}'
+		# 	and t1.docstatus = 1
+		# 	and sd.parent = t1.name
+		# 	and sc.name = sd.salary_component
+		# 	and sca.parent = sc.name
+		# 	and sca.company = t1.company
+		# 	and c.name = t1.company
+		# 	and t1.payroll_entry = '{2}'
+		# 	and sd.amount > 0
+		# 	and exists(select 1
+		# 				from `tabPayroll Employee Detail` ped
+		# 				where ped.parent = t1.payroll_entry
+		# 				and ped.employee = t1.employee)
+		# 	group by 
+		# 		t1.cost_center,
+		# 		(case when sc.type = 'Earning' then sc.type else ifnull(sc.clubbed_component,sc.name) end),
+		# 		sc.type,
+		# 		(case when sc.type = 'Earning' then 0 else ifnull(sc.is_remittable,0) end),
+		# 		sca.account,
+		# 		sca.company,
+		# 		(case when ifnull(sc.make_party_entry,0) = 1 then 'Payable' else 'Other' end),
+		# 		(case when ifnull(sc.make_party_entry,0) = 1 then 'Employee' else 'Other' end),
+		# 		(case when ifnull(sc.make_party_entry,0) = 1 then t1.employee else 'Other' end)
+		# 	order by t1.cost_center, sc.name;
+		# 	""".format(self.fiscal_year, self.month, self.name)
+
+		# frappe.throw(str(cc))
+
+
+		
 		cc = frappe.db.sql("""
-			select
-				(case
-					when sc.type = 'Deduction' and ifnull(sc.make_party_entry,0) = 0 then c.company_cost_center
-					else t1.cost_center
-				end)                       as cost_center,
+			select t1.cost_center as cost_center,
 				(case
 					when sc.type = 'Earning' then sc.type
 					else ifnull(sc.clubbed_component,sc.name)
@@ -605,18 +727,18 @@ class PayrollEntry(Document):
 					else 'Other'
 				end) as party
 			 from
-				`tabSalary Slip` t1,
+				`tabSalary Slip` as t1,
 				`tabSalary Detail` sd,
 				`tabSalary Component` sc,
-				`tabSalary Component Account` sca,
+				`tabSalary Component Account` as sca,
 				`tabCompany` c
 			where t1.fiscal_year = '{0}'
 			  and t1.month       = '{1}'
 			  and t1.docstatus   = 1
 			  and sd.parent      = t1.name
 			  and sc.name        = sd.salary_component
-			  and sca.parent = sc.name
-			  and sca.company	 = t1.company
+			#   and sca.parent = sc.name
+			#   and sca.company	 = t1.company
 			  and c.name         = t1.company
 			  and t1.payroll_entry = '{2}'
 			  and sd.amount > 0
@@ -625,25 +747,35 @@ class PayrollEntry(Document):
 						where ped.parent = t1.payroll_entry
 						and ped.employee = t1.employee)
 			group by 
-				(case
-					when sc.type = 'Deduction' and ifnull(sc.make_party_entry,0) = 0 then c.company_cost_center
-					else t1.cost_center
-				end),
+				# t1.cost_center,
+				# (case when sc.type = 'Earning' then sc.type else ifnull(sc.clubbed_component, sc.name) end),
+				# sc.type,
+				# (case when sc.type = 'Earning' then 0 else ifnull(sc.is_remittable, 0) end),
+				# sca.account,
+				# sca.company,
+				# (case when ifnull(sc.make_party_entry, 0) = 1 then 'Payable' else 'Other' end),
+				# (case when ifnull(sc.make_party_entry, 0) = 1 then 'Employee' else 'Other' end),
+				# (case when ifnull(sc.make_party_entry, 0) = 1 then t1.employee else 'Other' end)
+				t1.cost_center,
 				(case when sc.type = 'Earning' then sc.type else ifnull(sc.clubbed_component,sc.name) end),
 				sc.type,
 				(case when sc.type = 'Earning' then 0 else ifnull(sc.is_remittable,0) end),
-				sca.account,
-				sca.company,
+				# sca.account,
+				# sca.company,
 				(case when ifnull(sc.make_party_entry,0) = 1 then 'Payable' else 'Other' end),
 				(case when ifnull(sc.make_party_entry,0) = 1 then 'Employee' else 'Other' end),
 				(case when ifnull(sc.make_party_entry,0) = 1 then t1.employee else 'Other' end)
 			order by t1.cost_center, sc.type, sc.name
 		""".format(self.fiscal_year, self.month, self.name),as_dict=1)
-
-		posting        = frappe._dict()
+		frappe.throw(str(cc))
+		
+		posting = frappe._dict()
 		cc_wise_totals = frappe._dict()
 		tot_payable_amt= 0
+		
 		for rec in cc:
+			# frappe.throw('hi')
+			
 			# To Payables
 			tot_payable_amt += (-1*flt(rec.amount) if rec.component_type == 'Deduction' else flt(rec.amount))
 			posting.setdefault("to_payables",[]).append({
@@ -929,6 +1061,7 @@ def remove_salary_slips_for_employees(payroll_entry, salary_slips, publish_progr
 
 # following method is created by SHIV on 2020/10/20
 def create_salary_slips_for_employees(employees, args, title=None, publish_progress=True):
+	# frappe.throw(str(args))
 	salary_slips_exists_for = get_existing_salary_slips(employees, args)
 	count=0
 	successful = 0

@@ -154,7 +154,7 @@ class SalarySlip(TransactionBase):
 		self.employment_type    = emp.employment_type
 		self.employee_group     = emp.employee_group
 		self.employee_grade     = emp.grade
-		self.business_activity  = emp.business_activity
+		self.business_activity  = frappe.db.get_value("Business Activity","is_default",1)
 			
 	def get_leave_details(self, joining_date=None, relieving_date=None, ss_doc=None, lwp=None):
 		days_in_month= 0

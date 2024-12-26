@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:dzongkhag_name",
  "creation": "2022-11-15 11:48:00.706785",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -27,7 +28,9 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Dzongkhag Name",
-   "reqd": 1
+   "no_copy": 1,
+   "reqd": 1,
+   "unique": 1
   },
   {
    "fieldname": "lft",
@@ -49,40 +52,47 @@
    "default": "0",
    "fieldname": "is_group",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Is Group"
   },
   {
    "fieldname": "old_parent",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Old Parent",
    "options": "Dzongkhag"
   },
   {
    "fieldname": "parent_dzongkhag",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Parent Dzongkhag",
    "options": "Dzongkhag"
   },
   {
    "fieldname": "column_break_7",
-   "fieldtype": "Column Break"
+   "fieldtype": "Column Break",
+   "hidden": 1
   },
   {
    "default": "0",
    "fieldname": "is_dzongkhag",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Is Dzongkhag"
   },
   {
    "default": "0",
    "fieldname": "is_gewog",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Is Gewog"
   },
   {
    "default": "0",
    "fieldname": "is_village",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Is Village"
   },
   {
@@ -104,16 +114,17 @@
    "default": "0",
    "fieldname": "is_dungkhag",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Is Dungkhag"
   }
  ],
  "index_web_pages_for_search": 1,
- "is_tree": 1,
  "links": [],
- "modified": "2022-12-06 12:35:04.878132",
+ "modified": "2024-12-10 10:46:19.639110",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Dzongkhag",
+ "naming_rule": "By fieldname",
  "nsm_parent_field": "parent_dzongkhag",
  "owner": "Administrator",
  "permissions": [

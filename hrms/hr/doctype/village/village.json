@@ -1,6 +1,8 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
+ "autoname": "field:village",
  "creation": "2024-10-15 15:27:30.620861",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -33,7 +35,8 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Village",
-   "reqd": 1
+   "reqd": 1,
+   "unique": 1
   },
   {
    "fieldname": "column_break_yrfd",
@@ -47,10 +50,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-15 15:30:17.191431",
+ "modified": "2024-12-10 11:09:32.503049",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Village",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {

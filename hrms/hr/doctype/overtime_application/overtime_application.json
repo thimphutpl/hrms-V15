@@ -35,6 +35,8 @@
   "items",
   "section_break_11",
   "approver_name",
+  "column_break_dnyo",
+  "approver_full_name",
   "column_break_11",
   "approver",
   "approver_designation",
@@ -127,8 +129,10 @@
    "reqd": 1
   },
   {
+   "fetch_from": "employee.reports_to",
    "fieldname": "approver",
    "fieldtype": "Read Only",
+   "hidden": 1,
    "label": "Approver Email ID"
   },
   {
@@ -136,9 +140,9 @@
    "fieldtype": "Column Break"
   },
   {
+   "fetch_from": "employee.reports_to",
    "fieldname": "approver_name",
    "fieldtype": "Read Only",
-   "hidden": 1,
    "label": "Approver"
   },
   {
@@ -327,12 +331,22 @@
    "fieldtype": "Currency",
    "label": "Net Amount",
    "read_only": 1
+  },
+  {
+   "fieldname": "column_break_dnyo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "employee.reports_to_name",
+   "fieldname": "approver_full_name",
+   "fieldtype": "Data",
+   "label": "Approver Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-11-25 20:34:10.488896",
+ "modified": "2024-12-23 16:51:31.822057",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Overtime Application",

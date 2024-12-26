@@ -20,10 +20,11 @@ def get_employees(
 	department: str | None = None,
 	branch: str | None = None,
 	company: str | None = None,
+	employment_type: str | None = None,
 ) -> dict[str, list]:
 	filters = {"status": "Active", "date_of_joining": ["<=", date]}
 
-	for field, value in {"department": department, "branch": branch, "company": company}.items():
+	for field, value in {"department": department, "branch": branch,"employment_type": employment_type, "company": company}.items():
 		if value:
 			filters[field] = value
 

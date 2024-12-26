@@ -289,8 +289,7 @@
    "depends_on": "eval:doc.need_advance",
    "fieldname": "estimated_amount",
    "fieldtype": "Currency",
-   "label": "Estimated Total Amount",
-   "read_only": 1
+   "label": "Estimated Total Amount"
   },
   {
    "depends_on": "eval:doc.need_advance",
@@ -472,6 +471,7 @@
   {
    "fieldname": "sponsorship",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Sponsorship",
    "options": "CDCL\nOthers"
   },
@@ -525,7 +525,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-11-27 15:25:45.232550",
+ "modified": "2024-12-19 15:37:04.110889",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",

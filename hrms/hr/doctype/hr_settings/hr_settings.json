@@ -11,6 +11,7 @@
   "standard_working_hours",
   "column_break_9",
   "retirement_age",
+  "gratuity_percent",
   "reminders_section",
   "send_birthday_reminders",
   "enable_bulk_overtime_payment",
@@ -64,20 +65,14 @@
   "hr_verifier_name",
   "separation_clearance_approver_section",
   "afd",
-  "ama",
   "icthr",
   "iad",
-  "ada",
   "pc",
-  "sws",
   "column_break_60",
   "approver_name_afd",
   "approver_name_ama",
   "approver_name_icthr",
   "approver_name_iad",
-  "approver_name_ada",
-  "approver_name_pc",
-  "approver_name_sws",
   "tb_notifications",
   "sb_encashment_settings",
   "encashment_approval_notification_template",
@@ -816,40 +811,40 @@
   {
    "fieldname": "icthr",
    "fieldtype": "Link",
-   "label": "Human Resource & Administration",
+   "label": "HR Approver",
    "options": "Employee"
   },
   {
    "fieldname": "iad",
    "fieldtype": "Link",
-   "label": "Internal Audit Division",
+   "label": "ERP Approver",
    "options": "Employee"
   },
   {
    "fetch_from": "icthr.employee_name",
    "fieldname": "approver_name_icthr",
    "fieldtype": "Data",
-   "label": "Approver Name (Human Resource & Administration Division)",
+   "label": "Approver Name (ERP)",
    "read_only": 1
   },
   {
    "fetch_from": "iad.employee_name",
    "fieldname": "approver_name_iad",
    "fieldtype": "Data",
-   "label": "Approver Name (Internal Audit Division)",
+   "label": "Approver Name (ADM Section)",
    "read_only": 1
   },
   {
    "fieldname": "afd",
    "fieldtype": "Link",
-   "label": "Accounts & Finance Division",
+   "label": "Finance Approver",
    "options": "Employee"
   },
   {
    "fetch_from": "afd.employee_name",
    "fieldname": "approver_name_afd",
    "fieldtype": "Data",
-   "label": "Approver Name (Accounts & Finance Division)",
+   "label": "Approver Name (Finance Section)",
    "read_only": 1
   },
   {
@@ -908,19 +903,6 @@
    "fieldtype": "Link",
    "label": "eNote Status Notification",
    "options": "Email Template"
-  },
-  {
-   "fieldname": "sws",
-   "fieldtype": "Link",
-   "label": "SWS Treasurer",
-   "options": "Employee"
-  },
-  {
-   "fetch_from": "sws.employee_name",
-   "fieldname": "approver_name_sws",
-   "fieldtype": "Data",
-   "label": "Approver Name(SWS Treasurer)",
-   "read_only": 1
   },
   {
    "fieldname": "pms_section",
@@ -1125,42 +1107,17 @@
    "label": "HR Verifier Name"
   },
   {
-   "fieldname": "ada",
-   "fieldtype": "Link",
-   "label": "Asset Declaration Administrator",
-   "options": "Employee"
-  },
-  {
    "fieldname": "pc",
    "fieldtype": "Link",
-   "label": "Procurement and Contracts",
+   "label": "ADM Approver",
    "options": "Employee"
   },
   {
-   "fetch_from": "ama.employee_name",
+   "fetch_from": "icthr.employee_name",
    "fieldname": "approver_name_ama",
    "fieldtype": "Data",
-   "label": "Approver Name (Asset Management Section)",
+   "label": "Approver Name (HR Section)",
    "read_only": 1
-  },
-  {
-   "fetch_from": "ada.employee_name",
-   "fieldname": "approver_name_ada",
-   "fieldtype": "Data",
-   "label": "Approver Name (Asset Declaration Administrator)"
-  },
-  {
-   "fetch_from": "pc.employee_name",
-   "fieldname": "approver_name_pc",
-   "fieldtype": "Data",
-   "label": "Approver Name(Procurement and Contracts)",
-   "read_only": 1
-  },
-  {
-   "fieldname": "ama",
-   "fieldtype": "Link",
-   "label": "Asset Management Section",
-   "options": "Employee"
   },
   {
    "default": "0",
@@ -1183,13 +1140,18 @@
    "fieldname": "rest_pbva_percent",
    "fieldtype": "Percent",
    "label": "Rest PBVA Percent"
+  },
+  {
+   "fieldname": "gratuity_percent",
+   "fieldtype": "Int",
+   "label": "Gratuity %"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-12-03 17:03:13.002073",
+ "modified": "2024-12-23 12:55:25.067813",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",

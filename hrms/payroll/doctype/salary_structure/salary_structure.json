@@ -51,6 +51,15 @@
   "eligible_for_underground_allowance",
   "eligible_for_underground_allowance_payment_method",
   "valueunderground_allowance",
+  "eligible_for_banking_allowance",
+  "payment_methods",
+  "value",
+  "eligible_for_project_allowance",
+  "payment_method",
+  "valueproject_allowance",
+  "eligible_for_lumpsum_pay_revision",
+  "lumpsum_pay_revision_method",
+  "lump_sum_revision",
   "cb_10",
   "eligible_for_difficulty",
   "difficulty_method",
@@ -73,6 +82,27 @@
   "eligible_for_housing_allowance",
   "eligible_for_housing_allowance_payment_method",
   "valuehousing_allowance",
+  "eligible_for_one_off_5__indexation",
+  "one_off_5__indexation_method",
+  "one_off_5__indexation_value",
+  "eligible_for_pda",
+  "eligible_for_pda_method",
+  "pda",
+  "eligible_for_house_rent_allowance",
+  "house_rent_allowance_method",
+  "house_rent_allowance_value",
+  "eligible_for_voltage_hazard_allowance",
+  "voltage_hazard_allowance_method",
+  "voltage_hazard_allowance_value",
+  "eligible_for_medical_allowance",
+  "eligible_for_medical_allowance_method",
+  "medical_allowance_value",
+  "eligible_for_royal_audit_allowance",
+  "royal_audit_allowance_method",
+  "royal_audit_allowance_value",
+  "eligible_for_leave_travel_concession_allowance",
+  "leave_travel_concession_allowance_method",
+  "eligible_for_leave_travel_concession_allowance_value",
   "cb_12",
   "eligible_for_officiating_allowance",
   "officiating_allowance_method",
@@ -93,6 +123,30 @@
   "eligible_for_fixed_allowance",
   "fixed_allowance_method",
   "fixed_allowance",
+  "eligible_for_oneoff_5_indexation_gi",
+  "oneoff_5_indexation_gi_method",
+  "oneoff_5_indexation_gi",
+  "eligible_for_lumpsum_fixed_allowance_gi",
+  "lumpsum_fixed_allowance_gi_method",
+  "lumpsum_fixed_allowance_gi",
+  "eligible_for_oneoff_fixed_payment_gi",
+  "oneoff_fixed_payment_gi_method",
+  "oneoff_fixed_payment_gi",
+  "eligible_for_salary_arrears",
+  "salary_arrears_method",
+  "salary_arrear",
+  "eligible_for_one_off_fixed_payment",
+  "off_fixed_payment",
+  "fixed_payment_value",
+  "eligible_for_leave_encashment_allowance",
+  "leave_encashment_allowance_method",
+  "encashment_value",
+  "eligible_for_scarcity_allowance",
+  "eligible_for_scarcity_allowance_method",
+  "scarcity_allowance_value",
+  "eligible_for_cash_handling_allowance",
+  "cash_handling_allowance_method",
+  "cash_handling_allowance_value",
   "sb_other_benefits",
   "eligible_for_gis",
   "eligible_for_pf",
@@ -131,6 +185,7 @@
    "reqd": 1
   },
   {
+   "fetch_from": "employee.employee_name",
    "fieldname": "employee_name",
    "fieldtype": "Data",
    "in_list_view": 1,
@@ -917,12 +972,355 @@
    "fieldname": "valuehousing_allowance",
    "fieldtype": "Currency",
    "label": "Value(Housing Allowance)"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_oneoff_5_indexation_gi",
+   "fieldtype": "Check",
+   "label": "Eligible for One-off 5% Indexation GI"
+  },
+  {
+   "depends_on": "eligible_for_oneoff_5_indexation_gi",
+   "fieldname": "oneoff_5_indexation_gi_method",
+   "fieldtype": "Select",
+   "label": "One-off 5% Indexation GI Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_oneoff_5_indexation_gi",
+   "fieldname": "oneoff_5_indexation_gi",
+   "fieldtype": "Currency",
+   "label": "One-off 5% Indexation GI"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_lumpsum_fixed_allowance_gi",
+   "fieldtype": "Check",
+   "label": "Eligible for Lumpsum Fixed Allowance GI"
+  },
+  {
+   "depends_on": "eligible_for_lumpsum_fixed_allowance_gi",
+   "fieldname": "lumpsum_fixed_allowance_gi_method",
+   "fieldtype": "Select",
+   "label": "Lumpsum Fixed Allowance GI Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_lumpsum_fixed_allowance_gi",
+   "fieldname": "lumpsum_fixed_allowance_gi",
+   "fieldtype": "Currency",
+   "label": "Lumpsum Fixed Allowance GI"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_oneoff_fixed_payment_gi",
+   "fieldtype": "Check",
+   "label": "Eligible for One-off Fixed Payment GI"
+  },
+  {
+   "depends_on": "eligible_for_oneoff_fixed_payment_gi",
+   "fieldname": "oneoff_fixed_payment_gi_method",
+   "fieldtype": "Select",
+   "label": "Oneoff Fixed Payment GI Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_oneoff_fixed_payment_gi",
+   "fieldname": "oneoff_fixed_payment_gi",
+   "fieldtype": "Currency",
+   "label": "Oneoff Fixed Payment GI"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_salary_arrears",
+   "fieldtype": "Check",
+   "label": "Eligible for Salary Arrears"
+  },
+  {
+   "depends_on": "eligible_for_salary_arrears",
+   "fieldname": "salary_arrears_method",
+   "fieldtype": "Select",
+   "label": "Salary Arrears Method",
+   "options": "\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_salary_arrears",
+   "fieldname": "salary_arrear",
+   "fieldtype": "Currency",
+   "label": "Salary Arrear"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_banking_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Banking Allowance"
+  },
+  {
+   "depends_on": "eligible_for_banking_allowance",
+   "fieldname": "payment_methods",
+   "fieldtype": "Select",
+   "label": "Payment Methods",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_banking_allowance",
+   "fieldname": "value",
+   "fieldtype": "Int",
+   "label": "Value"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_project_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Project Allowance"
+  },
+  {
+   "depends_on": "eligible_for_project_allowance",
+   "fieldname": "payment_method",
+   "fieldtype": "Select",
+   "label": "Payment Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_project_allowance",
+   "fieldname": "valueproject_allowance",
+   "fieldtype": "Int",
+   "label": "Value(Project Allowance)"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_lumpsum_pay_revision",
+   "fieldtype": "Check",
+   "label": "Eligible for Lumpsum Pay Revision"
+  },
+  {
+   "depends_on": "eligible_for_lumpsum_pay_revision",
+   "fieldname": "lumpsum_pay_revision_method",
+   "fieldtype": "Select",
+   "label": "Payment Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_lumpsum_pay_revision",
+   "fieldname": "lump_sum_revision",
+   "fieldtype": "Int",
+   "label": "Value"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_one_off_5__indexation",
+   "fieldtype": "Check",
+   "label": "Eligible for One off 5 % Indexation"
+  },
+  {
+   "depends_on": "eligible_for_one_off_5__indexation",
+   "fieldname": "one_off_5__indexation_method",
+   "fieldtype": "Select",
+   "label": "Payment Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_one_off_5__indexation",
+   "fieldname": "one_off_5__indexation_value",
+   "fieldtype": "Currency",
+   "label": "Value"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_pda",
+   "fieldtype": "Check",
+   "label": "Eligible for PDA"
+  },
+  {
+   "depends_on": "eligible_for_pda",
+   "fieldname": "eligible_for_pda_method",
+   "fieldtype": "Select",
+   "label": "Payment Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_pda",
+   "fieldname": "pda",
+   "fieldtype": "Currency",
+   "label": "Value"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_house_rent_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for House Rent Allowance"
+  },
+  {
+   "depends_on": "eligible_for_house_rent_allowance",
+   "fieldname": "house_rent_allowance_method",
+   "fieldtype": "Select",
+   "label": "Payment Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_house_rent_allowance",
+   "fieldname": "house_rent_allowance_value",
+   "fieldtype": "Currency",
+   "label": "Value"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_voltage_hazard_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Voltage Hazard Allowance"
+  },
+  {
+   "depends_on": "eligible_for_voltage_hazard_allowance",
+   "fieldname": "voltage_hazard_allowance_method",
+   "fieldtype": "Select",
+   "label": "Payment Method",
+   "mandatory_depends_on": "eligible_for_voltage_hazard_allowance",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_voltage_hazard_allowance",
+   "fieldname": "voltage_hazard_allowance_value",
+   "fieldtype": "Currency",
+   "label": "Value"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_medical_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Medical allowance"
+  },
+  {
+   "depends_on": "eligible_for_medical_allowance",
+   "fieldname": "eligible_for_medical_allowance_method",
+   "fieldtype": "Select",
+   "label": "Payment Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_medical_allowance",
+   "fieldname": "medical_allowance_value",
+   "fieldtype": "Int",
+   "label": "Value"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_royal_audit_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Royal Audit allowance"
+  },
+  {
+   "depends_on": "eligible_for_royal_audit_allowance",
+   "fieldname": "royal_audit_allowance_method",
+   "fieldtype": "Select",
+   "label": "Payment Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_royal_audit_allowance",
+   "fieldname": "royal_audit_allowance_value",
+   "fieldtype": "Currency",
+   "label": "Value"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_one_off_fixed_payment",
+   "fieldtype": "Check",
+   "label": "Eligible for One off Fixed Payment"
+  },
+  {
+   "depends_on": "eligible_for_one_off_fixed_payment",
+   "fieldname": "off_fixed_payment",
+   "fieldtype": "Select",
+   "label": "Payment Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_one_off_fixed_payment",
+   "fieldname": "fixed_payment_value",
+   "fieldtype": "Currency",
+   "label": "Value"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_leave_encashment_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Leave Encashment Allowance"
+  },
+  {
+   "depends_on": "eligible_for_leave_encashment_allowance",
+   "fieldname": "leave_encashment_allowance_method",
+   "fieldtype": "Select",
+   "label": "Payment Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_leave_encashment_allowance",
+   "fieldname": "encashment_value",
+   "fieldtype": "Currency",
+   "label": "Value"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_leave_travel_concession_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Leave Travel Concession Allowance"
+  },
+  {
+   "depends_on": "eligible_for_leave_travel_concession_allowance",
+   "fieldname": "leave_travel_concession_allowance_method",
+   "fieldtype": "Select",
+   "label": "Payment Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_leave_travel_concession_allowance",
+   "fieldname": "eligible_for_leave_travel_concession_allowance_value",
+   "fieldtype": "Currency",
+   "label": "Value"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_scarcity_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Scarcity Allowance"
+  },
+  {
+   "depends_on": "eligible_for_scarcity_allowance",
+   "fieldname": "eligible_for_scarcity_allowance_method",
+   "fieldtype": "Select",
+   "label": "Payment Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_scarcity_allowance",
+   "fieldname": "scarcity_allowance_value",
+   "fieldtype": "Currency",
+   "label": "Value"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_cash_handling_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Cash Handling Allowance"
+  },
+  {
+   "depends_on": "eligible_for_cash_handling_allowance",
+   "fieldname": "cash_handling_allowance_method",
+   "fieldtype": "Select",
+   "label": "Payment Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_cash_handling_allowance",
+   "fieldname": "cash_handling_allowance_value",
+   "fieldtype": "Currency",
+   "label": "Value"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2024-11-23 12:35:28.566109",
+ "modified": "2024-12-13 10:32:18.973080",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",

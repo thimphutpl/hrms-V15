@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
  "autoname": "field:gewog",
  "creation": "2024-10-15 15:24:30.740896",
@@ -40,7 +41,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-15 15:26:48.936546",
+ "modified": "2024-12-10 10:55:41.926592",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Gewog",

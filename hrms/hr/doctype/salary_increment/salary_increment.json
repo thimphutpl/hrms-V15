@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
  "creation": "2022-11-07 16:41:14.540600",
  "doctype": "DocType",
@@ -39,9 +40,9 @@
   "column_break_20",
   "calculated_increment",
   "column_break_25",
-  "amended_from",
   "minimum_months",
-  "total_months"
+  "total_months",
+  "amended_from"
  ],
  "fields": [
   {
@@ -132,7 +133,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Month",
-   "options": "January\nFebruary\nMarch\nApril\nMarch\nApril\nMay\nJune\nJuly\nAugust\nSeptember\nOctober\nNovember\nDecember",
+   "options": "January\nJuly",
    "reqd": 1
   },
   {
@@ -295,7 +296,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-01-20 16:20:48.757080",
+ "modified": "2024-12-23 09:58:56.075674",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Salary Increment",

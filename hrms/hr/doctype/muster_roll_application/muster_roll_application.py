@@ -12,7 +12,7 @@ class MusterRollApplication(Document):
 		self.default_validations()
 	
 	def on_submit(self):
-		self.validate_submitter()
+		# self.validate_submitter()
 		self.check_status()
 		if self.from_branch and self.date_of_transfer:
 			self.update_mr_master()
@@ -60,15 +60,10 @@ class MusterRollApplication(Document):
 	def get_employees(self):
 		cond = ''
 		if not self.from_branch:
-			frappe.throw("Select From Project Before Clicking the button")
+			frappe.throw("Select Requesting Project and Requesting Branch")
 
 		if self.from_branch:
 			cond += " and branch = '{0}'".format(self.from_branch)
-		# if self.from_unit:
-		# 	cond += " and unit = '{0}'".format(self.from_unit)
-		
-		# if self.from_branch and not self.from_unit:
-		# 	cond += " and unit IS NULL"
 
 		query = "select name as existing_cid, person_name, gender, bank_name as bank, bank_ac_no as account_no, bank_account_type, bank_branch, rate_per_day, rate_per_hour_normal as rate_per_hour, (rate_per_day/8) as rate_per_hour_normal from `tabMuster Roll Employee` where status = 'Active' {}".format(cond)
         
@@ -181,6 +176,8 @@ class MusterRollApplication(Document):
 						"rate_per_hour_normal": a.rate_per_hour,
 						"company": self.company,
 						"bank_account_type": a.bank_account_type,
+						"mobile": a.mobile,
+						"blood_group": a.blood,
 					}
 
 					if a.is_existing == 1:

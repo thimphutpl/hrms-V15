@@ -1,0 +1,71 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "UOAP.###",
+ "creation": "2024-12-12 09:30:01.201529",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "oap",
+  "person_name",
+  "id_card",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "oap",
+   "fieldtype": "Link",
+   "label": "Open Air Prisoner",
+   "options": "Open Air Prisoner"
+  },
+  {
+   "fetch_from": "oap.person_name",
+   "fieldname": "person_name",
+   "fieldtype": "Data",
+   "label": "Full Name",
+   "options": "oap.person_name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "oap.id_card",
+   "fieldname": "id_card",
+   "fieldtype": "Data",
+   "label": "CID",
+   "options": "oap.id_card",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "options": "Unfreeze OAP"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2024-12-25 15:26:15.994170",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Unfreeze OAP",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
