@@ -44,7 +44,7 @@ class EmployeeTransfer(Document):
 
 	def update_employee_master(self, cancel=False):
 		employee = frappe.get_doc("Employee", self.employee)
-		employee.department = self.new_department if not cancel else self.old_department
+		# employee.department = self.new_department if not cancel else self.old_department
 		employee.division	= self.new_division if not cancel else self.old_division
 		employee.designation= self.new_designation if not cancel else self.old_designation
 		employee.section	= self.new_section if not cancel else self.old_section
@@ -65,7 +65,7 @@ class EmployeeTransfer(Document):
 				""".format(self.doctype, self.name))
 		else:
 			internal_work_history = {
-				'department': self.new_department,
+				# 'department': self.new_department,
 				'division': self.new_division,
 				'section': self.new_section,
 				'branch': self.new_branch,

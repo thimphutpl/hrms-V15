@@ -5,17 +5,17 @@
 frappe.ui.form.on('Employee Transfer', {
 	onload:function(frm) {
 		
-		frm.set_query("new_department", function() {
-			return {
-				"filters": {
-					"company": frm.doc.company,
-					"disabled":0,
-					"is_division":0,
-					"is_section":0,
-					"is_unit":0
-				}
-			};
-		});
+		// frm.set_query("new_department", function() {
+		// 	return {
+		// 		"filters": {
+		// 			"company": frm.doc.company,
+		// 			"disabled":0,
+		// 			"is_division":0,
+		// 			"is_section":0,
+		// 			"is_unit":0
+		// 		}
+		// 	};
+		// });
 		frm.set_query("new_division", function() {
 			return {
 				"filters": {
@@ -63,13 +63,13 @@ frappe.ui.form.on('Employee Transfer', {
 			});
 		}
 	},
-	new_department: function(frm){
-		frm.set_value("new_division", null);
-		frm.set_value("new_section", null);
-		// frm.set_value("new_branch", null);
-		// frm.set_value("new_cost_center", null);
-		frm.set_value("new_reports_to", null)
-	},
+	// new_department: function(frm){
+	// 	frm.set_value("new_division", null);
+	// 	frm.set_value("new_section", null);
+	// 	// frm.set_value("new_branch", null);
+	// 	// frm.set_value("new_cost_center", null);
+	// 	frm.set_value("new_reports_to", null)
+	// },
 	new_division: function(frm){
 		frm.set_value("new_section", null);
 		// frm.set_value("new_branch", null);
@@ -86,9 +86,8 @@ frappe.ui.form.on('Employee Transfer', {
 var enable_disable = function(frm){
 	if(in_list(frappe.user_roles, "Administrator") || in_list(frappe.user_roles, "HR User") ||
 		in_list(frappe.user_roles, "HR Manager")){
-		frm.toggle_reqd(["new_department", "new_reports_to"], 1);
+		// frm.toggle_reqd(["new_department", "new_reports_to"], 1);
 	} else {
-		frm.toggle_display(["old_department", "old_division", "old_section", "old_reports_to", "current_supervisor_name",
-			"new_department", "new_division", "new_section", "new_reports_to"], 0);
+		frm.toggle_display(["old_division", "old_section", "old_reports_to", "current_supervisor_name", "new_division", "new_section", "new_reports_to"], 0);
 	}
 }
