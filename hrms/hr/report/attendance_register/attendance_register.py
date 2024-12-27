@@ -58,7 +58,7 @@ def execute(filters=None):
 	if not filters.month:
 		avg_mr = flt(total_mr/count)
 		data.append([f"<b>Total number of MR for {filters.year}</b>",total_mr]+['']*34)
-		data.append([f"<b>Average number of MR for {filters.year}</b>"+str(filters.year),avg_mr]+['']*34)
+		data.append([f"<b>Average number of MR for {filters.year}</b>",avg_mr]+['']*34)
 	# frappe.throw("<pre>{}</pre>".format(frappe.as_json(data)))
 
 	return columns, data
