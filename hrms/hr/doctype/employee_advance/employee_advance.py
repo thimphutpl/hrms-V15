@@ -25,11 +25,12 @@ class EmployeeAdvance(Document):
 			"Accounts Settings", "make_payment_via_journal_entry"
 		)
 	def validate(self):
-		validate_workflow_states(self)
+		# validate_workflow_states(self)
 		validate_active_employee(self.employee)
 		self.validate_employment_status()
 		self.set_status()
-		if self.advance_type != "Travel Advance" and self.advance_type != "Imprest Advance" :
+
+		if not frappe.db.get_value("Employee Advance Type", self.advance_type, 'is_imprest_advance'):
 			self.validate_advance_amount()
 			self.validate_deduction_month()
 		self.update_defaults()
@@ -37,8 +38,6 @@ class EmployeeAdvance(Document):
 		self.update_reference()
 		self.check_duplicate_advance()
 		self.select_advance_account()
-		if self.workflow_state != "Approved":
-			notify_workflow_states(self)
 	
 	def on_cancel(self):
 		self.ignore_linked_doctypes = "GL Entry"
@@ -46,23 +45,19 @@ class EmployeeAdvance(Document):
 		self.update_travel_request()
 		self.update_reference(cancel = 1)
 		self.update_salary_structure(True)
+
 	def on_submit(self):
 		if self.advance_type =="Travel Advance":
 			self.update_travel_request()
 		if self.advance_type =="Salary Advance":
 			self.update_salary_structure()
 		self.make_bank_entry()
-		notify_workflow_states(self)
 
 	def select_advance_account(self):
-		if self.advance_type == "Salary Advance":
-			self.advance_account = frappe.db.get_single_value("HR Accounts Settings", "employee_advance_salary")
-		elif self.advance_type == "Travel Advance":
-			self.advance_account = frappe.db.get_single_value("HR Accounts Settings", "employee_advance_travel")
-		# elif self.advance_type == "Imprest Advance":
-		# 	self.advance_account = frappe.db.get_value("Company", self.company, "imprest_advance_account")
-		else:
-			account = ""
+		account = ''
+		if self.advance_type:
+			account = frappe.db.get_value("Employee Advance Type", self.advance_type, 'account')
+		return account
 			
 	def update_defaults(self):
 		self.salary_component = "Salary Advance Deductions"
@@ -470,20 +465,21 @@ class EmployeeAdvance(Document):
 		paying_amount, paying_exchange_rate = get_paying_amount_paying_exchange_rate(payment_account, doc)
 		employee_cost_center = frappe.db.get_value("Branch",self.branch,"cost_center")
 		default_payment_account = frappe.db.get_value("Company", self.company,"default_bank_account")
-		if self.advance_type == "Salary Advance":
-			account_select = frappe.db.get_single_value("HR Accounts Settings", "employee_advance_salary")
-		elif self.advance_type == "Travel Advance":
-			account_select = frappe.db.get_single_value("HR Accounts Settings", "employee_advance_travel")
-		elif self.advance_type == "Medical Advance":
-			account_select = frappe.db.get_single_value("HR Accounts Settings", "employee_advance_salary")
-		elif self.advance_type == "Other Advance":
-			account_select = frappe.db.get_single_value("HR Accounts Settings", "employee_advance_salary")
-		else:
-			frappe.throw("Choose different advance type")
+		# if self.advance_type == "Salary Advance":
+		# 	account_select = frappe.db.get_single_value("HR Accounts Settings", "employee_advance_salary")
+		# elif self.advance_type == "Travel Advance":
+		# 	account_select = frappe.db.get_single_value("HR Accounts Settings", "employee_advance_travel")
+		# elif self.advance_type == "Medical Advance":
+		# 	account_select = frappe.db.get_single_value("HR Accounts Settings", "employee_advance_salary")
+		# elif self.advance_type == "Other Advance":
+		# 	account_select = frappe.db.get_single_value("HR Accounts Settings", "employee_advance_salary")
+		# else:
+		# 	frappe.throw("Choose different advance type")
 		
 		je = frappe.new_doc("Journal Entry")
 		je.posting_date = nowdate()
 		je.voucher_type = "Bank Entry"
+		je.naming_series = "Bank Payment Voucher"
 		je.company = self.company
 		je.branch = self.branch
 		je.remark = "Payment against Employee Advance: " +  doc.purpose
@@ -491,7 +487,7 @@ class EmployeeAdvance(Document):
 		je.append(
 			"accounts",
 			{
-				"account": account_select,
+				"account": self.advance_account,
 				"account_currency": advance_account_currency,
 				"exchange_rate": flt(advance_exchange_rate),
 				"debit_in_account_currency": flt(self.advance_amount),
@@ -501,7 +497,6 @@ class EmployeeAdvance(Document):
 				"cost_center": employee_cost_center,
 				"party": self.employee,
 				"is_advance": "Yes",
-				"business_activity": "Common"
 			},
 		)
 		je.append(
@@ -512,9 +507,6 @@ class EmployeeAdvance(Document):
 				"credit_in_account_currency": flt(self.advance_amount),
 				"account_currency": payment_account.account_currency,
 				"exchange_rate": flt(paying_exchange_rate),
-				"party_type": "Employee",
-				"party": self.employee,
-				"business_activity": "Common"
 			},
 		)
 		je.flags.ignore_permissions=1
@@ -666,21 +658,6 @@ def get_voucher_type(mode_of_payment=None):
 			voucher_type = "Bank Entry"
 
 	return voucher_type
-@frappe.whitelist()
-def select_account(advance_type, company):
-	if self.advance_type == "Salary Advance":
-		account = frappe.db.get_single_value("HR Accounts Settings", "employee_advance_salary")
-	elif self.advance_type == "Travel Advance":
-		account = frappe.db.get_single_value("HR Accounts Settings", "employee_advance_travel")
-	elif self.advance_type == "Medical Advance":
-		account = frappe.db.get_single_value("HR Accounts Settings", "employee_advance_salary")
-	elif self.advance_type == "Other Advance":
-		account = frappe.db.get_single_value("HR Accounts Settings", "employee_advance_salary")
-	# elif advance_type == "Imprest Advance":
-	# 	account = frappe.db.get_value("Company", company, "imprest_advance_account")
-	else:
-		account = ""
-	return account
 
 def get_permission_query_conditions(user):
 	if not user: user = frappe.session.user

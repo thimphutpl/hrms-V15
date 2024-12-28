@@ -19,6 +19,7 @@ from erpnext.custom_utils import nvl
 from frappe.desk.reportview import get_match_cond
 import operator
 import math
+from typing import Union
 
 
 class SalaryStructure(Document):
@@ -241,17 +242,17 @@ class SalaryStructure(Document):
 			add_list = []
 			del_list = []
 			calc_map = []
-
 			sst_map = {ed: []}
 			for sc in frappe.db.sql("select * from `tabSalary Component` where `type`='{0}' and ifnull(field_name,'') != ''".format(tbl_list[ed]), as_dict=True):
 				sst_map.setdefault(ed, []).append(sc)
 			ed_map = [i.name for i in sst_map[ed]]
 			for ed_item in self.get(ed):
+				# frappe.throw("<pre>{}</pre>".format(frappe.as_json(self.get(ed))))
 				# validate component validity dates
 				if ed_item.from_date and ed_item.to_date and str(ed_item.to_date) < str(ed_item.from_date):
 					frappe.throw(_("<b>Row#{}:</b> Invalid <b>From Date</b> for <b>{}</b> under <b>{}s</b>").format(ed_item.idx, ed_item.salary_component, tbl_list[ed]))
 				
-				ed_item.amount = roundoff(ed_item.amount)
+				ed_item.amount = roundoff_two_dec(ed_item.amount)
 				
 				amount = ed_item.amount
 
@@ -260,18 +261,12 @@ class SalaryStructure(Document):
 						if ed_item.salary_component == 'Basic Pay':
 							if flt(new_basic_pay) > 0 and flt(new_basic_pay) != flt(amount):
 								amount = flt(new_basic_pay)
-							basic_pay = amount
+							basic_pay = roundoff(amount)
 							ed_item.amount = basic_pay
-						# Following condition added by SHIV on 2019/04/29
 						elif frappe.db.exists("Salary Component", {"name": ed_item.salary_component, "is_pf_deductible": 1}):
 							basic_pay_arrears += flt(ed_item.amount)
 						total_earning += round(amount)
-
-						if ed_item.salary_component == 'Basic Pay Arrear':
-							basic_pay_arrears += flt(ed_item.amount)
 					else:
-						''' Ver.3.0.191212 Begins '''
-						# Following line commented and subsequent if condition added by SHIV on 2019/12/12
 						#total_deduction += round(amount)
 						if flt(ed_item.total_deductible_amount) == 0:
 							# total_deduction += round(amount)
@@ -279,7 +274,6 @@ class SalaryStructure(Document):
 						else:
 							if flt(ed_item.total_deductible_amount) != flt(ed_item.total_deducted_amount):
 								total_deduction += round(amount)
-						''' Ver3.0.191212 Ends '''
 				else:
 					for m in sst_map[ed]:
 						if m['name'] == ed_item.salary_component and not self.get(m['field_name']):
@@ -326,9 +320,8 @@ class SalaryStructure(Document):
 						calc_amt = roundoff(gis_amt)
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
 					elif self.get(m['field_name']) and m['name'] == 'PF':
-						# frappe.throw(str(basic_pay_arrears))
 						pf_amt = (flt(basic_pay)+flt(basic_pay_arrears))*flt(settings.get("employee_pf"))*0.01
-						calc_amt = roundoff(pf_amt)
+						calc_amt = roundoff_two_dec(pf_amt)
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
 					elif self.get(m['field_name']) and m['name'] == 'Health Contribution':
 						health_cont_amt = flt(total_earning)*flt(settings.get("health_contribution"))*0.01
@@ -371,6 +364,9 @@ class SalaryStructure(Document):
 		if flt(self.total_earning)-flt(self.total_deduction) < 0 and not self.get('__unsaved'):
 			frappe.throw(_("Total deduction cannot be more than total earning"), title="Invalid Data")
 		return del_list_all
+
+def roundoff_two_dec(amount: Union[float, int, None]) -> float:
+    return round(amount, 2) if amount is not None else 0.00
 
 def roundoff(amount):
 	if amount:
@@ -463,10 +459,10 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 				calc_amount = flt(amount)
 				if key == "earnings":
 					if d.depends_on_lwp:
-						calc_amount = round(flt(amount)*flt(payment_days)/flt(days_in_month))
+						calc_amount = round(flt(amount)*flt(payment_days)/flt(days_in_month), 2)
 					else:
-						calc_amount = round(flt(amount)*(flt(working_days)/flt(days_in_month)))
-				calc_amount = roundoff(calc_amount)
+						calc_amount = round(flt(amount)*(flt(working_days)/flt(days_in_month)), 2)
+				calc_amount = roundoff_two_dec(calc_amount)
 
 				# following condition added by SHIV on 2021/05/28
 				if not flt(calc_amount):
@@ -550,12 +546,12 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 				if d['salary_component'] == 'PF':
 					percent = flt(settings.get("employee_pf"))
 					pf_amt = (flt(basic_amt)+flt(basic_pay_arrears))*flt(percent)*0.01
-					calc_amt = roundoff(pf_amt)
+					calc_amt = flt(pf_amt, 2)
 					# added by phuntsho on feb April 6th 2021
 					# calculate employer pf
 					employer_percent = flt(settings.get("employer_pf"))
 					employer_pf_amount = (flt(basic_amt)+flt(basic_pay_arrears))*flt(employer_percent)*0.01
-					employer_pf_amount = roundoff(employer_pf_amount)
+					employer_pf_amount = flt(employer_pf_amount, 2)
 					target.employer_pf = employer_pf_amount
 					# ----- end of code by phuntsho -----
 					d['amount'] = calc_amt

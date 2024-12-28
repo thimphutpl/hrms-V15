@@ -23,6 +23,7 @@
   "is_loan_component",
   "is_pf_deductible",
   "group_by_institution_name",
+  "round_off",
   "accounts_details_section",
   "table_ayfl",
   "sb_posting_settings",
@@ -223,12 +224,19 @@
    "fieldtype": "Link",
    "label": "GL Head",
    "options": "Account"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval: doc.type == 'Earning' || doc.type == 'Deduction'",
+   "fieldname": "round_off",
+   "fieldtype": "Check",
+   "label": "Round Off"
   }
  ],
  "icon": "fa fa-flag",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-11-06 12:55:49.826123",
+ "modified": "2024-12-27 09:53:08.634098",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Component",

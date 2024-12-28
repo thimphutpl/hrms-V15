@@ -201,6 +201,7 @@ class PromotionEntry(Document):
 		# 	ratio = ((flt(basic_pay) + flt(personal_pay))-flt(new_lower_limit))/flt(new_increment)
 		# else:
 		ratio = ((flt(basic_pay) + flt(personal_pay) + flt(new_increment))-flt(new_lower_limit))/flt(new_increment)
+		frappe.throw(str(ratio))
 		if flt(str(ratio).split(".")[1]) >= 0.01 and ratio > 0:				
 			ratio = math.ceil(ratio)
 		elif flt(str(ratio).split(".")[1]) == 0 and ratio > 0:

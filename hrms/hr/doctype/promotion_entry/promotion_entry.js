@@ -21,7 +21,7 @@ frappe.ui.form.on('Promotion Entry', {
 	refresh: function(frm) {
 		console.log("here")
 		if (frm.doc.docstatus == 0) {
-			if(!frm.is_new() && frm.doc.single_employee == 0) {
+			if(!frm.is_new()) {
 				frm.page.clear_primary_action();
 				frm.add_custom_button(__("Get Employees"),
 					function() {

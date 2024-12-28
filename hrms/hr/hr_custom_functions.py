@@ -437,7 +437,7 @@ def update_suspension_record():
 	query = "select employee, increment_month, promotion_month from `tabEmployee Disciplinary Record` where docstatus=1 and not_quilty_or_acquitted=0 and DATE_ADD(to_date, INTERVAL 1 DAY) = %(today)s"
 	data = frappe.db.sql(query, {"today":nowdate()})
 	for d in data:
-		emp = frppe.get_doc("Employee", self.employee)
+		emp = frappe.get_doc("Employee", self.employee)
 		emp.employment_status = "In Service"
 		emp.increment_and_promotion_cycle = d.increment_month
 		emp.promotion_cycle = d.promotion_month
