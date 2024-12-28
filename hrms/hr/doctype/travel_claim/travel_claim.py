@@ -93,7 +93,7 @@ class TravelClaim(Document):
 		#self.validate_submitter()
 		#self.check_status()
 		# self.update_attendance()
-		# self.update_travel_authorization()
+		self.update_travel_authorization()
 		self.post_journal_entry()
 		
 
@@ -865,8 +865,6 @@ class TravelClaim(Document):
 					"reference_type": "Travel Claim",
 					"reference_name": self.name,
 					"credit_in_account_currency": bank_amt,
-					"party_type": "Employee",
-					"party": self.employee,
 					"credit": bank_amt,
 					# "business_activity": self.business_activity,
 				})
@@ -880,46 +878,51 @@ class TravelClaim(Document):
 	# Update the claim reference on travel authorization and append items
 	##
 	def update_travel_authorization(self):
-		count_a = 0
-		for i in self.get("items"):
-			count_b = 0
-			idtc = count_a	
-			ta = frappe.get_doc("Travel Authorization", i.travel_authorization)
-			if ta.travel_claim and ta.travel_claim != self.name:
-				frappe.throw("A travel claim <b>" + str(ta.travel_claim) + "</b> has already been created for the authorization <b>" + str(i.travel_authorization) + "</b>")
-			ta.db_set("travel_claim", self.name)
+		ta = frappe.get_doc("Travel Authorization", self.ta)
+		if ta.travel_claim and ta.travel_claim != self.name:
+			frappe.throw("A travel claim <b>" + str(ta.travel_claim) + "</b> has already been created for the authorization")
+		ta.db_set("travel_claim", self.name)
 
-			# for a in ta.items:
-			#     tai = frappe.get_doc("Travel Authorization Item", a.name)
-			#     idta = count_b
-			#     if idtc == idta:
-			#         tai.db_set("date",i.date)
-			#         tai.db_set("till_date",i.till_date)
-			#     count_b += 1
-			# count_a += 1
-		# frappe.throw(str(self.ta))
-		auth_doc=frappe.get_doc("Travel Authorization", self.ta)
-		for child_d in auth_doc.get_all_children():
-			if child_d.doctype=='Travel Authorization Item':
-				frappe.db.sql("delete from `tabTravel Authorization Item` where name = '{}'".format(child_d.name))
-			else:
-				frappe.db.sql("delete from `tabTravel Authorization Detail` where name = '{}'".format(child_d.name))
+		# count_a = 0
+		# for i in self.get("items"):
+		# 	count_b = 0
+		# 	idtc = count_a	
+		# 	ta = frappe.get_doc("Travel Authorization", i.travel_authorization)
+		# 	if ta.travel_claim and ta.travel_claim != self.name:
+		# 		frappe.throw("A travel claim <b>" + str(ta.travel_claim) + "</b> has already been created for the authorization <b>" + str(i.travel_authorization) + "</b>")
+		# 	ta.db_set("travel_claim", self.name)
 
-		for child_doc in self.get("items"):
-			doc=frappe.get_doc("Travel Authorization",self.ta)
-			doc.append("items",
-			{
-				"idx":child_doc.idx,
-				"date":child_doc.date,
-				"till_date":child_doc.till_date,
-				"halt":child_doc.halt,
-				"halt_at":child_doc.halt_at,
-				"from_place":child_doc.from_place,
-				"to_place":child_doc.to_place,
-				"no_days":child_doc.no_days,
-				"country":child_doc.country
-			})
-			doc.save()
+		# 	# for a in ta.items:
+		# 	#     tai = frappe.get_doc("Travel Authorization Item", a.name)
+		# 	#     idta = count_b
+		# 	#     if idtc == idta:
+		# 	#         tai.db_set("date",i.date)
+		# 	#         tai.db_set("till_date",i.till_date)
+		# 	#     count_b += 1
+		# 	# count_a += 1
+		# # frappe.throw(str(self.ta))
+		# auth_doc=frappe.get_doc("Travel Authorization", self.ta)
+		# for child_d in auth_doc.get_all_children():
+		# 	if child_d.doctype=='Travel Authorization Item':
+		# 		frappe.db.sql("delete from `tabTravel Authorization Item` where name = '{}'".format(child_d.name))
+		# 	else:
+		# 		frappe.db.sql("delete from `tabTravel Authorization Detail` where name = '{}'".format(child_d.name))
+
+		# for child_doc in self.get("items"):
+		# 	doc=frappe.get_doc("Travel Authorization",self.ta)
+		# 	doc.append("items",
+		# 	{
+		# 		"idx":child_doc.idx,
+		# 		"date":child_doc.date,
+		# 		"till_date":child_doc.till_date,
+		# 		"halt":child_doc.halt,
+		# 		"halt_at":child_doc.halt_at,
+		# 		"from_place":child_doc.from_place,
+		# 		"to_place":child_doc.to_place,
+		# 		"no_days":child_doc.no_days,
+		# 		"country":child_doc.country
+		# 	})
+		# 	doc.save()
 		
 		# for child_doc in self.get("items"):
 		#     doc=frappe.get_doc("Travel Authorization",self.ta)
