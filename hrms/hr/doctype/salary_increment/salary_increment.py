@@ -111,6 +111,7 @@ class SalaryIncrement(Document):
 				# Fetching employee group settings
 				group_doc = frappe.get_doc("Employee Group", self.employee_group)
 				self.minimum_months = group_doc.minimum_months
+				
 				self.total_months = frappe.db.sql("""
 							select (
 								case
@@ -128,6 +129,16 @@ class SalaryIncrement(Document):
 				self.payscale_increment = grade.increment_value
 				self.payscale_maximum   = grade.upper_limit 
 
+				# added by Dawa Tshering
+				if flt(self.total_months) == 12:
+					self.calculated_increment = round(flt(self.payscale_increment), 0)
+				else:
+					self.calculated_increment = round(flt(self.payscale_increment)/12 * flt(self.total_months), 0)
+				self.increment = self.calculated_increment
+				self.new_basic = flt(self.old_basic) + flt(self.increment)
+				if flt(self.new_basic) > flt(self.payscale_maximum):
+					self.new_basic = flt(self.payscale_maximum)
+				'''
 				# Calculating increment
 				if flt(self.total_months) >= flt(self.minimum_months):
 					self.calculated_factor    = 1 if flt(self.total_months)/12 >= 1 else round(flt(self.total_months if cint(group_doc.increment_prorated) else 12)/12,2)				
@@ -139,6 +150,8 @@ class SalaryIncrement(Document):
 					self.new_basic = flt(self.old_basic) + flt(self.increment)
 				else:
 					self.new_basic = flt(self.old_basic)
+				'''
+				
 
 def get_salary_structure(employee, effective_date):
 	sst = frappe.db.sql("""

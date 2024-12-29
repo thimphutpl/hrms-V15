@@ -64,7 +64,16 @@ class IncrementEntry(Document):
 		if emp_list:
 			for a in emp_list:
 				new_basic, increment, old_basic = self.get_employee_payscale(a.employee)
-				data.append({"employee":a.employee,"employee_name":a.employee_name,"grade":a.grade,"department":a.department,"designation":a.designation,"current_basic_pay":old_basic,"increment":increment,"new_basic_pay":new_basic})
+				data.append({
+					"employee": a.employee,
+					"employee_name": a.employee_name,
+					"grade": a.grade, 
+					"department": a.department,
+					"designation": a.designation,
+					"current_basic_pay": old_basic, 
+					"increment": increment, 
+					"new_basic_pay": new_basic
+				})
 		return data
 
 	def get_filter_condition(self):
@@ -155,8 +164,8 @@ class IncrementEntry(Document):
 		self.check_permission('write')
 		si_list = self.get_sal_increment_list(si_status=0)
 		if len(si_list) > 300:
-			# frappe.enqueue(submit_salary_increments_for_employees, timeout=600, increment_entry=self, salary_increments=si_list)
-			submit_salary_increments_for_employee(self, si_list, publish_progress=False)
+			frappe.enqueue(submit_salary_increments_for_employees, timeout=600, increment_entry=self, salary_increments=si_list)
+			# submit_salary_increments_for_employees(self, si_list, publish_progress=False)
 		else:
 			submit_salary_increments_for_employees(self, si_list, publish_progress=False)
 
@@ -169,7 +178,6 @@ class IncrementEntry(Document):
 		month_id = list(calendar.month_name).index(self.month_name)
 		return str(month_id).rjust(2,"0")
 
-	# Following method created by SHIV on 2018/10/10
 	def get_employee_payscale(self, employee):
 		effective_date = "-".join([self.fiscal_year, self.get_month_id(), "01"])
 		old_basic = 0
@@ -180,14 +188,16 @@ class IncrementEntry(Document):
 			salary_structure = get_salary_structure(employee,effective_date)
 			if salary_structure:
 				sst_doc = frappe.get_doc("Salary Structure", salary_structure)
-				date_of_reference = sst_doc.from_date if getdate(sst_doc.from_date) < getdate(frappe.db.get_value("Employee",employee,"date_of_joining")) else frappe.db.get_value("Employee",employee,"date_of_joining")
+				date_of_reference = sst_doc.from_date if getdate(sst_doc.from_date) < getdate(frappe.db.get_value("Employee",employee,"date_of_joining")) else frappe.db.get_value("Employee", employee, "date_of_joining")
 				for d in sst_doc.earnings:
 					if d.salary_component == 'Basic Pay':
 						old_basic = flt(d.amount)
-
+						
 				# Fetching employee group settings
-				group_doc = frappe.get_doc("Employee Group", frappe.db.get_value("Employee",employee,"employee_group"))
+				group_doc = frappe.get_doc("Employee Group", frappe.db.get_value("Employee", employee, "employee_group"))
 				minimum_months = group_doc.minimum_months
+				# frappe.throw(str(minimum_months))
+
 				total_months = frappe.db.sql("""
 							select (
 								case
@@ -196,15 +206,25 @@ class IncrementEntry(Document):
 									else timestampdiff(MONTH,'{0}','{1}')       
 								end
 								) as no_of_months
-				""".format(str(date_of_reference),str(effective_date)))[0][0]
+				""".format(str(date_of_reference), str(effective_date)))[0][0]
 				
 				# Fetching Payscale from employee grade
-				grade= frappe.get_doc("Employee Grade", frappe.db.get_value("Employee",employee,"grade"))
+				grade= frappe.get_doc("Employee Grade", frappe.db.get_value("Employee", employee, "grade"))
 				payscale_minimum   = grade.lower_limit
 				payscale_increment_method = grade.increment_method
 				payscale_increment = grade.increment_value
 				payscale_maximum   = grade.upper_limit 
 
+				# added by Dawa Tshering
+				if flt(total_months) == 12:
+					increment = round(flt(payscale_increment), 0)
+				else:
+					increment = round(flt(payscale_increment)/12 * flt(total_months), 0)
+				new_basic = flt(old_basic) + flt(increment)
+				if flt(new_basic) > flt(payscale_maximum):
+					new_basic = flt(payscale_maximum)
+
+				'''
 				# Calculating increment
 				if flt(total_months) >= flt(minimum_months):
 					calculated_factor    = 1 if flt(total_months)/12 >= 1 else round(flt(total_months if cint(group_doc.increment_prorated) else 12)/12,2)				
@@ -216,7 +236,7 @@ class IncrementEntry(Document):
 					new_basic = flt(old_basic) + flt(increment)
 				else:
 					new_basic = flt(old_basic)
-				
+				'''
 				return new_basic, increment, old_basic
 
 	@frappe.whitelist()

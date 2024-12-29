@@ -39,9 +39,9 @@
   "column_break_20",
   "calculated_increment",
   "column_break_25",
+  "total_months",
   "amended_from",
-  "minimum_months",
-  "total_months"
+  "minimum_months"
  ],
  "fields": [
   {
@@ -295,7 +295,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-01-20 16:20:48.757080",
+ "modified": "2024-12-28 17:51:09.152812",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Salary Increment",

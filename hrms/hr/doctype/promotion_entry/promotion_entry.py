@@ -151,13 +151,9 @@ class PromotionEntry(Document):
 				# frappe.msgprint(str(e.employee)+" "+str(is_eligible)+" grade:"+str(e.employee_grade))
 				if is_eligible:
 					salary_structure = frappe.db.sql("select sd.amount as amount, ss.employee_grade from `tabSalary Detail` sd, `tabSalary Structure` ss where sd.parent = ss.name and ss.employee = '{0}' and ss.is_active = 'Yes' and sd.salary_component = 'Basic Pay'".format(e.employee), as_dict = True)
-					personal_pay = frappe.db.sql("select sd.amount as amount from `tabSalary Detail` sd, `tabSalary Structure` ss where sd.parent = ss.name and ss.employee = '{0}' and ss.is_active = 'Yes' and sd.salary_component = 'Personal Pay'".format(e.employee), as_dict = True)
-					if len(personal_pay) > 0:
-						personal_pay = flt(personal_pay[0].amount,2)
-					else:
-						personal_pay = 0
-					new_grade, new_basic_pay = self.get_additional_details(e.employee, salary_structure[0].amount, personal_pay)
-					emp.append({"employee":e.employee, "employee_name": e.employee_name, "department": e.department, "designation": e.designation, "employee_grade": e.employee_grade, "current_basic_pay": salary_structure[0].amount, "new_basic_pay": new_basic_pay, "new_employee_grade": new_grade})
+
+					new_grade, new_increment, new_basic_pay = self.get_additional_details(e.employee, salary_structure[0].amount)
+					emp.append({"employee":e.employee, "employee_name": e.employee_name, "department": e.department, "designation": e.designation, "employee_grade": e.employee_grade, "current_basic_pay": salary_structure[0].amount, "new_increment": new_increment, "new_basic_pay": new_basic_pay, "new_employee_grade": new_grade})
 			else:
 				# is_eligible = frappe.db.sql("""
 				# 	select 1 from
@@ -173,19 +169,15 @@ class PromotionEntry(Document):
                             """.format(pe_date, e.employee))
 				if is_eligible:
 					salary_structure = frappe.db.sql("select sd.amount as amount,  ss.employee_grade from `tabSalary Detail` sd, `tabSalary Structure` ss where sd.parent = ss.name and ss.employee = '{0}' and ss.is_active = 'Yes' and sd.salary_component = 'Basic Pay'".format(e.employee), as_dict = True)
-					personal_pay = frappe.db.sql("select sd.amount as amount from `tabSalary Detail` sd, `tabSalary Structure` ss where sd.parent = ss.name and ss.employee = '{0}' and ss.is_active = 'Yes' and sd.salary_component = 'Personal Pay'".format(e.employee), as_dict = True)
-					if len(personal_pay) > 0:
-						personal_pay = flt(personal_pay[0].amount,2)
-					else:
-						personal_pay = 0
-					new_grade, new_basic_pay, new_promot_date = self.get_additional_details(e.employee, salary_structure[0].amount, personal_pay)
-					emp.append({"employee":e.employee, "employee_name": e.employee_name, "department": e.department, "designation": e.designation, "employee_grade": e.employee_grade, "current_basic_pay": salary_structure[0].amount, "new_basic_pay": new_basic_pay, "new_employee_grade": new_grade, "next_promotion_date":new_promot_date})		
+
+					new_grade, new_increment, new_basic_pay, new_promot_date = self.get_additional_details(e.employee, salary_structure[0].amount)
+					emp.append({"employee":e.employee, "employee_name": e.employee_name, "department": e.department, "designation": e.designation, "employee_grade": e.employee_grade, "current_basic_pay": salary_structure[0].amount, "new_increment": new_increment,"new_basic_pay": new_basic_pay, "new_employee_grade": new_grade, "next_promotion_date":new_promot_date})		
 		# it = iter(emp)
 		# emp_dict = dict(zip(it, it))
 		# frappe.msgprint(str(emp))
 		return emp
 
-	def get_additional_details(self, employee, basic_pay, personal_pay):
+	def get_additional_details(self, employee, basic_pay):
 		emp = frappe.get_doc("Employee", employee)
 		current_increment = frappe.db.get_value("Employee Grade", emp.grade, "increment_value")
 		new_grade = frappe.db.get_value("Employee Grade", emp.grade, "promotion_grade")
@@ -200,27 +192,31 @@ class PromotionEntry(Document):
 		# if personal_pay > 0:
 		# 	ratio = ((flt(basic_pay) + flt(personal_pay))-flt(new_lower_limit))/flt(new_increment)
 		# else:
-		ratio = ((flt(basic_pay) + flt(personal_pay) + flt(new_increment))-flt(new_lower_limit))/flt(new_increment)
-		frappe.throw(str(ratio))
+
+		new_basic_increment = flt(basic_pay)+flt(new_increment)
+		# frappe.throw(str(new_basic_increment))
+		if flt(new_basic_increment) < flt(new_lower_limit):
+			new_basic_increment = flt(new_lower_limit)
+		elif flt(new_basic_increment) > flt(new_upper_limit):
+			new_basic_increment = flt(new_upper_limit) 
+		
+		'''
+		ratio = ((flt(basic_pay) + flt(new_increment))-flt(new_lower_limit))/flt(new_increment)
 		if flt(str(ratio).split(".")[1]) >= 0.01 and ratio > 0:				
 			ratio = math.ceil(ratio)
 		elif flt(str(ratio).split(".")[1]) == 0 and ratio > 0:
 			ratio += 1
 		else:
-			ratio = 0
+			ratio = 0		
 		new_basic_increment = (ratio*flt(new_increment))+flt(new_lower_limit)
 		if new_basic_increment > new_upper_limit:
 			new_basic_increment = new_upper_limit
 
-		# if flt(new_basic_increment) > flt(new_lower_limit): 
-		# 	while True:
-		# 		new_lower_limit += new_increment
-		# 		amount = new_lower_limit
-		# 		if new_lower_limit >= new_basic_increment:
-		# 			break
-		# else:
+		
+		'''
 		amount = new_basic_increment
-		return new_grade, amount, new_promot_date
+		return new_grade, new_increment, amount, new_promot_date
+
 
 	@frappe.whitelist()
 	def fill_employee_details(self):
@@ -374,17 +370,49 @@ def create_employee_promotion_for_employees(employees, args, publish_progress=Tr
 				"employee": emp.employee
 			})
 			ep = frappe.get_doc(args)
-			row = ep.append("promotion_details")
-			row.property = 'Grade'
-			row.current = emp.employee_grade
-			row.new = frappe.db.get_value("Employee Grade", emp.employee_grade, "promotion_grade")
-			row.fieldname = 'grade'
+			rows = [
+					{
+						'property': 'Grade',
+						'current': emp.employee_grade,
+						'new': frappe.db.get_value("Employee Grade", emp.employee_grade, "promotion_grade") or "N/A",
+						'fieldname': 'grade'
+					},
+					{
+						'property': 'Promotion Due Date',
+						'current': frappe.db.get_value("Employee", emp.employee, "promotion_due_date"),
+						'new': emp.next_promotion_date,
+						'fieldname': 'promotion_due_date'
+					}
+				]
 			if emp.new_designation:
-				row_two = ep.append("promotion_details")
-				row_two.property = "Designation"
-				row_two.current = emp.designation
-				row_two.new = emp.new_designation
-				row_two.fieldname = "designation"
+				rows.append({
+					'property': 'Designation',
+					'current': emp.designation,
+					'new': emp.new_designation,
+					'fieldname': 'designation'
+				})
+			for row in rows:
+				ep.append("promotion_details", row)
+
+			# if emp.new_designation:
+			# 	designation_row = ep.append("promotion_details")
+			# 	designation_row.property = "Designation"
+			# 	designation_row.current = emp.designation
+			# 	designation_row.new = emp.new_designation
+			# 	designation_row.fieldname = "designation"
+
+			# row = ep.append("promotion_details")
+			# row.property = 'Grade'
+			# row.current = emp.employee_grade
+			# row.new = frappe.db.get_value("Employee Grade", emp.employee_grade, "promotion_grade")
+			# row.fieldname = 'grade'
+			# if emp.new_designation:
+			# 	row_two = ep.append("promotion_details")
+			# 	row_two.property = "Designation"
+			# 	row_two.current = emp.designation
+			# 	row_two.new = emp.new_designation
+			# 	row_two.fieldname = "designation"
+
 			# -----------------------Salary Details for Employee Promotion/Salary Fixation----------------#
 			old_lower_limit = frappe.db.get_value("Employee Grade", emp.employee_grade, "lower_limit")
 			old_increment = frappe.db.get_value("Employee Grade", emp.employee_grade, "increment_value")
