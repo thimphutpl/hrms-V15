@@ -10,36 +10,8 @@ frappe.ui.form.on('Travel Claim', {
                 	row.grid_form.fields_dict.dsa.refresh()
 		}*/
 	},
-	travel_type: function(frm){
-		if(frm.doc.travel_type == "Project Visit" || frm.doc.travel_type == "Maintenance"){
-			frm.set_value("for_maintenance_project", 1);
-		}
-		else{
-			frm.set_value("for_maintenance_project", 0);
-		}
-		frm.refresh_field("for_maintenance_project");
-	},
+	
 	refresh: function (frm) {
-		frm.set_query('reference_type', () => {
-			return {
-				filters: {
-					name: ['in', ['Project', 'Maintenance Order']]
-				}
-			};
-		});
-		if(frm.doc.workflow_state == "Waiting Project Manager Approval"){
-			if(frm.doc.reference_type == "Project" || frm.doc.reference_type == "Task"){
-				frm.set_query('reference_name', () => {
-					return {
-						query: "erpnext.controllers.queries.filter_projects",
-						filters: {
-							project_manager: frappe.session.user,
-							reference_type: frm.doc.reference_type
-						}
-					};
-				});
-			}
-		}
 		if (frm.doc.docstatus == 1) {
 			cur_frm.set_df_property("hr_approval", "hidden", 0)
 			cur_frm.set_df_property("supervisor_approval", "hidden", 0)
@@ -54,14 +26,8 @@ frappe.ui.form.on('Travel Claim', {
 				}, __("View"));
 			}
 		}
-		if (frm.doc.reference_type && frm.doc.reference_name) {
-			get_project_or_maintenance_cost_center(frm);
-		}
 	},
 	onload: function (frm) {
-		if (frm.doc.reference_type && frm.doc.reference_name) {
-			get_project_or_maintenance_cost_center(frm);
-		}
 		cur_frm.set_df_property("supervisor_approval", "hidden", 1)
 		cur_frm.set_df_property("hr_approval", "hidden", 1)
 		cur_frm.set_df_property("claim_status", "hidden", 1)
@@ -122,23 +88,7 @@ frappe.ui.form.on('Travel Claim', {
 		frm.set_value("balance_amount", frm.doc.total_claim_amount + frm.doc.extra_claim_amount - frm.doc.advance_amount)
 		frm.refresh_field("balance_amount");
 	},
-	"get_travel_authorization": function (frm) {
-		get_travel_detail(frm);
-	},
-	"reference_name": function (frm) {
-		if (frm.doc.reference_type) {
-			get_project_or_maintenance_cost_center(frm)
-		}
-	}
-
 });
-
-function get_project_or_maintenance_cost_center(frm) {
-	frappe.db.get_value(frm.doc.reference_type, frm.doc.reference_name, 'cost_center', (r) => {
-		frm.doc.cost_center = r.cost_center
-		cur_frm.refresh_field("cost_center")
-	})
-}
 
 frappe.ui.form.on("Travel Claim Item", {
 	"form_render": function (frm, cdt, cdn) {
@@ -216,14 +166,14 @@ frappe.ui.form.on("Travel Claim Item", {
 		})
 		frm.set_value("total_claim_amount", total)
 	},
-	"date": function (frm, cdt, cdn) {
+	from_date: function (frm, cdt, cdn) {
 		update_days(frm, cdt, cdn);
 		var items = frappe.get_doc(cdt, cdn)
 		if(items.halt==0){
 			frappe.model.set_value(cdt, cdn, "till_date", items.date)
 		}
 	},
-	"till_date": function (frm, cdt, cdn) {
+	to_date: function (frm, cdt, cdn) {
 		update_days(frm, cdt, cdn);
 	},
 })
@@ -231,8 +181,8 @@ frappe.ui.form.on("Travel Claim Item", {
 function update_days(frm, cdt, cdn){
 	frm.doc.items.forEach(function (d) {
 		if(d.halt==1){
-			const date1=new Date(d.date);
-			const date2=new Date(d.till_date);
+			const date1=new Date(d.from_date);
+			const date2=new Date(d.to_date);
 			let no_days=(date2-date1)/ (1000*60*60*24);
 			no_days+=1
 			console.log(no_days);
@@ -242,65 +192,6 @@ function update_days(frm, cdt, cdn){
 		}
 	})
 	do_update(frm, cdt, cdn)
-}
-function get_travel_detail(form) {
-	if (form.doc.start_date && form.doc.end_date && form.doc.place_type && form.doc.travel_type) {
-		frappe.call({
-			method: "hrms.hr.doctype.travel_claim.travel_claim.get_travel_detail",
-			async: false,
-			args: {
-				"employee": form.doc.employee,
-				"start_date": form.doc.start_date,
-				"end_date": form.doc.end_date,
-				"place_type": form.doc.place_type,
-				"travel_type": form.doc.travel_type
-			},
-			callback: function (r) {
-				if (r.message) {
-					var total_advance_amount = 0;
-					var total_claim_amount = 0;
-					var dsa_per_day = 0;
-					cur_frm.clear_table("items");
-					r.message.forEach(function (dtl) {
-						var row = frappe.model.add_child(cur_frm.doc, "Travel Claim Item", "items");
-						row.halt = dtl['halt'];
-						row.from_place = dtl['from_place'];
-						row.to_place = dtl['to_place'];
-						row.date = dtl['date'];
-						row.no_days = dtl['no_days'];
-						row.days_allocated = dtl['no_days']
-						row.till_date = dtl['till_date'];
-						row.halt_at = dtl['halt_at'];
-						row.travel_authorization = dtl['name'];
-						row.last_day = dtl['last_day'];
-						row.dsa = dtl['dsa_per_day'];
-						dsa_per_day = dtl['dsa_per_day'];
-						row.dsa_percent = dtl['dsa_percent'];
-						row.currency = dtl['currency'];
-						row.exchange_rate = dtl['exchange_rate'];
-						var amount = dtl['no_days'] * (dtl['dsa_per_day'] * (dtl['dsa_percent'] / 100));
-						var actual_amount = dtl['no_days'] * (dtl['dsa_per_day'] * (dtl['dsa_percent'] / 100)) * dtl['exchange_rate'];
-						row.amount = amount;
-						row.actual_amount = actual_amount;
-						total_claim_amount += actual_amount;
-						total_advance_amount += dtl['advance_amount'];
-					});
-					form.set_value("total_claim_amount", total_claim_amount);
-					form.set_value("advance_amount", total_advance_amount);
-					form.set_value("balance_amount", total_claim_amount - total_advance_amount);
-					form.set_value("dsa_per_day", dsa_per_day);
-					cur_frm.refresh();
-				}
-				else {
-					frappe.msgprint("No unclaimed Travel Authorization found!")
-				}
-			}
-		});
-
-	} else {
-		frappe.msgprint("Start Date, End Date, Place Type and Travel Purpose not be selected before");
-	}
-
 }
 
 function do_update(frm, cdt, cdn) {

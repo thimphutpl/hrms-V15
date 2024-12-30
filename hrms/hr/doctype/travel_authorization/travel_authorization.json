@@ -6,23 +6,18 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "workflow_state",
-  "document_status",
-  "column_break_2",
-  "reason",
   "employee_information",
   "employee",
   "employee_name",
-  "for_maintenance_project",
-  "column_break_6",
-  "designation",
-  "grade",
-  "department",
-  "division",
-  "section",
-  "unit",
   "cost_center",
+  "column_break_6",
+  "division",
+  "designation",
+  "section",
+  "column_break_kkkk",
+  "grade",
   "dsa_per_day",
+  "unit",
   "travel_purpose_information",
   "travel_type",
   "training_event",
@@ -30,6 +25,9 @@
   "place_type",
   "col_break_mode",
   "mode_of_travel",
+  "column_break_btbv",
+  "sponsorship",
+  "if_sponsorship_is_others",
   "seminar_and_workshop_details_section",
   "topic",
   "column_break_rtdp",
@@ -41,46 +39,30 @@
   "type_of_training",
   "bond_period_from_date",
   "bond_period_to_date",
-  "travel_details",
-  "column_break_iirtw",
-  "sponsorship",
-  "column_break_deeg",
-  "if_sponsorship_is_others",
   "section_break_s22dq",
   "items",
-  "from_date",
-  "to_date",
   "section_break_26",
   "details",
   "section_break_20",
   "currency",
-  "exchange_rate",
   "need_advance",
   "column_break_16",
+  "exchange_rate",
   "estimated_amount",
   "advance_amount",
-  "advance_amount_nu",
+  "base_advance_amount",
   "travel_authorization_details",
-  "supervisor",
-  "supervisor_designation",
-  "supervisor_manager",
   "posting_date",
-  "column_break_12",
-  "supervisor_name",
-  "supervisor_manager_name",
   "end_date_auth",
   "section_break_18",
   "purpose",
   "column_break_30",
+  "workflow_state",
   "company",
   "branch",
   "travel_claim",
   "advance_journal",
-  "amended_from",
-  "cancellation_reason",
-  "sb_remarks",
-  "remarks",
-  "column_break_54"
+  "amended_from"
  ],
  "fields": [
   {
@@ -99,24 +81,6 @@
    "label": "Branch",
    "options": "Branch",
    "read_only": 1
-  },
-  {
-   "fieldname": "document_status",
-   "fieldtype": "Select",
-   "hidden": 1,
-   "label": "Authorization Status",
-   "options": "\nDraft\nApproved\nRejected\nCancelled",
-   "permlevel": 1
-  },
-  {
-   "fieldname": "column_break_2",
-   "fieldtype": "Column Break"
-  },
-  {
-   "depends_on": "eval:doc.document_status=='Rejected'",
-   "fieldname": "reason",
-   "fieldtype": "Long Text",
-   "label": "Reason"
   },
   {
    "fieldname": "employee_information",
@@ -167,13 +131,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "department",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Department",
-   "options": "Department"
-  },
-  {
    "fieldname": "cost_center",
    "fieldtype": "Link",
    "hidden": 1,
@@ -181,15 +138,9 @@
    "options": "Cost Center"
   },
   {
-   "fetch_from": "grade.dsa_per_day",
-   "fieldname": "dsa_per_day",
-   "fieldtype": "Currency",
-   "label": "DSA Per Day"
-  },
-  {
    "fieldname": "travel_purpose_information",
    "fieldtype": "Section Break",
-   "label": "TRAVEL DETAILS"
+   "label": "Travel Details"
   },
   {
    "fieldname": "travel_type",
@@ -218,9 +169,11 @@
    "reqd": 1
   },
   {
-   "allow_on_submit": 1,
+   "allow_in_quick_entry": 1,
    "fieldname": "items",
    "fieldtype": "Table",
+   "ignore_user_permissions": 1,
+   "label": "Travel Itinerary",
    "options": "Travel Authorization Item",
    "reqd": 1
   },
@@ -233,6 +186,7 @@
   {
    "fieldname": "details",
    "fieldtype": "Table",
+   "label": "Original Travel Details",
    "options": "Travel Authorization Detail",
    "read_only": 1
   },
@@ -242,29 +196,11 @@
    "label": "Travel Authorization Details"
   },
   {
-   "fieldname": "supervisor",
-   "fieldtype": "Link",
-   "label": "Approver Email ID",
-   "options": "User",
-   "read_only": 1
-  },
-  {
-   "fieldname": "column_break_12",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "posting_date",
    "fieldtype": "Date",
    "in_list_view": 1,
    "label": "Travel Authorization Date",
    "reqd": 1
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "end_date_auth",
-   "fieldtype": "Date",
-   "hidden": 1,
-   "label": "Authorization End Date"
   },
   {
    "default": "0",
@@ -274,12 +210,10 @@
   },
   {
    "fieldname": "section_break_20",
-   "fieldtype": "Section Break",
-   "label": "TRAVEL ADVANCE DETAILS"
+   "fieldtype": "Section Break"
   },
   {
    "default": "BTN",
-   "depends_on": "eval:doc.need_advance",
    "fieldname": "currency",
    "fieldtype": "Link",
    "label": "Currency",
@@ -300,13 +234,6 @@
    "fieldname": "advance_amount",
    "fieldtype": "Currency",
    "label": "Advance Amount"
-  },
-  {
-   "depends_on": "eval:doc.need_advance && doc.currency!=\"BTN\"",
-   "fieldname": "advance_amount_nu",
-   "fieldtype": "Currency",
-   "label": "Amount in Nu.",
-   "read_only": 1
   },
   {
    "fieldname": "section_break_18",
@@ -347,82 +274,12 @@
    "read_only": 1
   },
   {
-   "fieldname": "sb_remarks",
-   "fieldtype": "Section Break",
-   "hidden": 1,
-   "label": "REMARKS"
-  },
-  {
-   "fieldname": "remarks",
-   "fieldtype": "Text Editor"
-  },
-  {
-   "depends_on": "eval:doc.docstatus==1 || doc.docstatus==2",
-   "fieldname": "cancellation_reason",
-   "fieldtype": "Select",
-   "hidden": 1,
-   "label": "Cancellation Reason",
-   "options": "\nChange In Travel Plan\nWrong Data Entry\nOthers"
-  },
-  {
-   "fieldname": "column_break_54",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "company",
    "fieldtype": "Link",
    "label": "Company",
    "options": "Company",
    "read_only": 1,
    "reqd": 1
-  },
-  {
-   "fieldname": "supervisor_name",
-   "fieldtype": "Data",
-   "label": "Approver Name",
-   "read_only": 1
-  },
-  {
-   "fieldname": "supervisor_designation",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Supervisor Designation",
-   "read_only": 1
-  },
-  {
-   "fieldname": "from_date",
-   "fieldtype": "Date",
-   "hidden": 1,
-   "label": "From Date",
-   "read_only": 1
-  },
-  {
-   "fieldname": "to_date",
-   "fieldtype": "Date",
-   "hidden": 1,
-   "label": "To Date",
-   "read_only": 1
-  },
-  {
-   "default": "0",
-   "fieldname": "for_maintenance_project",
-   "fieldtype": "Check",
-   "label": "For Maintenance/Project"
-  },
-  {
-   "fetch_from": "supervisor.email",
-   "fieldname": "supervisor_manager",
-   "fieldtype": "Link",
-   "label": "Supervisor Manager Email",
-   "options": "User",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "supervisor_manager.full_name",
-   "fieldname": "supervisor_manager_name",
-   "fieldtype": "Data",
-   "label": "Supervisor Manager Name",
-   "read_only": 1
   },
   {
    "fieldname": "exchange_rate",
@@ -456,21 +313,7 @@
   },
   {
    "fieldname": "section_break_s22dq",
-   "fieldtype": "Section Break",
-   "label": "Travel Claim"
-  },
-  {
-   "fieldname": "travel_details",
-   "fieldtype": "Section Break",
-   "label": "Sponsorship"
-  },
-  {
-   "fieldname": "column_break_deeg",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_iirtw",
-   "fieldtype": "Column Break"
+   "fieldtype": "Section Break"
   },
   {
    "fieldname": "sponsorship",
@@ -546,158 +389,46 @@
    "fieldtype": "Data",
    "label": "Venue",
    "mandatory_depends_on": "eval:doc.travel_type==\"Meeting and Seminars\""
+  },
+  {
+   "fieldname": "column_break_btbv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "dsa_per_day",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "DSA Per Day",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_kkkk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.need_advance && doc.currency!=\"BTN\"",
+   "fieldname": "base_advance_amount",
+   "fieldtype": "Currency",
+   "label": "Base Advance Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "end_date_auth",
+   "fieldtype": "Date",
+   "hidden": 1,
+   "label": "End Date Auth",
+   "read_only": 1
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-28 14:39:51.673644",
+ "modified": "2024-12-30 17:30:05.290046",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",
  "naming_rule": "Expression (old style)",
  "owner": "Administrator",
- "permissions": [
-  {
-   "amend": 1,
-   "create": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "HR User",
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  },
-  {
-   "amend": 1,
-   "cancel": 1,
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Administrator",
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Accounts User",
-   "share": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "HR Support",
-   "share": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "permlevel": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Approver",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "amend": 1,
-   "create": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "HR Manager",
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "permlevel": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Employee",
-   "share": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Auditor",
-   "share": 1
-  },
-  {
-   "cancel": 1,
-   "create": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Approver",
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  },
-  {
-   "amend": 1,
-   "create": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Employee",
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  },
-  {
-   "cancel": 1,
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  },
-  {
-   "create": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Travel Administrator",
-   "share": 1,
-   "write": 1
-  }
- ],
+ "permissions": [],
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],

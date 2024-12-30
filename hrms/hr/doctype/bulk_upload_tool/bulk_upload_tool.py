@@ -58,7 +58,7 @@ class BulkUploadTool(Document):
 		from frappe.utils.csvutils import check_record, import_doc
 
 		for i, row in enumerate(rows[1:]):
-			if not row:
+			if not row :
 				continue
 			count += 1
 			try:
@@ -67,6 +67,7 @@ class BulkUploadTool(Document):
 				month = row[6]
 				
 				employee=str(row[3]).strip('\'')
+				frappe.throw(month)
 				#frappe.throw(employee)
 				
 				
@@ -142,7 +143,7 @@ class BulkUploadTool(Document):
 						#frappe.throw(month_str)
 						year = row[5]
 						date_str = f"{year}-{month_str}-{day}"
-						#frappe.throw(employee)
+						#frappe.throw(str(date_str))
 						pay_details = get_pay_details(employee,year,month_str)
 						#frappe.throw(str(pay_details))
 						if not pay_details:
@@ -161,13 +162,14 @@ class BulkUploadTool(Document):
 						old = frappe.db.get_value("Muster Roll Attendance", {"mr_employee": str(row[3]).strip('\''), "date": date_str, "docstatus": 1}, ["status", "name"], as_dict=1)
 						if old:
 							#frappe.throw("kkk")
+							#frappe.throw(date_str)
 							doc = frappe.get_doc("Muster Roll Attendance", old.name)
 							doc.db_set('status', status if status in ('Present', 'Absent','Half Day') else doc.status)
 							doc.db_set('branch', row[0])
 							doc.db_set('cost_center', row[1])
 							doc.db_set('unit', row[2])
 						if not old and status in ('Present', 'Absent','Half Day'):
-							#frappe.throw(str(row[3]).strip('\''))
+							#frappe.throw("hi")
 							doc = frappe.new_doc("Muster Roll Attendance")
 							doc.status = status
 							doc.branch = row[0]
@@ -368,10 +370,7 @@ def get_template(branch, month, fiscal_year):
 
 	if not frappe.has_permission("Muster Roll Overtime Entry", "create"):
 		raise frappe.PermissionError
-	writer = UnicodeWriter()
-	writer.writerow([f"Notes:"])
-	writer.writerow([f"Please do not change the template headings"])
-	writer.writerow([f"Status should be P if Present, A if Absent and H is Half Day"])
+
 	month_in_number = frappe._dict({
 									"Jan":1,
 									"Feb":2,
@@ -404,6 +403,10 @@ def get_template(branch, month, fiscal_year):
 		
 		
 	#writer = UnicodeWriter()
+	writer = UnicodeWriter()
+	writer.writerow(["Notes:"])
+	writer.writerow(["Please do not change the template headings"])
+	writer.writerow(["Status should be P if Present, A if Absent and H is Half Day"])
 	writer.writerow(fields)
 
 	return writer

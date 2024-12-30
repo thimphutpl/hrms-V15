@@ -6,26 +6,17 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "date",
+  "from_date",
+  "return_same_day",
   "column_break_2",
+  "travel_from",
   "halt",
   "column_break_4",
-  "till_date",
+  "to_date",
   "no_days",
-  "from_place",
-  "dsa_rate",
-  "percent",
-  "currency",
-  "exchange_rate",
-  "amount_in_btn",
   "column_break_9",
-  "to_place",
+  "travel_to",
   "halt_at",
-  "temp_from_place",
-  "temp_to_place",
-  "temp_halt_at",
-  "temp_till_date",
-  "return_same_day",
   "country",
   "sb_project_maintenance",
   "reference_type",
@@ -33,34 +24,19 @@
  ],
  "fields": [
   {
-   "allow_on_submit": 1,
-   "fieldname": "date",
-   "fieldtype": "Date",
-   "in_list_view": 1,
-   "label": "From Date",
-   "reqd": 1
-  },
-  {
    "fieldname": "column_break_2",
    "fieldtype": "Column Break"
   },
   {
-   "allow_on_submit": 1,
    "default": "0",
    "fieldname": "halt",
    "fieldtype": "Check",
-   "label": "Halt?"
+   "label": "Halt?",
+   "read_only_depends_on": "eval:doc.idx==1;"
   },
   {
    "fieldname": "column_break_4",
    "fieldtype": "Column Break"
-  },
-  {
-   "allow_on_submit": 1,
-   "depends_on": "eval:doc.halt",
-   "fieldname": "till_date",
-   "fieldtype": "Date",
-   "label": "Till Date"
   },
   {
    "allow_on_submit": 1,
@@ -71,59 +47,16 @@
    "read_only": 1
   },
   {
-   "allow_on_submit": 1,
-   "depends_on": "eval:doc.halt==0 && doc.date",
-   "fieldname": "from_place",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "From Place"
-  },
-  {
    "fieldname": "column_break_9",
    "fieldtype": "Column Break"
   },
   {
-   "allow_on_submit": 1,
-   "depends_on": "eval:doc.halt==0 && doc.date",
-   "fieldname": "to_place",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "To Place"
-  },
-  {
-   "allow_on_submit": 1,
+   "columns": 2,
+   "depends_on": "eval:doc.halt===1",
    "fieldname": "halt_at",
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Halt At"
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "temp_from_place",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Temp From Place"
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "temp_to_place",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Temp To Place"
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "temp_halt_at",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Temp Halt At"
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "temp_till_date",
-   "fieldtype": "Date",
-   "hidden": 1,
-   "label": "Temp Till Date"
   },
   {
    "default": "0",
@@ -157,40 +90,43 @@
    "options": "reference_type"
   },
   {
-   "fieldname": "dsa_rate",
-   "fieldtype": "Currency",
-   "label": "DSA Rate",
-   "read_only": 1
+   "columns": 2,
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "From Date",
+   "reqd": 1
   },
   {
-   "default": "100",
-   "fieldname": "percent",
-   "fieldtype": "Percent",
-   "label": "Percent"
+   "allow_on_submit": 1,
+   "columns": 2,
+   "depends_on": "eval:doc.halt==1;",
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "To Date",
+   "mandatory_depends_on": "eval:doc.halt==1;"
   },
   {
-   "fieldname": "currency",
-   "fieldtype": "Link",
-   "label": "Currency",
-   "options": "Currency"
+   "columns": 2,
+   "fieldname": "travel_from",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Travel From"
   },
   {
-   "default": "1",
-   "fieldname": "exchange_rate",
-   "fieldtype": "Float",
-   "label": "Exchange rate"
-  },
-  {
-   "fieldname": "amount_in_btn",
-   "fieldtype": "Currency",
-   "label": "DSA Amount in BTN",
-   "read_only": 1
+   "columns": 2,
+   "depends_on": "eval:doc.halt==0 && doc.from_date",
+   "fieldname": "travel_to",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Travel To"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-12-23 16:24:36.656135",
+ "modified": "2024-12-30 16:54:32.746029",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization Item",

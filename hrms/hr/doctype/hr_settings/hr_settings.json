@@ -178,10 +178,11 @@
   "remove_semso",
   "tb_travel",
   "return_day_dsa",
+  "dsa_within_same_locality",
   "training_dsa",
+  "column_break_wrte",
   "dsa_30_to_90",
   "dsa_90_plus",
-  "dsa_within_same_locality",
   "pbva_settings_tab",
   "ceo_pbva_percent",
   "rest_pbva_percent"
@@ -1183,13 +1184,17 @@
    "fieldname": "rest_pbva_percent",
    "fieldtype": "Percent",
    "label": "Rest PBVA Percent"
+  },
+  {
+   "fieldname": "column_break_wrte",
+   "fieldtype": "Column Break"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-12-03 17:03:13.002073",
+ "modified": "2024-12-30 17:43:24.783390",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",
