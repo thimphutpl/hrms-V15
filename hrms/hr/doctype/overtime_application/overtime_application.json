@@ -46,6 +46,7 @@
   "company",
   "payment_made",
   "salary_component",
+  "workflow_state",
   "column_break_20",
   "payment_jv",
   "salary_slip"
@@ -327,12 +328,20 @@
    "fieldtype": "Currency",
    "label": "Net Amount",
    "read_only": 1
+  },
+  {
+   "fieldname": "workflow_state",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Workflow State",
+   "options": "Workflow State",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-11-25 20:34:10.488896",
+ "modified": "2024-12-31 17:40:55.298906",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Overtime Application",
