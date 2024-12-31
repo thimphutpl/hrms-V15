@@ -130,7 +130,7 @@ class SalaryIncrement(Document):
 				self.payscale_maximum   = grade.upper_limit 
 
 				# added by Dawa Tshering
-				if flt(self.total_months) == 12:
+				if flt(self.total_months) >= 12:
 					self.calculated_increment = round(flt(self.payscale_increment), 0)
 				else:
 					self.calculated_increment = round(flt(self.payscale_increment)/12 * flt(self.total_months), 0)

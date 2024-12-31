@@ -216,7 +216,7 @@ class IncrementEntry(Document):
 				payscale_maximum   = grade.upper_limit 
 
 				# added by Dawa Tshering
-				if flt(total_months) == 12:
+				if flt(total_months) >= 12:
 					increment = round(flt(payscale_increment), 0)
 				else:
 					increment = round(flt(payscale_increment)/12 * flt(total_months), 0)
