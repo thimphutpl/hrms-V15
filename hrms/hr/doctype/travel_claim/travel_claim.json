@@ -31,6 +31,10 @@
   "column_break_26",
   "extra_claim_amount",
   "extra_claim_reason",
+  "section_break_yrfb",
+  "currency",
+  "column_break_eldh",
+  "exchange_rate",
   "section_break_lhku4",
   "items",
   "total_claim_amount",
@@ -42,13 +46,18 @@
   "balance_amount",
   "column_break_24",
   "ta",
+  "section_break_xliw",
+  "approver",
+  "column_break_yrsk",
+  "approver_name",
+  "column_break_swzz",
+  "approver_designation",
   "section_break_44",
   "claim_journal",
+  "workflow_state",
   "column_break_46",
-  "ta_date",
   "company",
   "branch",
-  "workflow_state",
   "amended_from"
  ],
  "fields": [
@@ -219,13 +228,6 @@
    "read_only": 1
   },
   {
-   "allow_on_submit": 1,
-   "fieldname": "ta_date",
-   "fieldtype": "Date",
-   "label": "Travel Authorization Date",
-   "permlevel": 3
-  },
-  {
    "fieldname": "section_break_44",
    "fieldtype": "Section Break"
   },
@@ -260,7 +262,7 @@
    "fieldname": "mode_of_travel",
    "fieldtype": "Select",
    "label": "Mode of Travel",
-   "options": "\nFlight\nOffice Car\nPersonal Car\nPublic Transport\nWith Others",
+   "options": "\nOffice Car\nPersonal Car",
    "reqd": 1
   },
   {
@@ -323,11 +325,62 @@
   {
    "fieldname": "column_break_adhe",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_xliw",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "approver",
+   "fieldtype": "Link",
+   "label": "Approver",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_yrsk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approver_name",
+   "fieldtype": "Data",
+   "label": "Approver Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_swzz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approver_designation",
+   "fieldtype": "Link",
+   "label": "Approver Designation",
+   "options": "Designation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_yrfb",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "label": "Currency",
+   "options": "Currency"
+  },
+  {
+   "fieldname": "column_break_eldh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "exchange_rate",
+   "fieldtype": "Float",
+   "label": "Exchange Rate"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-30 16:08:56.566180",
+ "modified": "2024-12-31 17:29:24.142739",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim",

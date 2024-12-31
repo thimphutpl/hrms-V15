@@ -23,7 +23,6 @@ class TravelAuthorization(Document):
 		self.validate_travel_dates(update=True)
 		if self.training_event:
 			self.update_training_event()
-		self.set_dsa_rate()
 
 	def on_update(self):
 		self.validate_travel_dates()
@@ -39,8 +38,7 @@ class TravelAuthorization(Document):
 		self.post_journal_entry()
 		if self.travel_type=="Training":
 			self.update_training_records()
-		
-
+	
 	def before_cancel(self):
 		self.update_training_records(cancel=True)
 		if self.advance_journal:
@@ -52,10 +50,6 @@ class TravelAuthorization(Document):
 		""".format(self.name))
 		if ta:
 			frappe.throw("""There is Travel Claim <a href="#Form/Travel%20Claim/{0}"><b>{0}</b></a> linked to this Travel Authorization""".format(ta[0][0]))
-
-	def set_dsa_rate(self):
-		if self.grade:
-			self.db_set("dsa_per_day", frappe.db.get_value("Employee Grade", self.grade, "dsa_per_day"))
 		
 	def update_training_records(self, cancel=False):
 		emp_doc=frappe.get_doc("Employee", self.employee)
@@ -77,10 +71,6 @@ class TravelAuthorization(Document):
 
 			})
 			emp_doc.save()
-
-	def on_cancel_after_draft(self):
-		validate_workflow_states(self)
-		notify_workflow_states(self)
 
 	def on_cancel(self):
 		self.cancel_attendance()	
@@ -170,7 +160,6 @@ class TravelAuthorization(Document):
 	def assign_end_date(self):
 		if self.items:
 			self.end_date_auth = self.items[len(self.items) - 1].from_date 
-			frappe.throw(str(self.end_date_auth))
 
 	def post_journal_entry(self):
 		if self.need_advance:
@@ -294,19 +283,26 @@ class TravelAuthorization(Document):
 			if d.overlap_idx >= 0:
 				frappe.throw(_("Row#{}: Dates are overlapping with dates in Row#{}").format(d.idx, d.overlap_idx))
 
-	# @frappe.whitelist()
-	# def set_estimate_amount(self):
-	# 	total_days = 0.0
-	# 	return_day = 1
-	# 	full_dsa = 0
-	# 	# doc=frappe.get_doc("Travel Authorization", self.name)
-	# 	for i in self.items:
-	# 		from_date = i.from_date
-	# 		to_date   = i.from_date if not i.to_date else i.to_date
-	# 		no_days   = date_diff(to_date, from_date) + 1
-	# 		full_dsa += flt(i.base_advance_amount) * (flt(i.percent)/100) * flt(no_days)
-	# 	final=flt(full_dsa)
-	# 	self.estimated_amount = flt(final)
+
+	@frappe.whitelist()
+	def set_dsa_per_day(self):
+		if self.grade:
+			self.dsa_per_day = frappe.db.get_value("Employee Grade", self.grade, "dsa_per_day")
+		return self.dsa_per_day
+
+	@frappe.whitelist()
+	def set_estimate_amount(self):
+		if not self.need_advance:
+			return
+		
+		if len(self.items) > 1:
+			first_day = self.items[0].from_date
+			last_second_day = self.items[len(self.items) - 2].to_date
+			total_days = date_diff(last_second_day, first_day)
+			self.estimated_amount = flt(total_days) * flt(self.dsa_per_day)
+		else:
+			self.estimated_amount = self.dsa_per_day
+		return self.estimated_amount if self.currency == "BTN" else 0.0
 
 @frappe.whitelist()
 def make_travel_claim(source_name, target_doc=None):
@@ -321,22 +317,29 @@ def make_travel_claim(source_name, target_doc=None):
 		else:
 			target.no_days = 1
 			target.halt_at = None
-			
-		target.currency = source_parent.currency
-		target.currency_exchange_date = source_parent.posting_date
-		
-		target.dsa = source_parent.dsa_per_day
+
+		if source_parent.currency == "BTN":
+			target.dsa = source_parent.dsa_per_day
+		else:
+			target.base_dsa = source_parent.dsa_per_day
+
 		target.country=obj.country
 			
-		if target.currency == "BTN":
-			target.exchange_rate = 1
-		else:
-			target.exchange_rate = get_exchange_rate(target.currency, "BTN", date=source_parent.posting_date)
+		# target.currency = source_parent.currency
+		# target.currency_exchange_date = source_parent.posting_date
 		
-		target.amount = target.dsa
+		# target.dsa = source_parent.dsa_per_day
+		# target.country=obj.country
+			
+		# if target.currency == "BTN":
+		# 	target.exchange_rate = 1
+		# else:
+		# 	target.exchange_rate = get_exchange_rate(target.currency, "BTN", date=source_parent.posting_date)
+		
+		# target.amount = target.dsa
 			  
-		target.actual_amount = target.amount * target.exchange_rate * (flt(target.dsa_percent)/100)
-		target.amount=target.actual_amount
+		# target.actual_amount = target.amount * target.exchange_rate * (flt(target.dsa_percent)/100)
+		# target.amount=target.actual_amount
 		
 	def adjust_last_date(source, target):
 		pass

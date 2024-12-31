@@ -12,7 +12,6 @@ cur_frm.add_fetch("employee", "cost_center", "cost_center")
 frappe.ui.form.on('Travel Authorization', {
 	refresh: function (frm) {
 		
-		//show the document status field and submit button
 		if (in_list(frappe.user_roles, "Expense Approver") && frappe.session.user == frm.doc.supervisor) {
 			frm.toggle_display("document_status", frm.doc.docstatus == 0);
 			frm.toggle_reqd("document_status", frm.doc.docstatus == 0);
@@ -53,28 +52,75 @@ frappe.ui.form.on('Travel Authorization', {
 
 		frm.set_query("employee", erpnext.queries.employee);
 	},
+
+	employee: function (frm) {
+		frappe.call({
+			method: "set_dsa_per_day",
+			doc: frm.doc,
+			callback: function(r) {
+				frm.set_value("dsa_per_day", r.message)
+				frm.refresh_field("dsa_per_day");
+			}
+		});
+	},
 	
 	need_advance: function (frm) {
 		frm.toggle_reqd("estimated_amount", frm.doc.need_advance == 1);
 		frm.toggle_reqd("currency", frm.doc.need_advance == 1);
 		frm.toggle_reqd("advance_amount", frm.doc.need_advance == 1);
-		// calculate_advance(frm);
-		
+		calculate_advance(frm);
 	},
 
-	advance_amount: function (frm) {
-		if (frm.doc.currency == "BTN") {
-			frm.set_value("base_advance_amount", flt(frm.doc.advance_amount))
+	currency: function (frm) {
+		calculate_advance(frm);
+		let company_currency = erpnext.get_currency(frm.doc.company);
+		if (company_currency != frm.doc.company) {
+			frappe.call({
+				method: "erpnext.setup.utils.get_exchange_rate",
+				args: {
+					from_currency: company_currency,
+					to_currency: frm.doc.currency,
+				},
+				callback: function (r) {
+					if (r.message) {
+						frm.set_value("exchange_rate", flt(r.message));
+						frm.set_df_property(
+							"exchange_rate",
+							"description",
+							"1 " + frm.doc.currency + " = [?] " + company_currency
+						);
+					}
+				},
+			});
+		} else {
+			frm.set_value("exchange_rate", 1.0);
+			frm.set_df_property("exchange_rate", "hidden", 1);
+			frm.set_df_property("exchange_rate", "description", "");
 		}
-		else {
-			update_advance_amount(frm)
-		}
+
+		frm.trigger("advance_amount");
+		frm.trigger("set_dynamic_field_label");
 	},
-	
-	document_status: function (frm) {
-		if (frm.doc.document_status == "Rejected") {
-			frm.toggle_reqd("purpose")
-		}
+
+	advance_amount: (frm) => {
+        frm.set_value("base_advance_amount", flt(frm.doc.advance_amount) * flt(frm.doc.exchange_rate));
+    },
+
+	set_dynamic_field_label: function (frm) {
+		// frm.trigger("change_grid_labels");
+		frm.trigger("change_form_labels");
+	},
+
+	change_form_labels: function (frm) {
+		let company_currency = erpnext.get_currency(frm.doc.company);
+		frm.set_currency_labels(["base_advance_amount"], company_currency);
+		frm.set_currency_labels(["advance_amount"], frm.doc.currency);
+
+		// toggle fields
+		frm.toggle_display(
+			["exchange_rate", "base_advance_amount"],
+			frm.doc.currency != company_currency
+		);
 	},
 	
 	make_traveil_claim: function () {
@@ -82,15 +128,6 @@ frappe.ui.form.on('Travel Authorization', {
 			method: "hrms.hr.doctype.travel_authorization.travel_authorization.make_travel_claim",
 			frm: cur_frm
 		})
-	},
-	
-	currency: function (frm) {
-		if (frm.doc.currency == "BTN") {
-			frm.set_value("base_advance_amount", flt(frm.doc.advance_amount))
-		}
-		else {
-			update_advance_amount(frm)
-		}
 	},
 });
 
@@ -132,8 +169,6 @@ frappe.ui.form.on("Travel Authorization Item", {
 
 			frappe.model.set_value(cdt, cdn, "return_same_day", 0);
 		}
-
-		// Refresh the field to reflect the changes in the child table
 		frm.refresh_field("items");
 	},
 	
@@ -150,8 +185,8 @@ frappe.ui.form.on("Travel Authorization Item", {
 			}
 		} else {
 			if (item.to_date < item.from_date) {
-				msgprint("Till Date cannot be earlier than From Date");
-				frappe.model.set_value(cdt, cdn, "to_date", null);
+				msgprint("To Date cannot be earlier than From Date");
+				// frappe.model.set_value(cdt, cdn, "to_date", null);
 			}
 		}
 
@@ -161,28 +196,11 @@ frappe.ui.form.on("Travel Authorization Item", {
 			console.log(item.no_days)
 		}
 
-		/*
-		if(item.till_date){
-			if (item.till_date >= item.date) {
-				frappe.model.set_value(cdt, cdn, "no_days", 1 + cint(frappe.datetime.get_day_diff(item.till_date, item.date)))
-			}
-			else{
-				msgprint("Till Date cannot be earlier than From Date")
-				frappe.model.set_value(cdt, cdn, "till_date", "")
-			}
-		} else {
-			if(!item.halt) {
-				frappe.model.set_value(cdt, cdn, "till_date", item.date);
-			}
-		}
-		*/
-		
 		frm.refresh_fields();
 		frm.refresh_field("items");
 	},
 
-	"to_date": function (frm, cdt, cdn) {
-		
+	to_date: function (frm, cdt, cdn) {
 		var item = locals[cdt][cdn]
 		frappe.call({
 			method: "check_date_overlap",
@@ -195,7 +213,7 @@ frappe.ui.form.on("Travel Authorization Item", {
 		}
 		else {
 			if (item.to_date) {
-				msgprint("Till Date cannot be earlier than From Date")
+				msgprint("To Date cannot be earlier than From Date")
 				frappe.model.set_value(cdt, cdn, "to_date", "")
 			}
 		}
@@ -205,28 +223,19 @@ frappe.ui.form.on("Travel Authorization Item", {
 	},
 
 	exchange_rate: function (frm, cdt, cdn) {
-		frm.refresh_fields();
 		frm.refresh_field("items");
+		frm.refresh_fields();
 	},
 
 	halt: function (frm, cdt, cdn) {
 		var item = locals[cdt][cdn]
 		cur_frm.toggle_reqd("to_date", item.halt);
 		if (!item.halt) {
-			//frappe.model.set_value(cdt, cdn, "no_days", 1)
-			frappe.model.set_value(cdt, cdn, "temp_till_date", (item.till_date || item.date));
-			frappe.model.set_value(cdt, cdn, "to_date", item.date)
-			frappe.model.set_value(cdt, cdn, "travel_from", item.temp_from_place);
-			frappe.model.set_value(cdt, cdn, "travel_to", item.temp_to_place);
-			frappe.model.set_value(cdt, cdn, "temp_halt_at", item.halt_at);
-			// frappe.model.set_value(cdt, cdn, "halt_at", "");
+			frappe.model.set_value(cdt, cdn, "no_days", 1)
 		} else {
-			// frappe.model.set_value(cdt, cdn, "temp_from_place", item.travel_from);
-			// frappe.model.set_value(cdt, cdn, "temp_to_place", item.to_place);
 			frappe.model.set_value(cdt, cdn, "travel_from", "");
 			frappe.model.set_value(cdt, cdn, "travel_to", "");
-			// frappe.model.set_value(cdt, cdn, "halt_at", item.temp_halt_at);
-			frappe.model.set_value(cdt, cdn, "till_date", item.temp_till_date || item.date);frappe.model.set_value(cdt, cdn, "no_days", 1 + cint(frappe.datetime.get_day_diff(item.till_date, item.date)))
+			frappe.model.set_value(cdt, cdn, "no_days", 1 + cint(frappe.datetime.get_day_diff(item.to_date, item.from_date)))
 		}
 	},
 });
@@ -236,36 +245,8 @@ function calculate_advance(frm) {
 		method: "set_estimate_amount",
 		doc: frm.doc,
 		callback: function(r) {
-			frm.refresh_fields();
+			frm.set_value("estimated_amount", r.message)
 			frm.refresh_field("estimated_amount");
-			frm.refresh_field("advance_amount");
-			frm.refresh_field("base_advance_amount");
 		}
 	});
-}
-
-function update_advance_amount(frm) {
-	frappe.call({
-		//method: "erpnext.setup.utils.get_exchange_rate",
-		method: "hrms.hr.doctype.travel_authorization.travel_authorization.get_exchange_rate",
-		args: {
-			"from_currency": frm.doc.currency,
-			"to_currency": "BTN",
-			"date": frm.doc.posting_date
-		},
-		callback: function (r) {
-			if (r.message) {
-				frm.set_value("base_advance_amount", flt(frm.doc.advance_amount) * flt(r.message))
-				frm.set_value("advance_amount", flt(frm.doc.advance_amount))
-				frm.set_value("estimated_amount", flt(frm.doc.estimated_amount))
-				frm.set_value("exchange_rate", flt(r.message))
-				//frm.set_value("advance_amount", format_currency(flt(frm.doc.advance_amount), frm.doc.currency))
-				//frm.set_value("estimated_amount", format_currency(flt(frm.doc.estimated_amount), frm.doc.currency))
-			}
-		}
-	})
-}
-
-frappe.form.link_formatters['Employee'] = function (value, doc) {
-	return value
 }
