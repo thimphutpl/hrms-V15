@@ -58,7 +58,13 @@ class BulkUploadTool(Document):
 		from frappe.utils.csvutils import check_record, import_doc
 
 		for i, row in enumerate(rows[1:]):
-			if not row :
+			if not row  :
+				continue
+			if row[6]=="Month":
+				continue
+			if row[5]=="Year":
+				continue
+			if row[3]==None:
 				continue
 			count += 1
 			try:
@@ -67,7 +73,7 @@ class BulkUploadTool(Document):
 				month = row[6]
 				
 				employee=str(row[3]).strip('\'')
-				frappe.throw(month)
+				#frappe.throw(row[0])
 				#frappe.throw(employee)
 				
 				
@@ -143,7 +149,7 @@ class BulkUploadTool(Document):
 						#frappe.throw(month_str)
 						year = row[5]
 						date_str = f"{year}-{month_str}-{day}"
-						#frappe.throw(str(date_str))
+						#frappe.throw(year)
 						pay_details = get_pay_details(employee,year,month_str)
 						#frappe.throw(str(pay_details))
 						if not pay_details:
@@ -206,7 +212,8 @@ class BulkUploadTool(Document):
 			show_progress = 1
 
 		if show_progress:
-			description = " Processing OT Of {}({}): ".format(frappe.bold(str(row[4]).strip('\'')), frappe.bold(row[3])) + "[" + str(count) + "/" + str(total_count) + "]"
+			description = " Processing OT Of {}({}): f".format(str(row[4]).strip('\''), row[3]) + "[" + str(count) + "/" + str(total_count) + "]"
+			
 			frappe.publish_progress(count * 100 / total_count,
 									title=_("Posting Overtime Entry..."),
 									description=description)
