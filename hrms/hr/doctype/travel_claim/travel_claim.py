@@ -31,8 +31,8 @@ class TravelClaim(Document):
 		self.update_travel_authorization()
 		self.post_journal_entry()
 
-	def before_cancel(self):
-		self.unlink_travel_authorization()
+	# def before_cancel(self):
+	# 	self.unlink_travel_authorization()
 
 	def on_cancel(self):
 		self.check_journal_entry()

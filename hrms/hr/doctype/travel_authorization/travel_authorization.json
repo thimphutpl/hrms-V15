@@ -415,7 +415,7 @@
    "depends_on": "eval:doc.need_advance && doc.currency!=\"BTN\"",
    "fieldname": "base_advance_amount",
    "fieldtype": "Currency",
-   "label": "Base Advance Amount",
+   "label": "Advance Amount",
    "options": "Company:company:default_currency",
    "read_only": 1
   },
@@ -462,7 +462,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-31 18:29:54.068446",
+ "modified": "2024-12-31 22:49:32.401643",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",

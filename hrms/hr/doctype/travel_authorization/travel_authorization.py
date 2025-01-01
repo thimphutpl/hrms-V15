@@ -39,17 +39,17 @@ class TravelAuthorization(Document):
 		if self.travel_type=="Training":
 			self.update_training_records()
 	
-	def before_cancel(self):
-		self.update_training_records(cancel=True)
-		if self.advance_journal:
-			for t in frappe.get_all("Journal Entry", ["name"], {"name": self.advance_journal, "docstatus": ("<",2)}):
-				msg = '<b>Reference# : <a href="#Form/Journal Entry/{0}">{0}</a></b>'.format(t.name)
-				frappe.throw(_("Advance payment for this transaction needs to be cancelled first.<br>{0}").format(msg),title='<div style="color: red;">Not permitted</div>')
-		ta = frappe.db.sql("""
-			select name from `tabTravel Claim` where ta = '{}' and docstatus != 2
-		""".format(self.name))
-		if ta:
-			frappe.throw("""There is Travel Claim <a href="#Form/Travel%20Claim/{0}"><b>{0}</b></a> linked to this Travel Authorization""".format(ta[0][0]))
+	# def before_cancel(self):
+	# 	self.update_training_records(cancel=True)
+	# 	if self.advance_journal:
+	# 		for t in frappe.get_all("Journal Entry", ["name"], {"name": self.advance_journal, "docstatus": ("<",2)}):
+	# 			msg = '<b>Reference# : <a href="#Form/Journal Entry/{0}">{0}</a></b>'.format(t.name)
+	# 			frappe.throw(_("Advance payment for this transaction needs to be cancelled first.<br>{0}").format(msg),title='<div style="color: red;">Not permitted</div>')
+	# 	ta = frappe.db.sql("""
+	# 		select name from `tabTravel Claim` where ta = '{}' and docstatus != 2
+	# 	""".format(self.name))
+	# 	if ta:
+	# 		frappe.throw("""There is Travel Claim <a href="#Form/Travel%20Claim/{0}"><b>{0}</b></a> linked to this Travel Authorization""".format(ta[0][0]))
 		
 	def update_training_records(self, cancel=False):
 		emp_doc=frappe.get_doc("Employee", self.employee)
@@ -298,7 +298,7 @@ class TravelAuthorization(Document):
 		if len(self.items) > 1:
 			first_day = self.items[0].from_date
 			last_second_day = self.items[len(self.items) - 2].to_date
-			total_days = date_diff(last_second_day, first_day)
+			total_days = date_diff(last_second_day, first_day) + 1
 			self.estimated_amount = flt(total_days) * flt(self.dsa_per_day)
 		else:
 			self.estimated_amount = self.dsa_per_day
