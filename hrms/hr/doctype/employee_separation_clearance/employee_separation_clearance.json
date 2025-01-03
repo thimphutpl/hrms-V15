@@ -48,7 +48,6 @@
   "mail_sent",
   "approvers_set",
   "employee_separation_id",
-  "workflow_state",
   "amended_from"
  ],
  "fields": [
@@ -93,14 +92,6 @@
    "fieldname": "employee_separation_id",
    "fieldtype": "Data",
    "label": "Employee Separation ID",
-   "read_only": 1
-  },
-  {
-   "fieldname": "workflow_state",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Workflow State",
-   "options": "Workflow State",
    "read_only": 1
   },
   {
@@ -365,7 +356,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-03 15:35:20.900399",
+ "modified": "2025-01-03 16:52:14.097652",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Separation Clearance",
