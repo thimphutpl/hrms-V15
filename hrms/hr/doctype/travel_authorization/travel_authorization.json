@@ -58,22 +58,12 @@
   "end_date_auth",
   "purpose",
   "column_break_30",
-  "workflow_state",
   "company",
   "branch",
   "travel_claim",
   "amended_from"
  ],
  "fields": [
-  {
-   "allow_on_submit": 1,
-   "fieldname": "workflow_state",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Workflow State",
-   "options": "Workflow State",
-   "read_only": 1
-  },
   {
    "fetch_from": "employee.branch",
    "fieldname": "branch",
@@ -417,7 +407,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-02 13:57:03.734833",
+ "modified": "2025-01-03 16:45:23.115266",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",
