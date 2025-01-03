@@ -95,7 +95,7 @@ class TravelClaim(Document):
 
 	def validate_travel_last_day(self):
 		if len(self.get("items")) > 1:
-			self.items[-1].last_day = 1
+			self.items[-1].is_last_day = 1
 
 	def update_amounts(self):
 		lastday_dsa_percent = flt(frappe.db.get_single_value("HR Settings", "return_day_dsa")) 
@@ -105,7 +105,7 @@ class TravelClaim(Document):
 		for item in self.get("items"):
 			# exchange_rate = 1 if self.currency == company_currency else get_exchange_rate(self.currency, company_currency)
 			item.dsa = flt(item.dsa)
-			if item.last_day:
+			if item.is_last_day:
 				item.dsa_percent = flt(lastday_dsa_percent)
 			
 			if self.mode_of_travel == "Personal Car":
@@ -201,22 +201,6 @@ class TravelClaim(Document):
 			if a.mileage_rate and a.distance:
 				mileage_amount+=flt(a.mileage_rate)*flt(a.distance)
 
-		# if self.travel_type == "Training":
-		#     if self.place_type == "Out Country":
-		#         mileage_acc_field = "training_out_country_mileage_account"
-		#     else:
-		#         mileage_acc_field = "training_in_country_mileage_account"
-		# elif self.travel_type in ("Workshop", "Meeting and Seminars"):
-		#     if self.place_type == "Out Country":
-		#         mileage_acc_field = "wms_out_country_mileage_account"
-		#     else:
-		#         mileage_acc_field = "wms_in_country_mileage_account"
-		# else:
-		#     mileage_acc_field = "travel_mileage_account"
-		# mileage_acc = frappe.db.get_value("Company", self.company, "travel_mileage_account")
-		# if not mileage_acc:
-		#     frappe.throw("Please set the {} mileage account in company settings".format(self.travel_type))
-
 		je.append("accounts", {
 				"account": expense_account,
 				"reference_type": "Travel Claim",
@@ -262,7 +246,6 @@ class TravelClaim(Document):
 		je.submit()
 		je_references = je.name
 
-		#Added by Thukten to make payable
 		if flt(self.balance_amount) > 0:
 			jeb = frappe.new_doc("Journal Entry")
 			jeb.flags.ignore_permissions = 1
@@ -300,63 +283,6 @@ class TravelClaim(Document):
 		if ta.travel_claim and ta.travel_claim != self.name:
 			frappe.throw("A travel claim <b>" + str(ta.travel_claim) + "</b> has already been created for the authorization")
 		ta.db_set("travel_claim", self.name)
-
-		# count_a = 0
-		# for i in self.get("items"):
-		# 	count_b = 0
-		# 	idtc = count_a	
-		# 	ta = frappe.get_doc("Travel Authorization", i.travel_authorization)
-		# 	if ta.travel_claim and ta.travel_claim != self.name:
-		# 		frappe.throw("A travel claim <b>" + str(ta.travel_claim) + "</b> has already been created for the authorization <b>" + str(i.travel_authorization) + "</b>")
-		# 	ta.db_set("travel_claim", self.name)
-
-		# 	# for a in ta.items:
-		# 	#     tai = frappe.get_doc("Travel Authorization Item", a.name)
-		# 	#     idta = count_b
-		# 	#     if idtc == idta:
-		# 	#         tai.db_set("from_date",i.from_date)
-		# 	#         tai.db_set("to_date",i.to_date)
-		# 	#     count_b += 1
-		# 	# count_a += 1
-		# # frappe.throw(str(self.ta))
-		# auth_doc=frappe.get_doc("Travel Authorization", self.ta)
-		# for child_d in auth_doc.get_all_children():
-		# 	if child_d.doctype=='Travel Authorization Item':
-		# 		frappe.db.sql("delete from `tabTravel Authorization Item` where name = '{}'".format(child_d.name))
-		# 	else:
-		# 		frappe.db.sql("delete from `tabTravel Authorization Detail` where name = '{}'".format(child_d.name))
-
-		# for child_doc in self.get("items"):
-		# 	doc=frappe.get_doc("Travel Authorization",self.ta)
-		# 	doc.append("items",
-		# 	{
-		# 		"idx":child_doc.idx,
-		# 		"from_date":child_doc.from_date,
-		# 		"to_date":child_doc.to_date,
-		# 		"halt":child_doc.halt,
-		# 		"halt_at":child_doc.halt_at,
-		# 		"from_place":child_doc.from_place,
-		# 		"to_place":child_doc.to_place,
-		# 		"no_days":child_doc.no_days,
-		# 		"country":child_doc.country
-		# 	})
-		# 	doc.save()
-		
-		# for child_doc in self.get("items"):
-		#     doc=frappe.get_doc("Travel Authorization",self.ta)
-		#     doc.append("details",
-		#     {
-		#         "idx":child_doc.idx,
-		#         "from_date":child_doc.from_date,
-		#         "to_date":child_doc.to_date,
-		#         "halt":child_doc.halt,
-		#         "halt_at":child_doc.halt_at,
-		#         "temp_from_place":child_doc.from_place,
-		#         "temp_to_place":child_doc.to_place,
-		#         "no_days":child_doc.no_days,
-		#         # "docstatus":child_doc.docstatus
-		#     })
-		#     doc.save()
 	
 	def validate_dates(self):
 		if self.ta:

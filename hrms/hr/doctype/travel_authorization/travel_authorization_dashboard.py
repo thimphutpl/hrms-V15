@@ -3,12 +3,12 @@ from frappe import _
 
 def get_data():
 	return {
-		'fieldname': 'ta',
+		'fieldname': 'travel_authorization',
         # "non_standard_fieldnames": {"Project Payment": "reference_name"},
 		'transactions': [
 			{
-				'label': _('Related'),
-				'items': ['Travel Claim']
+				'label': _(''),
+				'items': ['Travel Claim', 'Travel Adjustment']
 			}
         ]
 	}

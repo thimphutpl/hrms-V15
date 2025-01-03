@@ -45,7 +45,7 @@
   "column_break_16",
   "balance_amount",
   "column_break_24",
-  "ta",
+  "travel_authorization",
   "section_break_xliw",
   "approver",
   "column_break_yrsk",
@@ -54,22 +54,12 @@
   "approver_designation",
   "section_break_44",
   "claim_journal",
-  "workflow_state",
   "column_break_46",
   "company",
   "branch",
   "amended_from"
  ],
  "fields": [
-  {
-   "allow_on_submit": 1,
-   "fieldname": "workflow_state",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Workflow State",
-   "options": "Workflow State",
-   "read_only": 1
-  },
   {
    "fieldname": "branch",
    "fieldtype": "Link",
@@ -221,13 +211,6 @@
    "label": "Tour Report"
   },
   {
-   "fieldname": "ta",
-   "fieldtype": "Link",
-   "label": "Travel Authorization",
-   "options": "Travel Authorization",
-   "read_only": 1
-  },
-  {
    "fieldname": "section_break_44",
    "fieldtype": "Section Break"
   },
@@ -376,11 +359,18 @@
    "fieldname": "exchange_rate",
    "fieldtype": "Float",
    "label": "Exchange Rate"
+  },
+  {
+   "fieldname": "travel_authorization",
+   "fieldtype": "Link",
+   "label": "Travel Authorization",
+   "options": "Travel Authorization",
+   "read_only": 1
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-31 17:29:24.142739",
+ "modified": "2025-01-03 16:37:16.057712",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim",

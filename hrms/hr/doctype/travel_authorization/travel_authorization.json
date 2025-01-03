@@ -13,11 +13,9 @@
   "column_break_6",
   "division",
   "designation",
-  "section",
   "column_break_kkkk",
-  "grade",
+  "posting_date",
   "dsa_per_day",
-  "unit",
   "travel_purpose_information",
   "travel_type",
   "training_event",
@@ -41,8 +39,6 @@
   "bond_period_to_date",
   "section_break_s22dq",
   "items",
-  "section_break_26",
-  "details",
   "section_break_20",
   "currency",
   "need_advance",
@@ -51,9 +47,6 @@
   "estimated_amount",
   "advance_amount",
   "base_advance_amount",
-  "travel_authorization_details",
-  "posting_date",
-  "end_date_auth",
   "approver_details_section",
   "approver",
   "column_break_bdeb",
@@ -61,13 +54,14 @@
   "column_break_lxei",
   "approver_designation",
   "section_break_18",
+  "journal_entry",
+  "end_date_auth",
   "purpose",
   "column_break_30",
   "workflow_state",
   "company",
   "branch",
   "travel_claim",
-  "advance_journal",
   "amended_from"
  ],
  "fields": [
@@ -118,15 +112,6 @@
    "label": "Designation",
    "options": "Designation",
    "read_only": 1
-  },
-  {
-   "fetch_from": "employee.grade",
-   "fieldname": "grade",
-   "fieldtype": "Link",
-   "label": "Grade",
-   "options": "Employee Grade",
-   "read_only": 1,
-   "reqd": 1
   },
   {
    "fetch_from": "employee.division",
@@ -184,28 +169,10 @@
    "reqd": 1
   },
   {
-   "collapsible": 1,
-   "fieldname": "section_break_26",
-   "fieldtype": "Section Break",
-   "label": "Original Travel Details"
-  },
-  {
-   "fieldname": "details",
-   "fieldtype": "Table",
-   "label": "Original Travel Details",
-   "options": "Travel Authorization Detail",
-   "read_only": 1
-  },
-  {
-   "fieldname": "travel_authorization_details",
-   "fieldtype": "Section Break",
-   "label": "Travel Authorization Details"
-  },
-  {
    "fieldname": "posting_date",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "label": "Travel Authorization Date",
+   "label": "Posting Date",
    "reqd": 1
   },
   {
@@ -246,7 +213,7 @@
   {
    "fieldname": "section_break_18",
    "fieldtype": "Section Break",
-   "label": "ADDITIONAL INFORMATION"
+   "label": "Additional Information"
   },
   {
    "fieldname": "purpose",
@@ -264,12 +231,6 @@
    "label": "Travel Claim",
    "no_copy": 1,
    "options": "Travel Claim",
-   "read_only": 1
-  },
-  {
-   "fieldname": "advance_journal",
-   "fieldtype": "Data",
-   "label": "Advance Journal Entry",
    "read_only": 1
   },
   {
@@ -293,18 +254,6 @@
    "fieldname": "exchange_rate",
    "fieldtype": "Currency",
    "label": "Exchange Rate"
-  },
-  {
-   "fieldname": "section",
-   "fieldtype": "Data",
-   "label": "Section",
-   "read_only": 1
-  },
-  {
-   "fieldname": "unit",
-   "fieldtype": "Data",
-   "label": "Unit",
-   "read_only": 1
   },
   {
    "fieldname": "training_event",
@@ -458,11 +407,17 @@
    "label": "Approver Designation",
    "options": "Designation",
    "read_only": 1
+  },
+  {
+   "fieldname": "journal_entry",
+   "fieldtype": "Data",
+   "label": "Journal Entry",
+   "read_only": 1
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-31 22:49:32.401643",
+ "modified": "2025-01-02 13:57:03.734833",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",

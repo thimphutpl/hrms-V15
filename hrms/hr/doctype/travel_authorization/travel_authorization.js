@@ -11,34 +11,36 @@ cur_frm.add_fetch("employee", "cost_center", "cost_center")
 
 frappe.ui.form.on('Travel Authorization', {
 	refresh: function (frm) {
-		
-		if (in_list(frappe.user_roles, "Expense Approver") && frappe.session.user == frm.doc.supervisor) {
-			frm.toggle_display("document_status", frm.doc.docstatus == 0);
-			frm.toggle_reqd("document_status", frm.doc.docstatus == 0);
+		if (frm.doc.docstatus == 1 && !frm.doc.travel_claim) {
+			if (frm.doc.end_date_auth < frappe.datetime.get_today()) {
+				frm.add_custom_button(__("Travel Claim"), function () {
+					frm.trigger("create_travel_claim");
+					},
+					__("Create")
+				);
+				frm.add_custom_button(__("Travel Adjustment"), function () {
+						frm.trigger("create_travel_adjustment");
+					},
+					__("Create")
+				);
+			}
 		}
 
-		// Follwoing line temporarily replaced by SHIV on 2020/09/17, need to restore back
-		if (frm.doc.docstatus == 1 && !frm.doc.travel_claim && frm.doc.workflow_state == "Approved") {
-			frm.add_custom_button("Create Travel Claim", function () {
-				if (frm.doc.end_date_auth < frappe.datetime.get_today()) {
-					frappe.model.open_mapped_doc({
-						method: "hrms.hr.doctype.travel_authorization.travel_authorization.make_travel_claim",
-						frm: cur_frm
-					})
-				} else {
-					frappe.msgprint(__('Claim is allowed only after travel completion date i.e., {0}', [frm.doc.end_date_auth]));
-				}
-			}).addClass((frm.doc.end_date_auth < frappe.datetime.get_today()) ? "btn-success" : "btn-danger");
-		}
-
-		if (frm.doc.docstatus == 1) {
-			frm.toggle_display("document_status", 1);
-		}
-
-		if (frm.doc.__islocal) {
-			frm.set_value("advance_journal", "");
-		}
 		cur_frm.set_df_property("items", "read_only", frm.doc.travel_claim ? 1 : 0)
+	},
+
+	create_travel_adjustment: function (frm) {
+		frappe.model.open_mapped_doc({
+			method: "hrms.hr.doctype.travel_authorization.travel_authorization.make_travel_adjustment",
+			frm: cur_frm
+		})
+	},
+
+	create_travel_claim: function (frm) {
+		frappe.model.open_mapped_doc({
+			method: "hrms.hr.doctype.travel_authorization.travel_authorization.make_travel_claim",
+			frm: cur_frm
+		})
 	},
 	
 	onload: function (frm) {

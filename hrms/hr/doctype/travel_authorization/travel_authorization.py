@@ -29,9 +29,6 @@ class TravelAuthorization(Document):
 		self.check_date_overlap()
 		self.check_leave_applications()
 
-	def before_submit(self):
-		self.create_copy()
-
 	def on_submit(self):
 		self.validate_travel_dates(update=True)
 		self.create_attendance()
@@ -99,19 +96,6 @@ class TravelAuthorization(Document):
 				frappe.db.sql("""
 					update `tabTraining Event Employee` set travel_authorization_id = NULL where name = '{}'
 					""".format(self.training_event_child_ref))
-
-	def create_copy(self):
-		self.details = []
-		for a in self.items:
-			self.append("details", {
-				"from_date": a.from_date, 
-				"halt": a.halt, 
-				"to_date": a.to_date, 
-				"no_days": a.no_days, 
-				"travel_from": a.travel_from, 
-				"travel_to": a.travel_to, 
-				"halt_at": a.halt_at
-			})
 
 	def validate_advance(self):
 		self.advance_amount     = 0 if not self.need_advance else self.advance_amount
@@ -207,7 +191,7 @@ class TravelAuthorization(Document):
 				})
 				
 				je.insert(ignore_permissions=True)
-				self.db_set("advance_journal", je.name)
+				self.db_set("journal_entry", je.name)
 
 	def validate_travel_dates(self, update=False):
 		for item in self.get("items"):
@@ -283,7 +267,6 @@ class TravelAuthorization(Document):
 			if d.overlap_idx >= 0:
 				frappe.throw(_("Row#{}: Dates are overlapping with dates in Row#{}").format(d.idx, d.overlap_idx))
 
-
 	@frappe.whitelist()
 	def set_dsa_per_day(self):
 		if self.grade:
@@ -324,40 +307,18 @@ def make_travel_claim(source_name, target_doc=None):
 			target.base_dsa = source_parent.dsa_per_day
 
 		target.country=obj.country
-			
-		# target.currency = source_parent.currency
-		# target.currency_exchange_date = source_parent.posting_date
-		
-		# target.dsa = source_parent.dsa_per_day
-		# target.country=obj.country
-			
-		# if target.currency == "BTN":
-		# 	target.exchange_rate = 1
-		# else:
-		# 	target.exchange_rate = get_exchange_rate(target.currency, "BTN", date=source_parent.posting_date)
-		
-		# target.amount = target.dsa
-			  
-		# target.actual_amount = target.amount * target.exchange_rate * (flt(target.dsa_percent)/100)
-		# target.amount=target.actual_amount
 		
 	def adjust_last_date(source, target):
-		pass
-		# dsa_percent = frappe.db.get_single_value("HR Settings", "return_day_dsa")
-		
-		
-		# if target.items[len(target.items) - 1].halt!=1:
-		#     target.items[len(target.items) - 1].dsa_percent = dsa_percent
-		#     target.items[len(target.items) - 1].actual_amount = flt(target.items[len(target.items) - 1].actual_amount) * flt(dsa_percent)/100
-		#     target.items[len(target.items) - 1].amount = flt(target.items[len(target.items) - 1].amount) * flt(dsa_percent)/100
-		#     target.items[len(target.items) - 1].last_day = 1 
-		
+		dsa_percent = frappe.db.get_single_value("HR Settings", "return_day_dsa")
+		for d in target.items:
+			if d.is_last_day == 1:
+				d.dsa = flt(d.dsa) * flt(dsa_percent)/100
 
 	doc = get_mapped_doc("Travel Authorization", source_name, {
 			"Travel Authorization": {
 				"doctype": "Travel Claim",
 				"field_map": {
-					"name": "ta",
+					"name": "travel_authorization",
 					"posting_date": "ta_date",
 					"base_advance_amount": "advance_amount"
 				},
@@ -367,9 +328,39 @@ def make_travel_claim(source_name, target_doc=None):
 			"Travel Authorization Item": {
 				"doctype": "Travel Claim Item",
 				"postprocess": transfer_currency,
-				"travel_authorization": "parent"
 			},
 		}, target_doc, adjust_last_date)
+	return doc
+
+@frappe.whitelist()
+def make_travel_adjustment(source_name, target_doc=None):
+	res = frappe.db.sql("""select * from `tabTravel Authorization Item` where parent=%s order by idx asc
+		""", (source_name), as_dict=True
+	)
+
+	def update_date(obj, target, source_parent):
+		target.posting_date = nowdate()
+		target.set(
+			"travel_authorization_items",
+			[d for d in res]
+		)
+	
+	doc = get_mapped_doc("Travel Authorization", source_name, {
+			"Travel Authorization": {
+				"doctype": "Travel Adjustment",
+				"field_map": {
+					"name": "travel_authorization",
+				},
+				"postprocess": update_date,
+				"validation": {"docstatus": ["=", 1]},
+			},
+			"Travel Authorization Item": {
+				"doctype": "Travel Adjustment Item",
+			},
+		}, 
+		target_doc
+	)
+	
 	return doc
 
 @frappe.whitelist()
