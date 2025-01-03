@@ -54,7 +54,6 @@
   "new_employee_id",
   "sb_benefits",
   "employee_benefits_status",
-  "workflow_state",
   "amended_from"
  ],
  "fields": [
@@ -134,14 +133,6 @@
    "no_copy": 1,
    "options": "Employee Transfer",
    "print_hide": 1,
-   "read_only": 1
-  },
-  {
-   "fieldname": "workflow_state",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Workflow State",
-   "options": "Workflow State",
    "read_only": 1
   },
   {
@@ -392,7 +383,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-27 16:29:37.149679",
+ "modified": "2025-01-03 16:54:33.700216",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Transfer",
