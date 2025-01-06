@@ -16,7 +16,7 @@ from erpnext.accounts.doctype.accounts_settings.accounts_settings import get_ban
 
 class TravelAuthorization(Document):
 	def validate(self):
-		# validate_workflow_states(self)
+		validate_workflow_states(self)
 		self.validate_travel_last_day()
 		self.assign_end_date()
 		self.validate_advance()
@@ -24,6 +24,8 @@ class TravelAuthorization(Document):
 		self.validate_travel_dates(update=True)
 		if self.training_event:
 			self.update_training_event()
+		if self.workflow_state != "Approved":
+			notify_workflow_states(self)
 
 	def on_update(self):
 		self.validate_travel_dates()
@@ -31,6 +33,7 @@ class TravelAuthorization(Document):
 		self.check_leave_applications()
 
 	def on_submit(self):
+		notify_workflow_states(self)
 		self.validate_travel_dates(update=True)
 		self.create_attendance()
 		self.post_journal_entry()
