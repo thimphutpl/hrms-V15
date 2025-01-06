@@ -9,7 +9,7 @@ from erpnext.custom_workflow import validate_workflow_states, notify_workflow_st
 
 class TravelAdjustment(Document):
 	def validate(self):
-		validate_workflow_states(self)
+		# validate_workflow_states(self)
 		self.validate_travel_dates(update=True)
 		self.validate_travel_last_day()
 

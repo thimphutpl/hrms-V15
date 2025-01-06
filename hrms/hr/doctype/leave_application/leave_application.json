@@ -27,6 +27,7 @@
   "section_break_7",
   "leave_approver",
   "leave_approver_name",
+  "leave_approver_designation",
   "follow_via_email",
   "column_break_18",
   "posting_date",
@@ -257,6 +258,12 @@
    "label": "Workflow State",
    "no_copy": 1,
    "options": "Workflow State"
+  },
+  {
+   "fieldname": "leave_approver_designation",
+   "fieldtype": "Data",
+   "label": "Leave Approver Designation",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-calendar",
@@ -264,7 +271,7 @@
  "is_submittable": 1,
  "links": [],
  "max_attachments": 3,
- "modified": "2024-12-13 16:29:18.028851",
+ "modified": "2025-01-06 22:58:21.818298",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Application",

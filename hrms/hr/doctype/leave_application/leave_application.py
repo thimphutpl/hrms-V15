@@ -36,6 +36,7 @@ from hrms.hr.utils import (
 )
 from hrms.mixins.pwa_notifications import PWANotificationsMixin
 from hrms.utils import get_employee_email
+from erpnext.custom_workflow import validate_workflow_states, notify_workflow_states
 
 
 class LeaveDayBlockedError(frappe.ValidationError):
@@ -74,6 +75,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
 
 	def validate(self):
 		validate_active_employee(self.employee)
+		validate_workflow_states(self)
 		set_employee_name(self)
 		self.validate_dates()
 		self.validate_balance_leaves()
@@ -87,12 +89,15 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		if frappe.db.get_value("Leave Type", self.leave_type, "is_optional_leave"):
 			self.validate_optional_leave()
 		self.validate_applicable_after()
+		if self.workflow_state != "Approved":
+			notify_workflow_states(self)
 
 	def on_update(self):
-		if self.status == "Open" and self.docstatus < 1:
-			# notify leave approver about creation
-			if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-				self.notify_leave_approver()
+		# comment out by Jai, taken care in workflow notify
+		# if self.status == "Open" and self.docstatus < 1:
+		# 	# notify leave approver about creation
+		# 	if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
+		# 		self.notify_leave_approver()
 
 		share_doc_with_approver(self, self.leave_approver)
 		self.publish_update()
@@ -100,6 +105,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
 
 	def on_submit(self):
 		
+		notify_workflow_states(self)
 		if self.workflow_state == "Approved":
 			self.db_set("status", "Approved")
 		elif self.workflow_state == "Rejected":
@@ -111,8 +117,9 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		self.update_attendance()
 
 		# notify leave applier about approval
-		if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-			self.notify_employee()
+		# commented out by Jai, its already in workflow notify
+		# if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
+		# 	self.notify_employee()
 
 		self.create_leave_ledger_entry()
 		self.reload()
@@ -123,8 +130,8 @@ class LeaveApplication(Document, PWANotificationsMixin):
 	def on_cancel(self):
 		self.create_leave_ledger_entry(submit=False)
 		# notify leave applier about cancellation
-		if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-			self.notify_employee()
+		# if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
+		# 	self.notify_employee()
 		self.cancel_attendance()
 
 		self.publish_update()
@@ -895,7 +902,7 @@ def get_leave_details(employee, date):
 
 	return {
 		"leave_allocation": leave_allocation,
-		"leave_approver": get_leave_approver(employee),
+		# "leave_approver": get_leave_approver(employee),
 		"lwps": lwp,
 	}
 
@@ -1391,6 +1398,8 @@ def get_permission_query_conditions(user):
 		return
 	
 	return """(
+		`tabLeave Application`.owner = '{user}'
+		or
 		exists(select 1
 				from `tabEmployee`
 				where `tabEmployee`.name = `tabLeave Application`.employee

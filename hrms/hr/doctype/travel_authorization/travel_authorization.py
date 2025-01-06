@@ -16,7 +16,7 @@ from erpnext.accounts.doctype.accounts_settings.accounts_settings import get_ban
 
 class TravelAuthorization(Document):
 	def validate(self):
-		validate_workflow_states(self)
+		# validate_workflow_states(self)
 		self.validate_travel_last_day()
 		self.assign_end_date()
 		self.validate_advance()
@@ -408,6 +408,10 @@ def get_permission_query_conditions(user):
 				where `tabEmployee`.name = `tabTravel Authorization`.employee
 				and `tabEmployee`.user_id = '{user}' and `tabTravel Authorization`.docstatus != 2)
 		or
+		(`tabTravel Authorization`.approver = '{user}' and `tabTravel Authorization`.workflow_state not in ('Draft','Rejected','Cancelled'))
+	)""".format(user=user)
+
+""" 
 		exists(select 1
 				from `tabEmployee`, `tabHas Role`
 				where `tabEmployee`.user_id = `tabHas Role`.parent
@@ -415,7 +419,4 @@ def get_permission_query_conditions(user):
 				and (select region from `tabEmployee` where `tabEmployee`.name = `tabTravel Authorization`.employee limit 1) = (select region from `tabEmployee` where `tabEmployee`.user_id = '{user}' limit 1)
 				and `tabEmployee`.user_id = '{user}')
 		or
-		(`tabTravel Authorization`.supervisor = '{user}' and `tabTravel Authorization`.workflow_state not in ('Draft','Approved','Rejected','Rejected By Supervisor','Cancelled'))
-		or 
-		(`tabTravel Authorization`.supervisor_manager = '{user}' and `tabTravel Authorization`.workflow_state not in ('Draft', 'Rejected', 'Cancelled','Approved','Rejected By Supervisor'))
-	)""".format(user=user)
+		 """

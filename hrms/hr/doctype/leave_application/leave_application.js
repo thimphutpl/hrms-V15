@@ -128,7 +128,7 @@ frappe.ui.form.on("Leave Application", {
 	employee: function (frm) {
 		frm.trigger("make_dashboard");
 		frm.trigger("get_leave_balance");
-		frm.trigger("set_leave_approver");
+		// frm.trigger("set_leave_approver");
 	},
 
 	leave_approver: function (frm) {
