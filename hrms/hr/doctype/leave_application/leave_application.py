@@ -1397,6 +1397,11 @@ def get_permission_query_conditions(user):
 			and e.user_id = '{user}')
 		or
 		exists(select 1
+				from `tabEmployee`
+				where `tabEmployee`.name = `tabLeave Application`.employee
+				and `tabEmployee`.user_id = '{user}')
+		or
+		exists(select 1
 			from `tabEmployee` e, `tabAssign Branch` ab, `tabBranch Item` bi
 			where e.user_id = '{user}'
 			and ab.employee = e.name
