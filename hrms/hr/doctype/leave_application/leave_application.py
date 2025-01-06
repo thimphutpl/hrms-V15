@@ -1392,11 +1392,6 @@ def get_permission_query_conditions(user):
 	
 	return """(
 		exists(select 1
-			from `tabEmployee` as e
-			where e.name = `tabEmployee`.name
-			and e.user_id = '{user}')
-		or
-		exists(select 1
 				from `tabEmployee`
 				where `tabEmployee`.name = `tabLeave Application`.employee
 				and `tabEmployee`.user_id = '{user}')
