@@ -13,16 +13,19 @@ frappe.ui.form.on('Travel Authorization', {
 	refresh: function (frm) {
 		if (frm.doc.docstatus == 1 && !frm.doc.travel_claim) {
 			if (frm.doc.end_date_auth < frappe.datetime.get_today()) {
-				frm.add_custom_button(__("Travel Claim"), function () {
-					frm.trigger("create_travel_claim");
-					},
-					__("Create")
-				);
-				frm.add_custom_button(__("Travel Adjustment"), function () {
+				if (!frm.doc.travel_claim) {
+					frm.add_custom_button(__("Travel Claim"), function () {
+						frm.trigger("create_travel_claim");
+						},
+						__("Create")
+					);
+				}
+				if (!frm.doc.travel_adjustment) {
+					frm.add_custom_button(__("Travel Adjustment"), function () {
 						frm.trigger("create_travel_adjustment");
-					},
-					__("Create")
-				);
+						}, __("Create")
+					);
+				}
 			}
 		}
 

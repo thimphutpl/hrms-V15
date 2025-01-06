@@ -17,6 +17,7 @@ from erpnext.accounts.doctype.accounts_settings.accounts_settings import get_ban
 class TravelAuthorization(Document):
 	def validate(self):
 		validate_workflow_states(self)
+		self.validate_travel_last_day()
 		self.assign_end_date()
 		self.validate_advance()
 		self.set_travel_period()
@@ -35,6 +36,10 @@ class TravelAuthorization(Document):
 		self.post_journal_entry()
 		if self.travel_type=="Training":
 			self.update_training_records()
+
+	def validate_travel_last_day(self):
+		if len(self.get("items")) > 1:
+			self.items[-1].is_last_day = 1
 	
 	# def before_cancel(self):
 	# 	self.update_training_records(cancel=True)

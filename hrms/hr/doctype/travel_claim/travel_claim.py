@@ -31,9 +31,6 @@ class TravelClaim(Document):
 		self.update_travel_authorization()
 		self.post_journal_entry()
 
-	# def before_cancel(self):
-	# 	self.unlink_travel_authorization()
-
 	def on_cancel(self):
 		self.check_journal_entry()
 		if self.training_event:
@@ -44,10 +41,10 @@ class TravelClaim(Document):
 		existing = frappe.db.sql("""
 			select name from `tabTravel Claim` where name != '{}' and docstatus != 2 and workflow_state != 'Rejected'
 			and ta = '{}'
-		""".format(self.name, self.ta), as_dict=True)
+		""".format(self.name, self.travel_authorization), as_dict=True)
 
 		for a in existing:
-			frappe.throw("""Another {} already exists for Travel Authorization {}.""".format(frappe.get_desk_link("Travel Claim",a.name), self.ta))
+			frappe.throw("""Another {} already exists for Travel Authorization {}.""".format(frappe.get_desk_link("Travel Claim",a.name), self.travel_authorization))
 	
 	def get_dates_between(self,start_date, end_date):
 		# Convert start_date and end_date to datetime.date if they are strings
@@ -78,20 +75,6 @@ class TravelClaim(Document):
 	def check_journal_entry(self):
 		if self.claim_journal and frappe.db.exists("Journal Entry", {"name": self.claim_journal, "docstatus": ("<","2")}):
 			frappe.throw(_("You need to cancel {} first").format(frappe.get_desk_link("Journal Entry", self.claim_journal)))
-
-	def unlink_travel_authorization(self):
-		cl_status = frappe.db.get_value("Journal Entry", self.claim_journal, "docstatus")
-		if cl_status and cl_status != 2:
-			frappe.throw("You need to cancel the claim journal entry first!")
-
-		tas = frappe.db.sql("select distinct(travel_authorization) as ta from `tabTravel Claim Item` where parent = %s", str(self.name), as_dict=True)
-		for a in tas:
-			ta = frappe.get_doc("Travel Authorization", a.ta)
-			ta.db_set("travel_claim", "")
-
-		if self.ta:
-			travel_a = frappe.get_doc("Travel Authorization", self.ta)
-			travel_a.db_set("travel_claim","")
 
 	def validate_travel_last_day(self):
 		if len(self.get("items")) > 1:
@@ -279,14 +262,14 @@ class TravelClaim(Document):
 		self.db_set("claim_journal", je_references)
 
 	def update_travel_authorization(self):
-		ta = frappe.get_doc("Travel Authorization", self.ta)
+		ta = frappe.get_doc("Travel Authorization", self.travel_authorization)
 		if ta.travel_claim and ta.travel_claim != self.name:
 			frappe.throw("A travel claim <b>" + str(ta.travel_claim) + "</b> has already been created for the authorization")
 		ta.db_set("travel_claim", self.name)
 	
 	def validate_dates(self):
-		if self.ta:
-			self.ta_date = frappe.db.get_value("Travel Authorization", self.ta, "posting_date")
+		if self.travel_authorization:
+			self.ta_date = frappe.db.get_value("Travel Authorization", self.travel_authorization, "posting_date")
 		if str(self.ta_date) > str(self.posting_date):
 			frappe.throw("The Travel Claim Date cannot be earlier than Travel Authorization Date")
 

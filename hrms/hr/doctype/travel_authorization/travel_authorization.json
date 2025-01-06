@@ -61,6 +61,7 @@
   "company",
   "branch",
   "travel_claim",
+  "travel_adjustment",
   "amended_from"
  ],
  "fields": [
@@ -359,6 +360,7 @@
    "read_only": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "end_date_auth",
    "fieldtype": "Date",
    "hidden": 1,
@@ -403,11 +405,19 @@
    "fieldtype": "Data",
    "label": "Journal Entry",
    "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "travel_adjustment",
+   "fieldtype": "Data",
+   "label": "Travel Adjustment",
+   "no_copy": 1,
+   "read_only": 1
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-03 16:45:23.115266",
+ "modified": "2025-01-06 13:50:57.011744",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",
