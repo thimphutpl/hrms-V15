@@ -1398,17 +1398,20 @@ def get_permission_query_conditions(user):
 		return
 	
 	return """(
-		`tabLeave Application`.owner = '{user}'
+		owner = '{user}'
 		or
-		exists(select 1
-				from `tabEmployee`
-				where `tabEmployee`.name = `tabLeave Application`.employee
-				and `tabEmployee`.user_id = '{user}')
+		name in (select la.name
+				from `tabEmployee` e, `tabLeave Application` la
+				where e.name = la.employee
+				and e.user_id = '{user}')
 		or
-		exists(select 1
-			from `tabEmployee` e, `tabAssign Branch` ab, `tabBranch Item` bi
-			where e.user_id = '{user}'
-			and ab.employee = e.name
-			and bi.parent = ab.name
-			and bi.branch = e.branch)
+		(leave_approver = '{user}' and workflow_state not in ('Draft','Rejected','Cancelled'))
 	)""".format(user=user)
+	
+	""" 
+		or
+		employee in (select e.name
+				from `tabEmployee` e, `tabLeave Application` la
+				where e.name = la.employee
+				and e.user_id = '{user}')
+	 """
