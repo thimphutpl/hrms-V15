@@ -3,6 +3,10 @@
 
 cur_frm.add_fetch("employee", "branch", "branch");
 frappe.ui.form.on('Travel Claim', {
+	onload: function (frm) {
+		let grid = frm.fields_dict['items'].grid;
+        grid.cannot_add_rows = true;
+	},
 	
 	refresh: function (frm) {
 		if (frm.doc.docstatus == 1) {
