@@ -140,6 +140,19 @@ def get_conditions(filters):
 	elif filters.get("process_status") == "Cancelled":
 			conditions += " and docstatus = 2"
 
+	user = ''
+	if not user: user = frappe.session.user
+	user_roles = frappe.get_roles(user)
+	if "HR Support" in user_roles and "HR User" not in user_roles and "HR Manager" not in user_roles:
+		conditions += " and branch in ( \
+					select bi.branch \
+					from `tabSalary Slip` a, `tabAssign Branch` ab, `tabBranch Item` bi \
+					where ab.user = '{user}' \
+					and ab.employee = a.employee \
+					and bi.parent = ab.name \
+				)".format(user=user)
+	elif "HR User" not in user_roles and "HR Manager" not in user_roles:
+		conditions += " and employee = (select name from tabEmployee where user_id='{user}')".format(user=user)
 	
 	return conditions, filters
 	
