@@ -647,9 +647,9 @@ def get_permission_query_conditions(user):
 		return
 	else:
 		return """(
-			exists(select 1
-				from `tabEmployee` as e
-				where e.name = `tabSalary Structure`.employee
+			employee in (select e.name
+				from `tabEmployee` as e, `tabSalary Structure` s
+				where e.name = s.employee
 				and e.user_id = '{user}')
 		)""".format(user=user)
 

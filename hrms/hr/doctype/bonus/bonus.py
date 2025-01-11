@@ -17,8 +17,8 @@ class Bonus(Document):
 		cc_amount = {}
 		for a in self.items:
 			tax = get_salary_tax(a.amount)
-			cost_center, ba = frappe.db.get_value("Employee", a.employee, ["cost_center", "business_activity"])
-			cc = str(str(cost_center) + ":" + str(ba))
+			cost_center = frappe.db.get_value("Employee", a.employee, ["cost_center"])
+			cc = str(cost_center)
 			if cc in cc_amount:
 				cc_amount[cc]['amount'] = cc_amount[cc]['amount'] + a.amount
 				cc_amount[cc]['tax'] = cc_amount[cc]['tax'] + a.tax_amount

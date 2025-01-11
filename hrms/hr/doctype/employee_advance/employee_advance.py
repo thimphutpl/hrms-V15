@@ -523,7 +523,7 @@ class EmployeeAdvance(Document):
 		eas.advance_account = self.advance_account
 		eas.cost_center = self.cost_center
 		eas.advance_amount = self.advance_amount
-		eas.business_activity = "Common"
+		# eas.business_activity = "Common"
 		eas.salary_component = self.salary_component
 		eas.salary_structure = self.salary_structure
 
@@ -624,7 +624,7 @@ def make_return_entry(
 			"party": employee,
 			"is_advance": "Yes",
 			"cost_center": erpnext.get_default_cost_center(company),
-			"business_activity": "Common"
+			# "business_activity": "Common"
 		},
 	)
 

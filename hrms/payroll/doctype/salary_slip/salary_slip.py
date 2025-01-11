@@ -154,7 +154,7 @@ class SalarySlip(TransactionBase):
 		self.employment_type    = emp.employment_type
 		self.employee_group     = emp.employee_group
 		self.employee_grade     = emp.grade
-		self.business_activity  = emp.business_activity
+		# self.business_activity  = emp.business_activity
 			
 	def get_leave_details(self, joining_date=None, relieving_date=None, ss_doc=None, lwp=None):
 		days_in_month= 0
@@ -538,11 +538,28 @@ def get_permission_query_conditions(user):
 
 	if "HR User" in user_roles or "HR Manager" in user_roles:
 		return
+	if "HR Support" in user_roles:
+		return """(
+			employee in (select s.employee
+				from `tabEmployee` as e, `tabSalary Slip` as s
+				where e.name = s.employee
+				and e.user_id = '{user}')
+			or
+			name in (select e.name
+				from `tabSalary Slip` e
+				where e.branch in (
+					select bi.branch
+					from `tabSalary Slip` a, `tabAssign Branch` ab, `tabBranch Item` bi
+					where ab.user = '{user}'
+					and ab.employee = a.employee
+					and bi.parent = ab.name
+				))
+		)""".format(user=user)
 	else:
 		return """(
-			exists(select 1
-				from `tabEmployee` as e
-				where e.name = `tabSalary Slip`.employee
+			employee in (select s.employee
+				from `tabEmployee` as e, `tabSalary Slip` as s
+				where e.name = s.employee
 				and e.user_id = '{user}')
 		)""".format(user=user)
 

@@ -11,7 +11,17 @@ class PromotionApplication(Document):
 		pass
 
 	def on_submit(self):
-		pass
+		# pass
+		# Check if the employee is a supervisor
+		emp_doc = frappe.get_doc("Employee", self.employee)
+		if not emp_doc.reports_to:
+			frappe.throw(("This employee is not a supervisor and cannot forward the promotion application."))
+
+		supervisor_role = frappe.get_value("Employee", emp_doc.reports_to, "supervisor")
+		if frappe.session.user != supervisor_role:
+			frappe.throw(("Only the supervisor can forward the promotion application."))
+
+
 	
 	@frappe.whitelist()
 	def get_promotion_detail(self):
@@ -19,6 +29,7 @@ class PromotionApplication(Document):
 		last_date=frappe.db.sql("select promotion_date from `tabEmployee Promotion` where employee = '{}' order by promotion_date desc limit 1".format(self.employee), as_dict=True)
 		emp_doc = frappe.get_doc("Employee", self.employee)
 
+		# self.supervisor=frappe.get_value("Employee",emp_doc.reports_to, "user_id")
 		self.supervisor=frappe.get_value("Employee",emp_doc.reports_to, "user_id")
 		if not emp_doc.division:
 			frappe.throw("Please assign division to the employee")
@@ -64,4 +75,15 @@ class PromotionApplication(Document):
 						"fiscal_year": row.pms_calendar,
 						"rating": row.final_score,
 					})
+
+
+@frappe.whitelist()
+def validate_action(self, action):
+	current_user = frappe.session.user
+
+	if action in ["Forward", "Reject"] and self.employee == current_user:
+		frappe.throw(("You are not allowed to {0} your own promotion application. Only your supervisor can perform this action.").format(action))
+
+
+
 

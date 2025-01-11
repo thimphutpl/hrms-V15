@@ -181,6 +181,7 @@ class PromotionEntry(Document):
 		emp = frappe.get_doc("Employee", employee)
 		current_increment = frappe.db.get_value("Employee Grade", emp.grade, "increment_value")
 		new_grade = frappe.db.get_value("Employee Grade", emp.grade, "promotion_grade")
+		#frappe.throw(str(emp))
 		years_to_add = flt(frappe.db.get_value("Employee Grade", new_grade, "noof_years_for_next_promotion"))
 		old_promo_date = emp.promotion_due_date
 		new_promot_date = add_to_date(old_promo_date, years=years_to_add)

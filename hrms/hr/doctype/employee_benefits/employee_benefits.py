@@ -223,7 +223,7 @@ class EmployeeBenefits(Document):
 				"debit": flt(a.amount),
 				"party_type": party_type,
 				"party": party,
-				"business_activity": emp.business_activity,
+				# "business_activity": emp.business_activity,
 			})
 
 			if flt(a.tax_amount > 0):
@@ -237,7 +237,7 @@ class EmployeeBenefits(Document):
 					"reference_type": "Employee Benefits",
 					"reference_name": self.name,
 					"cost_center": self.cost_center,
-					"business_activity": emp.business_activity,
+					# "business_activity": emp.business_activity,
 				})
 				tax_amount += flt(a.tax_amount)
 
@@ -260,7 +260,7 @@ class EmployeeBenefits(Document):
 				"party_type": party_type,
 				"party": party,
 				"cost_center": self.cost_center,
-				"business_activity": emp.business_activity,
+				# "business_activity": emp.business_activity,
 				"reference_type": "Employee Benefits",
 				"reference_name": self.name,
 			})
@@ -274,7 +274,7 @@ class EmployeeBenefits(Document):
 				"cost_center": self.cost_center,
 				"credit_in_account_currency": flt(total_amount),
 				"credit": flt(total_amount),
-				"business_activity": emp.business_activity,
+				# "business_activity": emp.business_activity,
 				"party_type": "Employee",
 				"party": self.employee,
 			})
@@ -298,7 +298,7 @@ class EmployeeBenefits(Document):
 				"cost_center": self.cost_center,
 				"debit_in_account_currency": flt(total_amount),
 				"debit": flt(total_amount),
-				"business_activity": emp.business_activity,
+				# "business_activity": emp.business_activity,
 				"party_type": "Employee",
 				"party": self.employee,
 			})
@@ -310,7 +310,7 @@ class EmployeeBenefits(Document):
 				"reference_name": self.name,
 				"credit_in_account_currency": flt(total_amount),
 				"credit": flt(total_amount),
-				"business_activity": emp.business_activity,
+				# "business_activity": emp.business_activity,
 			})
 			jeb.insert()
 

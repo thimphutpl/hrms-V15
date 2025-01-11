@@ -3,7 +3,6 @@
 
 frappe.ui.form.on("Promotion Application", {
 	refresh: function(frm) {
-		
 
 	},
 	employee: function(frm){

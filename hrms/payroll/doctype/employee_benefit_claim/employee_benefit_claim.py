@@ -147,7 +147,7 @@ class EmployeeBenefitClaim(Document):
 				"party_type": party_type,
 				"party": party,
 				"cost_center": emp.cost_center,
-				"business_activity": emp.business_activity,
+				# "business_activity": emp.business_activity,
 				"reference_type": "Employee Benefit Claim",
 				"reference_name": self.name,
 			})
@@ -158,7 +158,7 @@ class EmployeeBenefitClaim(Document):
 					"credit_in_account_currency": flt(a.tax_amount,2),
 					"credit": flt(a.tax_amount,2),
 					"cost_center": emp.cost_center,
-					"business_activity": emp.business_activity,
+					# "business_activity": emp.business_activity,
 					"reference_type": "Employee Benefit Claim",
 					"reference_name": self.name,
 				})
@@ -181,7 +181,7 @@ class EmployeeBenefitClaim(Document):
 				"party_type": party_type,
 				"party": party,
 				"cost_center": emp.cost_center,
-				"business_activity": emp.business_activity,
+				# "business_activity": emp.business_activity,
 				"reference_type": "Employee Benefit Claim",
 				"reference_name": self.name,
 			})
@@ -192,7 +192,7 @@ class EmployeeBenefitClaim(Document):
 			"credit_in_account_currency" if flt(self.net_amount,2) > 0 else "debit_in_account_currency": abs(flt(self.net_amount,2)),
 			"credit" if flt(self.net_amount) > 0 else "debit": abs(flt(self.net_amount,2)),
 			"cost_center": emp.cost_center,
-			"business_activity": emp.business_activity,
+			# "business_activity": emp.business_activity,
 			"reference_type": "Employee Benefit Claim",
 			"reference_name": self.name,
 		})

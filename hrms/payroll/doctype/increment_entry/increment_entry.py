@@ -10,7 +10,7 @@ from frappe.utils import cint, flt, nowdate, add_days, add_years, getdate, fmt_m
 from frappe import _
 from erpnext.accounts.utils import get_fiscal_year
 from erpnext.setup.doctype.employee.employee import get_holiday_list_for_employee
-from erpnext.accounts.doctype.business_activity.business_activity import get_default_ba
+# from erpnext.accounts.doctype.business_activity.business_activity import get_default_ba
 import calendar
 import datetime
 
