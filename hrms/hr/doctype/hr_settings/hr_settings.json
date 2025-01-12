@@ -608,6 +608,8 @@
    "fieldtype": "Column Break"
   },
   {
+   "collapsible": 1,
+   "description": "It is in Stock Settings",
    "fieldname": "section_break_56",
    "fieldtype": "Section Break",
    "label": "Material Request Settings"
@@ -1203,7 +1205,7 @@
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-01-13 00:13:16.590959",
+ "modified": "2025-01-13 00:18:59.234076",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",
