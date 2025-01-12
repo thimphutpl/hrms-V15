@@ -117,8 +117,10 @@
   "repair_and_services_status_notification_template",
   "budget_reappropiation_settings_section",
   "budget_reappropiation_approval_notification_template",
+  "supplementary_budget_approval_notification",
   "column_break_90",
   "budget_reappropiation_status_notification_template",
+  "supplementary_budget_status_notification",
   "vehicle_request_settings_section",
   "vehicle_request_approval_notification_template",
   "column_break_94",
@@ -168,7 +170,6 @@
   "review_approval_notification_template",
   "evaluation_approval_notification_template",
   "pms_appeal_approval_notification_template",
-  "housing_clearance_approver_notification",
   "sws_setting_tab",
   "semso_deduction_from_salary_section",
   "semso",
@@ -637,6 +638,7 @@
    "label": "Asset Movement Settings"
   },
   {
+   "collapsible": 1,
    "fieldname": "repair_and_services_settings_section",
    "fieldtype": "Section Break",
    "label": "Repair and Services Settings"
@@ -660,7 +662,7 @@
   {
    "fieldname": "budget_reappropiation_settings_section",
    "fieldtype": "Section Break",
-   "label": "Budget Reappropiation Settings"
+   "label": "Budget Notification Settings"
   },
   {
    "fieldname": "budget_reappropiation_approval_notification_template",
@@ -679,6 +681,7 @@
    "options": "Email Template"
   },
   {
+   "collapsible": 1,
    "fieldname": "vehicle_request_settings_section",
    "fieldtype": "Section Break",
    "label": "Vehicle Request Settings"
@@ -991,12 +994,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "housing_clearance_approver_notification",
-   "fieldtype": "Link",
-   "label": "Housing Clearance Approver Notification",
-   "options": "Email Template"
-  },
-  {
    "fieldname": "sign_and_seal_section",
    "fieldtype": "Section Break",
    "label": "Sign and Seal"
@@ -1188,13 +1185,25 @@
   {
    "fieldname": "column_break_wrte",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "supplementary_budget_approval_notification",
+   "fieldtype": "Link",
+   "label": "Supplementary Budget Approval Notification",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "supplementary_budget_status_notification",
+   "fieldtype": "Link",
+   "label": "Supplementary Budget Status Notification",
+   "options": "Email Template"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-12-30 17:43:24.783390",
+ "modified": "2025-01-13 00:13:16.590959",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",
