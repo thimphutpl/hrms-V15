@@ -133,7 +133,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Month",
-   "options": "January\nJuly",
+   "options": "\nJanuary\nFebruary\nMarch\nApril\nMarch\nApril\nMay\nJune\nJuly\nAugust\nSeptember\nOctober\nNovember\nDecember",
    "reqd": 1
   },
   {
@@ -296,7 +296,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-23 09:58:56.075674",
+ "modified": "2025-01-09 16:36:28.973092",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Salary Increment",

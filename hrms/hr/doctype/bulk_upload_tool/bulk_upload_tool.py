@@ -83,18 +83,27 @@ class BulkUploadTool(Document):
 				# 	date_str = f"{year}-{month_str}-{day}" 
 
 				if self.upload_type == "Overtime":
+					
 					rate_per_day, rate_per_hour, rate_per_hour_normal = 0, 0, 0	
-											
+					#frappe.throw("pl")						
 															
-
-					for day_idx in range(1, (len(row) - 7) // 2 + 1):
-						#day = str(day_idx).zfill(2)
-						rh_hours = flt(row[7 + (day_idx - 1) * 2])
-						sh_hours = flt(row[7 + (day_idx - 1) * 2 + 1])
-
-						if sh_hours == 0 and rh_hours == 0:
+					for day_idx, day_value in enumerate(row[7:], start=1):
+						if not str(day_value).strip():
 							continue
-						day = str(day_idx).zfill(2)
+						
+						rh_hours = flt(day_value)
+
+						if rh_hours <= 0:
+							continue
+					# for day_idx in range(1, (len(row) - 7) // 2 + 1):
+					# 	#day = str(day_idx).zfill(2)
+					# 	rh_hours = flt(row[7 + (day_idx - 1) * 2])
+					# 	sh_hours = flt(row[7 + (day_idx - 1) * 2 + 1])
+
+					# 	if sh_hours == 0 and rh_hours == 0:
+					# 		continue
+						#day = str(day_idx).zfill(2)
+						day = str(day_idx) if day_idx > 9 else "0" + str(day_idx)
 						month_number = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].index(month) + 1
 						date_str = f"{year}-{str(month_number).zfill(2)}-{day}"
 
@@ -107,12 +116,15 @@ class BulkUploadTool(Document):
 						#sh_hours = flt(row[8]) if len(row) > 8 else 0
 						old = frappe.db.get_value("Muster Roll Overtime Entry", {"mr_employee": str(row[3]).strip('\''), "date": date_str, "docstatus": 1}, ["docstatus", "name", "number_of_hours_regular"], as_dict=1)
 						if old:
+							#frappe.throw("hi123")
 							doc = frappe.get_doc("Muster Roll Overtime Entry", old.name)
 							doc.db_set('number_of_hours_regular', rh_hours)
-							doc.db_set('number_of_hours_special', sh_hours)
+							#doc.db_set('number_of_hours_special', sh_hours)
 							#doc.db_set('number_of_hours_regular', flt(day_value))
 						#if not old and flt(day_value) > 0:
-						elif rh_hours > 0 or sh_hours > 0:
+						#elif rh_hours > 0 :
+						else:
+							#frappe.throw("plham")
 							doc = frappe.new_doc("Muster Roll Overtime Entry")
 							doc.branch = row[0]
 							doc.cost_center = row[1]
@@ -122,7 +134,7 @@ class BulkUploadTool(Document):
 							doc.date = date_str
 							#doc.number_of_hours_regular = flt(day_value)
 							doc.number_of_hours_regular=rh_hours
-							doc.number_of_hours_special=sh_hours
+							#doc.number_of_hours_special=sh_hours
 							doc.rate_per_day=rate_per_day
 							doc.rate_per_hour=rate_per_hour
 							doc.rate_per_hour_normal=rate_per_hour_normal
@@ -132,10 +144,16 @@ class BulkUploadTool(Document):
 								doc.submit()
 					successful += 1
 				else:
+					
+					
 					for day_idx, day_value in enumerate(row[7:], start=1):
-						if not str(day_value).strip():
-							continue
+						
 
+						if not str(day_value).strip():
+							
+							continue
+						
+                        
 						day = str(day_idx) if day_idx > 9 else "0" + str(day_idx)
 						month_number = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].index(row[6]) + 1
 						month_str = str(month_number).zfill(2)
@@ -144,7 +162,7 @@ class BulkUploadTool(Document):
 						date_str = f"{year}-{month_str}-{day}"
 						#frappe.throw(employee)
 						pay_details = get_pay_details(employee,year,month_str)
-						#frappe.throw(str(pay_details))
+						# frappe.throw(str(pay_details))
 						if not pay_details:
 							frappe.throw("Wage Details is not defined")
 						status = ''
@@ -159,6 +177,7 @@ class BulkUploadTool(Document):
 							status = ''
 
 						old = frappe.db.get_value("Muster Roll Attendance", {"mr_employee": str(row[3]).strip('\''), "date": date_str, "docstatus": 1}, ["status", "name"], as_dict=1)
+						#frappe.throw("kkk1")
 						if old:
 							#frappe.throw("kkk")
 							doc = frappe.get_doc("Muster Roll Attendance", old.name)
@@ -167,6 +186,7 @@ class BulkUploadTool(Document):
 							doc.db_set('cost_center', row[1])
 							doc.db_set('unit', row[2])
 						if not old and status in ('Present', 'Absent','Half Day'):
+							
 							#frappe.throw(str(row[3]).strip('\''))
 							doc = frappe.new_doc("Muster Roll Attendance")
 							doc.status = status
@@ -204,10 +224,11 @@ class BulkUploadTool(Document):
 			show_progress = 1
 
 		if show_progress:
-			description = " Processing OT Of {}({}): ".format(frappe.bold(str(row[4]).strip('\'')), frappe.bold(row[3])) + "[" + str(count) + "/" + str(total_count) + "]"
-			frappe.publish_progress(count * 100 / total_count,
-									title=_("Posting Overtime Entry..."),
-									description=description)
+			pass
+			# description = " Processing OT Of {}({}): ".format(frappe.bold(str(row[4]).strip('\'')), frappe.bold(row[3])) + "[" + str(count) + "/" + str(total_count) + "]"
+			# frappe.publish_progress(count * 100 / total_count,
+			# 						title=_("Posting Overtime Entry..."),
+			# 						description=description)
 			pass
 		return {"messages": ret, "error": error}
 
@@ -268,7 +289,7 @@ def download_template(file_type, branch, month, fiscal_year, upload_type, unit):
 			row.append(d.month)
 			attendance_query = """        SELECT mr_employee, branch,
                DAY(date) AS day_of_date,
-               SUM(IFNULL(number_of_hours, 0)) AS number_of_hours,
+               SUM(IFNULL(number_of_hours_regular, 0)) AS number_of_hours_regular,
                SUM(IFNULL(number_of_hours_special, 0)) AS number_of_hours_special
                FROM `tabMuster Roll Overtime Entry` WHERE branch = %s AND mr_employee = %s AND date BETWEEN %s AND %s
 			   group by mr_employee, day_of_date
@@ -435,8 +456,8 @@ def get_template_overtime(branch, month, fiscal_year):
         
 		#elif doctype == "Muster Roll Overtime Entry":
        
-			fields.append(f"{day + 1}_RH")
-			fields.append(f"{day + 1}_SH")
+			fields.append(f"{day + 1} ")
+			#fields.append(f"{day + 1}_SH")
 		
 		
 	writer = UnicodeWriter()

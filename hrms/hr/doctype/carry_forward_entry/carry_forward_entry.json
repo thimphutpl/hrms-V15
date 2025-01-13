@@ -6,13 +6,13 @@
  "engine": "InnoDB",
  "field_order": [
   "company",
-  "leave_type",
-  "employee_type",
-  "employee",
+  "employment_type",
   "column_break_vjkv",
   "branch",
+  "leave_type",
   "column_break_frxo",
   "fiscal_year",
+  "employee",
   "section_for_new_inputs_section",
   "job_type",
   "column_break_fzvm",
@@ -34,13 +34,8 @@
    "fieldname": "leave_type",
    "fieldtype": "Link",
    "label": "Leave Type",
-   "options": "Leave Type"
-  },
-  {
-   "fieldname": "employee_type",
-   "fieldtype": "Link",
-   "label": "Employee Type",
-   "options": "Employment Type"
+   "options": "Leave Type",
+   "reqd": 1
   },
   {
    "fieldname": "employee",
@@ -65,8 +60,10 @@
   {
    "fieldname": "fiscal_year",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Fiscal Year",
-   "options": "Fiscal Year"
+   "options": "Fiscal Year",
+   "reqd": 1
   },
   {
    "fieldname": "section_for_new_inputs_section",
@@ -111,11 +108,17 @@
    "fieldtype": "Table",
    "label": "Leave Details",
    "options": "Carry Forward Item"
+  },
+  {
+   "fieldname": "employment_type",
+   "fieldtype": "Link",
+   "label": "Employee Type",
+   "options": "Employment Type"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-13 14:33:16.603090",
+ "modified": "2025-01-08 17:16:13.229584",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Carry Forward Entry",

@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "OT.YYYY.MM.#####",
  "creation": "2024-12-24 17:02:26.092466",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -74,11 +75,13 @@
   }
  ],
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2024-12-24 17:06:21.665636",
+ "modified": "2024-12-27 15:00:20.755018",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Overtime Entry",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {

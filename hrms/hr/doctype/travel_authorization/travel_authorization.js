@@ -28,8 +28,20 @@ frappe.ui.form.on('Travel Authorization', {
 			{ fieldname: 'till_date', columns: 2 },
 		];
 	},
-
 	refresh: function (frm) {
+		if (frm.doc.docstatus === 0 && frm.doc.workflow_state == 'Draft' && !frm.doc.__islocal && cint(frm.doc.need_advance) == 1 && !frm.doc.advance_journal)  {
+			cur_frm.add_custom_button('Request Advance', function() {
+				return frappe.call({
+					method: "make_advance_payment",
+					doc:frm.doc,
+					callback: function(r) {
+						var doclist = frappe.model.sync(r.message);
+						frappe.set_route("Form", doclist[0].doctype, doclist[0].name);
+					}
+				});
+			});
+			// cur_frm.page.set_inner_btn_group_as_primary(__('Create'));
+		}
 		frm.set_query('reference_type', () => {
 			return {
 				filters: {

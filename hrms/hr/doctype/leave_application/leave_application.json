@@ -27,10 +27,12 @@
   "section_break_7",
   "leave_approver",
   "leave_approver_name",
+  "leave_approver_designation",
   "follow_via_email",
   "column_break_18",
   "posting_date",
   "status",
+  "branch",
   "sb_other_details",
   "salary_slip",
   "color",
@@ -157,9 +159,11 @@
    "fieldname": "leave_approver",
    "fieldtype": "Link",
    "label": "Leave Approver",
-   "options": "User"
+   "options": "User",
+   "read_only": 1
   },
   {
+   "fetch_from": "employee.second_approver_name",
    "fieldname": "leave_approver_name",
    "fieldtype": "Data",
    "label": "Leave Approver Name",
@@ -247,7 +251,22 @@
    "collapsible": 1,
    "fieldname": "sb_other_details",
    "fieldtype": "Section Break",
+   "hidden": 1,
    "label": "Other Details"
+  },
+  {
+   "fetch_from": "employee.branch",
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch",
+   "read_only": 1
+  },
+  {
+   "fieldname": "leave_approver_designation",
+   "fieldtype": "Data",
+   "label": "Leave Approver Designation",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-calendar",
@@ -255,7 +274,7 @@
  "is_submittable": 1,
  "links": [],
  "max_attachments": 3,
- "modified": "2024-04-08 13:56:03.818019",
+ "modified": "2025-01-08 14:59:54.638239",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Application",
@@ -283,7 +302,6 @@
    "read": 1,
    "report": 1,
    "role": "HR Manager",
-   "set_user_permissions": 1,
    "share": 1,
    "submit": 1,
    "write": 1
@@ -303,7 +321,6 @@
    "read": 1,
    "report": 1,
    "role": "HR User",
-   "set_user_permissions": 1,
    "share": 1,
    "submit": 1,
    "write": 1

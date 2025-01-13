@@ -6,12 +6,11 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "workflow_state",
   "branch",
+  "workflow_state",
   "cost_center",
   "column_break_2",
   "posting_date",
-  "purpose",
   "section_break_4",
   "employee",
   "department",
@@ -21,20 +20,23 @@
   "designation",
   "grade",
   "section_break_8",
+  "purpose",
   "separation_date",
   "reason_for_resignation",
   "column_break_10",
+  "separation_reference",
   "description",
   "section_break_12",
   "items",
-  "deduction_details_section",
-  "deduction_details",
   "section_break_14",
   "journal",
+  "amended_from",
   "column_break_23",
   "total_amount",
   "total_deducted_amount",
   "net_amount",
+  "deduction_details_section",
+  "deduction_details",
   "section_break_24",
   "carraige_charges_doc",
   "column_break_26",
@@ -49,8 +51,7 @@
   "employee_separation_id",
   "employee_transfer_id",
   "column_break_32",
-  "company",
-  "amended_from"
+  "company"
  ],
  "fields": [
   {
@@ -93,16 +94,16 @@
    "reqd": 1
   },
   {
-   "fetch_from": "employee.department",
    "fieldname": "department",
    "fieldtype": "Read Only",
-   "label": "Department"
+   "label": "Department",
+   "options": "employee.department"
   },
   {
-   "fetch_from": "employee.division",
    "fieldname": "division",
    "fieldtype": "Read Only",
-   "label": "Division"
+   "label": "Division",
+   "options": "employee.division"
   },
   {
    "fieldname": "column_break_4",
@@ -113,19 +114,20 @@
    "fieldname": "employee_name",
    "fieldtype": "Read Only",
    "label": "Employee Name",
+   "options": "employee.employee_name",
    "reqd": 1
   },
   {
-   "fetch_from": "employee.designation",
    "fieldname": "designation",
    "fieldtype": "Read Only",
-   "label": "Designation"
+   "label": "Designation",
+   "options": "employee.designation"
   },
   {
-   "fetch_from": "employee.grade",
    "fieldname": "grade",
    "fieldtype": "Read Only",
-   "label": "Grade"
+   "label": "Grade",
+   "options": "employee.employee_subgroup"
   },
   {
    "fieldname": "section_break_8",
@@ -136,19 +138,19 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Purpose",
-   "options": "\nTransfer\nSeparation\nOthers",
+   "options": "\nSeparation",
    "reqd": 1
   },
   {
    "fieldname": "separation_date",
    "fieldtype": "Date",
-   "label": "Separation/Transfer Date",
-   "reqd": 1
+   "label": "Separation/Transfer Date"
   },
   {
    "depends_on": "eval:doc.purpose == \"Separation\"",
    "fieldname": "reason_for_resignation",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Reason for Seperation",
    "options": "\nVoluntary Resignation\nSuperannuation Age\nLay-off or Compulsory Retirement\nEarly Retirement Scheme\nTermination without Benefits\nDeath\nEnd of Deputation\nProbation not completed successfully\nEnd of Contract"
   },
@@ -177,6 +179,7 @@
    "fieldtype": "Section Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "journal",
    "fieldtype": "Read Only",
    "label": "Journal Entry"
@@ -188,6 +191,7 @@
   {
    "fieldname": "total_amount",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Total Amount",
    "precision": "2",
    "read_only": 1
@@ -206,12 +210,12 @@
    "fieldtype": "Link",
    "label": "Company",
    "options": "Company",
-   "read_only": 1,
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fieldname": "section_break_24",
    "fieldtype": "Section Break",
+   "hidden": 1,
    "label": "SUPPORTING DOCUMENTS"
   },
   {
@@ -231,6 +235,7 @@
   {
    "fieldname": "section_break_29",
    "fieldtype": "Section Break",
+   "hidden": 1,
    "label": "APPROVER DETAILS"
   },
   {
@@ -253,6 +258,7 @@
   {
    "fieldname": "sb_reference",
    "fieldtype": "Section Break",
+   "hidden": 1,
    "label": "Reference"
   },
   {
@@ -278,6 +284,7 @@
   {
    "fieldname": "net_amount",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Net Amount",
    "precision": "2",
    "read_only": 1
@@ -285,6 +292,7 @@
   {
    "fieldname": "deduction_details_section",
    "fieldtype": "Section Break",
+   "hidden": 1,
    "label": "Deduction Details"
   },
   {
@@ -296,6 +304,7 @@
   {
    "fieldname": "total_deducted_amount",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Total Deducted Amount",
    "precision": "2",
    "read_only": 1
@@ -312,14 +321,20 @@
    "fetch_from": "branch.cost_center",
    "fieldname": "cost_center",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Cost Center",
    "options": "Cost Center",
    "read_only": 1
+  },
+  {
+   "fieldname": "separation_reference",
+   "fieldtype": "Data",
+   "label": "Separation Reference"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-02 11:30:21.459337",
+ "modified": "2025-01-07 17:03:01.076004",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Benefits",

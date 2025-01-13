@@ -10,6 +10,7 @@
   "employee",
   "emp_name",
   "date_of_joining",
+  "grade",
   "column_break_3",
   "company",
   "transfer_type",
@@ -45,9 +46,13 @@
   "sb_reports_to",
   "old_reports_to",
   "current_supervisor_name",
+  "current_approver",
+  "current_approver_name",
   "column_break_9",
   "new_reports_to",
   "new_supervisor_name",
+  "new_approver",
+  "new_approver_name",
   "sb_additional_information",
   "reallocate_leaves",
   "create_new_employee_id",
@@ -386,12 +391,45 @@
    "label": "Employee Benefit Status",
    "options": "Not Claimed\nClaimed",
    "read_only": 1
+  },
+  {
+   "fetch_from": "employee.employee_subgroup",
+   "fieldname": "grade",
+   "fieldtype": "Link",
+   "label": "Grade",
+   "options": "Employee Grade"
+  },
+  {
+   "fetch_from": "employee.second_approver",
+   "fieldname": "current_approver",
+   "fieldtype": "Link",
+   "label": "Current Approver",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "current_approver.employee_name",
+   "fieldname": "current_approver_name",
+   "fieldtype": "Data",
+   "label": "Current Approver Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "new_approver",
+   "fieldtype": "Link",
+   "label": "New Approver",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "new_approver.employee_name",
+   "fieldname": "new_approver_name",
+   "fieldtype": "Data",
+   "label": "New Approver Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-03 15:03:11.151735",
+ "modified": "2025-01-13 15:40:31.387014",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Transfer",
@@ -424,14 +462,14 @@
    "write": 1
   },
   {
+   "cancel": 1,
    "create": 1,
-   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "Employee",
+   "role": "HR Manager",
    "share": 1,
    "submit": 1,
    "write": 1

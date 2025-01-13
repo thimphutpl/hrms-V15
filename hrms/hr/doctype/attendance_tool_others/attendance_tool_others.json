@@ -29,7 +29,7 @@
    "fieldname": "employee_type",
    "fieldtype": "Select",
    "label": "Employee Type",
-   "options": "\nMuster Roll Employee\nOperator\nOpen Air Prisoner\nDFG"
+   "options": "\nMuster Roll Employee\nOperator\nOpen Air Prisoner\nDFG\nGFG"
   },
   {
    "fieldname": "column_break_qnzy",
@@ -93,7 +93,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-12-24 10:36:06.319860",
+ "modified": "2025-01-09 12:34:19.564939",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Attendance Tool Others",

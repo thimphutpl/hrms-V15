@@ -59,20 +59,22 @@
   "hrgm",
   "hr_approver",
   "hr_verifier",
+  "approver",
   "cb_01",
   "hrgm_name",
   "hr_approver_name",
   "hr_verifier_name",
+  "approver_name",
   "separation_clearance_approver_section",
-  "afd",
-  "icthr",
-  "iad",
-  "pc",
+  "fa_approver",
+  "hr_approvers",
+  "erp_approver",
+  "aa_approver",
   "column_break_60",
-  "approver_name_afd",
-  "approver_name_ama",
-  "approver_name_icthr",
-  "approver_name_iad",
+  "fa_name",
+  "hr_approver_names",
+  "erp_name",
+  "aa_name",
   "tb_notifications",
   "sb_encashment_settings",
   "encashment_approval_notification_template",
@@ -809,45 +811,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "icthr",
-   "fieldtype": "Link",
-   "label": "HR Approver",
-   "options": "Employee"
-  },
-  {
-   "fieldname": "iad",
-   "fieldtype": "Link",
-   "label": "ERP Approver",
-   "options": "Employee"
-  },
-  {
-   "fetch_from": "icthr.employee_name",
-   "fieldname": "approver_name_icthr",
-   "fieldtype": "Data",
-   "label": "Approver Name (ERP)",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "iad.employee_name",
-   "fieldname": "approver_name_iad",
-   "fieldtype": "Data",
-   "label": "Approver Name (ADM Section)",
-   "read_only": 1
-  },
-  {
-   "fieldname": "afd",
-   "fieldtype": "Link",
-   "label": "Finance Approver",
-   "options": "Employee"
-  },
-  {
-   "fetch_from": "afd.employee_name",
-   "fieldname": "approver_name_afd",
-   "fieldtype": "Data",
-   "label": "Approver Name (Finance Section)",
-   "read_only": 1
-  },
-  {
    "fieldname": "imprest_notification_settings_section",
    "fieldtype": "Section Break",
    "label": "Imprest Notification Settings"
@@ -1107,19 +1070,6 @@
    "label": "HR Verifier Name"
   },
   {
-   "fieldname": "pc",
-   "fieldtype": "Link",
-   "label": "ADM Approver",
-   "options": "Employee"
-  },
-  {
-   "fetch_from": "icthr.employee_name",
-   "fieldname": "approver_name_ama",
-   "fieldtype": "Data",
-   "label": "Approver Name (HR Section)",
-   "read_only": 1
-  },
-  {
    "default": "0",
    "description": "For PBVA",
    "fieldname": "take_department_rating",
@@ -1145,13 +1095,76 @@
    "fieldname": "gratuity_percent",
    "fieldtype": "Int",
    "label": "Gratuity %"
+  },
+  {
+   "fieldname": "fa_approver",
+   "fieldtype": "Link",
+   "label": "Finance Approver",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "hr_approvers",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "HR Approver",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "erp_approver",
+   "fieldtype": "Link",
+   "label": "ERP Approver",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "aa_approver",
+   "fieldtype": "Link",
+   "label": "Asset Administrator Approver",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "fa_approver.employee_name",
+   "fieldname": "fa_name",
+   "fieldtype": "Data",
+   "label": "Approver Name (Finance Section)"
+  },
+  {
+   "fetch_from": "icthr.employee_name",
+   "fieldname": "hr_approver_names",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Approver Name (HR Section)",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "erp_approver.employee_name",
+   "fieldname": "erp_name",
+   "fieldtype": "Data",
+   "label": "Approver Name (ERP)"
+  },
+  {
+   "fetch_from": "aa_approver.employee_name",
+   "fieldname": "aa_name",
+   "fieldtype": "Data",
+   "label": "Approver Name (ADM Section)"
+  },
+  {
+   "fieldname": "approver",
+   "fieldtype": "Link",
+   "label": "Approver",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "approver.employee_name",
+   "fieldname": "approver_name",
+   "fieldtype": "Data",
+   "label": "Approver Name"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-12-23 12:55:25.067813",
+ "modified": "2025-01-07 14:53:21.722644",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",

@@ -149,6 +149,6 @@ def get_permission_query_conditions(user):
 				where `tabEmployee`.name = `tabEmployee Transfer`.employee
 				and `tabEmployee`.user_id = '{user}')
 		or
-		(`tabEmployee Transfer`.supervisor = '{user}' and `tabEmployee Transfer`.workflow_state not in ('Draft','Approved','Rejected','Waiting Supervisor Approval','Waiting Approval','Cancelled'))
+		(`tabEmployee Transfer`.supervisor = '{user}' and `tabEmployee Transfer`.workflow_state not in ('Draft','Approved','Rejected','Waiting HR Approval','Cancelled'))
 	)""".format(user=user)
 

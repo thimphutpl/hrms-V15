@@ -8,7 +8,7 @@ from frappe.model.document import Document
 from frappe.utils import flt, getdate, cint,today, add_years, date_diff, nowdate
 from frappe.utils.data import get_first_day, get_last_day, add_days
 
-class DFG(Document):
+class DFGANDGFG(Document):
 	def validate(self):
 		self.check_status()
 		self.calculate_rates()

@@ -58,11 +58,32 @@ frappe.ui.form.on('Muster Roll Application', {
 			}
 		}
 	},
-	// onload: function(frm) {
-	// 	if (!frm.doc.posting_date) {
-	// 		frm.set_value("posting_date", get_today());
-	// 	}
-	// },
+
+	// from_branch: function (frm) {
+	// 	if (frm.doc.from_branch) {
+    //         frappe.call({
+				
+    //              method: "hrms.hr.doctype.muster_roll_application.muster_roll_application.set_property",
+    //              args: {
+    //                 child_table: "items", 
+    //                 fieldname: "existing_cid" 
+    //             },
+    //             callback: function(r) {
+    //                 if (!r.exc) {
+    //                     frappe.msgprint(__('Child table property updated successfully.'));
+    //                     frm.refresh_field("items");
+    //                 } else {
+    //                     frappe.msgprint(__('There was an issue updating the property.'));
+    //                 }
+    //             }
+    //         });
+    //     }
+    // },
+	onload: function(frm) {
+		if (!frm.doc.posting_date) {
+			frm.set_value("posting_date", get_today());
+		}
+	},
 	requested_by: function(frm){
 		if (frm.doc.requested_by){
 			frappe.call({
@@ -126,14 +147,14 @@ frappe.ui.form.on('Muster Roll Application Item', {
 		var child  = locals[cdt][cdn];
 		frappe.call({
 			method: "frappe.client.get_value",
-			args: {doctype: "Muster Roll Employee", fieldname: ["person_name", "rate_per_day", "rate_per_hour_overtime","rate_per_hour_normal"],
+			args: {doctype: "Muster Roll Employee", fieldname: ["person_name", "rate_per_day", "rate_per_hour","rate_per_hour_normal"],
 				filters: {
 					name: child.existing_cid
 				}},
 			callback: function(r){
 				frappe.model.set_value(cdt, cdn, "person_name", r.message.person_name);
 				frappe.model.set_value(cdt, cdn, "rate_per_day", r.message.rate_per_day);
-				frappe.model.set_value(cdt, cdn, "rate_per_hour", r.message.rate_per_hour_overtime);
+				frappe.model.set_value(cdt, cdn, "rate_per_hour", r.message.rate_per_hour);
 				frappe.model.set_value(cdt, cdn, "rate_per_hour_normal", r.message.rate_per_hour_normal);
 			}
 

@@ -16,9 +16,9 @@
   "notify_users_by_email",
   "column_break_7",
   "resignation_letter_date",
-  "separation_date",
   "reason_for_resignation",
   "served_notice_period",
+  "separation_date",
   "reason",
   "employee_separation_template",
   "project",
@@ -32,6 +32,10 @@
   "separation_clearance",
   "column_break_ihgf",
   "separation_benefits",
+  "column_break_fjcv",
+  "clearance_acquired",
+  "employee_benefits_status",
+  "amended_from",
   "table_for_activity",
   "activities",
   "sb_employee_benefit_claim",
@@ -40,15 +44,12 @@
   "benefit_claim_reference",
   "section_break_14",
   "exit_interview",
-  "section_break_23",
-  "clearance_acquired",
   "section_break_28",
   "resignation",
   "superannuation",
   "workflow_state",
   "additional_information_section",
-  "company",
-  "amended_from"
+  "company"
  ],
  "fields": [
   {
@@ -68,7 +69,8 @@
    "fieldname": "resignation_letter_date",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "label": "Resignation Letter Date"
+   "label": "Resignation Letter Date",
+   "reqd": 1
   },
   {
    "allow_on_submit": 1,
@@ -137,7 +139,8 @@
   },
   {
    "fieldname": "table_for_activity",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "hidden": 1
   },
   {
    "allow_on_submit": 1,
@@ -149,7 +152,8 @@
   },
   {
    "fieldname": "section_break_14",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "hidden": 1
   },
   {
    "fieldname": "exit_interview",
@@ -201,6 +205,7 @@
   {
    "fieldname": "sb_employee_benefit_claim",
    "fieldtype": "Section Break",
+   "hidden": 1,
    "label": "Employee Benefit Claim"
   },
   {
@@ -225,7 +230,8 @@
   },
   {
    "fieldname": "section_break_28",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "hidden": 1
   },
   {
    "default": "0",
@@ -244,11 +250,8 @@
   {
    "fieldname": "additional_information_section",
    "fieldtype": "Section Break",
+   "hidden": 1,
    "label": "ADDITIONAL INFORMATION"
-  },
-  {
-   "fieldname": "section_break_23",
-   "fieldtype": "Section Break"
   },
   {
    "allow_on_submit": 1,
@@ -263,18 +266,21 @@
    "fieldname": "branch",
    "fieldtype": "Link",
    "label": "Branch",
-   "options": "Branch"
+   "options": "Branch",
+   "reqd": 1
   },
   {
    "fieldname": "separation_date",
    "fieldtype": "Date",
-   "label": "Separation Date"
+   "label": "Separation Date",
+   "reqd": 1
   },
   {
    "fieldname": "reason_for_resignation",
    "fieldtype": "Select",
    "label": "Types of Separation",
-   "options": "\nVoluntary Resignation\nSuperannuation Age\nLay-off or Compulsory Retirement\nEarly Retirement Scheme\nTermination without Benefits\nDeath\nEnd of Deputation\nEnd of Contract"
+   "options": "\nVoluntary Resignation\nSuperannuation Age\nLay-off or Compulsory Retirement\nEarly Retirement Scheme\nTermination without Benefits\nDeath\nEnd of Deputation\nEnd of Contract",
+   "reqd": 1
   },
   {
    "fieldname": "served_notice_period",
@@ -286,7 +292,8 @@
   {
    "fieldname": "reason",
    "fieldtype": "Text",
-   "label": "Reason for Separation"
+   "label": "Reason for Separation",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_xnpm",
@@ -304,21 +311,34 @@
   {
    "fieldname": "separation_clearance",
    "fieldtype": "Data",
-   "label": "Separation Clearance "
+   "label": "Separation Clearance ",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_ihgf",
    "fieldtype": "Column Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "separation_benefits",
    "fieldtype": "Data",
-   "label": "Separation Benefits"
+   "label": "Separation Benefits",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_fjcv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "employee_benefits_status",
+   "fieldtype": "Select",
+   "label": "Employee Benefits Status",
+   "options": "Not Claimed\nClaimed"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-26 15:35:41.449838",
+ "modified": "2025-01-07 16:38:23.204217",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Separation",

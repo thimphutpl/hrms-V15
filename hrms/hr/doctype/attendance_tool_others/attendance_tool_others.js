@@ -1,18 +1,6 @@
 // Copyright (c) 2024, Frappe Technologies Pvt. Ltd. and contributors
 // For license information, please see license.txt
 
-// frappe.ui.form.on("Attendance Tool Others", {
-// 	refresh(frm) {
-
-// 	},
-// });
-
-// cur_frm.add_fetch("cost_center", "branch", "branch")
-// cur_frm.add_fetch("project", "cost_center", "cost_center")
-// cur_frm.add_fetch("project", "branch", "branch")
-
-
-
 frappe.ui.form.on("Attendance Tool Others", {
 	refresh: function(frm) {
 		frm.disable_save();
@@ -160,7 +148,9 @@ erpnext.EmployeeSelector = Class.extend({
 			});
 
 		mark_employee_toolbar.find(".btn-mark-present")
+			.addClass('custom-present-btn')
 			.html(__('Mark Present'))
+			.css("margin-top", "20px")
 			.on("click", function() {
 				var employee_present = [];
 				$(me.wrapper).find('input[type="checkbox"]').each(function(i, check) {
@@ -187,7 +177,9 @@ erpnext.EmployeeSelector = Class.extend({
 			});
 
 		mark_employee_toolbar.find(".btn-mark-absent")
+			.addClass('custom-absent-btn')
 			.html(__('Mark Absent'))
+			.css("margin-top", "20px")
 			.on("click", function() {
 				var employee_absent = [];
 				$(me.wrapper).find('input[type="checkbox"]').each(function(i, check) {
@@ -215,7 +207,9 @@ erpnext.EmployeeSelector = Class.extend({
 			});
 
 		mark_employee_toolbar.find(".btn-mark-half")
+			.addClass('custom-half-day-btn')
 			.html(__('Mark Half Day'))
+			.css("margin-top", "20px")
 			.on("click", function() {
 				var employee_half = [];
 				$(me.wrapper).find('input[type="checkbox"]').each(function(i, check) {

@@ -7,43 +7,48 @@
  "engine": "InnoDB",
  "field_order": [
   "posting_date",
+  "column_break_yzcz",
+  "separation_date",
   "document_no",
   "sb_emp_details",
   "employee",
   "grade",
+  "department",
   "cid",
-  "phone_number",
   "fixed_line_number",
   "cb_01",
   "employee_name",
   "designation",
+  "branch",
+  "phone_number",
   "division",
   "region",
-  "sb_official",
   "reason_for_resignation",
+  "sb_official",
+  "reason_for_resignations",
   "sb_remarks",
   "supervisor",
   "supervisor_clearance",
   "supervisor_remarks",
-  "afd",
-  "afd_clearance",
-  "afd_remarks",
-  "column_break_29",
-  "ams",
-  "ams_clearance",
-  "sms_remarks",
-  "icthr",
-  "icthr_clearance",
-  "icthr_remarks",
-  "pc",
-  "pc_clearance",
-  "pc_remarks",
+  "erp",
+  "erp_clearance",
+  "erp_remarks",
+  "column_break_ftmq",
+  "fd",
+  "finance_clearance",
+  "finance_head_remarks",
+  "hra",
+  "hra_clearance",
+  "hr_remarks",
+  "adm",
+  "adm_clearance",
+  "adm_remarks",
   "sb_reference",
-  "mail_sent",
   "approvers_set",
   "employee_separation_id",
-  "workflow_state",
-  "amended_from"
+  "mail_sent",
+  "amended_from",
+  "workflow_state"
  ],
  "fields": [
   {
@@ -55,7 +60,8 @@
    "fieldname": "employee",
    "fieldtype": "Link",
    "label": "Employee ID",
-   "options": "Employee"
+   "options": "Employee",
+   "reqd": 1
   },
   {
    "fetch_from": "employee.designation",
@@ -108,8 +114,7 @@
    "fieldname": "reason_for_resignation",
    "fieldtype": "Select",
    "label": "Separation Type",
-   "options": "\nVoluntary Resignation\nSuperannuation\nLay-off or Compulsory Retirement\nEarly Retirement Scheme\nTermination without Benefits\nDemise\nEnd of Deputation\nProbation not completed successfully\nEnd of Contract\ntest",
-   "read_only": 1
+   "options": "\nVoluntary Resignation\nSuperannuation Age\nLay-off or Compulsory Retirement\nEarly Retirement Scheme\nTermination without Benefits\nDeath\nEnd of Deputation\nEnd of Contract"
   },
   {
    "fieldname": "sb_official",
@@ -119,7 +124,8 @@
    "default": "Today",
    "fieldname": "posting_date",
    "fieldtype": "Date",
-   "label": "Posting Date"
+   "label": "Posting Date",
+   "reqd": 1
   },
   {
    "fieldname": "region",
@@ -171,10 +177,10 @@
    "label": "CID"
   },
   {
-   "fetch_from": "employee.cell_number",
    "fieldname": "phone_number",
    "fieldtype": "Data",
-   "label": "Phone Number"
+   "label": "Phone Number",
+   "reqd": 1
   },
   {
    "fetch_if_empty": 1,
@@ -192,10 +198,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "column_break_29",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "supervisor",
    "fieldtype": "Link",
    "label": "Supervisor",
@@ -206,79 +208,98 @@
    "default": "0",
    "fieldname": "supervisor_clearance",
    "fieldtype": "Check",
-   "label": "Clearance Acquired (Supervisor)",
-   "read_only": 1,
-   "read_only_depends_on": "eval:frappe.session.user != doc.supervisor"
+   "label": "Clearance Acquired (Supervisor)"
   },
   {
-   "depends_on": "eval:doc.supervisor==frappe.session.user",
    "fieldname": "supervisor_remarks",
    "fieldtype": "Small Text",
    "label": "Supervisor's Remarks",
-   "mandatory_depends_on": "eval:frappe.session.user == doc.supervisor"
-  },
-  {
-   "fieldname": "afd",
-   "fieldtype": "Link",
-   "label": "Finance Section",
-   "options": "User",
    "read_only": 1
   },
   {
-   "default": "0",
-   "fieldname": "afd_clearance",
-   "fieldtype": "Check",
-   "label": "Clearance Acquired (Finance Section)",
-   "read_only": 1,
-   "read_only_depends_on": "eval:frappe.session.user != doc.afd"
+   "fieldname": "separation_date",
+   "fieldtype": "Date",
+   "label": "Separation Date",
+   "reqd": 1
   },
   {
-   "depends_on": "eval:doc.afd==frappe.session.user",
-   "fieldname": "afd_remarks",
-   "fieldtype": "Small Text",
-   "label": "Finance Section Remarks",
-   "read_only_depends_on": "eval:frappe.session.user != doc.afd"
+   "fieldname": "column_break_yzcz",
+   "fieldtype": "Column Break"
   },
   {
-   "fieldname": "icthr",
+   "fieldname": "department",
    "fieldtype": "Link",
-   "label": "HR Approver",
-   "options": "User",
+   "label": "Department",
+   "options": "Department"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch",
+   "reqd": 1
+  },
+  {
+   "fieldname": "reason_for_resignations",
+   "fieldtype": "Select",
+   "label": "Separation Type",
+   "options": "\nVoluntary Resignation\nSuperannuation\nLay-off or Compulsory Retirement\nEarly Retirement Scheme\nTermination without Benefits\nDemise\nEnd of Deputation\nProbation not completed successfully\nEnd of Contract\ntest",
    "read_only": 1
   },
   {
-   "default": "0",
-   "fieldname": "icthr_clearance",
-   "fieldtype": "Check",
-   "label": "Clearance Acquired (HR Approver)",
-   "mandatory_depends_on": "eval:frappe.session.user == doc.icthr",
-   "read_only": 1,
-   "read_only_depends_on": "eval:frappe.session.user != doc.icthr"
-  },
-  {
-   "depends_on": "eval:doc.icthr==frappe.session.user",
-   "fieldname": "icthr_remarks",
-   "fieldtype": "Small Text",
-   "label": "HR Remarks",
-   "mandatory_depends_on": "eval:frappe.session.user == doc.icthr",
-   "read_only_depends_on": "eval:frappe.session.user != doc.icthr"
-  },
-  {
-   "fieldname": "ams",
+   "fieldname": "erp",
    "fieldtype": "Link",
    "label": "ERP Approver",
    "options": "User",
    "read_only": 1
   },
   {
-   "depends_on": "eval:doc.ams==frappe.session.user",
-   "fieldname": "sms_remarks",
-   "fieldtype": "Small Text",
-   "label": "ERP Remarks",
-   "mandatory_depends_on": "eval:doc.ams==frappe.session.user"
+   "default": "0",
+   "fieldname": "erp_clearance",
+   "fieldtype": "Check",
+   "label": "Clearance Acquired (ERP Approver)"
   },
   {
-   "fieldname": "pc",
+   "fieldname": "erp_remarks",
+   "fieldtype": "Small Text",
+   "label": "ERP Approver Remarks"
+  },
+  {
+   "fieldname": "fd",
+   "fieldtype": "Link",
+   "label": "Finance Section",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_ftmq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "finance_clearance",
+   "fieldtype": "Check",
+   "label": "Clearance Acquired (Finance Head)"
+  },
+  {
+   "fieldname": "finance_head_remarks",
+   "fieldtype": "Small Text",
+   "label": "Finance Head Remarks"
+  },
+  {
+   "default": "0",
+   "fieldname": "hra_clearance",
+   "fieldtype": "Check",
+   "label": "Clearance Acquired (HR Approver)"
+  },
+  {
+   "fieldname": "hr_remarks",
+   "fieldtype": "Small Text",
+   "label": "HR Remarks"
+  },
+  {
+   "fieldname": "adm",
    "fieldtype": "Link",
    "label": "ADM Approver",
    "options": "User",
@@ -286,35 +307,27 @@
   },
   {
    "default": "0",
-   "fieldname": "pc_clearance",
+   "fieldname": "adm_clearance",
    "fieldtype": "Check",
-   "label": "Clearance Acquired(ADM Approver)",
-   "mandatory_depends_on": "eval:frappe.session.user == doc.pc",
-   "read_only": 1,
-   "read_only_depends_on": "eval:frappe.session.user != doc.pc"
+   "label": "Clearance Acquired (ADM Approver)"
   },
   {
-   "depends_on": "eval:frappe.session.user == doc.pc",
-   "fieldname": "pc_remarks",
+   "fieldname": "adm_remarks",
    "fieldtype": "Small Text",
-   "label": "ADM Approver Remarks",
-   "mandatory_depends_on": "eval:frappe.session.user == doc.pc",
-   "read_only_depends_on": "eval:frappe.session.user != doc.pc"
+   "label": "ADM Remarks"
   },
   {
-   "default": "0",
-   "fieldname": "ams_clearance",
-   "fieldtype": "Check",
-   "label": "Clearance Acquired (ERP Approver)",
-   "mandatory_depends_on": "eval:doc.ams==frappe.session.user",
-   "read_only": 1,
-   "read_only_depends_on": "eval:doc.ams!=frappe.session.user"
+   "fieldname": "hra",
+   "fieldtype": "Link",
+   "label": "HR Approver",
+   "options": "User",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-26 12:32:08.069915",
+ "modified": "2024-12-27 10:31:41.128567",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Separation Clearance",

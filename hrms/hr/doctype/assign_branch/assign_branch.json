@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "autoname": "AB.#####",
  "creation": "2024-11-26 12:51:43.889633",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -22,83 +23,84 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Employee Type",
-   "options": "Employee\nDES Employee\nMuster Roll Employee",
+   "options": "Employee\nGEP Employee\nMuster Roll Employee",
    "reqd": 1
   },
-   {
-    "fieldname": "employee",
-    "fieldtype": "Dynamic Link",
-    "ignore_user_permissions": 1,
-    "in_list_view": 1,
-    "in_standard_filter": 1,
-    "label": "Employee",
-    "options": "employee_type",
-    "reqd": 1
-   },
-   {
-    "fieldname": "column_break_2",
-    "fieldtype": "Column Break"
-   },
-   {
-    "fieldname": "user",
-    "fieldtype": "Link",
-    "in_list_view": 1,
-    "in_standard_filter": 1,
-    "label": "User",
-    "options": "User",
-    "read_only": 1
-   },
-   {
-    "fieldname": "current_branch",
-    "fieldtype": "Link",
-    "in_list_view": 1,
-    "in_standard_filter": 1,
-    "label": "Current Branch",
-    "options": "Branch",
-    "read_only": 1
-   },
-   {
-    "fieldname": "company",
-    "fieldtype": "Link",
-    "label": "Company",
-    "options": "Company",
-    "read_only": 1,
-    "reqd": 1
-   },
-   {
-    "fieldname": "section_break_4",
-    "fieldtype": "Section Break"
-   },
-   {
-    "fieldname": "get_all_branch",
-    "fieldtype": "Button",
-    "label": "Get All Active Branches"
-   },
-   {
-    "fieldname": "section_break_8",
-    "fieldtype": "Section Break"
-   },
-   {
-    "fieldname": "items",
-    "fieldtype": "Table",
-    "label": "Approved Branches",
-    "options": "Branch Item",
-    "reqd": 1
-   },
-   {
-    "fieldname": "employee_name",
-    "fieldtype": "Data",
-    "in_list_view": 1,
-    "label": "Employee Name",
-    "read_only": 1
-   }
+  {
+   "fieldname": "employee",
+   "fieldtype": "Dynamic Link",
+   "ignore_user_permissions": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Employee",
+   "options": "employee_type",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "User",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "current_branch",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Current Branch",
+   "options": "Branch",
+   "read_only": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_4",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "get_all_branch",
+   "fieldtype": "Button",
+   "label": "Get All Active Branches"
+  },
+  {
+   "fieldname": "section_break_8",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Approved Branches",
+   "options": "Branch Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Employee Name",
+   "read_only": 1
+  }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-11-26 12:53:03.025048",
+ "modified": "2024-12-30 11:34:39.649837",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Assign Branch",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {

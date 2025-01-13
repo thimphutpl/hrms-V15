@@ -137,13 +137,14 @@ class LeaveTravelConcession(Document):
 						and (b.is_active = 'Yes' or e.relieving_date between \'"+str(start)+"\' and \'"+str(end)+"\') 
 						and b.eligible_for_ltc = 1 
 					order by b.branch """, as_dict=True)
+		
 		self.set('items', [])
 		for d in entries:
 			d.basic_pay = d.amount
 			month_start = datetime.strptime(str(d.date_of_joining).split("-")[0]+"-"+str(d.date_of_joining).split("-")[1]+"-01","%Y-%m-%d")
 			dates = calendar.monthrange(month_start.year, month_start.month)[1]
 			working_days =date_diff(self.posting_date,d.date_of_joining)
-			if working_days >= 360 :
+			if working_days >= 90 :
 				if getdate(str(self.fiscal_year) + "-01-01") < getdate(d.date_of_joining) <  getdate(str(self.fiscal_year) + "-12-31"):
 					if cint(str(d.date_of_joining)[8:10]) < 15:
 						months = 12 - cint(str(d.date_of_joining)[5:7]) + 1

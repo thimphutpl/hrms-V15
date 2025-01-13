@@ -1,7 +1,7 @@
 // Copyright (c) 2024, Frappe Technologies Pvt. Ltd. and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.on('DFG', {
+frappe.ui.form.on('DFG AND GFG', {
 	refresh: function(frm) {
 		cur_frm.toggle_reqd("date_of_separation", frm.doc.status == "Left")
 
@@ -43,7 +43,7 @@ cost_center: function(frm){
 	}
 },
 });
-frappe.ui.form.on("DFG", "refresh", function(frm) {
+frappe.ui.form.on("DFG AND GFG", "refresh", function(frm) {
     cur_frm.set_query("cost_center", function() {
         return {
             "filters": {

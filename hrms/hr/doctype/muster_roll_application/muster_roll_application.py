@@ -6,6 +6,11 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.utils import today, nowdate
+from frappe.custom.doctype.property_setter.property_setter import make_property_setter
+import frappe
+
+
+
 
 class MusterRollApplication(Document):
 	def validate(self):
@@ -170,10 +175,12 @@ class MusterRollApplication(Document):
 						"docstatus": 0,
 						"branch": self.branch,
 						"cost_center": self.cost_center,
-						"unit": self.unit,
+						"bank": a.bank,
+						"bank_branch": a.bank_branch,
+						"account_no": a.account_no,
 						"section": self.section,
 						"rate_per_day": a.rate_per_day,
-						"rate_per_hour_normal": a.rate_per_hour,
+						"rate_per_hour_normal": a.rate_per_hour_normal,
 						"company": self.company,
 						"bank_account_type": a.bank_account_type,
 						"mobile": a.mobile,
@@ -217,9 +224,17 @@ class MusterRollApplication(Document):
 						),
 						title="Validation Error"
 					)
+	
 
 @frappe.whitelist()
 def get_mr_approvers(employee):
 	approver, approver_name= frappe.db.get_value("Employee", {"name":frappe.db.get_value("Employee", employee, "reports_to")}, ["user_id", "employee_name"])	
 	return approver, approver_name
 
+
+# @frappe.whitelist()
+# def set_property(fieldname):
+# 	frappe.throw(fieldname)
+# 	make_property_setter('Muster Roll Application Item', fieldname, "in_list_view", 0, "Check")
+	
+# 	return {"message": "Property updated successfully"}

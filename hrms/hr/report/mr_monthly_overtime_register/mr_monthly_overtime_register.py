@@ -29,7 +29,8 @@ def execute(filters=None):
 
 		total_p = 0.0
 		for day in range(filters["total_days_in_month"]):
-			for t in ("R","S"):
+			#for t in ("R","S"):
+			for t in ("R"):
 				status = att_map.get(emp).get(str(day + 1)+str(t), '')
 
 				if flt(status) > 0:
@@ -49,7 +50,7 @@ def get_columns(filters):
 
 	for day in range(filters["total_days_in_month"]):
 		columns.append(cstr(day+1)+"R" +"::35")
-		columns.append(cstr(day+1)+"S" +"::35")
+		#columns.append(cstr(day+1)+"S" +"::35")
 
 	columns += [_("Total Hours") + ":Float:100"]
 	return columns
@@ -62,7 +63,8 @@ def get_attendance_list(conditions, filters):
 
 	att_map = {}
 	for d in attendance_list:
-		for t in ("R","S"):
+		#for t in ("R","S"):
+		for t in ("R"):
 			day_of_month = str(d.day_of_month) + str(t)
 			att_map.setdefault(d.employee, frappe._dict()).setdefault(day_of_month, "")
 			att_map[d.employee][day_of_month] = d.status if t=="R" else d.hrs

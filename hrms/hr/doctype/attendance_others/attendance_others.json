@@ -8,6 +8,7 @@
  "field_order": [
   "date",
   "employee_type",
+  "emp_cat",
   "employee",
   "status",
   "cost_center",
@@ -25,7 +26,7 @@
    "fieldname": "employee_type",
    "fieldtype": "Select",
    "label": "Employee Type",
-   "options": "\nMuster Roll Employee\nOperator\nOpen Air Prisoner\nDFG"
+   "options": "\nMuster Roll Employee\nOperator\nOpen Air Prisoner\nDFG AND GFG"
   },
   {
    "fieldname": "employee",
@@ -61,12 +62,19 @@
    "fieldtype": "Link",
    "label": "Amended From",
    "options": "Attendance Others"
+  },
+  {
+   "fieldname": "emp_cat",
+   "fieldtype": "Select",
+   "label": "Employee Category",
+   "options": "\nDFG\nGFG",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-24 10:52:09.841253",
+ "modified": "2025-01-10 16:17:28.704207",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Attendance Others",

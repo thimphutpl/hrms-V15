@@ -24,6 +24,7 @@
   "is_default",
   "from_date",
   "to_date",
+  "depend_salary_on_attendance",
   "time_sheet_earning_detail",
   "salary_slip_based_on_timesheet",
   "cb_9",
@@ -1315,12 +1316,18 @@
    "fieldname": "cash_handling_allowance_value",
    "fieldtype": "Currency",
    "label": "Value"
+  },
+  {
+   "default": "0",
+   "fieldname": "depend_salary_on_attendance",
+   "fieldtype": "Check",
+   "label": "Depend Salary On Attendance"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2024-12-13 10:32:18.973080",
+ "modified": "2024-12-30 14:08:38.301773",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",

@@ -120,13 +120,18 @@ before_app_uninstall = "hrms.setup.before_app_uninstall"
 # -----------
 # Permissions evaluated in scripted ways
 
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
+permission_query_conditions = {
+	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
+	"Employee": "hrms.hr.doctype.leave_application.leave_application.get_permission_query_conditions",
+	"Leave Application": "hrms.hr.doctype.leave_application.leave_application.get_permission_query_conditions",
+	"Travel Authorization": "hrms.hr.doctype.travel_authorization.travel_authorization.get_permission_query_conditions",
+	"Travel Claim": "hrms.hr.doctype.travel_claim.travel_claim.get_permission_query_conditions",
+	
+}
 #
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
+has_permission = {
+	"Event": "frappe.desk.doctype.event.event.has_permission",
+}
 
 has_upload_permission = {"Employee": "erpnext.setup.doctype.employee.employee.has_upload_permission"}
 

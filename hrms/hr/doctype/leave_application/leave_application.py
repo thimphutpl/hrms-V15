@@ -17,6 +17,7 @@ from frappe.utils import (
 	get_link_to_form,
 	getdate,
 	nowdate,
+	add_to_date
 )
 
 from erpnext.buying.doctype.supplier_scorecard.supplier_scorecard import daterange
@@ -25,6 +26,7 @@ from erpnext.setup.doctype.employee.employee import get_holiday_list_for_employe
 import hrms
 from hrms.hr.doctype.leave_block_list.leave_block_list import get_applicable_block_dates
 from hrms.hr.doctype.leave_ledger_entry.leave_ledger_entry import create_leave_ledger_entry
+from erpnext.custom_workflow import validate_workflow_states, notify_workflow_states
 from hrms.hr.utils import (
 	get_holiday_dates_for_employee,
 	get_leave_period,
@@ -71,6 +73,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		self.notify_approver()
 
 	def validate(self):
+		validate_workflow_states(self)
 		validate_active_employee(self.employee)
 		set_employee_name(self)
 		self.validate_dates()
@@ -180,6 +183,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
 
 		if self.from_date and self.to_date and (getdate(self.to_date) < getdate(self.from_date)):
 			frappe.throw(_("To date cannot be before from date"))
+		
 
 		if (
 			self.half_day
@@ -357,6 +361,8 @@ class LeaveApplication(Document, PWANotificationsMixin):
 			frappe.throw(_("You are not authorized to approve leaves on Block Dates"), LeaveDayBlockedError)
 
 	def validate_balance_leaves(self):
+		if self.leave_type == 'Casual Leave' and (getdate(self.to_date) - getdate(self.from_date)).days > 5:
+			frappe.throw(_("Casual Leave cannot exceed 5 days."))
 		if self.from_date and self.to_date:
 			self.total_leave_days = get_number_of_leave_days(
 				self.employee,
@@ -453,11 +459,12 @@ class LeaveApplication(Document, PWANotificationsMixin):
 				self.throw_overlap_error(d)
 
 	def throw_overlap_error(self, d):
-		form_link = get_link_to_form("Leave Application", d.name)
-		msg = _("Employee {0} has already applied for {1} between {2} and {3} : {4}").format(
-			self.employee, d["leave_type"], formatdate(d["from_date"]), formatdate(d["to_date"]), form_link
-		)
-		frappe.throw(msg, OverlapError)
+		pass
+		# form_link = get_link_to_form("Leave Application", d.name)
+		# msg = _("Employee {0} has already applied for {1} between {2} and {3} : {4}").format(
+		# 	self.employee, d["leave_type"], formatdate(d["from_date"]), formatdate(d["to_date"]), form_link
+		# )
+		# frappe.throw(msg, OverlapError)
 
 	def get_total_leaves_on_half_day(self):
 		leave_count_on_half_day_date = frappe.db.sql(
@@ -573,6 +580,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
 			frappe.throw(
 				_("Optional Holiday List not set for leave period {0}").format(leave_period[0]["name"])
 			)
+		
 		day = getdate(self.from_date)
 		while day <= getdate(self.to_date):
 			if not frappe.db.exists(
@@ -819,6 +827,8 @@ def get_allocation_expiry_for_cf_leaves(
 	return expiry[0][0] if expiry else ""
 
 
+
+
 @frappe.whitelist()
 def get_number_of_leave_days(
 	employee: str,
@@ -912,6 +922,7 @@ def get_leave_balance_on(
 
 	allocation_records = get_leave_allocation_records(employee, date, leave_type)
 	allocation = allocation_records.get(leave_type, frappe._dict())
+	
 
 	end_date = allocation.to_date if cint(consider_all_leaves_in_the_allocation_period) else date
 	cf_expiry = get_allocation_expiry_for_cf_leaves(employee, leave_type, to_date, allocation.from_date)
@@ -924,6 +935,7 @@ def get_leave_balance_on(
 		return remaining_leaves
 	else:
 		return remaining_leaves.get("leave_balance")
+
 
 
 def get_leave_allocation_records(employee, date, leave_type=None):
@@ -971,14 +983,21 @@ def get_leave_allocation_records(employee, date, leave_type=None):
 			)
 		)
 	)
+	
+	
+
 
 	if leave_type:
+		
 		query = query.where(Ledger.leave_type == leave_type)
 	query = query.groupby(Ledger.employee, Ledger.leave_type)
-
+	# frappe.msgprint(_("Query Result: {0}").format(query))
+	
 	allocation_details = query.run(as_dict=True)
+	
 
 	allocated_leaves = frappe._dict()
+	# frappe.throw(str(allocated_leaves))
 	for d in allocation_details:
 		allocated_leaves.setdefault(
 			d.leave_type,
@@ -995,6 +1014,134 @@ def get_leave_allocation_records(employee, date, leave_type=None):
 			),
 		)
 	return allocated_leaves
+	# frappe.msgprint(_("Query Result: {0}").format(allocated_leaves))
+
+
+# def get_leave_allocation_records(ason_date, employee=None):
+#     ##
+#     #  Ver 2.0 Begins, Following code replaced by the subsequent, by SHIV on 2018/02/09
+#     ##
+    
+#     '''
+#     from datetime import date as mod_date
+#     conditions = (" and employee='%s'" % employee) if employee else ""
+#     from_date = date
+#     from_date = getdate(mod_date(getdate(from_date).year,1,1))
+
+#     leave_allocation_records = frappe.db.sql("""
+#         select employee, leave_type, total_leaves_allocated, from_date, to_date
+#         from `tabLeave Allocation`
+#         where %s between from_date and to_date and docstatus=1 {0}""".format(conditions), (date), as_dict=1)
+
+#     allocated_leaves = frappe._dict()
+#     for d in leave_allocation_records:
+#         # Ver 1.0 Begins added by SSK on 20/08/2016, Latest allocation record for Earned Leave is handled later
+#         if d.leave_type != 'Earned Leave':
+#             allocated_leaves.setdefault(d.employee, frappe._dict()).setdefault(d.leave_type, frappe._dict({
+#                 "from_date": d.from_date,
+#                 "to_date": d.to_date,
+#                 "total_leaves_allocated": d.total_leaves_allocated
+#             }))
+
+#     # Ver 1.0 Begins added by SSK on 20/08/2016, Earned Leave
+#     if employee:
+#         leave_allocation_records = frappe.db.sql("""
+#             select employee, leave_type, total_leaves_allocated, from_date, to_date
+#             from `tabLeave Allocation`
+#             where from_date <= %s
+#             and docstatus=1 and leave_type = 'Earned Leave'
+#             {0}
+#             order by to_date desc limit 1""".format(conditions), (date), as_dict=1)
+
+#         for d in leave_allocation_records:
+#             if d.leave_type == 'Earned Leave':
+#                 allocated_leaves.setdefault(d.employee, frappe._dict()).setdefault(d.leave_type, frappe._dict({
+#                     "from_date": d.from_date,
+#                     "to_date": d.to_date,
+#                     "total_leaves_allocated": d.total_leaves_allocated
+#                 }))
+#     else:
+#         employee_list = frappe.db.sql("""
+#             select distinct employee
+#             from `tabLeave Allocation`
+#             where from_date <= %s
+#             and docstatus=1 and leave_type = 'Earned Leave'
+#             """, (date), as_dict=1)
+#         for e in employee_list:
+#             leave_allocation_records = frappe.db.sql("""
+#                 select employee, leave_type, total_leaves_allocated, from_date, to_date
+#                 from `tabLeave Allocation`
+#                 where employee = %s
+#                 and from_date <= %s
+#                 and docstatus=1 and leave_type = 'Earned Leave'
+#                 order by to_date desc limit 1""", (e.employee, date), as_dict=1)
+
+#             for d in leave_allocation_records:
+#                 if d.leave_type == 'Earned Leave':
+#                     allocated_leaves.setdefault(d.employee, frappe._dict()).setdefault(d.leave_type, frappe._dict({
+#                         "from_date": d.from_date,
+#                         "to_date": d.to_date,
+#                         "total_leaves_allocated": d.total_leaves_allocated
+#                     }))
+#     # Ver 1.0 Ends
+#     '''
+
+#     allocated_leaves = frappe._dict()
+#     conditions = ("where employee='%s' and " % employee) if employee else "where "
+#     leave_types_cf = frappe.db.sql_list("select name from `tabLeave Type` where is_carry_forward=1")
+
+#     # Non-CarryForward Types
+#     leave_allocation_records = frappe.db.sql("""
+#         select
+#             la.employee, la.leave_type, la.total_leaves_allocated,
+#             la.from_date, la.to_date, lt.is_carry_forward 
+#         from
+#             `tabLeave Allocation` as la,
+#             `tabLeave Type` as lt
+#         {0}     lt.name = la.leave_type
+#         and     lt.is_carry_forward = 0
+#         and     '{1}' between la.from_date and la.to_date
+#         and     la.docstatus = 1
+#         """.format(conditions, ason_date), as_dict=True)
+		
+	
+
+#     # CarryForward Types
+#     for emp in frappe.db.sql("select name from `tabEmployee` {0} 1=1".format(conditions), as_dict=True):
+#         for lt in leave_types_cf:
+#             latest = frappe.db.sql("""
+#                 select
+#                     la.employee, la.leave_type, la.total_leaves_allocated,
+#                     la.from_date, la.to_date, lt.is_carry_forward
+#                 from
+#                     `tabLeave Allocation` as la,
+#                     `tabLeave Type` as lt
+#                 where   la.employee = '{0}'
+#                 and     la.leave_type = '{1}'
+#                 and     lt.name = la.leave_type
+#                 and     la.docstatus = 1
+#                 and     la.from_date <= '{2}'
+#                 order by from_date desc limit 1
+#             """.format(emp.name, lt, ason_date), as_dict=True)
+				
+#         if latest:
+			
+#             leave_allocation_records.append(latest[0])
+	
+#     for d in leave_allocation_records:
+#         allocated_leaves.setdefault(d.employee, frappe._dict()).setdefault(d.leave_type, frappe._dict({
+#             "from_date": d.from_date,
+#             "to_date": d.to_date,
+#             "total_leaves_allocated": d.total_leaves_allocated,
+#             "is_carry_forward": d.is_carry_forward
+#         }))
+#     ##
+#     #  Ver 2.0 Ends
+#     ##
+	
+#     return allocated_leaves
+
+
 
 
 def get_leaves_pending_approval_for_period(
@@ -1154,16 +1301,19 @@ def get_leave_entries(employee, leave_type, from_date, to_date):
 
 @frappe.whitelist()
 def get_holidays(employee, from_date, to_date, holiday_list=None):
+	
 	"""get holidays between two dates for the given employee"""
 	if not holiday_list:
 		holiday_list = get_holiday_list_for_employee(employee)
-
+		# frappe.throw(str(holiday_list))
+		
 	holidays = frappe.db.sql(
 		"""select count(distinct holiday_date) from `tabHoliday` h1, `tabHoliday List` h2
 		where h1.parent = h2.name and h1.holiday_date between %s and %s
-		and h2.name = %s""",
-		(from_date, to_date, holiday_list),
+		and h2.name = %s""", (from_date, to_date, holiday_list),
 	)[0][0]
+	
+
 
 	return holidays
 
@@ -1367,3 +1517,41 @@ def get_leave_approver(employee):
 
 def on_doctype_update():
 	frappe.db.add_index("Leave Application", ["employee", "from_date", "to_date"])
+
+def get_permission_query_conditions(user):
+	if not user: user = frappe.session.user
+	user_roles = frappe.get_roles(user)
+
+	if user == "Administrator":
+		return
+	if "HR Master" in user_roles or "Auditor" in user_roles:
+		return
+	if "HR User" in user_roles or "HR Manager" in user_roles:
+		""" get all list with branch same as the branch of login user """
+		user_branch = frappe.db.get_value("Employee", {"user_id": user}, "branch")
+
+		return """(
+			`tabLeave Application`.branch = '{branch}'
+		)""".format(branch=user_branch)
+
+	return """(
+		`tabLeave Application`.owner = '{user}'
+		or
+		exists(select 1
+				from `tabEmployee`
+				where `tabEmployee`.name = `tabLeave Application`.employee
+				and `tabEmployee`.user_id = '{user}')
+		or
+		(`tabLeave Application`.leave_approver = '{user}' and `tabLeave Application`.workflow_state not in  ('Draft','Approved','Rejected','Cancelled'))
+		or
+		exists(select 1
+				from `tabEmployee`
+				where name in (select second_approver from `tabEmployee`
+				where `tabEmployee`.name = `tabLeave Application`.employee
+				and `tabLeave Application`.workflow_state not in  ('Draft','Rejected','Cancelled')
+				)
+				and `tabEmployee`.user_id = '{user}'
+		)
+		
+	)""".format(user=user)
+

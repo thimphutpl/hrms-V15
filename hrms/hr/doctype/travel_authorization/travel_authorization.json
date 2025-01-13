@@ -180,6 +180,7 @@
    "fetch_from": "grade.dsa_per_day",
    "fieldname": "dsa_per_day",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "DSA Per Day"
   },
   {
@@ -289,7 +290,8 @@
    "depends_on": "eval:doc.need_advance",
    "fieldname": "estimated_amount",
    "fieldtype": "Currency",
-   "label": "Estimated Total Amount"
+   "label": "Estimated Total Amount",
+   "read_only": 1
   },
   {
    "depends_on": "eval:doc.need_advance",
@@ -381,7 +383,6 @@
   {
    "fieldname": "supervisor_designation",
    "fieldtype": "Data",
-   "hidden": 1,
    "label": "Supervisor Designation",
    "read_only": 1
   },
@@ -409,6 +410,7 @@
    "fetch_from": "supervisor.email",
    "fieldname": "supervisor_manager",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Supervisor Manager Email",
    "options": "User",
    "read_only": 1
@@ -417,6 +419,7 @@
    "fetch_from": "supervisor_manager.full_name",
    "fieldname": "supervisor_manager_name",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Supervisor Manager Name",
    "read_only": 1
   },
@@ -453,7 +456,7 @@
   {
    "fieldname": "section_break_s22dq",
    "fieldtype": "Section Break",
-   "label": "Travel Claim"
+   "label": "Travel Itinerary"
   },
   {
    "fieldname": "travel_details",
@@ -525,7 +528,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-19 15:37:04.110889",
+ "modified": "2025-01-13 14:55:50.235291",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",

@@ -1,0 +1,71 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "prompt",
+ "creation": "2025-01-04 15:52:12.417506",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "column_break_zfho",
+  "type_of_fees",
+  "currency",
+  "dsa_amount",
+  "dsa_percentage",
+  "amount"
+ ],
+ "fields": [
+  {
+   "fieldname": "type_of_fees",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Type of Fees",
+   "no_copy": 1,
+   "options": "\nPassport Fees\nVisa Fees\nCourse/Tuition Fees\nTravel Cost\nDSA\nIncidental  Charges\nMileage Claim\nStipend\nBook Allowances\nHealth Care Fees\nIELTS Fees\nHealth Insurance\nTravel Insurance"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Currency",
+   "options": "Currency",
+   "reqd": 1
+  },
+  {
+   "fieldname": "dsa_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Total DSA Amount",
+   "reqd": 1
+  },
+  {
+   "fieldname": "dsa_percentage",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "DSA Percentage (%)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount"
+  },
+  {
+   "fieldname": "column_break_zfho",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-01-04 16:05:51.772591",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Training Fees",
+ "naming_rule": "Set by user",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

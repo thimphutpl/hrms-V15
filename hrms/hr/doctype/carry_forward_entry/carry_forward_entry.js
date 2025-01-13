@@ -6,3 +6,26 @@
 
 // 	},
 // });
+
+frappe.ui.form.on('Carry Forward Entry', {
+	setup: function(frm) {
+	frm.get_field('items').grid.editable_fields = [
+			{fieldname: 'employee', columns: 2},
+			{fieldname: 'employee_name', cloumns: 2},
+			{fieldname: 'leaves_allocated', columns: 2},
+			{fieldname: 'leaves_taken', columns: 2},
+			{fieldname: 'leave_balance', columns: 2}
+		];
+	
+	},
+	"get_details": function(frm) {
+		return frappe.call({
+			method: "get_data",
+			doc: frm.doc,
+			callback: function(r, rt) {
+			frm.refresh_field("items");
+                        frm.refresh_fields();
+                        }
+		});
+                }
+});

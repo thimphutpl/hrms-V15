@@ -155,6 +155,17 @@ frappe.ui.form.on("Travel Claim Item", {
 			
 
 		}
+		if(item.idx != frm.doc.items.length-1){
+			frappe.call({
+				method: "get_dsa_rate",
+				doc: frm.doc,
+				callback: function(r){
+					if(r.message){
+						frappe.model.set_value(cdt, cdn, "dsa", r.message);
+					}
+				}
+			})
+		}
 		if (item.halt==0){
 			frm.fields_dict['items'].grid.grid_rows_by_docname[cdn].toggle_editable('to_place', true)
 			frm.fields_dict['items'].grid.grid_rows_by_docname[cdn].toggle_editable('from_place', true)
@@ -162,6 +173,7 @@ frappe.ui.form.on("Travel Claim Item", {
 		frm.refresh_field("items");
 		if (frm.doc.__islocal) {
 			var item = frappe.get_doc(cdt, cdn)
+			
 			// if (item.halt == 0) {
 			// 	var df = frappe.meta.get_docfield("Travel Claim Item", "distance", cur_frm.doc.name);
 			// 	frappe.model.set_value(cdt, cdn, "distance", "")

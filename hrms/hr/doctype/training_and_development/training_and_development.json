@@ -1,0 +1,210 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "TD.YY.MM.#####",
+ "creation": "2025-01-04 15:40:42.964941",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "biodata_section",
+  "employee",
+  "employee_name",
+  "department",
+  "division",
+  "column_break_javx",
+  "employee_group",
+  "employee_subgroup",
+  "designation",
+  "branch",
+  "cost_center",
+  "training_details_section",
+  "type_of_training",
+  "location_type",
+  "development_type",
+  "country",
+  "college_name",
+  "column_break_feoc",
+  "start_date",
+  "end_date",
+  "duration",
+  "remarks",
+  "expenditures_section",
+  "training_expenditures",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "biodata_section",
+   "fieldtype": "Section Break",
+   "label": "Biodata"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Employee ID",
+   "options": "Employee",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Read Only",
+   "label": "Employee Name",
+   "options": "employee.employee_name"
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fieldname": "division",
+   "fieldtype": "Link",
+   "label": "Division",
+   "options": "Division",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.employee_group",
+   "fieldname": "employee_group",
+   "fieldtype": "Read Only",
+   "label": "Employee Group Type",
+   "options": "employee.employee_group"
+  },
+  {
+   "fieldname": "employee_subgroup",
+   "fieldtype": "Link",
+   "label": "Employee SubGroup",
+   "options": "Employee Grade",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.designation",
+   "fieldname": "designation",
+   "fieldtype": "Read Only",
+   "label": "Designation",
+   "options": "employee.designation"
+  },
+  {
+   "fetch_from": "employee.branch",
+   "fieldname": "branch",
+   "fieldtype": "Read Only",
+   "label": "Branch",
+   "options": "employee.branch"
+  },
+  {
+   "fetch_from": "employee.cost_center",
+   "fieldname": "cost_center",
+   "fieldtype": "Read Only",
+   "label": "Cost Center",
+   "options": "employee.cost_center"
+  },
+  {
+   "fieldname": "training_details_section",
+   "fieldtype": "Section Break",
+   "label": "Training Details"
+  },
+  {
+   "fieldname": "type_of_training",
+   "fieldtype": "Select",
+   "label": "Type of Training",
+   "options": "\nShort-Term Training\nLong-Term Training\nBusiness Events & Travels"
+  },
+  {
+   "fieldname": "location_type",
+   "fieldtype": "Select",
+   "label": "Location Type",
+   "options": "\nIn-Country\nIndia\nThird Country"
+  },
+  {
+   "fieldname": "development_type",
+   "fieldtype": "Select",
+   "label": "Development Type",
+   "options": "\nKnowledge and Skills Development\nFurther  Studies Self\nFurther Studies  (Scholarship)\nFurther Studies (SMCL Scholarship)\nMeeting\nConsultation\nConference\nDelegation\nSeminar\nWorkshop\nInstitutional Visit\nReference visits"
+  },
+  {
+   "fieldname": "country",
+   "fieldtype": "Link",
+   "label": "Country",
+   "options": "Country"
+  },
+  {
+   "fieldname": "college_name",
+   "fieldtype": "Text",
+   "label": "College / Training Institute"
+  },
+  {
+   "fieldname": "column_break_feoc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "label": "Start Date"
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "End Date"
+  },
+  {
+   "fieldname": "duration",
+   "fieldtype": "Data",
+   "label": "Duration"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "expenditures_section",
+   "fieldtype": "Section Break",
+   "label": "Expenditures"
+  },
+  {
+   "fieldname": "training_expenditures",
+   "fieldtype": "Table",
+   "in_standard_filter": 1,
+   "options": "Training Fees"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "options": "Training And Development"
+  },
+  {
+   "fieldname": "column_break_javx",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-01-04 16:36:52.900468",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Training And Development",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
