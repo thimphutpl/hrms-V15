@@ -167,7 +167,7 @@
    "reqd": 1
   },
   {
-   "depends_on": "eval:doc.halt==0 && doc.date",
+   "depends_on": "eval:doc.halt==0 && doc.from_date",
    "fieldname": "travel_from",
    "fieldtype": "Data",
    "label": "Travel From",
@@ -183,7 +183,7 @@
    "read_only": 1
   },
   {
-   "depends_on": "eval:doc.halt==0 && doc.date",
+   "depends_on": "eval:doc.halt==0 && doc.from_date",
    "fieldname": "travel_to",
    "fieldtype": "Data",
    "label": "Travel To",
@@ -219,7 +219,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-01-02 12:01:16.020533",
+ "modified": "2025-01-14 16:01:12.499681",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim Item",
