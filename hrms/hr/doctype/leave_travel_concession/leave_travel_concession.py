@@ -140,27 +140,31 @@ class LeaveTravelConcession(Document):
 			month_start = datetime.strptime(str(d.date_of_joining).split("-")[0]+"-"+str(d.date_of_joining).split("-")[1]+"-01","%Y-%m-%d")
 			dates = calendar.monthrange(month_start.year, month_start.month)[1]
 			working_days =date_diff(self.posting_date,d.date_of_joining)
-			if working_days >= 360 :
-				if getdate(str(self.fiscal_year) + "-01-01") < getdate(d.date_of_joining) <  getdate(str(self.fiscal_year) + "-12-31"):
-					if cint(str(d.date_of_joining)[8:10]) < 15:
-						months = 12 - cint(str(d.date_of_joining)[5:7]) + 1
-					else:
-						months = 12 - cint(str(d.date_of_joining)[5:7])
-					
-					amount = d.amount
-					if flt(d.amount) > 15000:
-						amount = 15000
-
-					d.amount = round(flt((flt(months)/12.0) * amount), 2)
-					days = relativedelta(datetime.strptime(str(d.date_of_joining).split("-")[0]+"-"+str(d.date_of_joining).split("-")[1]+"-"+str(dates),"%Y-%m-%d"),datetime.strptime(str(d.date_of_joining),"%Y-%m-%d")).days
-					if int(days) < int(dates):
-						d.amount += round(flt((flt(days)/12.0/30.0) * amount), 2)
-
+			# if working_days >= 360 :
+			# 2024-09-10
+			if getdate(str(self.fiscal_year) + "-01-01") < getdate(d.date_of_joining) <  getdate(str(self.fiscal_year) + "-12-31"):
+				if cint(str(d.date_of_joining)[8:10]) <= 15:
+					months = 12 - cint(str(d.date_of_joining)[5:7]) + 1
 				else:
-					if flt(d.amount) > 15000:
-						d.amount = 15000
-				row = self.append('items', {})
+					months = 12 - cint(str(d.date_of_joining)[5:7])
 				
-				row.update(d)
+				amount = d.amount
+				if flt(d.amount) > 15000:
+					amount = 15000
+
+				if months >= 3:
+					d.amount = round(flt((flt(months)/12.0) * amount), 2)
+				else:
+					d.amount = 0.0
+				# days = relativedelta(datetime.strptime(str(d.date_of_joining).split("-")[0]+"-"+str(d.date_of_joining).split("-")[1]+"-"+str(dates),"%Y-%m-%d"),datetime.strptime(str(d.date_of_joining),"%Y-%m-%d")).days
+				# if int(days) < int(dates):
+				# 	d.amount += round(flt((flt(days)/12.0/30.0) * amount), 2)
+
+			else:
+				if flt(d.amount) > 15000:
+					d.amount = 15000
+			row = self.append('items', {})
+			
+			row.update(d)
 
 
