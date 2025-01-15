@@ -9,7 +9,8 @@ class DispatchRegister(Document):
 
 	def validate(self):
 		self.generate_dispatch_no()
- 
+	
+	
 	def generate_dispatch_no(self):
 		if self.manual_dispatch and self.dispatch_series_type:
 			id = frappe.db.sql('''
@@ -20,7 +21,8 @@ class DispatchRegister(Document):
 			else:
 				
 				self.dispatch_serial = int(id[0][0]) + 1
-				self.transaction_dispatch_number = f'{self.dispatch_series_type}{self.dispatch_serial}'
+		if not self.transaction_dispatch_number:
+			self.transaction_dispatch_number = f'{self.dispatch_series_type}{self.dispatch_serial}'
    
 @frappe.whitelist()
 def get_employees_by_department(transaction_type, transaction):

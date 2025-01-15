@@ -160,13 +160,14 @@
   {
    "fieldname": "dispatch_serial",
    "fieldtype": "Int",
-   "label": "Dispatch Serial"
+   "label": "Dispatch Serial",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-15 10:09:28.381626",
+ "modified": "2025-01-15 10:17:40.357837",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Dispatch Register",
