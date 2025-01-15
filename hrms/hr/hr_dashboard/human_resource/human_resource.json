@@ -47,10 +47,6 @@
   {
    "chart": "Hiring vs Attrition Count",
    "width": "Half"
-  },
-  {
-   "chart": "Muster Roll Data",
-   "width": "Half"
   }
  ],
  "creation": "2023-11-17 14:10:56.741833",
@@ -60,8 +56,8 @@
  "idx": 259,
  "is_default": 0,
  "is_standard": 1,
- "modified": "2025-01-11 17:21:25.380858",
- "modified_by": "kinzang.namgyal@cdcl.bt",
+ "modified": "2025-01-15 20:10:20.582064",
+ "modified_by": "Administrator",
  "module": "HR",
  "name": "Human Resource",
  "owner": "Administrator"
