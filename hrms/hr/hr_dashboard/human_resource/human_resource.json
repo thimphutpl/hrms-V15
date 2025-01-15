@@ -14,6 +14,9 @@
   },
   {
    "card": "Employees Relieving (This Quarter)"
+  },
+  {
+   "card": "Leave Pending Approval"
   }
  ],
  "charts": [
@@ -44,16 +47,20 @@
   {
    "chart": "Hiring vs Attrition Count",
    "width": "Half"
+  },
+  {
+   "chart": "Muster Roll Data",
+   "width": "Half"
   }
  ],
  "creation": "2023-11-17 14:10:56.741833",
  "dashboard_name": "Human Resource",
  "docstatus": 0,
  "doctype": "Dashboard",
- "idx": 209,
+ "idx": 259,
  "is_default": 0,
  "is_standard": 1,
- "modified": "2024-11-28 12:25:42.902812",
+ "modified": "2025-01-11 17:21:25.380858",
  "modified_by": "kinzang.namgyal@cdcl.bt",
  "module": "HR",
  "name": "Human Resource",
