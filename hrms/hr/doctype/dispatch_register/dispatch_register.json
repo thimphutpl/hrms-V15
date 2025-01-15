@@ -1,41 +1,36 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "format:DR{YYYY}-{MM}-{###}",
  "creation": "2024-11-04 15:34:55.872503",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "section_break_bbpv",
-  "amended_from",
   "date_section",
   "date",
-  "to_whom_sent_section",
+  "fiscal_year",
+  "column_break_dush",
   "company",
-  "column_break_nmjs",
   "department",
+  "section_break_eibt",
+  "manual_dispatch",
+  "transaction_type",
+  "transaction_dispatch_number",
+  "column_break_vkwq",
+  "transaction",
+  "dispatch_series_type",
+  "dispatch_serial",
   "details_section",
   "subject",
   "file_no",
   "column_break_wvif",
   "place",
+  "to_whom_sent",
   "remarks_section",
-  "remarks"
+  "remarks",
+  "amended_from"
  ],
  "fields": [
-  {
-   "fieldname": "section_break_bbpv",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Dispatch Register",
-   "print_hide": 1,
-   "read_only": 1,
-   "search_index": 1
-  },
   {
    "fieldname": "date_section",
    "fieldtype": "Section Break",
@@ -45,23 +40,6 @@
    "fieldname": "date",
    "fieldtype": "Date",
    "label": "Date"
-  },
-  {
-   "fieldname": "to_whom_sent_section",
-   "fieldtype": "Section Break",
-   "label": "To Whom Sent"
-  },
-  {
-   "fieldname": "company",
-   "fieldtype": "Link",
-   "label": "Company",
-   "options": "Company"
-  },
-  {
-   "fieldname": "department",
-   "fieldtype": "Link",
-   "label": "Department",
-   "options": "Department"
   },
   {
    "fieldname": "details_section",
@@ -98,17 +76,102 @@
    "label": "Remarks"
   },
   {
-   "fieldname": "column_break_nmjs",
+   "fieldname": "to_whom_sent",
+   "fieldtype": "Data",
+   "label": "To Whom Sent"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_dush",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department",
+   "reqd": 1
+  },
+  {
+   "fieldname": "fiscal_year",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Fiscal Year",
+   "options": "Fiscal Year",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Dispatch Register",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "section_break_eibt",
+   "fieldtype": "Section Break",
+   "label": "Transaction Dispatch "
+  },
+  {
+   "fieldname": "column_break_vkwq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "transaction_type",
+   "fieldtype": "Link",
+   "label": "Transaction Type",
+   "options": "DocType"
+  },
+  {
+   "depends_on": "eval: doc.manual_dispatch!=1",
+   "fieldname": "transaction",
+   "fieldtype": "Dynamic Link",
+   "label": "Transaction",
+   "options": "transaction_type"
+  },
+  {
+   "fieldname": "transaction_dispatch_number",
+   "fieldtype": "Data",
+   "label": "Transaction Dispatch Number"
+  },
+  {
+   "default": "0",
+   "fieldname": "manual_dispatch",
+   "fieldtype": "Check",
+   "label": "Manual Dispatch"
+  },
+  {
+   "depends_on": "eval: doc.manual_dispatch ==1",
+   "fieldname": "dispatch_series_type",
+   "fieldtype": "Link",
+   "label": "Dispatch Series Type",
+   "options": "Dispatch Series Type"
+  },
+  {
+   "fieldname": "dispatch_serial",
+   "fieldtype": "Int",
+   "label": "Dispatch Serial",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-11-04 16:31:47.515543",
+ "modified": "2025-01-14 14:33:58.335731",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Dispatch Register",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
