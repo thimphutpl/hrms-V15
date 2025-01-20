@@ -13,15 +13,38 @@ frappe.ui.form.on("Employee", {
 		});
 	},
 
+	// date_of_birth(frm) {
+	// 	frm.call({
+	// 		method: "hrms.overrides.employee_master.get_retirement_date",
+	// 		args: {
+	// 			date_of_birth: frm.doc.date_of_birth,
+	// 			grade: frm.doc.grade,
+	// 		},
+	// 	}).then((r) => {
+	// 		if (r && r.message) frm.set_value("date_of_retirement", r.message);
+	// 	});
+	// },
 	date_of_birth(frm) {
-		frm.call({
-			method: "hrms.overrides.employee_master.get_retirement_date",
-			args: {
-				date_of_birth: frm.doc.date_of_birth,
-				grade: frm.doc.grade,
-			},
-		}).then((r) => {
-			if (r && r.message) frm.set_value("date_of_retirement", r.message);
-		});
-	},
+        calculate_retirement_date(frm);
+    },
+    grade(frm) {
+        calculate_retirement_date(frm);
+    },
 });
+
+// Function to calculate and set the retirement date
+function calculate_retirement_date(frm) {
+    if (frm.doc.date_of_birth && frm.doc.grade) {
+        frm.call({
+            method: "hrms.overrides.employee_master.get_retirement_date",
+            args: {
+                date_of_birth: frm.doc.date_of_birth,
+                grade: frm.doc.grade,
+            },
+        }).then((r) => {
+            if (r && r.message) {
+                frm.set_value("date_of_retirement", r.message);
+            }
+        });
+    }
+}

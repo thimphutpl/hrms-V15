@@ -143,15 +143,34 @@ def get_timeline_data(doctype, name):
 	return out
 
 
+# @frappe.whitelist()
+# def get_retirement_date(date_of_birth=None, grade=None):
+# 	if date_of_birth:
+# 		try:
+# 			# retirement_age = cint(frappe.db.get_single_value("HR Settings", "retirement_age") or 60)
+# 			# frappe.throw(str(frappe.db.get_value("Employee Grade", grade, "retirement_age")))
+# 			retirement_age = (frappe.db.get_value("Employee Grade", grade, "retirement_age"))
+# 			dt = add_years(getdate(date_of_birth), retirement_age)
+# 			return dt.strftime("%Y-%m-%d")
+# 		except ValueError:
+# 			# invalid date	
+# 			return
+		
 @frappe.whitelist()
 def get_retirement_date(date_of_birth=None, grade=None):
-	if date_of_birth:
-		try:
-			# retirement_age = cint(frappe.db.get_single_value("HR Settings", "retirement_age") or 60)
-			# frappe.throw(str(frappe.db.get_value("Employee Grade", grade, "retirement_age")))
-			retirement_age = (frappe.db.get_value("Employee Grade", grade, "retirement_age"))
-			dt = add_years(getdate(date_of_birth), retirement_age)
-			return dt.strftime("%Y-%m-%d")
-		except ValueError:
-			# invalid date	
-			return
+    if date_of_birth and grade:
+        try:
+            # Fetch retirement age based on the Employee Grade
+            retirement_age = frappe.db.get_value("Employee Grade", grade, "retirement_age")
+            
+            # Handle case where retirement age is not set
+            if not retirement_age:
+                frappe.throw(_("Retirement age is not defined for the selected Employee Grade."))
+
+            # Calculate retirement date
+            dt = add_years(getdate(date_of_birth), cint(retirement_age))
+            return dt.strftime("%Y-%m-%d")
+        except ValueError:
+            # Handle invalid date
+            return
+
