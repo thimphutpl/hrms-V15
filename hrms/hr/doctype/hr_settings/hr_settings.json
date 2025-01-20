@@ -10,7 +10,6 @@
   "emp_created_by",
   "standard_working_hours",
   "column_break_9",
-  "retirement_age",
   "reminders_section",
   "send_birthday_reminders",
   "enable_bulk_overtime_payment",
@@ -193,11 +192,6 @@
    "fieldname": "employee_settings",
    "fieldtype": "Section Break",
    "label": "Employee Settings"
-  },
-  {
-   "fieldname": "retirement_age",
-   "fieldtype": "Data",
-   "label": "Retirement Age (In Years)"
   },
   {
    "default": "Naming Series",
@@ -1205,7 +1199,7 @@
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-01-13 00:18:59.234076",
+ "modified": "2025-01-20 14:50:59.367203",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",
