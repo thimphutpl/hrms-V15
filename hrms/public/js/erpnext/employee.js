@@ -18,6 +18,7 @@ frappe.ui.form.on("Employee", {
 			method: "hrms.overrides.employee_master.get_retirement_date",
 			args: {
 				date_of_birth: frm.doc.date_of_birth,
+				grade: frm.doc.grade,
 			},
 		}).then((r) => {
 			if (r && r.message) frm.set_value("date_of_retirement", r.message);
