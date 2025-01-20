@@ -18,6 +18,7 @@
   "gis",
   "dsa_per_day",
   "sws_contribution",
+  "retirement_age",
   "pay_scale_section",
   "lower_limit",
   "column_break_tgfh",
@@ -169,11 +170,16 @@
    "fieldtype": "Link",
    "label": "Promote To Grade",
    "options": "Employee Grade"
+  },
+  {
+   "fieldname": "retirement_age",
+   "fieldtype": "Int",
+   "label": "Retirement Age"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-28 15:14:41.582433",
+ "modified": "2025-01-20 09:21:19.235329",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Grade",
