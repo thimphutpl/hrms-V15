@@ -1,4 +1,4 @@
-// Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
+// Copyright (c) 2025, Frappe Technologies Pvt. Ltd. and Contributors
 // License: GNU General Public License v3. See license.txt
 
 frappe.ui.form.on("Salary Slip", {
@@ -267,7 +267,7 @@ frappe.ui.form.on("Salary Slip", {
 					frm.refresh();
 					// triggering events explicitly because structure is set on the server-side
 					// and currency is fetched from the structure
-					frm.trigger("update_currency_changes");
+					// frm.trigger("update_currency_changes");
 				},
 			});
 		}

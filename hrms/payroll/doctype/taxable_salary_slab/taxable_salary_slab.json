@@ -6,11 +6,13 @@
  "engine": "InnoDB",
  "field_order": [
   "from_amount",
-  "to_amount",
   "percent_deduction",
   "condition",
   "column_break_5",
-  "html_6"
+  "to_amount",
+  "html_6",
+  "column_break_quno",
+  "tax"
  ],
  "fields": [
   {
@@ -27,20 +29,18 @@
    "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "To Amount",
-   "options": "currency"
+   "options": "currency",
+   "reqd": 1
   },
   {
    "default": "0",
    "fieldname": "percent_deduction",
    "fieldtype": "Percent",
-   "in_list_view": 1,
-   "label": "Percent Deduction",
-   "reqd": 1
+   "label": "Percent Deduction"
   },
   {
    "fieldname": "condition",
    "fieldtype": "Code",
-   "in_list_view": 1,
    "label": "Condition"
   },
   {
@@ -51,11 +51,22 @@
    "fieldname": "html_6",
    "fieldtype": "HTML",
    "options": "<h4>Condition Examples</h4>\n<ol>\n<li>Applying tax if employee born between 31-12-1937 and 01-01-1958 (Employees aged 60 to 80)<br>\n<code>Condition: date_of_birth&gt;date(1937, 12, 31) and date_of_birth&lt;date(1958, 01, 01)</code></li><br><li>Applying tax by employee gender<br>\n<code>Condition: gender==\"Male\"</code></li><br>\n<li>Applying tax by Salary Component<br>\n<code>Condition: base &gt; 10000</code></li></ol>"
+  },
+  {
+   "fieldname": "column_break_quno",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tax",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Tax",
+   "reqd": 1
   }
  ],
  "istable": 1,
  "links": [],
- "modified": "2020-10-19 13:44:39.549337",
+ "modified": "2024-12-25 20:50:04.543101",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Taxable Salary Slab",
@@ -64,5 +75,6 @@
  "quick_entry": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
+ "states": [],
  "track_changes": 1
 }

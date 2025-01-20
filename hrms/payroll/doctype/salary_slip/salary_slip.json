@@ -10,19 +10,16 @@
   "section_break_6",
   "employee",
   "employee_name",
+  "designation",
+  "column_break_obdl",
   "company",
   "department",
-  "designation",
   "branch",
-  "column_break_obdl",
-  "posting_date",
-  "letter_head",
   "column_break_18",
+  "posting_date",
   "status",
   "salary_withholding",
   "salary_withholding_cycle",
-  "currency",
-  "exchange_rate",
   "section_break_gsts",
   "payroll_frequency",
   "start_date",
@@ -31,11 +28,14 @@
   "salary_structure",
   "payroll_entry",
   "mode_of_payment",
-  "column_break_wyhp",
-  "salary_slip_based_on_timesheet",
   "section_break_gerh",
+  "letter_head",
   "deduct_tax_for_unclaimed_employee_benefits",
   "deduct_tax_for_unsubmitted_tax_exemption_proof",
+  "column_break_vtdh",
+  "salary_slip_based_on_timesheet",
+  "currency",
+  "exchange_rate",
   "payment_days_tab",
   "total_working_days",
   "unmarked_days",
@@ -161,7 +161,6 @@
    "fetch_from": "employee.branch",
    "fieldname": "branch",
    "fieldtype": "Link",
-   "in_standard_filter": 1,
    "label": "Branch",
    "oldfieldname": "branch",
    "oldfieldtype": "Link",
@@ -194,7 +193,6 @@
    "fieldname": "company",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "in_standard_filter": 1,
    "label": "Company",
    "options": "Company",
    "reqd": 1
@@ -230,19 +228,17 @@
   {
    "fieldname": "salary_structure",
    "fieldtype": "Link",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
    "label": "Salary Structure",
    "options": "Salary Structure",
    "read_only": 1,
-   "reqd": 1,
    "search_index": 1
   },
   {
+   "default": "Monthly",
    "fieldname": "payroll_frequency",
    "fieldtype": "Select",
    "label": "Payroll Frequency",
-   "options": "\nMonthly\nFortnightly\nBimonthly\nWeekly\nDaily"
+   "options": "\nMonthly"
   },
   {
    "fieldname": "total_working_days",
@@ -302,12 +298,14 @@
    "default": "0",
    "fieldname": "deduct_tax_for_unclaimed_employee_benefits",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Deduct Tax For Unclaimed Employee Benefits"
   },
   {
    "default": "0",
    "fieldname": "deduct_tax_for_unsubmitted_tax_exemption_proof",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Deduct Tax For Unsubmitted Tax Exemption Proof"
   },
   {
@@ -700,10 +698,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "column_break_wyhp",
-   "fieldtype": "Column Break"
-  },
-  {
    "depends_on": "eval:doc.salary_slip_based_on_timesheet",
    "fieldname": "timesheets_section",
    "fieldtype": "Section Break",
@@ -740,13 +734,17 @@
    "no_copy": 1,
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "column_break_vtdh",
+   "fieldtype": "Column Break"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 9,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-07-01 21:25:36.651583",
+ "modified": "2025-01-11 00:56:01.131233",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Slip",

@@ -655,7 +655,7 @@ def get_user_types_data():
 				# misc
 				"Employee Grievance": ["read", "write", "create", "delete"],
 				"Employee Referral": ["read", "write", "create", "delete"],
-				"Travel Request": ["read", "write", "create", "delete"],
+				# "Travel Request": ["read", "write", "create", "delete"],
 			},
 		}
 	}

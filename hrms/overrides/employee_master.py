@@ -3,7 +3,7 @@
 
 import frappe
 from frappe import _
-from frappe.model.naming import set_name_by_naming_series
+from frappe.model.naming import set_name_by_naming_series, make_autoname
 from frappe.utils import add_years, cint, get_link_to_form, getdate
 
 from erpnext.setup.doctype.employee.employee import Employee
@@ -11,19 +11,35 @@ from erpnext.setup.doctype.employee.employee import Employee
 
 class EmployeeMaster(Employee):
 	def autoname(self):
-		naming_method = frappe.db.get_value("HR Settings", None, "emp_created_by")
-		if not naming_method:
-			frappe.throw(_("Please setup Employee Naming System in Human Resource > HR Settings"))
+		# Added by Dawa Tshering on 25/12/2024
+		if self.old_employee_id:
+			self.employee = self.name = self.old_employee_id
 		else:
-			if naming_method == "Naming Series":
-				set_name_by_naming_series(self)
-			elif naming_method == "Employee Number":
-				self.name = self.employee_number
-			elif naming_method == "Full Name":
-				self.set_employee_name()
-				self.name = self.employee_name
+			if not self.date_of_joining:
+				frappe.throw(_("Date of Joining is required to generate a new Employee ID."))
+			try:
+				year_month_day = self.date_of_joining[:4] + self.date_of_joining[5:7] + self.date_of_joining[8:10]
+			except IndexError:
+				frappe.throw(_("Date of Joining must be in YYYY-MM-DD format."))
+			
+			unique_suffix = make_autoname('EMP.####')[3:]
+			new_name = f"{year_month_day}{unique_suffix}"
+			self.employee = self.name = new_name
 
-		self.employee = self.name
+
+		# naming_method = frappe.db.get_value("HR Settings", None, "emp_created_by")
+		# if not naming_method:
+		# 	frappe.throw(_("Please setup Employee Naming System in Human Resource > HR Settings"))
+		# else:
+		# 	if naming_method == "Naming Series":
+		# 		set_name_by_naming_series(self)
+		# 	elif naming_method == "Employee Number":
+		# 		self.name = self.employee_number
+		# 	elif naming_method == "Full Name":
+		# 		self.set_employee_name()
+		# 		self.name = self.employee_name
+
+		# self.employee = self.name
 
 
 def validate_onboarding_process(doc, method=None):

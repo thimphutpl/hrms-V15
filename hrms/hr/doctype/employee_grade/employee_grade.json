@@ -10,7 +10,24 @@
  "field_order": [
   "default_salary_structure",
   "currency",
-  "default_base_pay"
+  "default_base_pay",
+  "column_break_ytuy",
+  "fixed_allowance",
+  "gis",
+  "sws",
+  "eligible_for_overtime",
+  "section_break_ozeh",
+  "lower_limit",
+  "column_break_xjwr",
+  "increment_method",
+  "column_break_hsvb",
+  "increment",
+  "column_break_zmsn",
+  "upper_limit",
+  "section_break_vhic",
+  "promotion_eligibility_years",
+  "column_break_vxyh",
+  "next_promotion_grade"
  ],
  "fields": [
   {
@@ -34,11 +51,96 @@
    "label": "Currency",
    "options": "Currency",
    "read_only": 1
+  },
+  {
+   "fieldname": "column_break_ytuy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "gis",
+   "fieldtype": "Currency",
+   "label": "GIS"
+  },
+  {
+   "fieldname": "sws",
+   "fieldtype": "Currency",
+   "label": "SWS"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_overtime",
+   "fieldtype": "Check",
+   "label": "Eligible for Overtime"
+  },
+  {
+   "fieldname": "section_break_ozeh",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "lower_limit",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Lower Limit"
+  },
+  {
+   "fieldname": "column_break_xjwr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Lumpsum",
+   "fieldname": "increment_method",
+   "fieldtype": "Select",
+   "label": "Increment Method",
+   "options": "Lumpsum"
+  },
+  {
+   "fieldname": "column_break_hsvb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "increment",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Increment"
+  },
+  {
+   "fieldname": "column_break_zmsn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "upper_limit",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Upper Limit"
+  },
+  {
+   "fieldname": "section_break_vhic",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "promotion_eligibility_years",
+   "fieldtype": "Int",
+   "label": "Promotion Eligibility Years"
+  },
+  {
+   "fieldname": "column_break_vxyh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "next_promotion_grade",
+   "fieldtype": "Link",
+   "label": "Next Promotion Grade",
+   "options": "Employee Grade"
+  },
+  {
+   "fieldname": "fixed_allowance",
+   "fieldtype": "Currency",
+   "label": "Fixed Allowance"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-05-06 15:42:10.395508",
+ "modified": "2025-01-09 20:42:47.750235",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Grade",

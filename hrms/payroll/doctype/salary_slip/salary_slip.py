@@ -1,4 +1,4 @@
-# Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
+# Copyright (c) 2025, Frappe Technologies Pvt. Ltd. and Contributors
 # License: GNU General Public License v3. See license.txt
 
 
@@ -143,14 +143,14 @@ class SalarySlip(TransactionBase):
 
 		if not self.salary_slip_based_on_timesheet:
 			self.get_date_details()
-
+		
 		if not (len(self.get("earnings")) or len(self.get("deductions"))):
 			# get details from salary structure
 			self.get_emp_and_working_day_details()
 		else:
 			self.get_working_days_details(lwp=self.leave_without_pay)
 
-		self.set_salary_structure_assignment()
+		self.set_salary_structure()
 		self.calculate_net_pay()
 		self.compute_year_to_date()
 		self.compute_month_to_date()
@@ -358,33 +358,25 @@ class SalarySlip(TransactionBase):
 
 	def check_sal_struct(self):
 		ss = frappe.qb.DocType("Salary Structure")
-		ssa = frappe.qb.DocType("Salary Structure Assignment")
 
 		query = (
-			frappe.qb.from_(ssa)
-			.join(ss)
-			.on(ssa.salary_structure == ss.name)
-			.select(ssa.salary_structure)
+			frappe.qb.from_(ss)
+			.select(ss.name)
 			.where(
-				(ssa.docstatus == 1)
-				& (ss.docstatus == 1)
-				& (ss.is_active == "Yes")
-				& (ssa.employee == self.employee)
+				(ss.is_active == "Yes")
+				& (ss.employee == self.employee)
 				& (
-					(ssa.from_date <= self.start_date)
-					| (ssa.from_date <= self.end_date)
-					| (ssa.from_date <= self.joining_date)
+					(ss.from_date <= self.start_date)
+					| (ss.from_date <= self.end_date)
+					| (ss.from_date <= self.joining_date)
 				)
 			)
-			.orderby(ssa.from_date, order=Order.desc)
+			.orderby(ss.from_date, order=Order.desc)
 			.limit(1)
 		)
 
-		if not self.salary_slip_based_on_timesheet and self.payroll_frequency:
-			query = query.where(ss.payroll_frequency == self.payroll_frequency)
-
 		st_name = query.run()
-
+		
 		if st_name:
 			self.salary_structure = st_name[0][0]
 			return self.salary_structure
@@ -743,21 +735,19 @@ class SalarySlip(TransactionBase):
 			}
 			doc.append("earnings", wages_row)
 
-	def set_salary_structure_assignment(self):
-		self._salary_structure_assignment = frappe.db.get_value(
-			"Salary Structure Assignment",
+	def set_salary_structure(self):
+		self._salary_structure = frappe.db.get_value(
+			"Salary Structure",
 			{
 				"employee": self.employee,
-				"salary_structure": self.salary_structure,
 				"from_date": ("<=", self.actual_start_date),
-				"docstatus": 1,
+				"is_active": "Yess",
 			},
 			"*",
 			order_by="from_date desc",
 			as_dict=True,
 		)
-
-		if not self._salary_structure_assignment:
+		if not self._salary_structure:
 			frappe.throw(
 				_(
 					"Please assign a Salary Structure for Employee {0} applicable from or before {1} first"
@@ -1099,11 +1089,13 @@ class SalarySlip(TransactionBase):
 
 	def set_salary_structure_doc(self) -> None:
 		self._salary_structure_doc = frappe.get_cached_doc("Salary Structure", self.salary_structure)
+		
 		# sanitize condition and formula fields
-		for table in ("earnings", "deductions"):
-			for row in self._salary_structure_doc.get(table):
-				row.condition = sanitize_expression(row.condition)
-				row.formula = sanitize_expression(row.formula)
+		# for table in ("earnings", "deductions"):
+		# 	frappe.throw(str(table))
+		# 	for row in self._salary_structure_doc.get(table):
+		# 		row.condition = sanitize_expression(row.condition)
+		# 		row.formula = sanitize_expression(row.formula)
 
 	def add_structure_components(self, component_type):
 		self.data, self.default_data = self.get_data_for_eval()
@@ -1162,7 +1154,7 @@ class SalarySlip(TransactionBase):
 		employee = frappe.get_cached_doc("Employee", self.employee).as_dict()
 
 		if not hasattr(self, "_salary_structure_assignment"):
-			self.set_salary_structure_assignment()
+			self.set_salary_structure()
 
 		data.update(self._salary_structure_assignment)
 		data.update(self.as_dict())
