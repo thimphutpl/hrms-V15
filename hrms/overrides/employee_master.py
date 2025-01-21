@@ -11,17 +11,30 @@ from erpnext.setup.doctype.employee.employee import Employee
 
 class EmployeeMaster(Employee):
 	def autoname(self):
-		# Added by Dawa Tshering on 2024/07/24
+		
 		if self.old_id:
 			self.employee =	self.name = self.old_id
 		else:
 			# naming done with combination with joining year, month and 4 digits series
-			new_name = ''
-			year_month_day = str(self.date_of_joining)[0:4] + str(self.date_of_joining)[5:7] + str(self.date_of_joining)[8:10]
-			name = make_autoname('EMP.####')[3:]
-			new_name = year_month_day + name
-			self.employee =	self.name = new_name
-
+			naming_method = frappe.db.get_value("HR Settings", None, "emp_created_by")
+			if not naming_method:
+				frappe.throw(_("Please setup Employee Naming System in Human Resource > HR Settings"))
+			else:
+				if naming_method == 'Naming Series':
+					if not self.date_of_joining:
+						frappe.throw("Date of Joining not Set!")
+					abbr = frappe.db.get_value("Company", self.company, "abbr")
+					naming_series = str(abbr) + "." + str(getdate(self.date_of_joining).year)[2:4]	
+					x = make_autoname(str(naming_series) + '.###')
+					y = make_autoname(str(getdate(self.date_of_joining).strftime('%m')) + ".#")
+					start_id = cint(len(str(abbr))) + 2
+					eid = x[:start_id] + y[:2] + x[start_id:start_id + 3]
+					self.name = eid
+				# self.yearid = x
+				elif naming_method == 'Employee Number':
+					self.name = self.employee_number
+			
+			self.employee = self.name
 		# Commented by Dawa Tshering on 2024/07/24
 		# naming_method = frappe.db.get_value("HR Settings", None, "emp_created_by")
 		# if not naming_method:
