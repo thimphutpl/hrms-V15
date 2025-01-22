@@ -17,7 +17,7 @@ class PromotionApplication(Document):
 		if not emp_doc.reports_to:
 			frappe.throw(("This employee is not a supervisor and cannot forward the promotion application."))
 
-		supervisor_role = frappe.get_value("Employee", emp_doc.reports_to, "supervisor")
+		supervisor_role = frappe.get_value("Employee", emp_doc.reports_to, "user_id")
 		if frappe.session.user != supervisor_role:
 			frappe.throw(("Only the supervisor can forward the promotion application."))
 
