@@ -245,7 +245,7 @@
    "fieldname": "mode_of_travel",
    "fieldtype": "Select",
    "label": "Mode of Travel",
-   "options": "\nOffice Car\nPersonal Car",
+   "options": "\nOffice Car\nPersonal Car\nPublic Transport(Bus)\nTaxi",
    "reqd": 1
   },
   {
@@ -370,7 +370,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-03 16:37:16.057712",
+ "modified": "2025-01-22 10:51:47.948353",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim",
