@@ -155,6 +155,7 @@
    "fieldname": "dispatch_series_type",
    "fieldtype": "Link",
    "label": "Dispatch Series Type",
+   "mandatory_depends_on": "eval:doc.manual_dispatch ==1",
    "options": "Dispatch Series Type"
   },
   {
@@ -167,7 +168,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-15 10:17:40.357837",
+ "modified": "2025-01-22 15:53:28.163915",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Dispatch Register",
