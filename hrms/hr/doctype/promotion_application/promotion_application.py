@@ -4,24 +4,29 @@
 import frappe
 from frappe.model.document import Document
 from frappe.utils import flt
+from erpnext.custom_workflow import validate_workflow_states, notify_workflow_states
 
 class PromotionApplication(Document):
 	
 	def validate(self):
-		pass
+		validate_workflow_states(self)
+		if self.workflow_state != "Approved":
+			notify_workflow_states(self)
 
 	def on_submit(self):
+		notify_workflow_states(self)
 		# pass
 		# Check if the employee is a supervisor
-		emp_doc = frappe.get_doc("Employee", self.employee)
-		if not emp_doc.reports_to:
-			frappe.throw(("This employee is not a supervisor and cannot forward the promotion application."))
+		# emp_doc = frappe.get_doc("Employee", self.employee)
+		# if not emp_doc.reports_to:
+		# 	frappe.throw(("This employee is not a supervisor and cannot forward the promotion application."))
 
-		supervisor_role = frappe.get_value("Employee", emp_doc.reports_to, "user_id")
-		if frappe.session.user != supervisor_role:
-			frappe.throw(("Only the supervisor can forward the promotion application."))
+		# supervisor_role = frappe.get_value("Employee", emp_doc.reports_to, "user_id")
+		# if frappe.session.user != supervisor_role:
+		# 	frappe.throw(("Only the supervisor can forward the promotion application."))
 
-
+	def on_cancel(self):
+		notify_workflow_states(self)
 	
 	@frappe.whitelist()
 	def get_promotion_detail(self):
@@ -30,11 +35,11 @@ class PromotionApplication(Document):
 		emp_doc = frappe.get_doc("Employee", self.employee)
 
 		# self.supervisor=frappe.get_value("Employee",emp_doc.reports_to, "user_id")
-		self.supervisor=frappe.get_value("Employee",emp_doc.reports_to, "user_id")
-		if not emp_doc.division:
-			frappe.throw("Please assign division to the employee")
-		self.hod=frappe.get_value("Department", emp_doc.division, "approver_hod")
-		self.hod_user = frappe.get_value("Department", emp_doc.division, "approver_id")
+		# self.supervisor=frappe.get_value("Employee",emp_doc.reports_to, "user_id")
+		# if not emp_doc.division:
+		# 	frappe.throw("Please assign division to the employee")
+		# self.hod=frappe.get_value("Department", emp_doc.division, "approver_hod")
+		# self.hod_user = frappe.get_value("Department", emp_doc.division, "approver_id")
 		if last_date:
 			self.last_date_of_promotion=last_date
 

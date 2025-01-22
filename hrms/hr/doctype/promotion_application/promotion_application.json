@@ -39,9 +39,10 @@
   "hod",
   "hod_user",
   "column_break_xlsu",
-  "supervisor",
+  "approver",
+  "approver_name",
+  "approver_designation",
   "amended_from"
-
  ],
  "fields": [
   {
@@ -232,7 +233,7 @@
    "label": "Recommendation of the Supervisor"
   },
   {
-   "depends_on": "eval:doc.hod_user==frappe.session.user",
+   "depends_on": "eval:doc.workflow_state==\"Waiting GM Approval\"",
    "fieldname": "recommendation_of_hod",
    "fieldtype": "Small Text",
    "label": "Recommendation of HoD"
@@ -256,27 +257,39 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "supervisor",
+   "fieldname": "amended_from",
    "fieldtype": "Link",
-   "label": "Supervisor",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Contract Renewal Application",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "approver",
+   "fieldtype": "Link",
+   "label": "Approver",
    "options": "User",
    "read_only": 1
   },
   {
-    "fieldname": "amended_from",
-    "fieldtype": "Link",
-    "label": "Amended From",
-    "no_copy": 1,
-    "options": "Contract Renewal Application",
-    "print_hide": 1,
-    "read_only": 1,
-    "search_index": 1
-   }
+   "fieldname": "approver_name",
+   "fieldtype": "Data",
+   "label": "Approver Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "approver_designation",
+   "fieldtype": "Data",
+   "label": "Approver Designation",
+   "read_only": 1
+  }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-11-30 15:19:21.054926",
+ "modified": "2025-01-22 16:47:02.568208",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Promotion Application",
