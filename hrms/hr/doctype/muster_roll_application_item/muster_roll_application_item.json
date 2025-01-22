@@ -128,7 +128,7 @@
    "fieldname": "rate_per_hour",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Rate Per Hour(Regular)",
+   "label": "Rate Per Hour(Holiday/Special)",
    "read_only": 1,
    "reqd": 1
   },
@@ -193,7 +193,7 @@
   {
    "fieldname": "rate_per_hour_normal",
    "fieldtype": "Currency",
-   "label": "Rate Per Hour (Special)"
+   "label": "Rate Per Hour (Regular/Normal)"
   },
   {
    "fieldname": "nationality",
@@ -206,7 +206,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-12-06 13:18:02.001451",
+ "modified": "2025-01-22 19:31:06.395598",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Muster Roll Application Item",
