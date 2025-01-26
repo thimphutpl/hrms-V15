@@ -787,7 +787,7 @@ class PayrollEntry(Document):
 								"cost_center"   : rec.cost_center,
 								"account_type"   : rec.account_type if rec.party_type == "Employee" else "",
 								"party_type"     : "Supplier",
-								"party"          : rec.institution_name,
+								"party"          : frappe.get_value("Bank", rec.institution_name, "party") if rec.institution_name else "",
 								"reference_type": self.doctype,
 								"reference_name": self.name,
 								"salary_component": rec.salary_component
