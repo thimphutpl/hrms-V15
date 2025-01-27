@@ -185,8 +185,7 @@
    "label": "Branch",
    "oldfieldname": "branch",
    "oldfieldtype": "Select",
-   "options": "Branch",
-   "read_only": 1
+   "options": "Branch"
   },
   {
    "fieldname": "department",
@@ -830,8 +829,7 @@
    "fieldname": "cost_center",
    "fieldtype": "Link",
    "label": "Cost Center",
-   "options": "Cost Center",
-   "read_only": 1
+   "options": "Cost Center"
   },
   {
    "default": "0",
@@ -922,7 +920,7 @@
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2024-11-23 12:35:28.566109",
+ "modified": "2025-01-27 17:59:09.440868",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
