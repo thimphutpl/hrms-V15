@@ -8,6 +8,7 @@ from frappe.utils import cint, flt, nowdate, add_days, getdate, fmt_money, add_t
 from frappe import _
 from erpnext.accounts.utils import get_fiscal_year
 from erpnext.setup.doctype.employee.employee import get_holiday_list_for_employee
+from erpnext.budget.doctype.budget.budget import validate_expense_against_budget
 # from erpnext.accounts.doctype.business_activity.business_activity import get_default_ba
 # from erpnext.accounts.doctype.hr_accounts_settings.hr_accounts_settings import get_bank_account
 
@@ -683,7 +684,6 @@ class PayrollEntry(Document):
 					when sc.type = 'Deduction' and ifnull(sc.make_party_entry,0) = 0 then c.cost_center
 					else t1.cost_center
 				end),
-				sd.institution_name,
 				(case when sc.type = 'Earning' then sc.type else ifnull(sc.clubbed_component,sc.name) end),
 				sc.type,
 				(case when sc.type = 'Earning' then 0 else ifnull(sc.is_remittable,0) end),
@@ -694,6 +694,8 @@ class PayrollEntry(Document):
 			order by t1.cost_center, sc.type, sc.name
 		""".format(self.fiscal_year, self.month, self.name),as_dict=1)
 		# frappe.throw("<pre>{}</pre>".format(frappe.as_json(cc)))
+		# sd.institution_name,
+		
 		# (case
 		# 	when sc.type = 'Deduction' and ifnull(sc.group_by_institution_name,0) = 1 then sd.institution_name
 		# 	else t1.cost_center
@@ -754,44 +756,45 @@ class PayrollEntry(Document):
 							})
 						
 					else:
-						# posting.setdefault(rec.salary_component,[]).append({
-						# 	"account"       : r,
-						# 	"debit_in_account_currency" : flt(rec.amount),
-						# 	"cost_center"   : rec.cost_center,
-						# 	"party_check"   : 0,
-						# 	"account_type"   : rec.account_type if rec.party_type == "Employee" else "",
-						# 	"party_type"     : rec.party_type if rec.party_type == "Employee" else "",
-						# 	"party"          : rec.party if rec.party_type == "Employee" else "",
-						# 	"reference_type": self.doctype,
-						# 	"reference_name": self.name,
-						# 	"salary_component": rec.salary_component
-						# })
 						remit_amount += flt(rec.amount)
-						if rec.group_by_institution_name == 0:
-							posting.setdefault(rec.salary_component,[]).append({
-								"account"       : r,
-								"debit_in_account_currency" : flt(rec.amount),
-								"cost_center"   : rec.cost_center,
-								"party_check"   : 0,
-								"account_type"   : rec.account_type if rec.party_type == "Employee" else "",
-								"party_type"     : rec.party_type if rec.party_type == "Employee" else "",
-								"party"          : rec.party if rec.party_type == "Employee" else "",
-								"reference_type": self.doctype,
-								"reference_name": self.name,
-								"salary_component": rec.salary_component
-							})
-						else:
-							posting.setdefault(rec.salary_component,[]).append({
-								"account"       : r,
-								"debit_in_account_currency" : flt(rec.amount),
-								"cost_center"   : rec.cost_center,
-								"account_type"   : rec.account_type if rec.party_type == "Employee" else "",
-								"party_type"     : "Supplier",
-								"party"          : frappe.get_value("Bank", rec.institution_name, "party") if rec.institution_name else "",
-								"reference_type": self.doctype,
-								"reference_name": self.name,
-								"salary_component": rec.salary_component
-							})
+						posting.setdefault(rec.salary_component,[]).append({
+							"account"       : r,
+							"debit_in_account_currency" : flt(rec.amount),
+							"cost_center"   : rec.cost_center,
+							"party_check"   : 0,
+							"account_type"   : rec.account_type if rec.party_type == "Employee" else "",
+							"party_type"     : rec.party_type if rec.party_type == "Employee" else "",
+							"party"          : rec.party if rec.party_type == "Employee" else "",
+							"reference_type": self.doctype,
+							"reference_name": self.name,
+							"salary_component": rec.salary_component
+						})
+						# remit_amount += flt(rec.amount)
+						# if rec.group_by_institution_name == 0:
+						# 	posting.setdefault(rec.salary_component,[]).append({
+						# 		"account"       : r,
+						# 		"debit_in_account_currency" : flt(rec.amount),
+						# 		"cost_center"   : rec.cost_center,
+						# 		"party_check"   : 0,
+						# 		"account_type"   : rec.account_type if rec.party_type == "Employee" else "",
+						# 		"party_type"     : rec.party_type if rec.party_type == "Employee" else "",
+						# 		"party"          : rec.party if rec.party_type == "Employee" else "",
+						# 		"reference_type": self.doctype,
+						# 		"reference_name": self.name,
+						# 		"salary_component": rec.salary_component
+						# 	})
+						# else:
+						# 	posting.setdefault(rec.salary_component,[]).append({
+						# 		"account"       : r,
+						# 		"debit_in_account_currency" : flt(rec.amount),
+						# 		"cost_center"   : rec.cost_center,
+						# 		"account_type"   : rec.account_type if rec.party_type == "Employee" else "",
+						# 		"party_type"     : "Supplier",
+						# 		"party"          : frappe.get_value("Bank", rec.institution_name, "party") if rec.institution_name else "",
+						# 		"reference_type": self.doctype,
+						# 		"reference_name": self.name,
+						# 		"salary_component": rec.salary_component
+						# 	})
 
 				# if rec.salary_component != 'Salary Tax':
 				posting.setdefault(rec.salary_component,[]).append({
@@ -848,6 +851,9 @@ class PayrollEntry(Document):
 		# 	frappe.throw(str(posting))
 		# Final Posting to accounts
 		if posting:
+			# Budget check
+			self.check_budget(posting)
+
 			jv_name, v_title = None, ""
 			for i in posting:
 				if i == "to_payables":
@@ -893,7 +899,36 @@ class PayrollEntry(Document):
 		else:
 			frappe.throw(_("No data found"),title="Posting failed")
 	##### Ver3.0.190304 Ends
-	
+	# Ver 20190719.1 added by SHIV, JIGME on 2019/07/19
+	def check_budget(self, posting):
+		budget_error = []
+		### Ver.2.0.200106 Begins, added by SHIV on 2019/01/06
+		# Budget check should happen on processing year and month not nowdate()
+		budget_date = "-".join([self.fiscal_year, self.month, '01'])
+		budget_date = budget_date if budget_date else nowdate()
+		### Ver.2.0.200106 Ends
+		def check_budget_voucher_wise(vouchertype):
+			for rec in sorted(posting[vouchertype], key=lambda item: item['cost_center']):
+				if flt(rec.get("debit_in_account_currency")) > 0:
+					#frappe.msgprint(_("{0} {1}").format(vouchertype, rec))
+					if frappe.db.exists("Account", {"name": rec.get("account"), "root_type": "Expense"}):
+						### Ver.2.0.200106 Begins, added by SHIV on 2019/01/06
+						# Following line is replaced
+						#error = check_budget_available(rec.get("cost_center"), rec.get("account"), nowdate(), flt(rec.get("debit_in_account_currency")), False)
+						error = validate_expense_against_budget({"cost_center": rec.get("cost_center"), "account": rec.get("account"), "posting_date": budget_date, "amount": flt(rec.get("debit_in_account_currency")), "company": self.company}, False)
+						### Ver.2.0.200106 Ends
+						if error:
+							budget_error.append(error)
+
+		for p in posting:
+			check_budget_voucher_wise(p)
+
+		msg = ""
+		if budget_error:
+			for e in range(len(budget_error)):
+				msg += f"{e+1}#  {budget_error[e]} </br>"
+
+			frappe.throw(msg, title="Insufficient Budget")
 
 
 @frappe.whitelist()
