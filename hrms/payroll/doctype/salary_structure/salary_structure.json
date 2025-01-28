@@ -1327,7 +1327,7 @@
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2024-12-30 14:08:38.301773",
+ "modified": "2025-01-22 11:39:36.183980",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
@@ -1356,6 +1356,15 @@
    "role": "HR Manager",
    "share": 1,
    "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Employee",
+   "share": 1
   }
  ],
  "show_name_in_global_search": 1,

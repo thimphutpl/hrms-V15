@@ -205,7 +205,7 @@
    "hidden": 0,
    "is_query_report": 0,
    "label": "Attendance Other",
-   "link_count": 3,
+   "link_count": 5,
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
@@ -216,6 +216,16 @@
    "label": "Attendance Others",
    "link_count": 0,
    "link_to": "Attendance Others",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Update Attendance Others",
+   "link_count": 0,
+   "link_to": "Update Attendance Others",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -239,10 +249,20 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Process MR Payment",
+   "link_count": 0,
+   "link_to": "Process MR Payment",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2024-12-20 15:35:43.162649",
- "modified_by": "Administrator",
+ "modified": "2025-01-27 09:32:59.119583",
+ "modified_by": "sangay.choden@thimphutechpark.bt",
  "module": "HR",
  "name": "Shift & Attendance",
  "number_cards": [],

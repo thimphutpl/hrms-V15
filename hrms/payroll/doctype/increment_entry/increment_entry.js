@@ -69,14 +69,14 @@ frappe.ui.form.on('Increment Entry', {
 		})
 	},
 
-	add_context_buttons: function(frm) {
+	// add_context_buttons: function(frm) {
 
-		if(frm.doc.salary_increments_created && frm.doc.salary_increments_submitted == 0) {
-			frm.add_custom_button(__("Submit Salary Increment"), function() {
-				submit_salary_increment(frm);
-			}).addClass("btn-primary");
-		}
-	},
+	// 	if(frm.doc.salary_increments_created && frm.doc.salary_increments_submitted == 0) {
+	// 		frm.add_custom_button(__("Submit Salary Increment"), function() {
+	// 			submit_salary_increment(frm);
+	// 		}).addClass("btn-primary");
+	// 	}
+	// },
 
 	company: function (frm) {
 		frm.events.clear_employee_table(frm);

@@ -1,10 +1,9 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "OTA.-.YY.-.MM.-.DD.-.###",
- "creation": "2022-09-23 23:32:28.639859",
+ "autoname": "OTA.YY.MM.#####",
+ "creation": "2025-01-15 22:35:59.654292",
  "doctype": "DocType",
- "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "section_break_1",
@@ -13,62 +12,40 @@
   "rejection_reason",
   "section_break_2",
   "employee",
-  "column_break_pgib",
+  "column_break_3",
   "employee_name",
-  "department",
-  "column_break_qldj",
+  "column_break_5",
   "branch",
-  "designation",
-  "column_break_qkot",
+  "col_brk",
   "cost_center",
-  "employment_type",
-  "grade",
-  "employee_group",
-  "approval_details_section",
+  "section_break_11",
   "posting_date",
-  "column_break_meoa",
-  "verifier1",
+  "column_break_7",
+  "ot_approver",
   "approver",
-  "column_break_tlcw",
-  "verifier_name",
+  "column_break_11",
+  "ot_approver_name",
   "approver_name",
   "section_break_7",
   "rate",
   "total_hours",
   "total_amount",
-  "actual_hours",
-  "total_hour",
-  "total_hours_lapsed",
   "column_break_14",
   "purpose",
-  "actual_amount",
   "section_break_13",
   "items",
-  "section_break_qgtb",
+  "section_break_25",
   "payment_jv",
-  "more_info_section",
+  "mi_sb",
   "remarks",
   "amended_from",
   "workflow_state",
-  "section_break_11",
+  "bank_name",
+  "approver_sec",
   "verifier",
-  "approver_names",
-  "column_break_dnyo",
   "w_approver",
-  "approver_full_name",
-  "column_break_11",
   "rejector",
-  "approvers",
-  "approver_designation",
-  "sb_remarks",
-  "payment_jvs",
-  "processed",
-  "sb_additional_info",
-  "company",
-  "payment_made",
-  "salary_component",
-  "column_break_20",
-  "salary_slip"
+  "journal_entry"
  ],
  "fields": [
   {
@@ -103,14 +80,15 @@
   {
    "fieldname": "employee",
    "fieldtype": "Link",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
    "label": "Employee",
    "options": "Employee",
    "reqd": 1
   },
   {
-   "fetch_from": "employee.employee_name",
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
    "fieldname": "employee_name",
    "fieldtype": "Data",
    "in_list_view": 1,
@@ -119,24 +97,36 @@
    "reqd": 1
   },
   {
-   "fetch_from": "employee.branch",
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
    "fieldname": "branch",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "in_standard_filter": 1,
    "label": "Branch",
    "options": "Branch",
    "read_only": 1,
    "reqd": 1
   },
   {
-   "collapsible": 1,
+   "fieldname": "col_brk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
    "fieldname": "section_break_11",
    "fieldtype": "Section Break",
    "label": "Approval Details"
   },
   {
-   "default": "Today",
    "fieldname": "posting_date",
    "fieldtype": "Date",
    "in_list_view": 1,
@@ -144,10 +134,16 @@
    "reqd": 1
   },
   {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
    "fetch_from": "employee.second_approver",
    "fieldname": "approver",
    "fieldtype": "Data",
-   "label": "Approver"
+   "hidden": 1,
+   "label": "Approver",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_11",
@@ -157,7 +153,9 @@
    "fetch_from": "employee.second_approver_name",
    "fieldname": "approver_name",
    "fieldtype": "Data",
-   "label": "Approver Name"
+   "hidden": 1,
+   "label": "Approver Name",
+   "read_only": 1
   },
   {
    "fieldname": "section_break_7",
@@ -175,6 +173,7 @@
    "fieldname": "total_hours",
    "fieldtype": "Float",
    "label": "Total Number of Hours",
+   "precision": "2",
    "read_only": 1,
    "reqd": 1
   },
@@ -207,112 +206,25 @@
    "reqd": 1
   },
   {
+   "fieldname": "section_break_25",
+   "fieldtype": "Section Break"
+  },
+  {
    "fieldname": "payment_jv",
    "fieldtype": "Read Only",
    "label": "Payment Voucher"
   },
   {
    "collapsible": 1,
-   "fieldname": "remarks",
-   "fieldtype": "Text",
-   "label": "Remarks"
-  },
-  {
-   "fieldname": "approver_designation",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Approver Designation",
-   "read_only": 1
+   "fieldname": "mi_sb",
+   "fieldtype": "Section Break",
+   "label": "More Info"
   },
   {
    "collapsible": 1,
-   "fieldname": "sb_remarks",
-   "fieldtype": "Section Break",
-   "hidden": 1,
-   "label": "REMARKS"
-  },
-  {
-   "fieldname": "sb_additional_info",
-   "fieldtype": "Section Break",
-   "hidden": 1,
-   "label": "ADDITIONAL INFORMATION"
-  },
-  {
-   "fieldname": "column_break_20",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fetch_from": "employee.company",
-   "fieldname": "company",
-   "fieldtype": "Link",
-   "label": "Company",
-   "options": "Company",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "employee.employment_type",
-   "fieldname": "employment_type",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Employment Type",
-   "options": "Employment Type",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "employee.employee_group",
-   "fieldname": "employee_group",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Employee Group",
-   "options": "Employee Group",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "employee.grade",
-   "fieldname": "grade",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Grade",
-   "options": "Employee Grade",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "employee.department",
-   "fieldname": "department",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Department",
-   "options": "Department",
-   "read_only": 1
-  },
-  {
-   "fieldname": "actual_hours",
-   "fieldtype": "Float",
-   "hidden": 1,
-   "label": "Total Hours Claimed",
-   "read_only": 1
-  },
-  {
-   "fieldname": "total_hours_lapsed",
-   "fieldtype": "Float",
-   "hidden": 1,
-   "label": "Total Hours Lapsed",
-   "read_only": 1
-  },
-  {
-   "default": "Unpaid",
-   "fieldname": "payment_made",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "in_list_view": 1,
-   "label": "Payment Status",
-   "read_only": 1
-  },
-  {
-   "fieldname": "salary_slip",
-   "fieldtype": "Data",
-   "label": "Salary Slip",
-   "read_only": 1
+   "fieldname": "remarks",
+   "fieldtype": "Text",
+   "label": "Remarks"
   },
   {
    "fieldname": "amended_from",
@@ -324,131 +236,26 @@
    "read_only": 1
   },
   {
-   "fieldname": "salary_component",
-   "fieldtype": "Link",
-   "label": "Salary Component",
-   "options": "Salary Component",
-   "read_only": 1
-  },
-  {
-   "default": "0",
-   "fieldname": "processed",
-   "fieldtype": "Check",
-   "label": "Processed"
-  },
-  {
-   "fetch_from": "employee.designation",
-   "fieldname": "designation",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Designation",
-   "options": "Designation",
-   "read_only": 1
-  },
-  {
-   "fieldname": "actual_amount",
-   "fieldtype": "Currency",
-   "hidden": 1,
-   "label": "Net Amount",
-   "read_only": 1
-  },
-  {
-   "fieldname": "column_break_dnyo",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fetch_from": "employee.reports_to_name",
-   "fieldname": "approver_full_name",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Approver Name"
-  },
-  {
-   "fieldname": "column_break_pgib",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_qldj",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_qkot",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "cost_center",
-   "fieldtype": "Link",
-   "label": "Cost Center",
-   "options": "Cost Center",
-   "read_only": 1,
-   "reqd": 1
-  },
-  {
-   "fieldname": "approval_details_section",
-   "fieldtype": "Section Break",
-   "label": "Approval Details"
-  },
-  {
-   "fetch_from": "employee.reports_to",
-   "fieldname": "verifier1",
-   "fieldtype": "Data",
-   "label": "Verifier"
-  },
-  {
-   "fetch_from": "employee.reports_to",
-   "fieldname": "approvers",
-   "fieldtype": "Read Only",
-   "hidden": 1,
-   "label": "Approver Email ID"
-  },
-  {
-   "fieldname": "column_break_tlcw",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fetch_from": "employee.approver_name",
-   "fieldname": "verifier_name",
-   "fieldtype": "Data",
-   "label": "Verifier Name"
-  },
-  {
-   "fetch_from": "employee.reports_to",
-   "fieldname": "approver_names",
-   "fieldtype": "Read Only",
-   "hidden": 1,
-   "label": "Approver"
-  },
-  {
-   "fieldname": "total_hour",
-   "fieldtype": "Float",
-   "hidden": 1,
-   "label": "Total Hours Accepted for Payment",
-   "precision": "2",
-   "read_only": 1
-  },
-  {
-   "fieldname": "section_break_qgtb",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "payment_jvs",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Journal Entry",
-   "read_only": 1
-  },
-  {
-   "fieldname": "more_info_section",
-   "fieldtype": "Section Break",
-   "label": "More Info"
-  },
-  {
    "allow_on_submit": 1,
    "fieldname": "workflow_state",
    "fieldtype": "Link",
    "hidden": 1,
    "label": "Workflow State",
    "options": "Workflow State"
+  },
+  {
+   "fieldname": "bank_name",
+   "fieldtype": "Read Only",
+   "hidden": 1,
+   "label": "Bank",
+   "options": "employee.bank_name",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "approver_sec",
+   "fieldtype": "Section Break",
+   "label": "APPROVER DETAILS"
   },
   {
    "fieldname": "verifier",
@@ -466,14 +273,30 @@
    "label": "Rejected/Cancelled By"
   },
   {
-   "fieldname": "column_break_meoa",
-   "fieldtype": "Column Break"
+   "fieldname": "ot_approver",
+   "fieldtype": "Link",
+   "label": "OT Approver",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.second_approver_name",
+   "fieldname": "ot_approver_name",
+   "fieldtype": "Data",
+   "label": "OT Approver Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "journal_entry",
+   "fieldtype": "Link",
+   "label": "Journal Entry",
+   "options": "Journal Entry"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-31 11:01:28.395228",
+ "modified": "2025-01-21 22:41:11.608254",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Overtime Application",
@@ -482,7 +305,6 @@
  "permissions": [
   {
    "create": 1,
-   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
@@ -499,9 +321,19 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "Employee",
+   "role": "HR Manager",
    "share": 1,
-   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
+   "share": 1,
    "write": 1
   },
   {
@@ -512,7 +344,7 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "HR User",
+   "role": "OT Approver",
    "share": 1,
    "submit": 1,
    "write": 1
@@ -524,14 +356,12 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "Expense Approver",
+   "role": "OT Supervisor",
    "share": 1,
-   "submit": 1,
    "write": 1
   }
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": [],
- "title_field": "employee_name"
+ "states": []
 }

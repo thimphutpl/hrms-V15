@@ -52,9 +52,9 @@ frappe.ui.form.on('Muster Roll Application', {
 			var child = locals[cdt][cdn];
 			console.log("pl");
 			return {    
-				filters:[
-					['financial_institution', '=', child.bank]
-				]
+				// filters:[
+				// 	['financial_institution', '=', child.bank]
+				// ]
 			}
 		}
 	},

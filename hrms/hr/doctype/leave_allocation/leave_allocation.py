@@ -5,7 +5,10 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
+from frappe.utils import flt, cint, getdate, date_diff, nowdate
 from frappe.utils import add_days, date_diff, flt, formatdate, getdate
+from frappe.utils.data import get_first_day, get_last_day, add_days
+from erpnext.custom_utils import get_year_start_date, get_year_end_date
 
 from hrms.hr.doctype.leave_application.leave_application import get_approved_leaves_for_period
 from hrms.hr.doctype.leave_ledger_entry.leave_ledger_entry import (
@@ -74,6 +77,7 @@ class LeaveAllocation(Document):
 					).format(self.leave_type, self.employee),
 					OverAllocationError,
 				)
+
 
 	def on_submit(self):
 		self.create_leave_ledger_entry()
@@ -167,6 +171,7 @@ class LeaveAllocation(Document):
 			)
 
 	def validate_allocation_overlap(self):
+		return
 		leave_allocation = frappe.db.sql(
 			"""
 			SELECT
@@ -370,3 +375,36 @@ def get_unused_leaves(employee, leave_type, from_date, to_date):
 def validate_carry_forward(leave_type):
 	if not frappe.db.get_value("Leave Type", leave_type, "is_carry_forward"):
 		frappe.throw(_("Leave Type {0} cannot be carry-forwarded").format(leave_type))
+
+# Post earned leave on the first day of every month
+##
+def post_earned_leaves():	
+	if not getdate(frappe.utils.nowdate()) == getdate(get_first_day(frappe.utils.nowdate())):		
+		return 0	
+	date = add_days(frappe.utils.nowdate(), -20)
+	start = get_first_day(date);
+	end = get_last_day(date);	
+	employees = frappe.db.sql("select name, employee_name, date_of_joining from `tabEmployee` where status = 'Active' limit 1", as_dict=True)	
+	for e in employees:		
+		if cint(date_diff(end, getdate(e.date_of_joining))) > 14:			
+			la = frappe.new_doc("Leave Allocation")
+			la.employee = e.name
+			la.employee_name = e.employee_name
+			la.leave_type = "Earned Leave"
+			la.from_date = str(start)
+			la.to_date = str(end)
+			la.carry_forward = cint(1)
+			la.new_leaves_allocated = flt(2.5)
+			la.submit()
+			print(f"Leave Allocation submitted successfully for {e.name}!")
+		else:
+			pass
+
+@frappe.whitelist()
+def get_date_diff(start_date, end_date):
+	if start_date is None:
+		return 0
+	elif end_date is None:
+		return 0
+	else:	
+		return frappe.utils.data.date_diff(end_date, start_date) + 1

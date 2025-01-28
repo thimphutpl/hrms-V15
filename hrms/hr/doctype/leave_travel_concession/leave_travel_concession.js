@@ -16,7 +16,7 @@ frappe.ui.form.on('Leave Travel Concession', {
 
 	refresh: function(frm) {
 		if(!frm.doc.posting_date) {
-			frm.set_value("posting_date", get_today())
+			frm.set_value("posting_date", frappe.datetime.get_today())
 		}
 
 		if(frm.doc.docstatus == 1) {

@@ -66,7 +66,12 @@ class PayrollEntry(Document):
 	# ver.2020.10.20 Begins
 	# following method copied from NRDCL by SHIV on 2020/10/20
 	def get_emp_list(self, process_type=None):
+		emp_cond = " and 1 = 1"	
 		self.set_month_dates()
+		if self.employment_type == 'GCE':
+			emp_cond = " and employment_type = 'GCE'"
+		if self.employment_type == 'Others':
+			emp_cond = " and employment_type != 'GCE'"
 
 		cond = self.get_filter_condition()
 		cond += self.get_joining_relieving_condition()
@@ -86,7 +91,7 @@ class PayrollEntry(Document):
 
 		if not emp_list:
 			frappe.msgprint(_("No employees found for processing or Salary Slips already created"))
-		return emp_list
+		return emp_list	
 
 	@frappe.whitelist()
 	def fill_employee_details(self):
@@ -107,14 +112,23 @@ class PayrollEntry(Document):
 		'''
 		# ver.2020.10.20 Ends
 
+	
 	def get_filter_condition(self):
 		self.check_mandatory()
 
 		cond = ''
-		for f in ['company', 'branch', 'department', 'designation', 'employee']:
+		if self.employment_type: 
+                        if self.employment_type == 'GCE':
+                                cond += " and t1.employment_type = 'GCE'"
+
+                        else:
+                                cond += " and t1.employment_type != 'GCE'"
+
+		for f in ['company', 'employee']:
 			if self.get(f):
 				cond += " and t1." + f + " = '" + self.get(f).replace("'", "\'") + "'"
-
+	
+			
 		return cond
 
 	def get_joining_relieving_condition(self):

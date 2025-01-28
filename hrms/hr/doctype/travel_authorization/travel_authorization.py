@@ -13,61 +13,49 @@ from frappe.model.mapper import get_mapped_doc
 from datetime import timedelta
 from erpnext.custom_workflow import validate_workflow_states, notify_workflow_states
 from erpnext.accounts.doctype.accounts_settings.accounts_settings import get_bank_account
- 
 
 class TravelAuthorization(Document):
-	 
 	def validate(self):
 		validate_workflow_states(self)
-		self.branch = frappe.db.get_value("Employee", self.employee, "branch")
-		self.cost_center = frappe.db.get_value("Employee", self.employee, "cost_center")
-		
-		
-		self.validate_project()
+		self.validate_travel_last_day()
 		self.assign_end_date()
-		
 		self.validate_advance()
 		self.set_travel_period()
 		self.validate_travel_dates(update=True)
-		self.check_maintenance_project()
-		if self.workflow_state != "Approved":
-			notify_workflow_states(self)
 		if self.training_event:
 			self.update_training_event()
-
+		if self.workflow_state != "Approved":
+			notify_workflow_states(self)
 
 	def on_update(self):
-		# self.set_dsa_rate()
 		self.validate_travel_dates()
-		self.check_double_dates()
+		self.check_date_overlap()
 		self.check_leave_applications()
 
-	def before_submit(self):
-		self.create_copy()
-
 	def on_submit(self):
-		# self.post_advance_jv()
+		# notify_workflow_states(self)
 		self.validate_travel_dates(update=True)
-		self.check_status()
-		# self.check_workflow_status()
 		self.create_attendance()
+		self.post_journal_entry()
 		if self.travel_type=="Training":
 			self.update_training_records()
-		notify_workflow_states(self)
 
-	def before_cancel(self):
-		self.update_training_records(cancel=True)
-		if self.advance_journal:
-			for t in frappe.get_all("Journal Entry", ["name"], {"name": self.advance_journal, "docstatus": ("<",2)}):
-				msg = '<b>Reference# : <a href="#Form/Journal Entry/{0}">{0}</a></b>'.format(t.name)
-				frappe.throw(_("Advance payment for this transaction needs to be cancelled first.<br>{0}").format(msg),title='<div style="color: red;">Not permitted</div>')
-		ta = frappe.db.sql("""
-			select name from `tabTravel Claim` where ta = '{}' and docstatus != 2
-		""".format(self.name))
-		if ta:
-			frappe.throw("""There is Travel Claim <a href="#Form/Travel%20Claim/{0}"><b>{0}</b></a> linked to this Travel Authorization""".format(ta[0][0]))
+	def validate_travel_last_day(self):
+		if len(self.get("items")) > 1:
+			self.items[-1].is_last_day = 1
+	
+	# def before_cancel(self):
+	# 	self.update_training_records(cancel=True)
+	# 	if self.advance_journal:
+	# 		for t in frappe.get_all("Journal Entry", ["name"], {"name": self.advance_journal, "docstatus": ("<",2)}):
+	# 			msg = '<b>Reference# : <a href="#Form/Journal Entry/{0}">{0}</a></b>'.format(t.name)
+	# 			frappe.throw(_("Advance payment for this transaction needs to be cancelled first.<br>{0}").format(msg),title='<div style="color: red;">Not permitted</div>')
+	# 	ta = frappe.db.sql("""
+	# 		select name from `tabTravel Claim` where ta = '{}' and docstatus != 2
+	# 	""".format(self.name))
+	# 	if ta:
+	# 		frappe.throw("""There is Travel Claim <a href="#Form/Travel%20Claim/{0}"><b>{0}</b></a> linked to this Travel Authorization""".format(ta[0][0]))
 		
-
 	def update_training_records(self, cancel=False):
 		emp_doc=frappe.get_doc("Employee", self.employee)
 		if cancel:
@@ -78,7 +66,6 @@ class TravelAuthorization(Document):
 	
 		else:
 			emp_doc.append("train_record",{
-
 				"from_date": self.from_date,
 				"to_date": self.to_date,
 				"training_name": self.course_name,
@@ -90,27 +77,18 @@ class TravelAuthorization(Document):
 			})
 			emp_doc.save()
 
-	def on_cancel_after_draft(self):
-		validate_workflow_states(self)
-		notify_workflow_states(self)
-
 	def on_cancel(self):
-		# if self.travel_claim:
-		#     frappe.throw("Cancel the Travel Claim before cancelling Authorization")
-		#if not self.cancellation_reason:
-		#	frappe.throw("Cancellation Reason is Mandatory when Cancelling Travel Authorization")
 		self.cancel_attendance()	
 		if self.training_event:
 			self.update_training_event(cancel=True)
 		notify_workflow_states(self)
 
 	def on_update_after_submit(self):
-		# if self.travel_claim:
-		#     frappe.throw("Cannot change once claim is created")
+		if self.travel_claim:
+			frappe.throw("Cannot change once claim is created")
 		self.validate_travel_dates(update=True)
-		self.check_double_dates()
+		self.check_date_overlap()
 		self.check_leave_applications()
-		#self.assign_end_date()
 		self.db_set("end_date_auth", self.items[len(self.items) - 1].date)
 		self.cancel_attendance()
 		self.create_attendance()
@@ -127,48 +105,24 @@ class TravelAuthorization(Document):
 					update `tabTraining Event Employee` set travel_authorization_id = NULL where name = '{}'
 					""".format(self.training_event_child_ref))
 
-	def create_copy(self):
-		self.details = []
-		for a in self.items:
-			self.append("details", {"date": a.date, "halt": a.halt, "till_date": a.till_date, "no_days": a.no_days, "from_place": a.from_place, "halt_at": a.halt_at})
-
-	def validate_project(self):
-		for a in self.items:
-			if a.reference_type == "Project":
-				if frappe.db.get_value("Project", a.reference_name, "status") in ("Completed", "Cancelled"):
-					frappe.throw("Cannot create or submit Journal Entry {} since the project {} is {}".format(self.name, a.reference_name, frappe.db.get_value("Project", a.reference_name, "status")))
-			elif a.reference_type == "Task":
-				if frappe.db.get_value("Project", frappe.db.get_value("Task", a.reference_name, "project"), "status") in ("Completed", "Cancelled"):
-					frappe.throw("Cannot create or submit Journal Entry {} since the project {} is {}".format(self.name, a.reference_name, frappe.db.get_value("Project", frappe.db.get_value("Task", a.reference_name, "project"), "status")))
-
 	def validate_advance(self):
-		if self.need_advance==1:
-			if flt(self.advance_amount) > flt(flt(self.estimated_amount) * 0.9):
-				frappe.throw("Advance Amount cannot be greater than 90% of Total Estimated Amount")
-			self.advance_amount_nu  = 0 if not self.need_advance else self.advance_amount
-		else:
-			self.advance_amount_nu  = 0
-
+		self.advance_amount     = 0 if not self.need_advance else self.advance_amount
+		if flt(self.advance_amount) > flt(flt(self.estimated_amount) * 0.9):
+			frappe.throw("Advance Amount cannot be greater than 90% of Total Estimated Amount")
+		self.base_advance_amount  = 0 if not self.need_advance else self.base_advance_amount
+		self.advance_journal    = None if self.docstatus == 0 else self.advance_journal
 
 	def set_travel_period(self):
-		period = frappe.db.sql("""select min(`date`) as min_date, max(till_date) as max_date
+		period = frappe.db.sql("""select min(`from_date`) as min_date, max(to_date) as max_date
 				from `tabTravel Authorization Item` where parent = '{}' """.format(self.name), as_dict=True)
 		if period:
 			self.from_date 	= period[0].min_date
 			self.to_date 	= period[0].max_date
 
-	def check_maintenance_project(self):
-		row = 1
-		if self.for_maintenance_project == 1:
-			for item in self.items:
-				if not item.reference_type or not item.reference_name:
-					frappe.throw("Project/Maintenance and Reference Name fields are Mandatory in Row {}".format(row),title="Cannot Save")
-				row += 1 
-
 	def create_attendance(self):
 		for row in self.items:
-			from_date = getdate(row.date)
-			to_date = getdate(row.till_date) if cint(row.halt) else getdate(row.date)
+			from_date = getdate(row.from_date)
+			to_date = getdate(row.to_date) if cint(row.halt) else getdate(row.from_date)
 			noof_days = date_diff(to_date, from_date) + 1
 			for a in range(noof_days):
 				attendance_date = from_date + timedelta(days=a)
@@ -192,25 +146,19 @@ class TravelAuthorization(Document):
 				attendance.submit()
 
 	def cancel_attendance(self):
-		
 		if frappe.db.exists("Attendance", {"reference_name":self.name}):
 			frappe.db.sql("delete from tabAttendance where reference_name = %s", (self.name))
 	
 	def assign_end_date(self):
 		if self.items:
-			self.end_date_auth = self.items[len(self.items) - 1].date 
+			self.end_date_auth = self.items[len(self.items) - 1].from_date 
 
-	##
-	# check advance and make necessary journal entry
-	##
-	@frappe.whitelist()
-	def make_advance_payment(self):
+	def post_journal_entry(self):
 		if self.need_advance:
-			# frappe.throw("here and There")
-			if flt(self.advance_amount_nu) > 0:
+			if self.currency and flt(self.base_advance_amount) > 0:
 				cost_center = frappe.db.get_value("Employee", self.employee, "cost_center")
 				advance_account = frappe.db.get_single_value("HR Accounts Settings", "employee_advance_travel")
-				expense_bank_account = get_bank_account(self.branch)
+				expense_bank_account = get_bank_account(self.branch, self.company)
 				# expense_bank_account = frappe.db.get_value("Branch", self.branch, "expense_bank_account")
 				if not cost_center:
 					frappe.throw("Setup Cost Center for employee in Employee Information")
@@ -219,12 +167,8 @@ class TravelAuthorization(Document):
 				if not advance_account:
 					frappe.throw("Setup Advance to Employee (Travel) in HR Accounts Settings")
 
-				if frappe.db.exists('Company', {'abbr': 'BOBL'}):
-					voucher_type = 'Journal Entry'
-					naming_series = 'Journal Voucher'
-				else:
-					voucher_type = 'Bank Entry'
-					naming_series = 'Bank Payment Voucher'
+				voucher_type = 'Bank Entry'
+				naming_series = 'Bank Payment Voucher'
 
 				je = frappe.new_doc("Journal Entry")
 				je.flags.ignore_permissions = 1 
@@ -234,91 +178,70 @@ class TravelAuthorization(Document):
 				je.remark = 'Advance Payment against Travel Authorization: ' + self.name;
 				je.posting_date = self.posting_date
 				je.branch = self.branch
-				
 	
 				je.append("accounts", {
 					"account": advance_account,
 					"party_type": "Employee",
 					"party": self.employee,
-					"reference_type": "Travel Authorization",
+					"reference_type": self.doctype,
 					"reference_name": self.name,
 					"cost_center": cost_center,
-					"debit_in_account_currency": flt(self.advance_amount_nu),
-					"debit": flt(self.advance_amount_nu),
+					"debit_in_account_currency": flt(self.base_advance_amount),
+					"debit": flt(self.base_advance_amount),
 					"is_advance": "Yes"
 				})
 
 				je.append("accounts", {
 					"account": expense_bank_account,
 					"cost_center": cost_center,
-					"credit_in_account_currency": flt(self.advance_amount_nu),
-					"credit": flt(self.advance_amount_nu),
+					"credit_in_account_currency": flt(self.base_advance_amount),
+					"credit": flt(self.base_advance_amount),
 				})
 				
-				je.insert()
-				
-				#Set a reference to the advance journal entry
-				self.db_set("advance_journal", je.name)
-				self.advance_journal=je.name
-				frappe.msgprint("Advanced Request Successfull")
-			else:
-				frappe.throw("Advance amount in Nu is missing")
-	##
-	# Allow only approved authorizations to be submitted
-	##
-	def check_status(self):
-		if self.document_status == "Rejected":
-			frappe.throw("Rejected Documents cannot be submitted")
-		return
-		if not self.document_status == "Approved":
-			frappe.throw("Only Approved Documents can be submitted")
+				je.insert(ignore_permissions=True)
+				self.db_set("journal_entry", je.name)
 
-	##
-	# Ensure the dates are consistent
-	##
 	def validate_travel_dates(self, update=False):
-		for idx, item in enumerate(self.get("items")):
-			if item.halt:
-				if not item.till_date:
-					frappe.throw(_("Row#{0} : Till Date is Mandatory for Halt Days.").format(item.idx),title="Invalid Date")
+		for item in self.get("items"):
+			if cint(item.halt):
+				if not item.halt_at:
+					frappe.throw(_("Row#{}: <b>Halt at</b> is mandatory").format(item.idx))
+				elif not item.to_date:
+					frappe.throw(_("Row#{0}: <b>To Date</b> is mandatory").format(item.idx),title="Invalid Date")
+				elif item.from_date and item.to_date and (item.to_date < item.from_date):	
+					frappe.throw(_("Row#{0}: <b>To Date</b> cannot be earlier to <b>From Date</b>").format(item.idx),title="Invalid Date")
 			else:
-				if not item.till_date:
-					item.till_date = item.date
-
-			from_date = item.date
-			to_date   = item.date if not item.till_date else item.till_date
+				if not (item.travel_from and item.travel_to):
+					frappe.throw(_("Row#{0}: <b>Travel From</b> and <b>Travel To</b> are mandatory").format(item.idx))
+				item.to_date = item.from_date
+			from_date = item.from_date
+			to_date   = item.from_date if not item.to_date else item.to_date
 			item.no_days   = date_diff(to_date, from_date) + 1
-			
 			if update:
 				frappe.db.set_value("Travel Authorization Item", item.name, "no_days", item.no_days)
-		
 		if self.items:
 			# check if the travel dates are already used in other travel authorization
-			tas = frappe.db.sql("""select t3.idx, t1.name, t2.date, t2.till_date
+			tas = frappe.db.sql("""select t3.idx, t1.name, t2.from_date, t2.to_date
 					from 
 						`tabTravel Authorization` t1, 
 						`tabTravel Authorization Item` t2,
 						`tabTravel Authorization Item` t3
 					where t1.employee = "{employee}"
-					and t1.docstatus = 1
+					and t1.docstatus != 2
+					and t1.workflow_state !="Rejected"
 					and t1.name != "{travel_authorization}"
 					and t2.parent = t1.name
 					and t3.parent = "{travel_authorization}"
 					and (
-						(t2.date <= t3.till_date and t2.till_date >= t3.date)
+						(t2.from_date <= t3.to_date and t2.to_date >= t3.from_date)
 						or
-						(t3.date <= t2.till_date and t3.till_date >= t2.date)
+						(t3.from_date <= t2.to_date and t3.to_date >= t2.from_date)
 					)
 			""".format(travel_authorization = self.name, employee = self.employee), as_dict=True)
 			for t in tas:
-				pass
-				# frappe.throw("Row#{}: The dates in your current Travel Authorization have already been claimed in {} between {} and {}"\
-				# 	.format(t.idx, frappe.get_desk_link("Travel Authorization", t.name), t.date, t.till_date))
+				frappe.throw("Row#{}: The dates in your current Travel Authorization have already been claimed in {} between {} and {}"\
+					.format(t.idx, frappe.get_desk_link("Travel Request", t.name), t.from_date, t.to_date))
 
-
-	##
-	# Check if the dates are used under Leave Application
-	##
 	def check_leave_applications(self):
 		las = frappe.db.sql("""select t1.name from `tabLeave Application` t1 
 				where t1.employee = "{employee}"
@@ -327,177 +250,85 @@ class TravelAuthorization(Document):
 						from `tabTravel Authorization Item` t2
 						where t2.parent = "{travel_authorization}"
 						and (
-							(t1.from_date <= t2.till_date and t1.to_date >= t2.date)
+							(t1.from_date <= t2.to_date and t1.to_date >= t2.from_date)
 							or
-							(t2.date <= t1.to_date and t2.till_date >= t1.from_date)
+							(t2.from_date <= t1.to_date and t2.to_date >= t1.from_date)
 						)
 				)
 		""".format(travel_authorization = self.name, employee = self.employee), as_dict=True)
 		for t in las:
 			frappe.throw("The dates in your current travel authorization have been used in leave application {}".format(frappe.get_desk_link("Leave Application", t.name)))
-
-	##
-	# Send notification to the supervisor / employee
-	##
-	def sendmail(self, to_email, subject, message):
-		email = frappe.db.get_value("Employee", to_email, "user_id")
-		if email:
-			try:
-				frappe.sendmail(recipients=email, sender=None, subject=subject, message=message)
-			except:
-				pass
-	@frappe.whitelist()
-	def set_dsa_rate(self):
-		
-		grade=frappe.db.get_value("Employee", self.employee, "grade")
-		emp_type={
-			"first": ["CEO", "E2"],
-			"second": ["E3", "M1"]
-		}
-
-		if not grade:
-			frappe.throw("Set the Grade for the Employee {}".format(self.employee) )
-		
-		emp_grade="rest"
-		for key,val in emp_type.items():
-			if grade in val:
-				emp_grade=key
-
-		for item in self.items:
-			
-			if item.country=="Bhutan":				
-				item.dsa_rate=self.dsa_per_day				
-				item.amount_in_btn=flt(item.exchange_rate)*flt(self.dsa_per_day)
-				# item.db_set('amount_in_btn', item.amount_in_btn)
-				# frappe.msgprint(f"Calculated Amount in BTN: {item.amount_in_btn}")
-				# frappe.throw(str(item.amount_in_btn))
-			else:
-				dsa_rate=frappe.db.get_value("DSA Out Country", item.country, emp_grade)
-				currency=frappe.db.get_value("DSA Out Country", item.country, "currency")
-				if not dsa_rate:
-					frappe.throw("Set the DSA Out Country for {}".format(item.country))
-				item.dsa_rate=dsa_rate
-				item.currency=currency
-				item.amount_in_btn=flt(item.exchange_rate)*flt(dsa_rate)
-
 	  
 	@frappe.whitelist()
+	def check_date_overlap(self):
+		overlap = frappe.db.sql("""select t1.idx, 
+				ifnull((select t2.idx from `tabTravel Authorization Item` t2
+					where t2.parent = t1.parent
+					and t2.name != t1.name
+					and t1.from_date <= t2.to_date and t1.to_date >= t2.from_date
+					limit 1),-1) overlap_idx
+			from `tabTravel Authorization Item` t1
+			where t1.parent = "{parent}"
+			order by t1.from_date""".format(parent = self.name), as_dict=True)
+			
+		for d in overlap:
+			if d.overlap_idx >= 0:
+				frappe.throw(_("Row#{}: Dates are overlapping with dates in Row#{}").format(d.idx, d.overlap_idx))
+
+	@frappe.whitelist()
+	def set_dsa_per_day(self):
+		if self.grade:
+			self.dsa_per_day = frappe.db.get_value("Employee Grade", self.grade, "dsa_per_day")
+		return self.dsa_per_day
+
+	@frappe.whitelist()
 	def set_estimate_amount(self):
-		# total_days = 0.0
-		# return_day = 1
-		# full_dsa = 0
-		# # doc=frappe.get_doc("Travel Authorization", self.name)
-		# for i in self.items:
-		# 	from_date = i.date
-		# 	to_date   = i.date if not i.till_date else i.till_date
-		# 	no_days   = date_diff(to_date, from_date) + 1
-		# 	full_dsa+=flt(i.amount_in_btn)*(flt(i.percent)/100)*flt(no_days)
-		# final=flt(full_dsa)-(flt(i.amount_in_btn)) 
-		# self.estimated_amount = flt(final)
 		if not self.need_advance:
 			return
-		#frappe.throw(str(len(self.items)))
-		self.estimated_amount1=0
-		self.estimated_amount2=0
-		if len(self.items) == 1:
-			self.estimated_amount1 = flt(self.dsa_per_day) / 2
-			
-
+		
 		if len(self.items) > 1:
-			first_day = self.items[0].date
-			#frappe.throw(first_day)
-			last_second_day = self.items[len(self.items) - 2].till_date
+			first_day = self.items[0].from_date
+			last_second_day = self.items[len(self.items) - 2].to_date
 			total_days = date_diff(last_second_day, first_day) + 1
-			#frappe.throw(str(total_days))
-			self.estimated_amount2 = flt(total_days) * flt(self.dsa_per_day)
-			self.estimated_amount1 = flt(self.dsa_per_day) / 2
-
+			self.estimated_amount = flt(total_days) * flt(self.dsa_per_day)
 		else:
-			pass
-			#self.estimated_amount = flt(self.dsa_per_day) / 2
-		self.estimated_amount=self.estimated_amount1+self.estimated_amount2
-
+			self.estimated_amount = self.dsa_per_day
 		return self.estimated_amount if self.currency == "BTN" else 0.0
-		
-		
-	@frappe.whitelist()
-	def check_double_dates(self):
-		for i in self.get('items'):
-			for j in self.get('items'):
-				if i.name != j.name and str(i.date) <= str(j.till_date) and str(i.till_date) >= str(j.date):
-					frappe.throw(_("Row#{}: Dates are overlapping with Row#{}").format(i.idx, j.idx))
 
 @frappe.whitelist()
 def make_travel_claim(source_name, target_doc=None):
-	
-	
 	def update_date(obj, target, source_parent):
 		target.posting_date = nowdate()
 		target.supervisor = None
-		# target.for_maintenance_project = 1
-		
 
 	def transfer_currency(obj, target, source_parent):
-		
 		if obj.halt:
 			target.from_place = None
 			target.to_place = None
 		else:
 			target.no_days = 1
 			target.halt_at = None
-			
-		# frappe.throw(str(obj))
-		target.currency = obj.currency
-		target.currency_exchange_date = source_parent.posting_date
-		# target.within_the_dzongkhag=source_parent.within_the_dzongkhag
-		
-		target.dsa = obj.dsa_rate
-		target.dsa_percent = obj.percent
+
+		if source_parent.currency == "BTN":
+			target.dsa = source_parent.dsa_per_day
+		else:
+			target.base_dsa = source_parent.dsa_per_day
+
 		target.country=obj.country
 		
-			
-		if target.currency == "BTN":
-			target.exchange_rate = 1
-		else:
-			target.exchange_rate = get_exchange_rate(target.currency, "BTN", date=source_parent.posting_date)
-		
-		target.amount = target.dsa
-			  
-		target.actual_amount = target.amount * target.exchange_rate * (flt(target.dsa_percent)/100)
-		target.amount=target.actual_amount
-		
 	def adjust_last_date(source, target):
-		for idx, a in enumerate(target.items):
-			if idx != len(target.items)-1:
-				# frappe.throw(str(frappe.db.get_value("Employee Grade", source.grade, "dsa_per_day")))
-				a.dsa_percent = 100
-				a.dsa = flt(frappe.db.get_value("Employee Grade", source.grade, "dsa_per_day"),2)
-				a.amount = flt(a.dsa*flt(a.no_days),2)
-				a.actual_amount = a.amount
-			else:
-				a.dsa_percent = 50
-				a.dsa = flt(frappe.db.get_value("Employee Grade", source.grade, "dsa_per_day"),2)/2
-				a.amount = flt(a.dsa*flt(a.no_days),2)
-				a.actual_amount = a.amount
-			
-		# target.within_the_dzongkhag=source.within_the_dzongkhag
-		# dsa_percent = frappe.db.get_single_value("HR Settings", "return_day_dsa")
-		
-		
-		# if target.items[len(target.items) - 1].halt!=1:
-		#     target.items[len(target.items) - 1].dsa_percent = dsa_percent
-		#     target.items[len(target.items) - 1].actual_amount = flt(target.items[len(target.items) - 1].actual_amount) * flt(dsa_percent)/100
-		#     target.items[len(target.items) - 1].amount = flt(target.items[len(target.items) - 1].amount) * flt(dsa_percent)/100
-		#     target.items[len(target.items) - 1].last_day = 1 
-		
-
+		dsa_percent = frappe.db.get_single_value("HR Settings", "return_day_dsa")
+		for d in target.items:
+			if d.is_last_day == 1:
+				d.dsa = flt(d.dsa) * flt(dsa_percent)/100
+				
 	doc = get_mapped_doc("Travel Authorization", source_name, {
 			"Travel Authorization": {
 				"doctype": "Travel Claim",
 				"field_map": {
-					"name": "ta",
+					"name": "travel_authorization",
 					"posting_date": "ta_date",
-					"advance_amount_nu": "advance_amount"
+					"base_advance_amount": "advance_amount"
 				},
 				"postprocess": update_date,
 				"validation": {"docstatus": ["=", 1]}
@@ -505,9 +336,39 @@ def make_travel_claim(source_name, target_doc=None):
 			"Travel Authorization Item": {
 				"doctype": "Travel Claim Item",
 				"postprocess": transfer_currency,
-				"travel_authorization": "parent"
 			},
 		}, target_doc, adjust_last_date)
+	return doc
+
+@frappe.whitelist()
+def make_travel_adjustment(source_name, target_doc=None):
+	res = frappe.db.sql("""select * from `tabTravel Authorization Item` where parent=%s order by idx asc
+		""", (source_name), as_dict=True
+	)
+
+	def update_date(obj, target, source_parent):
+		target.posting_date = nowdate()
+		target.set(
+			"travel_authorization_items",
+			[d for d in res]
+		)
+	
+	doc = get_mapped_doc("Travel Authorization", source_name, {
+			"Travel Authorization": {
+				"doctype": "Travel Adjustment",
+				"field_map": {
+					"name": "travel_authorization",
+				},
+				"postprocess": update_date,
+				"validation": {"docstatus": ["=", 1]},
+			},
+			"Travel Authorization Item": {
+				"doctype": "Travel Adjustment Item",
+			},
+		}, 
+		target_doc
+	)
+	
 	return doc
 
 @frappe.whitelist()
@@ -550,6 +411,10 @@ def get_permission_query_conditions(user):
 				where `tabEmployee`.name = `tabTravel Authorization`.employee
 				and `tabEmployee`.user_id = '{user}' and `tabTravel Authorization`.docstatus != 2)
 		or
+		(`tabTravel Authorization`.approver = '{user}' and `tabTravel Authorization`.workflow_state not in ('Draft','Rejected','Cancelled'))
+	)""".format(user=user)
+
+""" 
 		exists(select 1
 				from `tabEmployee`, `tabHas Role`
 				where `tabEmployee`.user_id = `tabHas Role`.parent
@@ -557,7 +422,4 @@ def get_permission_query_conditions(user):
 				and (select region from `tabEmployee` where `tabEmployee`.name = `tabTravel Authorization`.employee limit 1) = (select region from `tabEmployee` where `tabEmployee`.user_id = '{user}' limit 1)
 				and `tabEmployee`.user_id = '{user}')
 		or
-		(`tabTravel Authorization`.supervisor = '{user}' and `tabTravel Authorization`.workflow_state not in ('Draft','Approved','Rejected','Rejected By Supervisor','Cancelled'))
-		or 
-		(`tabTravel Authorization`.supervisor_manager = '{user}' and `tabTravel Authorization`.workflow_state not in ('Draft', 'Rejected', 'Cancelled','Approved','Rejected By Supervisor'))
-	)""".format(user=user)
+		 """

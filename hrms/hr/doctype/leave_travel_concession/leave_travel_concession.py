@@ -113,57 +113,85 @@ class LeaveTravelConcession(Document):
 			frappe.throw("Can not cancel LTC without canceling the corresponding journal entry " + str(self.journal_entry))
 		else:
 			self.db_set("journal_entry", None)
-
-
+	
 	@frappe.whitelist()
 	def get_ltc_details(self):
-		start, end = frappe.db.get_value("Fiscal Year", self.fiscal_year, ["year_start_date", "year_end_date"])
-		entries = frappe.db.sql("""select 
-						e.date_of_joining, 
-						b.employee, 
-						b.employee_name, 
-						b.branch, 
-						a.amount, 
-						e.bank_name, 
-						e.bank_ac_no  
-					from 
-						`tabSalary Detail` a, 
-						`tabSalary Structure` b, 
-						`tabEmployee` e 
-					where 
-						a.parent = b.name 
-						and b.employee = e.name 
-						and a.salary_component = 'Basic Pay' 
-						and (b.is_active = 'Yes' or e.relieving_date between \'"+str(start)+"\' and \'"+str(end)+"\') 
-						and b.eligible_for_ltc = 1 
-					order by b.branch """, as_dict=True)
-		
+		start, end = frappe.db.get_value("Fiscal Year", self.fiscal_year , ["year_start_date", "year_end_date"])
+		query = "select e.date_of_joining, b.employee, b.employee_name, b.branch, a.amount, e.bank_name, e.bank_ac_no  from `tabSalary Detail` a, `tabSalary Structure` b, `tabEmployee` e where a.parent = b.name and b.employee = e.name and a.salary_component = 'Basic Pay' and b.is_active = 'Yes' and b.eligible_for_ltc = 1 "
+		if self.employment_type:
+			query += " and e.employment_type = '{0}'".format(self.employment_type)
+		if self.employee:
+			query += " and e.name = '{0}'".format(self.employee)
+		query += " order by b.branch;"
+		entries = frappe.db.sql(query, as_dict=True)
 		self.set('items', [])
-		for d in entries:
-			d.basic_pay = d.amount
-			month_start = datetime.strptime(str(d.date_of_joining).split("-")[0]+"-"+str(d.date_of_joining).split("-")[1]+"-01","%Y-%m-%d")
-			dates = calendar.monthrange(month_start.year, month_start.month)[1]
-			working_days =date_diff(self.posting_date,d.date_of_joining)
-			if working_days >= 90 :
-				if getdate(str(self.fiscal_year) + "-01-01") < getdate(d.date_of_joining) <  getdate(str(self.fiscal_year) + "-12-31"):
-					if cint(str(d.date_of_joining)[8:10]) < 15:
-						months = 12 - cint(str(d.date_of_joining)[5:7]) + 1
-					else:
-						months = 12 - cint(str(d.date_of_joining)[5:7])
-					
-					amount = d.amount
-					if flt(d.amount) > 15000:
-						amount = 15000
-
-					d.amount = round(flt((flt(months)/12.0) * amount), 2)
-					days = relativedelta(datetime.strptime(str(d.date_of_joining).split("-")[0]+"-"+str(d.date_of_joining).split("-")[1]+"-"+str(dates),"%Y-%m-%d"),datetime.strptime(str(d.date_of_joining),"%Y-%m-%d")).days
-					if int(days) < int(dates):
-						d.amount += round(flt((flt(days)/12.0/30.0) * amount), 2)
-
-				else:
-					if flt(d.amount) > 15000:
-						d.amount = 15000
+		days_in_year = date_diff(end, start)
+		for d in entries: 
+			date_of_joining = d.date_of_joining
+			if getdate(date_of_joining) < getdate(start):
+				date_of_joining = start
+			if (date_of_joining) < getdate(str(self.fiscal_year) + "-10-01"):
+				no_of_days = date_diff(end , date_of_joining) 
+				d.basic_pay = d.amount
+				amount = d.amount
+				if flt(amount) > 15000:
+					amount = 15000
+				total_amount = round((flt(no_of_days)/flt(days_in_year) * amount), 2)
+				d.amount = round(flt(total_amount),2)
 				row = self.append('items', {})
 				row.update(d)
+
+	# def get_ltc_details(self):
+	# 	start, end = frappe.db.get_value("Fiscal Year", self.fiscal_year, ["year_start_date", "year_end_date"])
+	# 	query = "select e.date_of_joining, b.employee, b.employee_name, b.branch, a.amount, e.bank_name, e.bank_ac_no  from `tabSalary Detail` a, `tabSalary Structure` b, `tabEmployee` e where a.parent = b.name and b.employee = e.name and a.salary_component = 'Basic Pay' and b.is_active = 'Yes' and b.eligible_for_ltc = 1 "
+	# 	if self.employee:
+	# 		query += " and e.name = '{0}'".format(self.employee)
+	# 	entries = frappe.db.sql("""select 
+	# 					e.date_of_joining, 
+	# 					b.employee, 
+	# 					b.employee_name, 
+	# 					b.branch, 
+	# 					a.amount, 
+	# 					e.bank_name, 
+	# 					e.bank_ac_no  
+	# 				from 
+	# 					`tabSalary Detail` a, 
+	# 					`tabSalary Structure` b, 
+	# 					`tabEmployee` e 
+	# 				where 
+	# 					a.parent = b.name 
+	# 					and b.employee = e.name 
+	# 					and a.salary_component = 'Basic Pay' 
+	# 					and (b.is_active = 'Yes' or e.relieving_date between \'"+str(start)+"\' and \'"+str(end)+"\') 
+	# 					and b.eligible_for_ltc = 1 
+	# 				order by b.branch """, as_dict=True)
+		
+	# 	self.set('items', [])
+	# 	for d in entries:
+	# 		d.basic_pay = d.amount
+	# 		month_start = datetime.strptime(str(d.date_of_joining).split("-")[0]+"-"+str(d.date_of_joining).split("-")[1]+"-01","%Y-%m-%d")
+	# 		dates = calendar.monthrange(month_start.year, month_start.month)[1]
+	# 		working_days =date_diff(self.posting_date,d.date_of_joining)
+	# 		if working_days >= 90 :
+	# 			if getdate(str(self.fiscal_year) + "-01-01") < getdate(d.date_of_joining) <  getdate(str(self.fiscal_year) + "-12-31"):
+	# 				if cint(str(d.date_of_joining)[8:10]) < 15:
+	# 					months = 12 - cint(str(d.date_of_joining)[5:7]) + 1
+	# 				else:
+	# 					months = 12 - cint(str(d.date_of_joining)[5:7])
+					
+	# 				amount = d.amount
+	# 				if flt(d.amount) > 15000:
+	# 					amount = 15000
+
+	# 				d.amount = round(flt((flt(months)/12.0) * amount), 2)
+	# 				days = relativedelta(datetime.strptime(str(d.date_of_joining).split("-")[0]+"-"+str(d.date_of_joining).split("-")[1]+"-"+str(dates),"%Y-%m-%d"),datetime.strptime(str(d.date_of_joining),"%Y-%m-%d")).days
+	# 				if int(days) < int(dates):
+	# 					d.amount += round(flt((flt(days)/12.0/30.0) * amount), 2)
+
+	# 			else:
+	# 				if flt(d.amount) > 15000:
+	# 					d.amount = 15000
+	# 			row = self.append('items', {})
+	# 			row.update(d)
 
 

@@ -336,6 +336,7 @@ def generate_leave_encashment():
 
 def allocate_earned_leaves():
 	"""Allocate earned leaves to Employees"""
+	
 	e_leave_types = get_earned_leaves()
 	today = frappe.flags.current_date or getdate()
 
@@ -365,6 +366,7 @@ def allocate_earned_leaves():
 
 			if e_leave_type.allocate_on_day == "Date of Joining":
 				from_date = date_of_joining
+				
 
 			if check_effective_date(
 				from_date, today, e_leave_type.earned_leave_frequency, e_leave_type.allocate_on_day
@@ -384,6 +386,7 @@ def update_previous_leave_allocation(allocation, annual_allocation, e_leave_type
 	)
 
 	new_allocation = flt(allocation.total_leaves_allocated) + flt(earned_leaves)
+
 	new_allocation_without_cf = flt(
 		flt(allocation.get_existing_leave_count()) + flt(earned_leaves),
 		allocation.precision("total_leaves_allocated"),
@@ -423,8 +426,10 @@ def get_monthly_earned_leave(
 ):
 	earned_leaves = 0.0
 	divide_by_frequency = {"Yearly": 1, "Half-Yearly": 2, "Quarterly": 4, "Monthly": 12}
+	
 	if annual_leaves:
 		earned_leaves = flt(annual_leaves) / divide_by_frequency[frequency]
+		
 
 		if pro_rated:
 			if not (period_start_date or period_end_date):
@@ -439,6 +444,7 @@ def get_monthly_earned_leave(
 		earned_leaves = round_earned_leaves(earned_leaves, rounding)
 
 	return earned_leaves
+	
 
 
 def round_earned_leaves(earned_leaves, rounding):
@@ -465,8 +471,6 @@ def get_leave_allocations(date, leave_type):
 		(date, leave_type),
 		as_dict=1,
 	)
-
-
 def get_earned_leaves():
 	return frappe.get_all(
 		"Leave Type",

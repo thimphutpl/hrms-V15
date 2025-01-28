@@ -1,0 +1,230 @@
+{
+ "actions": [],
+ "autoname": "TAJ.YYYY.MM.####",
+ "creation": "2024-12-31 23:02:52.141159",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "travel_authorization",
+  "column_break_mirj",
+  "posting_date",
+  "section_break_mged",
+  "employee",
+  "column_break_yodx",
+  "employee_name",
+  "section_break_soxe",
+  "items",
+  "section_break_nkbn",
+  "travel_authorization_items",
+  "end_date_auth",
+  "approver_details_section",
+  "approver",
+  "column_break_tbcz",
+  "approver_name",
+  "column_break_gpny",
+  "approver_designation",
+  "additional_information_section",
+  "company",
+  "column_break_atta",
+  "remarks",
+  "section_break_ncle",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_ncle",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Travel Adjustment",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "travel_authorization",
+   "fieldtype": "Link",
+   "label": "Travel Authorization",
+   "options": "Travel Authorization",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_mirj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date"
+  },
+  {
+   "fieldname": "section_break_mged",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "column_break_yodx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_soxe",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "New Travel Itinerary",
+   "options": "Travel Adjustment Item"
+  },
+  {
+   "fieldname": "section_break_nkbn",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "travel_authorization_items",
+   "fieldtype": "Table",
+   "label": "Original Travel Itinerary",
+   "options": "Travel Adjustment Detail",
+   "read_only": 1
+  },
+  {
+   "fieldname": "additional_information_section",
+   "fieldtype": "Section Break",
+   "label": "Additional Information"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "column_break_atta",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "end_date_auth",
+   "fieldtype": "Date",
+   "label": "End Date Auth",
+   "read_only": 1
+  },
+  {
+   "fieldname": "approver_details_section",
+   "fieldtype": "Section Break",
+   "label": "Approver Details"
+  },
+  {
+   "fieldname": "approver",
+   "fieldtype": "Link",
+   "label": "Approver",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_tbcz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approver_name",
+   "fieldtype": "Data",
+   "label": "Approver Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_gpny",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approver_designation",
+   "fieldtype": "Link",
+   "label": "Approver Designation",
+   "options": "Designation",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-01-06 14:12:08.960018",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Travel Adjustment",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Employee",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

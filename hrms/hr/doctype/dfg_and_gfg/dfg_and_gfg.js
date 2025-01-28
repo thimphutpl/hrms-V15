@@ -14,27 +14,27 @@ frappe.ui.form.on('DFG AND GFG', {
 	"status": function(frm) {
 		cur_frm.toggle_reqd("date_of_separation", frm.doc.status == "Left")
 	},
-	branch: function(frm){
-		if(frm.doc.branch){
-				frappe.call({
-						method: 'frappe.client.get_value',
-						args: {
-								doctype: 'Cost Center',
-								filters: {
-										'branch': frm.doc.branch,
-										'is_group': 0
-								},
-								fieldname: ['name']
-						},
-						callback: function(r){
-								if(r.message){
-										cur_frm.set_value("cost_center", r.message.name);
-										refresh_field('cost_center');
-								}
-						}
-				});
-		}
-},
+// 	branch: function(frm){
+// 		if(frm.doc.branch){
+// 				frappe.call({
+// 						method: 'frappe.client.get_value',
+// 						args: {
+// 								doctype: 'Cost Center',
+// 								filters: {
+// 										'branch': frm.doc.branch,
+// 										'is_group': 0
+// 								},
+// 								fieldname: ['name']
+// 						},
+// 						callback: function(r){
+// 								if(r.message){
+// 										cur_frm.set_value("cost_center", r.message.name);
+// 										refresh_field('cost_center');
+// 								}
+// 						}
+// 				});
+// 		}
+// },
 cost_center: function(frm){
 	if(!frm.doc.__islocal){
 		cur_frm.set_value("date_of_transfer",frappe.datetime.nowdate());

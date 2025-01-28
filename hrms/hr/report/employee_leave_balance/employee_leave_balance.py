@@ -228,7 +228,7 @@ def get_leave_ledger_entries(from_date: str, to_date: str, employee: str, leave_
 		)
 		.where(
 			(ledger.docstatus == 1)
-			& (ledger.transaction_type == "Leave Allocation")
+			& (ledger.transaction_type.isin(["Leave Allocation", "Merge CL To EL"]))
 			& (ledger.employee == employee)
 			& (ledger.leave_type == leave_type)
 			& (

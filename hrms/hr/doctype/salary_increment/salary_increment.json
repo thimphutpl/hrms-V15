@@ -48,6 +48,7 @@
   {
    "fieldname": "test",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Test"
   },
   {
@@ -151,13 +152,6 @@
    "in_list_view": 1,
    "label": "Current Basic Pay",
    "read_only": 1
-  },
-  {
-   "default": "0.00",
-   "fieldname": "increment",
-   "fieldtype": "Float",
-   "in_list_view": 1,
-   "label": "Increment"
   },
   {
    "default": "0.00",
@@ -291,12 +285,19 @@
    "options": "Salary Increment",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "default": "0.00",
+   "fieldname": "increment",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Increment"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-09 16:36:28.973092",
+ "modified": "2025-01-16 22:12:40.815226",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Salary Increment",

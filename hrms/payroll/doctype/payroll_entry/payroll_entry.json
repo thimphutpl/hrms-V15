@@ -13,6 +13,7 @@
   "month",
   "column_break_40",
   "processing_branch",
+  "employment_type",
   "status",
   "section_break_8",
   "branch",
@@ -361,12 +362,18 @@
    "label": "Employee Status",
    "options": "Active\nInactive\nSuspended\nLeft",
    "reqd": 1
+  },
+  {
+   "fieldname": "employment_type",
+   "fieldtype": "Select",
+   "label": "Employment Type",
+   "options": "\nGCE\nOthers"
   }
  ],
  "icon": "fa fa-cog",
  "is_submittable": 1,
  "links": [],
- "modified": "2023-04-17 13:14:18.262627",
+ "modified": "2025-01-14 14:15:05.898972",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Payroll Entry",

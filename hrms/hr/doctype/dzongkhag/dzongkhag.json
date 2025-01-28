@@ -120,7 +120,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-10 10:46:19.639110",
+ "modified": "2025-01-24 10:27:38.038834",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Dzongkhag",
@@ -137,6 +137,18 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
+   "select": 1,
    "share": 1,
    "write": 1
   }

@@ -1,6 +1,11 @@
-// Copyright (c) 2022, Frappe Technologies Pvt. Ltd. and contributors
+// Copyright (c) 2025, Frappe Technologies Pvt. Ltd. and contributors
 // For license information, please see license.txt
 
+// frappe.ui.form.on("Overtime Application", {
+// 	refresh(frm) {
+
+// 	},
+// });
 
 cur_frm.add_fetch("employee", "employee_name", "employee_name")
 cur_frm.add_fetch("employee", "branch", "branch")
@@ -33,7 +38,7 @@ frappe.ui.form.on('Overtime Application', {
 	employee: function(frm) {
 		if (frm.doc.employee) {
 			frappe.call({
-				method: "erpnext.setup.doctype.employee.employee.get_overtime_rate",				
+				method: "erpnext.setup.doctype.employee.employee.get_overtime_rate",
 				args: {
 					employee: frm.doc.employee,
 				},

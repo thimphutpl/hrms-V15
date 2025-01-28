@@ -6,50 +6,32 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "date",
-  "column_break_2",
+  "from_date",
   "halt",
-  "column_break_4",
-  "till_date",
-  "no_days",
-  "from_place",
-  "dsa_rate",
-  "percent",
-  "currency",
-  "exchange_rate",
-  "amount_in_btn",
-  "column_break_9",
-  "to_place",
-  "halt_at",
-  "temp_from_place",
-  "temp_to_place",
-  "temp_halt_at",
-  "temp_till_date",
+  "travel_from",
   "return_same_day",
+  "column_break_2",
+  "travel_to",
+  "halt_at",
+  "column_break_4",
+  "to_date",
+  "no_days",
   "country",
-  "sb_project_maintenance",
-  "reference_type",
-  "reference_name"
+  "is_last_day"
  ],
  "fields": [
-  {
-   "allow_on_submit": 1,
-   "fieldname": "date",
-   "fieldtype": "Date",
-   "in_list_view": 1,
-   "label": "From Date",
-   "reqd": 1
-  },
   {
    "fieldname": "column_break_2",
    "fieldtype": "Column Break"
   },
   {
-   "allow_on_submit": 1,
+   "columns": 1,
    "default": "0",
    "fieldname": "halt",
    "fieldtype": "Check",
-   "label": "Halt?"
+   "in_list_view": 1,
+   "label": "Halt?",
+   "read_only_depends_on": "eval:doc.idx==1;"
   },
   {
    "fieldname": "column_break_4",
@@ -57,146 +39,79 @@
   },
   {
    "allow_on_submit": 1,
-   "depends_on": "eval:doc.halt",
-   "fieldname": "till_date",
-   "fieldtype": "Date",
-   "label": "Till Date"
-  },
-  {
-   "allow_on_submit": 1,
    "default": "1",
    "fieldname": "no_days",
    "fieldtype": "Data",
-   "label": "Number of Days",
+   "label": "Number of Halt Days",
    "read_only": 1
   },
   {
-   "allow_on_submit": 1,
-   "depends_on": "eval:doc.halt==0 && doc.date",
-   "fieldname": "from_place",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "From Place",
-   "read_only_depends_on": "halt_at"
-  },
-  {
-   "fieldname": "column_break_9",
-   "fieldtype": "Column Break"
-  },
-  {
-   "allow_on_submit": 1,
-   "depends_on": "eval:doc.halt==0 && doc.date",
-   "fieldname": "to_place",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "To Place",
-   "read_only_depends_on": "halt_at"
-  },
-  {
-   "depends_on": "halt",
+   "columns": 1,
+   "depends_on": "eval:doc.halt===1",
    "fieldname": "halt_at",
    "fieldtype": "Data",
-   "label": "Halt At",
-   "read_only": 1
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "temp_from_place",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Temp From Place"
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "temp_to_place",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Temp To Place"
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "temp_halt_at",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Temp Halt At"
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "temp_till_date",
-   "fieldtype": "Date",
-   "hidden": 1,
-   "label": "Temp Till Date"
+   "in_list_view": 1,
+   "label": "Halt At"
   },
   {
    "default": "0",
    "fieldname": "return_same_day",
    "fieldtype": "Check",
-   "hidden": 1,
-   "label": "Return on the same day?"
+   "label": "Return on the same day?",
+   "read_only_depends_on": "eval:doc.idx!=1;"
   },
   {
    "fieldname": "country",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "Country",
    "options": "DSA Out Country"
   },
   {
-   "fieldname": "sb_project_maintenance",
-   "fieldtype": "Section Break",
-   "label": "Project/Maintenance Details"
+   "columns": 2,
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "From Date",
+   "reqd": 1
   },
   {
-   "depends_on": "eval:parent.for_maintenance_project == 1;",
-   "fieldname": "reference_type",
-   "fieldtype": "Select",
-   "label": "Reference Type",
-   "options": "\nProject\nTask\nMaintenance Order"
+   "allow_on_submit": 1,
+   "columns": 2,
+   "depends_on": "eval:doc.halt==1;",
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "To Date",
+   "mandatory_depends_on": "eval:doc.halt==1;"
   },
   {
-   "depends_on": "eval:parent.for_maintenance_project == 1;",
-   "fieldname": "reference_name",
-   "fieldtype": "Dynamic Link",
-   "label": "Reference Name",
-   "options": "reference_type"
+   "columns": 2,
+   "depends_on": "eval:doc.halt!=1",
+   "fieldname": "travel_from",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Travel From"
   },
   {
-   "fieldname": "dsa_rate",
-   "fieldtype": "Currency",
-   "hidden": 1,
-   "label": "DSA Rate"
+   "columns": 2,
+   "depends_on": "eval:doc.halt==0 && doc.from_date",
+   "fieldname": "travel_to",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Travel To"
   },
   {
-   "default": "100",
-   "fieldname": "percent",
-   "fieldtype": "Percent",
-   "hidden": 1,
-   "label": "Percent"
-  },
-  {
-   "fieldname": "currency",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Currency",
-   "options": "Currency"
-  },
-  {
-   "default": "1",
-   "fieldname": "exchange_rate",
-   "fieldtype": "Float",
-   "hidden": 1,
-   "label": "Exchange rate"
-  },
-  {
-   "fieldname": "amount_in_btn",
-   "fieldtype": "Currency",
-   "label": "DSA Amount in BTN"
+   "default": "0",
+   "fieldname": "is_last_day",
+   "fieldtype": "Check",
+   "label": "Is Last Day",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-01-13 14:02:41.321028",
+ "modified": "2025-01-02 11:58:50.558416",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization Item",

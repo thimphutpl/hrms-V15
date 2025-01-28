@@ -25,8 +25,8 @@ class EmployeeAdvance(Document):
 			"Accounts Settings", "make_payment_via_journal_entry"
 		)
 	def validate(self):
-		validate_workflow_states(self)
-		validate_active_employee(self.employee)
+		# validate_workflow_states(self)
+		# validate_active_employee(self.employee)
 		self.validate_employment_status()
 		self.set_status()
 		if self.advance_type != "Travel Advance" and self.advance_type != "Imprest Advance" :
@@ -37,8 +37,8 @@ class EmployeeAdvance(Document):
 		self.update_reference()
 		self.check_duplicate_advance()
 		self.select_advance_account()
-		if self.workflow_state != "Approved":
-			notify_workflow_states(self)
+		# if self.workflow_state != "Approved":
+		# 	notify_workflow_states(self)
 	
 	def on_cancel(self):
 		self.ignore_linked_doctypes = "GL Entry"
@@ -52,7 +52,7 @@ class EmployeeAdvance(Document):
 		if self.advance_type =="Salary Advance":
 			self.update_salary_structure()
 		self.make_bank_entry()
-		notify_workflow_states(self)
+		# notify_workflow_states(self)
 
 	def select_advance_account(self):
 		if self.advance_type == "Salary Advance":

@@ -14,18 +14,21 @@ from hrms.payroll.doctype.salary_structure.salary_structure import get_basic_and
 from hrms.hr.hr_custom_functions import get_salary_tax
 from erpnext.custom_workflow import validate_workflow_states, notify_workflow_states
 from erpnext.accounts.doctype.hr_accounts_settings.hr_accounts_settings import get_bank_account
+# from hrms.hr.doctype.leave_application.leave_application import get_leave_balance_on
 
 class LeaveEncashment(Document):
 	def validate(self):
-		# validate_workflow_states(self)
+		validate_workflow_states(self)
 		set_employee_name(self)
 		validate_active_employee(self.employee)
-		self.get_leave_details_for_encashment()
+		#self.get_leave_details_for_encashment()
+		# self.get_leave_balance()
+		self.validate_balances()
 		self.check_duplicate_entry()
-		if not self.encashment_date:
-			self.encashment_date = getdate(nowdate())
-		# if self.workflow_state != "Approved":
-		# 	notify_workflow_states(self)
+		# if not self.encashment_date:
+		# 	self.encashment_date = getdate(nowdate())
+		if self.workflow_state != "Approved":
+			notify_workflow_states(self)
 
 
 	def before_submit(self):
@@ -36,7 +39,7 @@ class LeaveEncashment(Document):
 		# self.post_expense_claim()
 		self.post_accounts_entry()
 		self.create_leave_ledger_entry()
-		# notify_workflow_states(self)
+		notify_workflow_states(self)
 	
 	def post_accounts_entry(self):
 		if not self.cost_center:
@@ -151,11 +154,12 @@ class LeaveEncashment(Document):
 		self.create_leave_ledger_entry(submit=False)
 		self.check_journal_entry()
 
-	def check_journal_entry():
+	def check_journal_entry(self):
 		if self.journal_entry:
-			for je in str(self.journal_entry).split(", "):
-				if frappe.db.get_value("Journal Entry", je, "docstatus") < 2:
-					frappe.throw("Please cancel/delete Journal Entry {} first".format(frappe.get_desk("Journal Entry", je)))
+			pass
+			# for je in str(self.journal_entry).split(", "):
+			# 	if frappe.db.get_value("Journal Entry", je, "docstatus") < 2:
+			# 		frappe.throw("Please cancel/delete Journal Entry {} first".format(frappe.get_desk("Journal Entry", je)))
 
 	def post_expense_claim(self):
 		cost_center = frappe.get_value("Employee", self.employee, "cost_center")
@@ -220,7 +224,54 @@ class LeaveEncashment(Document):
 				is_carry_forward=0
 			)
 			create_leave_ledger_entry(self, args, submit)
-			
+
+	def update_employee_details(self):
+		self.encashment_days      = 0
+		self.balance_before     = 0
+		self.balance_after      = 0
+
+		if self.employee:                
+				doc = frappe.get_doc("Employee", self.employee)
+				self.employee_name      = doc.employee_name
+				self.employment_type    = doc.employment_type
+				self.employee_group     = doc.employee_group
+				self.employee_subgroup  = doc.employee_subgroup
+				self.branch             = doc.branch
+				self.cost_center        = doc.cost_center
+				self.department         = doc.department
+				self.division           = doc.division
+				self.section            = doc.section
+                                
+
+	def validate_balances(self):
+		msg = ''
+		#le = get_le_settings()                                                                         # Line commented by SHIV on 2018/10/15
+		le = frappe.get_doc("Employee Group",frappe.db.get_value("Employee",self.employee,"employee_group")) # Line added by SHIV on 2018/10/15
+		if flt(self.balance_before) < flt(le.min_encashment_days):
+				msg = "Minimum leave balance {0} required to encash.".format(le.encashment_min)
+				# if self.employment_type =="Deputation" and flt(self.balance_before) < 30:
+				#         msg = "Minimum leave balance 30 required to encash."
+				# elif self.employment_type !="Deputation":
+
+				#         msg = "Minimum leave balance {0} required to encash.".format(le.encashment_min)
+
+		if flt(self.balance_after) < 0:
+				msg = "Insufficient leave balance"
+
+		if msg:
+				frappe.throw(_("{0}").format(msg), InsufficientError)
+	def get_leave_balance(self):
+		#frappe.throw("hi")
+		self.update_employee_details()
+		if self.employee:
+				group_doc = frappe.get_doc("Employee Group", self.employee_group)
+				self.encashment_days  = group_doc.min_encashment_days
+				self.balance_before = get_leave_balance_on(self.employee, self.leave_type, self.encashment_date)
+				
+				self.balance_after  = flt(self.balance_before) - flt(self.encashment_days)
+				# frappe.throw(str(self.balance_after))
+
+	
 	def check_duplicate_entry(self):
 		count = frappe.db.count(self.doctype,{"employee": self.employee, "leave_period": self.leave_period, "leave_type": self.leave_type, "docstatus": 1}) \
 					if frappe.db.count(self.doctype,{"employee": self.employee, "leave_period": self.leave_period, "leave_type": self.leave_type, "docstatus": 1}) else 0
@@ -250,14 +301,16 @@ class LeaveEncashment(Document):
 			frappe.throw(_("Leave Type {0} is not encashable").format(self.leave_type))
 
 		allocation = self.get_leave_allocation()
-
-		if not allocation:
+		##frappe.throw(str(allocation.total_leaves_allocated))
+		leave_bal_mr_cl=self.get_laave_bal_mr()
+		
+		if not allocation or not leave_bal_mr_cl:
 			frappe.throw(
 				_("No Leaves Allocated to Employee: {0} for Leave Type: {1}").format(
 					self.employee, self.leave_type
 				)
 			)
-
+		
 		self.leave_balance = (
 			allocation.total_leaves_allocated
 			- allocation.carry_forwarded_leaves_count
@@ -266,11 +319,16 @@ class LeaveEncashment(Document):
 				self.employee, self.leave_type, allocation.from_date, self.encashment_date
 			)
 		)
+		#frappe.throw(str(self.leave_balance))
 		employee_group = frappe.db.get_value("Employee", self.employee, "employee_group")
-		encashable_days = frappe.db.get_value("Employee Group", employee_group, "min_encashment_days")
-
-		if self.leave_balance < cint(encashable_days):
-			frappe.msgprint(_("Minimum '{}' days is Mandatory for Encashment").format(cint(encashable_days)),title="Leave Balance")
+		encashment_min = frappe.db.get_value("Employee Group", employee_group, "encashment_min")
+		encashable_days = frappe.db.get_value("Employee Group", employee_group, "max_encashment_days")
+		#frappe.throw(str(self.leave_balance))
+		
+		self.balance_before=self.leave_balance+leave_bal_mr_cl.leaves
+		self.balance_after=self.balance_before-self.leave_balance
+		if self.balance_before < flt(encashment_min):
+			frappe.msgprint(_("Minimum '{}' days is Mandatory for Encashment").format(cint(encashment_min)),title="Leave Balance")
 		
 		# self.encashable_days = encashable_days if encashable_days > 0 else 0
 		self.encashable_days = encashable_days if encashable_days and encashable_days > 0 else 0
@@ -292,6 +350,7 @@ class LeaveEncashment(Document):
 			self.encashment_amount 	= (flt(pay.get("gross_pay"))/30)*flt(self.encashment_days)
 		else:
 			self.encashment_amount = 0
+		
 
 		self.leave_encashment_type = leave_encashment_type
 		# self.salary_structure = salary_structure
@@ -303,6 +362,7 @@ class LeaveEncashment(Document):
 		return True
 
 	def get_leave_allocation(self):
+		#frappe.throw(self.leave_type)
 		date = self.encashment_date or getdate()
 
 		LeaveAllocation = frappe.qb.DocType("Leave Allocation")
@@ -324,6 +384,31 @@ class LeaveEncashment(Document):
 		).run(as_dict=True)
 
 		return leave_allocation[0] if leave_allocation else None
+
+	def get_laave_bal_mr(self):
+		#frappe.throw(self.leave_type)
+		date = self.encashment_date or getdate()
+
+		Leavebal = frappe.qb.DocType("Leave Ledger Entry")
+		leave_bal = (
+			frappe.qb.from_(Leavebal)
+			.select(
+				Leavebal.name,
+				Leavebal.from_date,
+				Leavebal.to_date,
+				
+				Leavebal.leaves
+			)
+			.where(
+				((Leavebal.from_date <= date) & (date <= Leavebal.to_date))
+				& (Leavebal.docstatus == 1)
+				& (Leavebal.leave_type == self.leave_type)
+				& (Leavebal.employee == self.employee)
+				& (Leavebal.transaction_type == 'Merge CL To EL')
+			)
+		).run(as_dict=True)
+
+		return leave_bal[0] if leave_bal else None
 
 	def create_leave_ledger_entry(self, submit=True):
 		args = frappe._dict(

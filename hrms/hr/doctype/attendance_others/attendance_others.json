@@ -20,7 +20,10 @@
   {
    "fieldname": "date",
    "fieldtype": "Date",
-   "label": "Date"
+   "in_list_view": 1,
+   "label": "Date",
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fieldname": "employee_type",
@@ -74,7 +77,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-10 16:17:28.704207",
+ "modified": "2025-01-24 11:50:24.219350",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Attendance Others",
@@ -96,7 +99,6 @@
   {
    "cancel": 1,
    "create": 1,
-   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
@@ -110,7 +112,6 @@
   {
    "cancel": 1,
    "create": 1,
-   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,

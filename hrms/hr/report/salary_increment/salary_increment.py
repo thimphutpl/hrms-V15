@@ -24,6 +24,7 @@ def get_columns():
 
 
 def get_data(filters):
+    frappe.throw('hi')
     query = """SELECT 
                    name, 
                    branch, 

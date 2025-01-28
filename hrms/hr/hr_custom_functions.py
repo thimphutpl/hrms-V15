@@ -264,21 +264,32 @@ def post_casual_leaves():
 		la.carry_forward = cint(0)
 		la.new_leaves_allocated = flt(10)
 		la.submit()
-
 ##
 # Post earned leave on the first day of every month
 ##
 def post_earned_leaves():
-	if not getdate(frappe.utils.nowdate()) == getdate(get_first_day(frappe.utils.nowdate())):
+	
+	
+	# if not getdate(frappe.utils.nowdate()) == getdate(get_first_day(frappe.utils.nowdate())):
+		
+	# 	return 0
+	if not getdate(frappe.utils.nowdate()).day == 27:
 		return 0
- 
+
+	# print(f"hh")
 	date = add_days(frappe.utils.nowdate(), -20)
 	start = get_first_day(date);
 	end = get_last_day(date);
-	
-	employees = frappe.db.sql("select name, employee_name, date_of_joining from `tabEmployee` where status = 'Active'", as_dict=True)
+	# print("hh")
+	employees = frappe.db.sql("select name, employee_name, date_of_joining from `tabEmployee` where status = 'Active' limit 1", as_dict=True)
+	# if not employees:
+		# print("hiii")
+	# else:
+	# 	print("fffff")
 	for e in employees:
+		# print(e.name)
 		if cint(date_diff(end, getdate(e.date_of_joining))) > 14:
+			# print('hiiiii')
 			la = frappe.new_doc("Leave Allocation")
 			la.employee = e.name
 			la.employee_name = e.employee_name
@@ -288,6 +299,7 @@ def post_earned_leaves():
 			la.carry_forward = cint(1)
 			la.new_leaves_allocated = flt(2.5)
 			la.submit()
+			print(f"Leave Allocation submitted successfully for {e.name}!")
 		else:
 			pass
 

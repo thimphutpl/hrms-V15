@@ -121,16 +121,21 @@ before_app_uninstall = "hrms.setup.before_app_uninstall"
 # Permissions evaluated in scripted ways
 
 permission_query_conditions = {
-	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-	"Employee": "hrms.hr.doctype.leave_application.leave_application.get_permission_query_conditions",
+	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",	
 	"Leave Application": "hrms.hr.doctype.leave_application.leave_application.get_permission_query_conditions",
 	"Travel Authorization": "hrms.hr.doctype.travel_authorization.travel_authorization.get_permission_query_conditions",
-	"Travel Claim": "hrms.hr.doctype.travel_claim.travel_claim.get_permission_query_conditions",
+	"Travel Claim": "hrms.hr.doctype.travel_claim.travel_claim.get_permission_query_conditions",	
+	"Employee Separation": "hrms.hr.doctype.employee_separation.employee_separation.get_permission_query_conditions",
+	"Salary Slip": "hrms.payroll.doctype.salary_slip.salary_slip.get_permission_query_conditions",
+	"Salary Structure": "hrms.payroll.doctype.salary_structure.salary_structure.get_permission_query_conditions",
+	"Leave Encashment": "hrms.hr.doctype.leave_encashment.leave_encashment.get_permission_query_conditions",
 	
 }
 #
 has_permission = {
+	# "Salary Slip": "hrms.payroll.doctype.salary_slip.salary_slip.has_record_permission",
 	"Event": "frappe.desk.doctype.event.event.has_permission",
+	# "Salary Structure": "hrms.payroll.doctype.salary_structure.salary_structure.has_record_permission",
 }
 
 has_upload_permission = {"Employee": "erpnext.setup.doctype.employee.employee.has_upload_permission"}
@@ -202,10 +207,19 @@ doc_events = {
 
 # Scheduled Tasks
 # ---------------
+# hrms/hrms/hr/hr_custom_functions.py
 
 scheduler_events = {
+	"cron": {
+		"* * * * *": [
+			
+			# "hrms.hr.hr_custom_functions.post_leave_credits",
+		],
+
+	},
+	
 	"all": [
-		"hrms.hr.doctype.interview.interview.send_interview_reminder",
+		"hrms.hr.doctype.interview.interview.send_interview_reminder",		
 	],
 	"hourly": [
 		"hrms.hr.doctype.daily_work_summary_group.daily_work_summary_group.trigger_emails",
@@ -219,15 +233,22 @@ scheduler_events = {
 		"hrms.hr.doctype.daily_work_summary_group.daily_work_summary_group.send_summary",
 		"hrms.hr.doctype.interview.interview.send_daily_feedback_reminder",
 		"hrms.hr.doctype.job_opening.job_opening.close_expired_job_openings",
+		"hrms.hr.hr_custom_functions.post_leave_credits",
+		"hrms.hr.hr_custom_functions.post_earned_leaves",
+		
 	],
 	"daily_long": [
 		"hrms.hr.doctype.leave_ledger_entry.leave_ledger_entry.process_expired_allocation",
 		"hrms.hr.utils.generate_leave_encashment",
-		# "hrms.hr.utils.allocate_earned_leaves",
+		
 		"erpnext.accounts.report.gcoa_wise_report.gcoa_wise_report.create_transaction",
 	],
 	"weekly": ["hrms.controllers.employee_reminders.send_reminders_in_advance_weekly"],
-	"monthly": ["hrms.controllers.employee_reminders.send_reminders_in_advance_monthly"],
+	
+	"monthly": [
+	"hrms.hr.doctype.leave_allocation.leave_allocation.post_earned_leaves",
+	"hrms.controllers.employee_reminders.send_reminders_in_advance_monthly",	
+	],
 }
 
 advance_payment_doctypes = ["Gratuity", "Employee Advance"]

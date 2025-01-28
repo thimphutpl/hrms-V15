@@ -2,7 +2,7 @@
  "actions": [],
  "allow_import": 1,
  "allow_rename": 1,
- "autoname": "field:person_name",
+ "autoname": "naming_series:",
  "creation": "2024-12-10 11:17:49.725428",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -12,6 +12,7 @@
   "gyalsup_id",
   "village",
   "active",
+  "naming_series",
   "column_break_qfby",
   "id_card",
   "employee_type",
@@ -43,6 +44,7 @@
   "gratuity_fund",
   "tpn_number",
   "date_of_separation",
+  "old_id",
   "internal_work_history_section",
   "internal_work_history",
   "dfg_training_section",
@@ -255,8 +257,7 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Full Name",
-   "reqd": 1,
-   "unique": 1
+   "reqd": 1
   },
   {
    "default": "0",
@@ -295,6 +296,7 @@
   {
    "fieldname": "employee_type",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Employee Type",
    "options": "\nDFG\nGFG",
    "reqd": 1
@@ -305,15 +307,28 @@
    "fieldtype": "Data",
    "label": "Gyalsup ID",
    "mandatory_depends_on": "eval:doc.employee_type == \"GFG\""
+  },
+  {
+   "fieldname": "old_id",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Old ID"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Series",
+   "options": "DFG.YY\nGFG.YY"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-07 09:39:12.311073",
+ "modified": "2025-01-22 17:08:49.737324",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "DFG AND GFG",
- "naming_rule": "By fieldname",
+ "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
   {
@@ -325,6 +340,39 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Support",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
    "share": 1,
    "write": 1
   }

@@ -381,11 +381,16 @@ class LeaveApplication(Document, PWANotificationsMixin):
 				)
 
 			if not is_lwp(self.leave_type):
+				to_date = (
+				self.to_date.strftime("%Y-%m-%d")
+				if isinstance(self.to_date, datetime.date)
+				else self.to_date
+			)
 				leave_balance = get_leave_balance_on(
 					self.employee,
 					self.leave_type,
-					self.from_date,
-					self.to_date,
+					str(getdate(self.from_date)),  # Convert to string
+    				str(getdate(self.to_date)),    # Convert to string					
 					consider_all_leaves_in_the_allocation_period=True,
 					for_consumption=True,
 				)
@@ -809,7 +814,9 @@ def get_allocation_expiry_for_cf_leaves(
 	employee: str, leave_type: str, to_date: datetime.date, from_date: datetime.date
 ) -> str:
 	"""Returns expiry of carry forward allocation in leave ledger entry"""
+	
 	Ledger = frappe.qb.DocType("Leave Ledger Entry")
+	
 	expiry = (
 		frappe.qb.from_(Ledger)
 		.select(Ledger.to_date)
@@ -823,8 +830,127 @@ def get_allocation_expiry_for_cf_leaves(
 		)
 		.limit(1)
 	).run()
+	# frappe.throw(str(expiry))
 
 	return expiry[0][0] if expiry else ""
+
+
+# def get_allocation_expiry_for_cf_leaves(employee, leave_type, from_date, to_date):
+# 	"""Returns leave entries between from_date and to_date."""
+# 	return frappe.db.sql(
+# 		"""
+# 		SELECT
+# 			employee, leave_type, from_date, to_date, leaves, transaction_name, transaction_type, holiday_list,
+# 			is_carry_forward, is_expired
+# 		FROM tabLeave Ledger Entry
+# 		WHERE employee=%(employee)s AND leave_type=%(leave_type)s
+# 			AND docstatus=1
+# 			AND (leaves<0
+# 				OR is_expired=1)
+# 			AND (from_date between %(from_date)s AND %(to_date)s
+# 				OR to_date between %(from_date)s AND %(to_date)s
+# 				OR (from_date < %(from_date)s AND to_date > %(to_date)s))
+# 	""",
+# 		{"from_date": from_date, "to_date": to_date, "employee": employee, "leave_type": leave_type},
+# 		as_dict=1,
+# 	)	
+
+
+
+
+# def get_allocation_expiry_for_cf_leaves(employee, leave_type, from_date, to_date):
+# 	frappe.throw(str(employee))
+#     """
+#     Returns leave entries between from_date and to_date for a given employee and leave type.
+
+#     Parameters:
+#         employee (str): The employee ID.
+#         leave_type (str): The type of leave (e.g., "Earned Leave").
+#         from_date (datetime.date): The start of the date range.
+#         to_date (datetime.date): The end of the date range.
+
+#     Returns:
+#         list[dict]: A list of dictionaries containing leave ledger entries.
+#     """
+	
+#     return frappe.db.sql(
+#         """
+#         SELECT
+#             employee, leave_type, from_date, to_date, leaves, transaction_name, transaction_type, holiday_list,
+#             is_carry_forward, is_expired
+#         FROM `tabLeave Ledger Entry`
+#         WHERE employee = %(employee)s AND leave_type = %(leave_type)s
+#             AND docstatus = 1
+#             AND (leaves < 0 OR is_expired = 1)
+#             AND (
+#                 from_date BETWEEN %(from_date)s AND %(to_date)s
+#                 OR to_date BETWEEN %(from_date)s AND %(to_date)s
+#                 OR (from_date < %(from_date)s AND to_date > %(to_date)s)
+#             )
+#         """,
+#         {
+#             "from_date": from_date,
+#             "to_date": to_date,
+#             "employee": employee,
+#             "leave_type": leave_type,
+#         },
+#         as_dict=True,
+#     )
+	
+
+
+# def get_allocation_expiry_for_cf_leaves(employee, leave_type, from_date, to_date):
+#     """
+#     Fetches leave ledger entries for the given employee and leave type between a date range.
+
+#     Parameters:
+#         employee (str): Employee ID.
+#         leave_type (str): Type of leave (e.g., "Earned Leave").
+#         from_date (datetime.date): Start of the date range.
+#         to_date (datetime.date): End of the date range.
+
+#     Returns:
+#         list[dict]: A list of dictionaries containing leave ledger entries.
+#     """
+#     try:
+#         # Debugging Input Parameters
+#         frappe.msgprint(f"Inputs: Employee={employee}, Leave Type={leave_type}, From={from_date}, To={to_date}")
+
+#         # Execute Query
+#         results = frappe.db.sql(
+#             """
+#             SELECT
+#                 employee, leave_type, from_date, to_date, leaves, transaction_name, transaction_type, holiday_list,
+#                 is_carry_forward, is_expired
+#             FROM `tabLeave Ledger Entry`
+#             WHERE
+#                 employee = %(employee)s AND leave_type = %(leave_type)s
+#                 AND docstatus = 1
+#                 AND (leaves < 0 OR is_expired = 1)
+#                 AND (
+#                     from_date BETWEEN %(from_date)s AND %(to_date)s
+#                     OR to_date BETWEEN %(from_date)s AND %(to_date)s
+#                     OR (from_date < %(from_date)s AND to_date > %(to_date)s)
+#                 )
+#             """,
+#             {
+#                 "from_date": from_date,
+#                 "to_date": to_date,
+#                 "employee": employee,
+#                 "leave_type": leave_type,
+#             },
+#             as_dict=1,
+#         )
+
+#         # Debugging Query Results
+#         frappe.msgprint(f"Query Results: {results}")
+
+#         return results
+
+#     except Exception as e:
+#         frappe.log_error(message=f"Error in get_allocation_expiry_for_cf_leaves: {str(e)}", title="Leave Ledger Query Error")
+#         return []
+
 
 
 
@@ -861,15 +987,17 @@ def get_number_of_leave_days(
 
 @frappe.whitelist()
 def get_leave_details(employee, date):
+	
 	allocation_records = get_leave_allocation_records(employee, date)
 	leave_allocation = {}
 	precision = cint(frappe.db.get_single_value("System Settings", "float_precision", cache=True))
 
 	for d in allocation_records:
 		allocation = allocation_records.get(d, frappe._dict())
+		
 		remaining_leaves = get_leave_balance_on(
-			employee, d, date, to_date=allocation.to_date, consider_all_leaves_in_the_allocation_period=True
-		)
+			employee, d, date, consider_all_leaves_in_the_allocation_period=True
+		)		
 
 		end_date = allocation.to_date
 		leaves_taken = get_leaves_for_period(employee, d, allocation.from_date, end_date) * -1
@@ -893,13 +1021,12 @@ def get_leave_details(employee, date):
 		"lwps": lwp,
 	}
 
-
 @frappe.whitelist()
 def get_leave_balance_on(
 	employee: str,
 	leave_type: str,
-	date: datetime.date,
-	to_date: datetime.date | None = None,
+	date: str,
+	to_date: str = None,
 	consider_all_leaves_in_the_allocation_period: bool = False,
 	for_consumption: bool = False,
 ):
@@ -911,26 +1038,26 @@ def get_leave_balance_on(
 	:param to_date: future date to check for allocation expiry
 	:param consider_all_leaves_in_the_allocation_period: consider all leaves taken till the allocation end date
 	:param for_consumption: flag to check if leave balance is required for consumption or display
-			eg: employee has leave balance = 10 but allocation is expiring in 1 day so employee can only consume 1 leave
-			in this case leave_balance = 10 but leave_balance_for_consumption = 1
-			if True, returns a dict eg: {'leave_balance': 10, 'leave_balance_for_consumption': 1}
-			else, returns leave_balance (in this case 10)
+	        eg: employee has leave balance = 10 but allocation is expiring in 1 day so employee can only consume 1 leave
+	        in this case leave_balance = 10 but leave_balance_for_consumption = 1
+	        if True, returns a dict eg: {'leave_balance': 10, 'leave_balance_for_consumption': 1}
+	        else, returns leave_balance (in this case 10)
 	"""
-
+	
 	if not to_date:
 		to_date = nowdate()
 
 	allocation_records = get_leave_allocation_records(employee, date, leave_type)
+	
 	allocation = allocation_records.get(leave_type, frappe._dict())
 	
-
-	end_date = allocation.to_date if cint(consider_all_leaves_in_the_allocation_period) else date
-	cf_expiry = get_allocation_expiry_for_cf_leaves(employee, leave_type, to_date, allocation.from_date)
-
+	end_date = allocation.to_date if cint(consider_all_leaves_in_the_allocation_period) else date	
+	cf_expiry = get_allocation_expiry_for_cf_leaves(employee, leave_type, to_date, date)
+	# frappe.throw(str(cf_expiry))
 	leaves_taken = get_leaves_for_period(employee, leave_type, allocation.from_date, end_date)
 
 	remaining_leaves = get_remaining_leaves(allocation, leaves_taken, date, cf_expiry)
-
+	
 	if for_consumption:
 		return remaining_leaves
 	else:
@@ -1014,136 +1141,7 @@ def get_leave_allocation_records(employee, date, leave_type=None):
 			),
 		)
 	return allocated_leaves
-	# frappe.msgprint(_("Query Result: {0}").format(allocated_leaves))
-
-
-# def get_leave_allocation_records(ason_date, employee=None):
-#     ##
-#     #  Ver 2.0 Begins, Following code replaced by the subsequent, by SHIV on 2018/02/09
-#     ##
-    
-#     '''
-#     from datetime import date as mod_date
-#     conditions = (" and employee='%s'" % employee) if employee else ""
-#     from_date = date
-#     from_date = getdate(mod_date(getdate(from_date).year,1,1))
-
-#     leave_allocation_records = frappe.db.sql("""
-#         select employee, leave_type, total_leaves_allocated, from_date, to_date
-#         from `tabLeave Allocation`
-#         where %s between from_date and to_date and docstatus=1 {0}""".format(conditions), (date), as_dict=1)
-
-#     allocated_leaves = frappe._dict()
-#     for d in leave_allocation_records:
-#         # Ver 1.0 Begins added by SSK on 20/08/2016, Latest allocation record for Earned Leave is handled later
-#         if d.leave_type != 'Earned Leave':
-#             allocated_leaves.setdefault(d.employee, frappe._dict()).setdefault(d.leave_type, frappe._dict({
-#                 "from_date": d.from_date,
-#                 "to_date": d.to_date,
-#                 "total_leaves_allocated": d.total_leaves_allocated
-#             }))
-
-#     # Ver 1.0 Begins added by SSK on 20/08/2016, Earned Leave
-#     if employee:
-#         leave_allocation_records = frappe.db.sql("""
-#             select employee, leave_type, total_leaves_allocated, from_date, to_date
-#             from `tabLeave Allocation`
-#             where from_date <= %s
-#             and docstatus=1 and leave_type = 'Earned Leave'
-#             {0}
-#             order by to_date desc limit 1""".format(conditions), (date), as_dict=1)
-
-#         for d in leave_allocation_records:
-#             if d.leave_type == 'Earned Leave':
-#                 allocated_leaves.setdefault(d.employee, frappe._dict()).setdefault(d.leave_type, frappe._dict({
-#                     "from_date": d.from_date,
-#                     "to_date": d.to_date,
-#                     "total_leaves_allocated": d.total_leaves_allocated
-#                 }))
-#     else:
-#         employee_list = frappe.db.sql("""
-#             select distinct employee
-#             from `tabLeave Allocation`
-#             where from_date <= %s
-#             and docstatus=1 and leave_type = 'Earned Leave'
-#             """, (date), as_dict=1)
-#         for e in employee_list:
-#             leave_allocation_records = frappe.db.sql("""
-#                 select employee, leave_type, total_leaves_allocated, from_date, to_date
-#                 from `tabLeave Allocation`
-#                 where employee = %s
-#                 and from_date <= %s
-#                 and docstatus=1 and leave_type = 'Earned Leave'
-#                 order by to_date desc limit 1""", (e.employee, date), as_dict=1)
-
-#             for d in leave_allocation_records:
-#                 if d.leave_type == 'Earned Leave':
-#                     allocated_leaves.setdefault(d.employee, frappe._dict()).setdefault(d.leave_type, frappe._dict({
-#                         "from_date": d.from_date,
-#                         "to_date": d.to_date,
-#                         "total_leaves_allocated": d.total_leaves_allocated
-#                     }))
-#     # Ver 1.0 Ends
-#     '''
-
-#     allocated_leaves = frappe._dict()
-#     conditions = ("where employee='%s' and " % employee) if employee else "where "
-#     leave_types_cf = frappe.db.sql_list("select name from `tabLeave Type` where is_carry_forward=1")
-
-#     # Non-CarryForward Types
-#     leave_allocation_records = frappe.db.sql("""
-#         select
-#             la.employee, la.leave_type, la.total_leaves_allocated,
-#             la.from_date, la.to_date, lt.is_carry_forward 
-#         from
-#             `tabLeave Allocation` as la,
-#             `tabLeave Type` as lt
-#         {0}     lt.name = la.leave_type
-#         and     lt.is_carry_forward = 0
-#         and     '{1}' between la.from_date and la.to_date
-#         and     la.docstatus = 1
-#         """.format(conditions, ason_date), as_dict=True)
-		
 	
-
-#     # CarryForward Types
-#     for emp in frappe.db.sql("select name from `tabEmployee` {0} 1=1".format(conditions), as_dict=True):
-#         for lt in leave_types_cf:
-#             latest = frappe.db.sql("""
-#                 select
-#                     la.employee, la.leave_type, la.total_leaves_allocated,
-#                     la.from_date, la.to_date, lt.is_carry_forward
-#                 from
-#                     `tabLeave Allocation` as la,
-#                     `tabLeave Type` as lt
-#                 where   la.employee = '{0}'
-#                 and     la.leave_type = '{1}'
-#                 and     lt.name = la.leave_type
-#                 and     la.docstatus = 1
-#                 and     la.from_date <= '{2}'
-#                 order by from_date desc limit 1
-#             """.format(emp.name, lt, ason_date), as_dict=True)
-				
-#         if latest:
-			
-#             leave_allocation_records.append(latest[0])
-	
-#     for d in leave_allocation_records:
-#         allocated_leaves.setdefault(d.employee, frappe._dict()).setdefault(d.leave_type, frappe._dict({
-#             "from_date": d.from_date,
-#             "to_date": d.to_date,
-#             "total_leaves_allocated": d.total_leaves_allocated,
-#             "is_carry_forward": d.is_carry_forward
-#         }))
-#     ##
-#     #  Ver 2.0 Ends
-#     ##
-	
-#     return allocated_leaves
-
-
-
-
 def get_leaves_pending_approval_for_period(
 	employee: str, leave_type: str, from_date: datetime.date, to_date: datetime.date
 ) -> float:
@@ -1175,6 +1173,7 @@ def get_remaining_leaves(
 			remaining_leaves = min(remaining_days, remaining_leaves)
 
 		return remaining_leaves
+		frappe.throw(str(remaining_leaves))
 
 	if cf_expiry and allocation.unused_leaves:
 		# allocation contains both carry forwarded and new leaves
@@ -1518,21 +1517,16 @@ def get_leave_approver(employee):
 def on_doctype_update():
 	frappe.db.add_index("Leave Application", ["employee", "from_date", "to_date"])
 
+
+
 def get_permission_query_conditions(user):
 	if not user: user = frappe.session.user
 	user_roles = frappe.get_roles(user)
 
 	if user == "Administrator":
 		return
-	if "HR Master" in user_roles or "Auditor" in user_roles:
-		return
 	if "HR User" in user_roles or "HR Manager" in user_roles:
-		""" get all list with branch same as the branch of login user """
-		user_branch = frappe.db.get_value("Employee", {"user_id": user}, "branch")
-
-		return """(
-			`tabLeave Application`.branch = '{branch}'
-		)""".format(branch=user_branch)
+		return
 
 	return """(
 		`tabLeave Application`.owner = '{user}'
@@ -1540,18 +1534,7 @@ def get_permission_query_conditions(user):
 		exists(select 1
 				from `tabEmployee`
 				where `tabEmployee`.name = `tabLeave Application`.employee
-				and `tabEmployee`.user_id = '{user}')
+				and `tabEmployee`.user_id = '{user}' and `tabLeave Application`.docstatus != 2)
 		or
-		(`tabLeave Application`.leave_approver = '{user}' and `tabLeave Application`.workflow_state not in  ('Draft','Approved','Rejected','Cancelled'))
-		or
-		exists(select 1
-				from `tabEmployee`
-				where name in (select second_approver from `tabEmployee`
-				where `tabEmployee`.name = `tabLeave Application`.employee
-				and `tabLeave Application`.workflow_state not in  ('Draft','Rejected','Cancelled')
-				)
-				and `tabEmployee`.user_id = '{user}'
-		)
-		
+		(`tabLeave Application`.leave_approver = '{user}' and `tabLeave Application`.workflow_state not in ('Draft','Approved','Rejected','Cancelled'))
 	)""".format(user=user)
-

@@ -3,92 +3,114 @@
  "allow_rename": 1,
  "creation": "2024-10-15 12:08:10.979554",
  "doctype": "DocType",
- "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "section_break_yxg4"
+  "relationship",
+  "full_name",
+  "gender",
+  "date_of_birth",
+  "c_brake",
+  "cid_no",
+  "district_name",
+  "city_name",
+  "village_name",
+  "column_break_10",
+  "f_remarks",
+  "cid_attach",
+  "sws_received",
+  "dead"
  ],
  "fields": [
-    {
-        "fieldname": "relationship",
-        "fieldtype": "Link",
-        "in_list_view": 1,
-        "label": "Relationship",
-        "options": "Relationship",
-        "reqd": 1
-       },
-       {
-        "fieldname": "full_name",
-        "fieldtype": "Data",
-        "in_list_view": 1,
-        "label": "Full Name",
-        "reqd": 1
-       },
-       {
-        "fieldname": "gender",
-        "fieldtype": "Select",
-        "in_list_view": 1,
-        "label": "Gender",
-        "options": "Male\nFemale\nOther",
-        "reqd": 1
-       },
-       {
-        "fieldname": "dob",
-        "fieldtype": "Date",
-        "label": "Date of birth",
-        "reqd": 1
-       },
-       {
-        "fieldname": "column_break_5",
-        "fieldtype": "Column Break"
-       },
-       {
-        "fieldname": "cid",
-        "fieldtype": "Data",
-        "in_list_view": 1,
-        "label": "CID Number"
-       },
-       {
-        "fieldname": "dzongkhag",
-        "fieldtype": "Link",
-        "in_list_view": 1,
-        "label": "Dzongkhag ",
-        "options": "Dzongkhag"
-       },
-       {
-        "fieldname": "gewog",
-        "fieldtype": "Link",
-        "label": "Gewog",
-        "options": "Gewog"
-       },
-       {
-        "fieldname": "village",
-        "fieldtype": "Link",
-        "label": "Village",
-        "options": "Village"
-       },
-       {
-        "fieldname": "supporting_document_section",
-        "fieldtype": "Section Break",
-        "label": "Supporting Document"
-       },
-       {
-        "fieldname": "cid_attached",
-        "fieldtype": "Attach",
-        "label": "CID Attached"
-       },
-       {
-        "allow_on_submit": 1,
-        "default": "0",
-        "fieldname": "deceased",
-        "fieldtype": "Check",
-        "label": "Deceased"
-       }
+  {
+   "fieldname": "relationship",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Relationship",
+   "options": "\nSelf\nSpouse\nFather\nMother\nChildren\nFather-in-law\nMother-in-law\nBrother\nSister"
+  },
+  {
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Full Name"
+  },
+  {
+   "fieldname": "gender",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Gender",
+   "options": "Male\nFemale"
+  },
+  {
+   "fieldname": "date_of_birth",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date of Birth"
+  },
+  {
+   "fieldname": "c_brake",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cid_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "CID No./Passport /Work Permit"
+  },
+  {
+   "fieldname": "district_name",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "District/Dzongkhags",
+   "options": "Dzongkhag"
+  },
+  {
+   "fieldname": "city_name",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "City/Gewogs",
+   "options": "Gewog"
+  },
+  {
+   "fieldname": "village_name",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Village",
+   "options": "Village"
+  },
+  {
+   "fieldname": "column_break_10",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "f_remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "cid_attach",
+   "fieldtype": "Attach",
+   "label": "CID"
+  },
+  {
+   "default": "0",
+   "fieldname": "sws_received",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "SWS Received"
+  },
+  {
+   "default": "0",
+   "fieldname": "dead",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Dead"
+  }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-10-15 12:08:10.979554",
+ "modified": "2025-01-19 23:15:15.804198",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Family Details",

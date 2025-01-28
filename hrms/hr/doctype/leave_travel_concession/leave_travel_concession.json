@@ -13,6 +13,7 @@
   "posting_date",
   "column_break_6",
   "branch",
+  "employment_type",
   "employee",
   "amount_details",
   "get_ltc",
@@ -130,12 +131,18 @@
   {
    "fieldname": "column_break_17",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "employment_type",
+   "fieldtype": "Link",
+   "label": "Employment Type",
+   "options": "Employment Type"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-02 11:04:58.595141",
+ "modified": "2025-01-27 15:49:04.441659",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Travel Concession",
@@ -151,6 +158,30 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
    "share": 1,
    "submit": 1,
    "write": 1

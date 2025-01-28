@@ -1,4 +1,4 @@
-# Copyright (c) 2022, Frappe Technologies Pvt. Ltd. and contributors
+# Copyright (c) 2025, Frappe Technologies Pvt. Ltd. and contributors
 # For license information, please see license.txt
 
 import frappe
@@ -11,14 +11,16 @@ from erpnext.custom_workflow import verify_workflow
 
 class OvertimeApplication(Document):	
 	def validate(self):
+		validate_workflow_states(self)
 		self.validate_dates()
 		self.calculate_totals()
+		self.validate_employee_grade()
 		verify_workflow(self)
 
 	def on_submit(self):
 		#self.check_status()
 		self.validate_submitter()
-         	#self.check_budget()
+		 	#self.check_budget()
 		#self.post_journal_entry()
 
 	def on_cancel(self):
@@ -41,7 +43,7 @@ class OvertimeApplication(Document):
 		if flt(self.total_hours) <= 0:
 			frappe.throw(_(" <b> From Time cannot be greater than to time </b> "),title="Wrong Input")
 
-                
+				
 	def check_status(self):
 		if self.status != "Approved":
 			frappe.throw("Only Approved documents can be submitted")
@@ -55,7 +57,7 @@ class OvertimeApplication(Document):
 		if self.posting_date > nowdate():
 				frappe.throw(_("Posting date cannot be a future date."), title="Invalid Date")
 		'''
-                
+				
 		for a in self.items:
 			if not a.from_date or not a.to_date:
 				frappe.throw(_("Row#{0} : Date cannot be blank").format(a.idx),title="Invalid Date")
@@ -69,6 +71,16 @@ class OvertimeApplication(Document):
 	##
 	# Allow only the approver to submit the document
 	##
+
+	def validate_employee_grade(self):		
+		allowed_grades = ['O1', 'O2', 'O3', 'O4', 'O5', 'O6', 'O7']
+		# Fetch the employee's grade
+		employee = frappe.get_doc('Employee', self.employee)		
+		if not employee.grade:
+			frappe.throw(_("The selected employee does not have a grade assigned."))
+		if employee.grade not in allowed_grades:
+			frappe.throw(_("Overtime Application can only be processed for employees with grades O1 to O8. Your Current grade is: {0}").format(employee.grade))
+
 	def validate_submitter(self):
 		if self.approver != frappe.session.user:
 			pass
@@ -76,52 +88,13 @@ class OvertimeApplication(Document):
 
 
 	##
-	# Post journal entry
+	# Check journal entry status (allow to cancel only if the JV is cancelled too)
 	##
-	def post_journal_entry(self):	
-		cost_center = frappe.db.get_value("Employee", self.employee, "cost_center")
-		ot_account = frappe.db.get_single_value("HR Accounts Settings", "overtime_account")
-		expense_bank_account = frappe.db.get_value("Branch", self.branch, "expense_bank_account")
-		if not cost_center:
-			frappe.throw("Setup Cost Center for employee in Employee Information")
-		if not expense_bank_account:
-			frappe.throw("Setup Default Expense Bank Account for your Branch")
-		if not ot_account:
-			frappe.throw("Setup Default Overtime Account in HR Account Setting")
-
-		je = frappe.new_doc("Journal Entry")
-		je.flags.ignore_permissions = 1 
-		je.title = "Overtime payment for " + self.employee_name + "(" + self.employee + ")"
-		je.voucher_type = 'Bank Entry'
-		je.naming_series = 'Bank Payment Voucher'
-		je.remark = 'Payment Paid against : ' + self.name + " for " + self.employee;
-		je.user_remark = 'Payment Paid against : ' + self.name + " for " + self.employee;
-		je.posting_date = self.posting_date
-		total_amount = self.total_amount
-		je.branch = self.branch
-
-		je.append("accounts", {
-				"account": expense_bank_account,
-				"cost_center": cost_center,
-				"credit_in_account_currency": flt(total_amount),
-				"credit": flt(total_amount),
-			})
+	def check_journal(self):
+		cl_status = frappe.db.get_value("Journal Entry", self.payment_jv, "docstatus")
+		if cl_status and cl_status != 2:
+			frappe.throw("You need to cancel the journal entry " + str(self.payment_jv) + " first!")
 		
-		je.append("accounts", {
-				"account": ot_account,
-				"cost_center": cost_center,
-				"debit_in_account_currency": flt(total_amount),
-				"debit": flt(total_amount),
-				"reference_type": self.doctype,
-				"reference_name": self.name
-			})
-
-		je.insert()
-
-		self.db_set("payment_jv", je.name)
-		frappe.msgprint("Bill processed to accounts through journal voucher " + je.name)
-
-
 	##
 	# Check journal entry status (allow to cancel only if the JV is cancelled too)
 	##
@@ -142,58 +115,7 @@ class OvertimeApplication(Document):
 # 		self.processed = 0
 # 		self.validate_total_claim_amount()
 	
-# 	def validate_total_claim_amount(self):
-# 		if self.total_amount and flt(self.total_amount) <= 0:
-# 			frappe.throw("Total Claim Amount cannot be 0, please process again")
-
-# 	def validate_eligible_creteria(self):
-# 		if "Employee" not in frappe.get_roles(frappe.session.user):
-# 			frappe.msgprint(_("Only employee of {} can apply for Overtime").format(frappe.bold(self.company)), title="Not Allowed", indicator="red", raise_exception=1)
-
-# 		salary_struc=frappe.db.sql("select name from `tabSalary Structure` where employee='{}' and is_active='Yes'".format(self.employee), as_dict=True)[0].name
-# 		if not salary_struc:
-# 			frappe.throw("There is no salary strcuture for the employee ")
-
-# 		if cint(frappe.db.get_value('Salary Structure',salary_struc,'eligible_for_overtime_and_payment')) == 0:
-# 			frappe.msgprint(_("You are not eligible for overtime"), title="Not Eligible", indicator="red", raise_exception=1)
-
-# 	def calculate_totals(self):			
-# 		settings = frappe.get_single("HR Settings")
-# 		overtime_limit_type, overtime_limit = settings.overtime_limit_type, flt(settings.overtime_limit)
-# 		total_amount = 0
-# 		total_hours = 0
-# 		for i in self.get("items"):
-# 			if i.is_holiday:
-# 				i.is_late_night_ot = 0
-# 			i.rate = self.rate
-# 			if i.is_late_night_ot or i.is_holiday:
-# 				i.number_of_hours    = flt(time_diff_in_hours(i.to_date, i.from_date),2)
-# 				i.amount             = flt(i.number_of_hours) * flt(flt(i.rate) * 1.5)
-# 			else:
-# 				i.number_of_hours    = flt(time_diff_in_hours(i.to_date, i.from_date),2)
-# 				i.amount             = flt(i.number_of_hours) * flt(i.rate)
-				
-# 			total_hours += flt(i.number_of_hours)
-# 			# if flt(i.number_of_hours) > flt(overtime_limit):
-# 			# 	frappe.throw(_("Row#{}: Number of Hours cannot be more than {} hours").format(i.idx, overtime_limit))
-
-# 			# if overtime_limit_type == "Per Day":
-# 			# 	month_start_date = add_to_date(i.to_date, days=-1)
-# 			# elif overtime_limit_type == "Per Month":
-# 			# 	month_start_date = add_to_date(i.to_date, months=-1)
-# 			# elif overtime_limit_type == "Per Year":
-# 			# 	month_start_date = add_to_date(i.to_date, years=-1)
-# 			# i.amount = flt(i.rate) * flt(i.number_of_hours)
-# 			total_amount += i.amount
-# 		self.actual_hours = flt(total_hours)
-# 		# if flt(total_hours) > flt(overtime_limit):
-# 		# 	frappe.throw(_("Only {} hours accepted for payment").format(overtime_limit))
-# 		# 	self.total_hours = flt(overtime_limit)
-# 		# 	self.total_hours_lapsed = flt(total_hours) - flt(overtime_limit)
-# 		# else:
-# 		self.total_hours = flt(self.actual_hours)
-# 		self.total_amount = round(total_amount,0)
-# 		self.actual_amount = round(total_amount,0)
+		self.db_set("payment_jv", None)
 
 # 	def on_cancel(self):
 # 		# notify_workflow_states(self)

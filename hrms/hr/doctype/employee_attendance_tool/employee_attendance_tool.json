@@ -83,7 +83,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
-   "options": "\nPresent\nAbsent\nHalf Day\nWork From Home",
+   "options": "\nPresent\nAbsent\nTour\nHalf Day\nWork From Home",
    "reqd": 1
   },
   {
@@ -144,7 +144,7 @@
  "hide_toolbar": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-12-23 17:14:45.414426",
+ "modified": "2025-01-27 10:35:43.977191",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Attendance Tool",
@@ -154,6 +154,24 @@
    "create": 1,
    "read": 1,
    "role": "HR Manager",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "HR Support",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "HR User",
+   "share": 1,
    "write": 1
   }
  ],
