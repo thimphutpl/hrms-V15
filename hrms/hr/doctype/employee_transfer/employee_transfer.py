@@ -9,7 +9,6 @@ from frappe.model.document import Document
 from frappe.utils import getdate
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from erpnext.custom_workflow import validate_workflow_states, notify_workflow_states
 
 class EmployeeTransfer(Document):
 	def validate(self):
@@ -19,7 +18,6 @@ class EmployeeTransfer(Document):
 		self.validate_employee_eligibility()
 		if frappe.get_value("Employee", self.employee, "status") == "Left":
 			frappe.throw(_("Cannot transfer Employee with status Left"))
-		validate_workflow_states(self)
   
 	def before_submit(self):
 		if getdate(self.transfer_date) > getdate():
@@ -43,6 +41,11 @@ class EmployeeTransfer(Document):
 				frappe.throw(_("There is another transfer record {} in process").format(frappe.get_desk_link(self.doctype, t.name)), title="Duplicate Entry")		
 
 	def update_employee_master(self, cancel=False):
+		new_holiday_list=frappe.get_doc("Branch",self.new_branch)
+		
+		#old_holiday_list=frappe.get_doc("Branch",self.old_branch)
+		new_holiday=new_holiday_list.holiday_list
+		#old_holiday=old_holiday_list.holiday_list
 		employee = frappe.get_doc("Employee", self.employee)
 		employee.department = self.new_department if not cancel else self.old_department
 		employee.division	= self.new_division if not cancel else self.old_division
@@ -50,8 +53,10 @@ class EmployeeTransfer(Document):
 		employee.section	= self.new_section if not cancel else self.old_section
 		employee.branch		= self.new_branch if not cancel else self.old_branch
 		employee.unit 		= self.new_unit if not cancel else self.old_unit
+		employee.holiday_list =new_holiday if not cancel else employee.holiday_list
 		employee.cost_center= self.new_cost_center if not cancel else self.old_cost_center
 		employee.reports_to = self.new_reports_to if not cancel and self.new_reports_to else self.old_reports_to
+		employee.second_approver = self.new_approver if not cancel and self.new_approver else self.current_approver
 		employee.expense_approver = frappe.db.get_value("Employee",self.new_reports_to,"user_id") if not cancel and self.new_reports_to else frappe.db.get_value("Employee",self.old_reports_to,"user_id")
 		employee.leave_approver = frappe.db.get_value("Employee",self.new_reports_to,"user_id") if not cancel and self.new_reports_to else frappe.db.get_value("Employee",self.old_reports_to,"user_id")
 		employee.shift_request_approver = frappe.db.get_value("Employee",self.new_reports_to,"user_id") if not cancel and self.new_reports_to else frappe.db.get_value("Employee",self.old_reports_to,"user_id")
@@ -63,20 +68,26 @@ class EmployeeTransfer(Document):
 			frappe.db.sql("""delete from `tabEmployee Internal Work History` 
 				where reference_doctype = "{}" and reference_docname = "{}"
 				""".format(self.doctype, self.name))
-		else:
+
+		else:			
+			existing_record = next((history for history in employee.internal_work_history if history.branch == self.old_branch and not history.to_date), None)			
+			if existing_record:
+				existing_record.to_date = self.transfer_date
+
+			# Add the new internal work history for the transfer
 			internal_work_history = {
 				'department': self.new_department,
 				'division': self.new_division,
 				'section': self.new_section,
 				'branch': self.new_branch,
 				'cost_center': self.new_cost_center,
-				'reports_to': self.new_reports_to,
-				'from_date': self.transfer_date,
+				'from_date': self.transfer_date,				
 				'reference_doctype': self.doctype,
 				'reference_docname': self.name
 			}
-			employee.append("internal_work_history", internal_work_history)
+			employee.append("internal_work_history", internal_work_history)		
 		employee.save(ignore_permissions=True)
+		
 
 	def validate_employee_eligibility(self):
 		if self.transfer_type == "Personal Request":

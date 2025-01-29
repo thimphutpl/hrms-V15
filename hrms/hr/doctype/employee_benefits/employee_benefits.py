@@ -19,10 +19,8 @@ import math
 class EmployeeBenefits(Document):
 	def validate(self):
 		validate_workflow_states(self)
-		if not self.employee_separation_id  and not self.employee_transfer_id and self.purpose != "Upgradation":
-			pass
-			# frappe.throw("This document should be created through either Employee Separation or Employee Transfer")
-
+		if not self.employee_separation_id  and not self.employee_transfer_id and self.purpose != "Upgradation":			
+			frappe.throw("This document should be created through either Employee Separation or Employee Transfer")
 		self.validate_gratuity()
 		self.check_duplicates()
 		self.validate_benefits()
@@ -328,6 +326,33 @@ def get_basic_salary(employee):
 		for a in data:
 			amount += a.amount
 	return amount
+
+@frappe.whitelist()
+def get_tada_amount(employee):
+    amount = 0
+    # Query to fetch dsa_per_day for the given employee
+    query = """
+        SELECT 
+            eg.dsa_per_day 
+        FROM 
+            `tabEmployee` e 
+        INNER JOIN 
+            `tabEmployee Grade` eg 
+        ON 
+            e.grade = eg.name 
+        WHERE 
+            e.name = %s
+    """    
+    data = frappe.db.sql(query, (employee,), as_dict=True)    
+    if not data:
+        frappe.throw("DSA per day is not assigned to the employee.")
+    else:         
+        for a in data:
+            dsa_per_day = float(a.get("dsa_per_day", 0))  # Convert to float
+            amount += dsa_per_day
+
+    return amount
+
 
 @frappe.whitelist()
 def get_leave_encashment_amount(employee, date):

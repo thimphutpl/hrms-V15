@@ -1150,6 +1150,7 @@
   {
    "fieldname": "approver",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Approver",
    "options": "Employee"
   },
@@ -1157,6 +1158,7 @@
    "fetch_from": "approver.employee_name",
    "fieldname": "approver_name",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Approver Name"
   }
  ],
@@ -1164,7 +1166,7 @@
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-01-07 14:53:21.722644",
+ "modified": "2025-01-29 11:30:12.816822",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",

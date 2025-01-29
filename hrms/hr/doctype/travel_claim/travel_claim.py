@@ -12,12 +12,11 @@ from erpnext.setup.utils import get_exchange_rate
 from erpnext.custom_workflow import validate_workflow_states, notify_workflow_states
 from erpnext.accounts.doctype.accounts_settings.accounts_settings import get_bank_account
 from datetime import datetime, timedelta
-from erpnext.custom_workflow import verify_workflow_tc
+
 
 class TravelClaim(Document):
-	def validate(self):		
-		verify_workflow_tc(self)
-		# validate_workflow_states(self)
+	def validate(self):			
+		validate_workflow_states(self)
 		self.validate_travel_last_day()
 		self.update_amounts()
 		self.validate_dates()
@@ -252,7 +251,8 @@ class TravelClaim(Document):
 			else:
 				gl_account = "meeting_and_seminars_out_account"
 		expense_account = frappe.db.get_single_value("HR Accounts Settings", gl_account)
-		payable_account = frappe.db.get_single_value("HR Accounts Settings", 'travel_claim_payable')
+		payable_account = expense_account
+
 		if not expense_account:
 			frappe.throw("Setup Travel/Training Accounts in HR Accounts Settings")
 		advance_je = frappe.db.get_value("Travel Authorization", self.ta, "need_advance")
@@ -364,6 +364,7 @@ class TravelClaim(Document):
 
 # Following code added by SHIV on 2020/09/21
 def get_permission_query_conditions(user):
+	
 	if not user: user = frappe.session.user
 	user_roles = frappe.get_roles(user)
 	permitted_regions = []

@@ -21,7 +21,7 @@ class OvertimeApplication(Document):
 		#self.check_status()
 		self.validate_submitter()
 		 	#self.check_budget()
-		#self.post_journal_entry()
+		self.post_journal_entry()
 
 	def on_cancel(self):
 		self.check_journal()
@@ -71,7 +71,6 @@ class OvertimeApplication(Document):
 	##
 	# Allow only the approver to submit the document
 	##
-
 	def validate_employee_grade(self):		
 		allowed_grades = ['O1', 'O2', 'O3', 'O4', 'O5', 'O6', 'O7']
 		# Fetch the employee's grade
@@ -82,102 +81,61 @@ class OvertimeApplication(Document):
 			frappe.throw(_("Overtime Application can only be processed for employees with grades O1 to O8. Your Current grade is: {0}").format(employee.grade))
 
 	def validate_submitter(self):
-		if self.approver != frappe.session.user:
-			pass
-			#frappe.throw("Only the selected Approver can submit this document")
-
-
-	##
-	# Check journal entry status (allow to cancel only if the JV is cancelled too)
-	##
-	def check_journal(self):
-		cl_status = frappe.db.get_value("Journal Entry", self.payment_jv, "docstatus")
-		if cl_status and cl_status != 2:
-			frappe.throw("You need to cancel the journal entry " + str(self.payment_jv) + " first!")
-		
-	##
-	# Check journal entry status (allow to cancel only if the JV is cancelled too)
-	##
-	def check_journal(self):
-		cl_status = frappe.db.get_value("Journal Entry", self.payment_jv, "docstatus")
-		if cl_status and cl_status != 2:
-			frappe.throw("You need to cancel the journal entry " + str(self.payment_jv) + " first!")
-		
-		self.db_set("payment_jv", None)
-
-# 	def validate(self):
-# 		# validate_workflow_states(self)
-# 		self.validate_dates()
-# 		self.calculate_totals()
-# 		self.validate_eligible_creteria()
-# 		# if self.workflow_state != "Approved":
-# 		# 	notify_workflow_states(self)
-# 		self.processed = 0
-# 		self.validate_total_claim_amount()
+		if self.approver != frappe.session.user:			
+			frappe.throw("Only the selected Approver can submit this document")
 	
-		self.db_set("payment_jv", None)
+	def post_journal_entry(self):	
+		cost_center = frappe.db.get_value("Employee", self.employee, "cost_center")
+		ot_account = frappe.db.get_single_value("HR Accounts Settings", "overtime_account")
+		expense_bank_account = frappe.db.get_value("Branch", self.branch, "expense_bank_account")
+		if not cost_center:
+			frappe.throw("Setup Cost Center for employee in Employee Information")
+		if not expense_bank_account:
+			frappe.throw("Setup Default Expense Bank Account for your Branch")
+		if not ot_account:
+			frappe.throw("Setup Default Overtime Account in HR Account Setting")
 
-# 	def on_cancel(self):
-# 		# notify_workflow_states(self)
-# 		self.update_salary_structure(True)
+		je = frappe.new_doc("Journal Entry")
+		je.flags.ignore_permissions = 1 
+		je.title = "Overtime payment for " + self.employee_name + "(" + self.employee + ")"
+		je.voucher_type = 'Bank Entry'
+		je.naming_series = 'Bank Payment Voucher'
+		je.remark = 'Payment Paid against : ' + self.name + " for " + self.employee;
+		je.user_remark = 'Payment Paid against : ' + self.name + " for " + self.employee;
+		je.posting_date = self.posting_date
+		total_amount = self.total_amount
+		je.branch = self.branch
 
-# 	def on_submit(self):
-# 		self.update_salary_structure()
+		je.append("accounts", {
+				"account": expense_bank_account,
+				"cost_center": cost_center,
+				"credit_in_account_currency": flt(total_amount),
+				"credit": flt(total_amount),
+			})
 		
-# 		# notify_workflow_states(self)
-# 	def update_salary_structure(self, cancel=False):
-# 		if cancel:
-# 			rem_list = []
-# 			if self.salary_structure:
-# 				doc = frappe.get_doc("Salary Structure", self.salary_structure)
-# 				for d in doc.get("earnings"):
-# 					if d.salary_component == self.salary_component and self.name in (d.reference_number, d.ref_docname):
-# 						rem_list.append(d)
+		je.append("accounts", {
+				"account": ot_account,
+				"cost_center": cost_center,
+				"debit_in_account_currency": flt(total_amount),
+				"debit": flt(total_amount),
+				"reference_type": self.doctype,
+				"reference_name": self.name
+			})
 
-# 				[doc.remove(d) for d in rem_list]
-# 				doc.save(ignore_permissions=True)
-# 		else:
-# 			if frappe.db.exists("Salary Structure", {"employee": self.employee, "is_active": "Yes"}):
-# 				doc = frappe.get_doc("Salary Structure", {"employee": self.employee, "is_active": "Yes"})
-# 				row = doc.append("earnings",{})
-# 				row.salary_component        = "Overtime Allowance"
-# 				# row.from_date               = self.recovery_start_date
-# 				# row.to_date                 = self.recovery_end_date
-# 				row.amount                  = flt(self.total_amount)
-# 				row.default_amount          = flt(self.total_amount)
-# 				row.reference_number        = self.name
-# 				row.ref_docname             = self.name
-# 				row.total_days_in_month     = 0
-# 				row.working_days            = 0
-# 				row.leave_without_pay       = 0
-# 				row.payment_days            = 0
-# 				doc.save(ignore_permissions=True)
-# 				# self.db_set("salary_structure", doc.name)
-# 			else:
-# 				frappe.throw(_("No active salary structure found for employee {0} {1}").format(self.employee, self.employee_name), title="No Data Found")
+		je.insert()
 
-# 	# Dont allow duplicate dates
-# 	def validate_dates(self):				
-# 		self.posting_date = nowdate()
-				  
-# 		for a in self.items:
-# 			if not a.date:
-# 				frappe.throw(_("Row#{0} : Date cannot be blank").format(a.idx),title="Invalid Date")
-
-# 			if str(a.date) > str(nowdate()):
-# 				frappe.throw(_("Row#{0} : Future dates are not accepted").format(a.idx), title="Invalid Date")
-
-# 			#Validate if time interval falls between another time interval for the same date   
-# 			for b in self.items:
-# 				if a.date == b.date and a.idx != b.idx:
-# 					time_format = "%H:%M:%S"
-# 					start1 = datetime.strptime(a.from_time, time_format)
-# 					end1 = datetime.strptime(a.to_time, time_format)
-# 					start2 = datetime.strptime(b.from_time, time_format)
-# 					end2 = datetime.strptime(b.to_time, time_format)
-# 					#frappe.throw("{}, {}, {} and {},{},{}".format(start2,start1,end2,start2,end1,end2))
-# 					if start2 <= start1 <= end2 or start2 <= end1 <= end2:
-# 						frappe.throw("Duplicate Dates in row " + str(a.idx) + " and " + str(b.idx))
+		self.db_set("payment_jv", je.name)
+		frappe.msgprint("Bill processed to accounts through journal voucher " + je.name)
+		
+	##
+	# Check journal entry status (allow to cancel only if the JV is cancelled too)
+	##
+	def check_journal(self):
+		cl_status = frappe.db.get_value("Journal Entry", self.payment_jv, "docstatus")
+		if cl_status and cl_status != 2:
+			frappe.throw("You need to cancel the journal entry " + str(self.payment_jv) + " first!")
+		
+		self.db_set("payment_jv", None)
 
 # def get_permission_query_conditions(user):
 # 	if not user: user = frappe.session.user

@@ -194,7 +194,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Transfer Type",
-   "options": "\nRegular Transfer\nRe-Deployment\nDeputation or Temporary Transfer\nInternal Transfer\nShort Term Transfer\nLong Term Transfer\nTransfer on request\nDisciplinary Transfer",
+   "options": "\nRegular Transfer\nRequest Transfer\nRe-Deployment\nDeputation or Temporary Transfer\nInternal Transfer\nShort Term Transfer\nLong Term Transfer\nDisciplinary Transfer",
    "reqd": 1
   },
   {
@@ -429,14 +429,13 @@
   {
    "fieldname": "upload_document",
    "fieldtype": "Attach",
-   "label": "Upload Document",
-   "reqd": 1
+   "label": "Upload Document"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-23 14:55:44.221296",
+ "modified": "2025-01-28 12:30:02.341581",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Transfer",
@@ -453,7 +452,6 @@
    "report": 1,
    "role": "System Manager",
    "share": 1,
-   "submit": 1,
    "write": 1
   },
   {
@@ -465,7 +463,6 @@
    "report": 1,
    "role": "HR User",
    "share": 1,
-   "submit": 1,
    "write": 1
   },
   {

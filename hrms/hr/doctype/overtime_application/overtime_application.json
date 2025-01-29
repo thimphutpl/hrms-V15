@@ -211,8 +211,10 @@
   },
   {
    "fieldname": "payment_jv",
-   "fieldtype": "Read Only",
-   "label": "Payment Voucher"
+   "fieldtype": "Link",
+   "label": "Payment Voucher",
+   "options": "Overtime Application",
+   "read_only": 1
   },
   {
    "collapsible": 1,
@@ -289,6 +291,7 @@
   {
    "fieldname": "journal_entry",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Journal Entry",
    "options": "Journal Entry"
   }
@@ -296,7 +299,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-21 22:41:11.608254",
+ "modified": "2025-01-28 16:05:27.549539",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Overtime Application",

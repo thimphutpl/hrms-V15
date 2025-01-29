@@ -117,6 +117,19 @@ frappe.ui.form.on("Separation Item", {
 				}
 			});
 		}
+		else if(item.benefit_type == "TADA-Incountry"){
+			return frappe.call({
+				method: "hrms.hr.doctype.employee_benefits.employee_benefits.get_tada_amount",
+				args: {"employee": frm.doc.employee},
+				callback: function(r) {
+					console.log(r.message);
+					if(r.message) {
+						frappe.model.set_value(cdt, cdn,"amount", r.message);
+					}
+					frm.refresh_fields()
+				}
+			});
+		}
 		else if (item.benefit_type == "Leave Encashment"){
 			if(frm.doc.purpose == "Separation"){
 				if(frm.doc.separation_date && frm.doc.employee){

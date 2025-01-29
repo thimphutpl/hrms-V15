@@ -7,7 +7,6 @@ from hrms.controllers.employee_boarding_controller import EmployeeBoardingContro
 
 import frappe
 from frappe.model.mapper import get_mapped_doc
-from erpnext.custom_workflow import validate_separation_workflow
 from erpnext.custom_workflow import validate_workflow_states, notify_workflow_states
 from frappe.utils import today
 from frappe.model.naming import make_autoname
@@ -15,8 +14,7 @@ from frappe.model.naming import make_autoname
 
 class EmployeeSeparation(EmployeeBoardingController):
 	def validate(self):
-		self.check_duplicate()
-		validate_separation_workflow(self)
+		self.check_duplicate()		
 
 	def autoname(self):
 		abb = "EMPSEP"
