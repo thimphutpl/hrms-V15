@@ -17,6 +17,7 @@
   "column_break_wbem",
   "status",
   "dzongkhag",
+  "is_lifer",
   "section_break_xbbv",
   "date_of_joining",
   "blood_group",
@@ -247,11 +248,17 @@
    "fieldname": "column_break_wbem",
    "fieldtype": "Column Break",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_lifer",
+   "fieldtype": "Check",
+   "label": "Is Lifer"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-24 10:30:07.247976",
+ "modified": "2025-01-31 10:01:20.002957",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Open Air Prisoner",

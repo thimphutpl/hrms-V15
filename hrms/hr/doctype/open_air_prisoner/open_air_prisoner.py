@@ -17,9 +17,11 @@ class OpenAirPrisoner(Document):
 	def calculate_rates(self):
 		# if not self.rate_per_day:
 		self.rate_per_day = flt(self.salary) / 30
-
-		gratuity_percent = frappe.db.get_value("HR Settings", None, "gratuity_percent")
-		self.gratuity_fund = flt(gratuity_percent)/100  * flt(self.salary)
+		if self.is_lifer==1:
+			self.gratuity_fund=0
+		else:
+			gratuity_percent = frappe.db.get_value("HR Settings", None, "gratuity_percent")
+			self.gratuity_fund = flt(gratuity_percent)/100  * flt(self.salary)
 
 		'''if not self.rate_per_hour:
 			self.rate_per_hour = (flt(self.salary) * 1.5) / (30 * 8)

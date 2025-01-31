@@ -1047,15 +1047,12 @@ def get_leave_balance_on(
 	if not to_date:
 		to_date = nowdate()
 
-	allocation_records = get_leave_allocation_records(employee, date, leave_type)
-	
-	allocation = allocation_records.get(leave_type, frappe._dict())
-	
+	allocation_records = get_leave_allocation_records(employee, date, leave_type)	
+	allocation = allocation_records.get(leave_type, frappe._dict())	
 	end_date = allocation.to_date if cint(consider_all_leaves_in_the_allocation_period) else date	
 	cf_expiry = get_allocation_expiry_for_cf_leaves(employee, leave_type, to_date, date)
 	# frappe.throw(str(cf_expiry))
 	leaves_taken = get_leaves_for_period(employee, leave_type, allocation.from_date, end_date)
-
 	remaining_leaves = get_remaining_leaves(allocation, leaves_taken, date, cf_expiry)
 	
 	if for_consumption:

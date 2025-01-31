@@ -356,6 +356,7 @@ def get_tada_amount(employee):
 
 @frappe.whitelist()
 def get_leave_encashment_amount(employee, date):
+	# frappe.throw('hi')
 	
 	basic_pay = amount = net_amount = 0
 	query = """
@@ -366,18 +367,17 @@ def get_leave_encashment_amount(employee, date):
 		AND d.salary_component = 'Basic Pay'
 		AND s.is_active = 'Yes'
 	"""
-	data = frappe.db.sql(query, (employee,), as_dict=True)
+	data = frappe.db.sql(query, (employee,), as_dict=True)	
 
 	if not data:
 		frappe.throw("Basic Salary has not been assigned to the employee.")
 
 	basic_pay = flt(data[0]["amount"])
-
 	leave_balance = get_leave_balance_on(employee, "Earned Leave", date)
-	if flt(leave_balance) == 30:
+	if flt(leave_balance) == 30:		
 		amount = flt(basic_pay)
-	else:
-		amount = (flt(basic_pay)/30.0) * flt(leave_balance)
+	else:		
+		amount = (flt(basic_pay)/30.0) * flt(leave_balance)		
 	encashment_tax = get_salary_tax(amount)
 	net_amount = flt(amount) - flt(encashment_tax)
 	return amount, leave_balance, encashment_tax, net_amount
@@ -403,11 +403,11 @@ def get_gratuity_amount(employee):
 	today_date = date.today()
 	years_in_service = flt(((today_date - date_of_joining).days)/365)
 	years_in_service = math.ceil(years_in_service) if (years_in_service - int(years_in_service)) >= 0.5 else math.floor(years_in_service)
-	if frappe.db.get_value("Employee", employee, "employment_type") != "Contract":
-		if years_in_service < 5 and employee_group != "ESP":
-			frappe.throw("Should have minimum of 5 years in service for Gratuity. Only <b>{0}</b> year/s in Services as of now ".format(years_in_service))
-	elif employee_group == "ESP" and years_in_service < 1:
-		frappe.throw("ESP Employee should have minimum of 1 years in service for Gratuity. Only <b>{0}</b> year/s in Services as of now ".format(years_in_service))
+	if frappe.db.get_value("Employee", employee, "employment_type") == "Contract":
+		if years_in_service < 1:
+			frappe.throw("Should have minimum of 1 years in service for Gratuity. Only <b>{0}</b> year/s in Services as of now ".format(years_in_service))
+	# elif employee_group == "ESP" and years_in_service < 1:
+	# 	frappe.throw("ESP Employee should have minimum of 1 years in service for Gratuity. Only <b>{0}</b> year/s in Services as of now ".format(years_in_service))
 	if years_in_service > 0:
 		amount = flt(basic_pay) * years_in_service
 	return amount
@@ -429,146 +429,3 @@ def get_permission_query_conditions(user):
 				where `tabEmployee`.name = `tabEmployee Benefits`.employee
 				and `tabEmployee`.user_id = '{user}')
 	)""".format(user=user)
-
-
-
-# 	def validate(self):
-# 		# self.check_duplicate()
-# 		self.check_reference()
-		
-# 		# pass
-
-# 	def on_submit(self):
-# 		# if self.purpose == "Separation":
-# 		# 	self.update_employee()
-# 		# self.check_duplicate()
-# 		self.check_leave_encashment()
-# 		self.update_seperation_benefit_reference()
-# 		self.post_journal()
-
-# 	def post_journal(self):
-# 		emp = frappe.get_doc("Employee", self.employee)
-# 		je = frappe.new_doc("Journal Entry")
-# 		je.flags.ignore_permissions=1
-# 		je.branch = emp.branch
-# 		je.posting_date = self.posting_date
-# 		je.title = str(self.purpose) + " Benefit (" + str(self.employee_name) + ")"
-# 		je.voucher_type = 'Bank Entry'
-# 		je.naming_series = 'Bank Payment Voucher'
-# 		je.remark = str(self.purpose) + ' Benefit payments for ' + str(self.employee_name) + "("+str(self.employee)+")";
-
-# 		total_amount = 0
-# 		for a in self.items:
-# 			je.append("accounts", {
-# 					"account": a.gl_account,
-# 					"party_type": "Employee",
-# 					"party": self.employee,
-# 					"reference_type": "Employee Benefits",
-# 					"reference_name": self.name,
-# 					"cost_center": emp.cost_center,
-# 					"debit_in_account_currency": flt(a.amount),
-# 					"debit": flt(a.amount),
-# 				})
-# 			total_amount = flt(total_amount) + flt(a.amount)
-# 		je.append("accounts", {
-# 				"account": frappe.db.get_value("Branch", emp.branch, "expense_bank_account"),
-# 				"cost_center": emp.cost_center,
-# 				"credit_in_account_currency": flt(total_amount),
-# 				"credit": flt(total_amount),
-# 			})
-# 		je.insert()
-# 		self.journal = je.name
-
-# 	def check_duplicate(self):		
-# 		duplicates = frappe.db.sql("""select name from 
-# 				`tabEmployee Benefits` 
-# 				where employee = '{0}'  
-# 				and name != '{1}' 
-# 				and docstatus != 2
-# 			""".format(self.employee, self.name))
-# 		if duplicates:
-# 			frappe.throw("Employee Benefit already claimed for the Employee '{}'".format(self.employee))
-
-
-# 	def check_reference(self):
-# 		if self.purpose == 'Separation' and not self.separation_reference:
-# 			frappe.throw("Employee Separation Clearance creation should route through Employee Separation Document.",title="Cannot Save")
-
-
-# 	def update_seperation_benefit_reference(self):
-# 		reference = frappe.db.get_value("Employee Separation", self.separation_reference, "separation_benefits")
-# 		if not reference:
-# 			frappe.db.set_value("Employee Separation", self.separation_reference,"separation_benefits", self.name)
-# 			frappe.db.set_value("Employee Separation",self.separation_reference ,"employee_benefits_status", 'Claimed')
-# 		else:
-# 			frappe.db.set_value("Employee Separation", self.separation_reference,"separation_benefits", "")	
-# 			frappe.db.set_value("Employee Separation",self.separation_reference ,"employee_benefits_status", 'Not Claimed')
-				
-
-
-# 	def update_employee(self):
-# 		emp = frappe.get_doc("Employee", self.employee)
-# 		emp.status = "Left"
-# 		emp.relieving_date = self.separation_date
-
-# 		for a in self.items:
-# 			doc = frappe.new_doc("Separation Benefits")
-# 			doc.parent = self.employee
-# 			doc.parentfield = "separation_benefits"
-# 			doc.parenttype = "Employee"
-# 			doc.s_b_type = a.benefit_type
-# 			doc.s_b_currency = a.amount
-# 			doc.save()
-# 		emp.save()	
-
-# 	def on_cancel(self):
-# 		self.check_journal()
-
-# 	def check_journal(self):
-# 		docs = frappe.db.sql("select parent from `tabJournal Entry Account` where reference_name = %s and docstatus != 2", self.name, as_dict=True)
-# 		if docs:
-# 			frappe.throw("Cancel Journal Entry <b>" + str(docs[0].parent) + "</b> before cancelling this document")
-
-# 	def check_leave_encashment(self):
-# 		for a in self.items:
-# 			if a.benefit_type == "Leave Encashment":
-# 				balance = 0
-# 				le = frappe.get_doc("Employee Group",frappe.db.get_value("Employee",self.employee,"employee_group")) # Line added by SHIV on 2018/10/16
-# 				las = frappe.db.sql("select name from `tabLeave Allocation` where employee = %s and leave_type = %s and to_date >= %s and YEAR(from_date) = %s and docstatus = 1", (self.employee, "Earned Leave", nowdate(), nowdate()), as_dict=True)
-# 				if flt(a.earned_leave_balance) > flt(le.encashment_lapse):
-# 					a.earned_leave_balance = flt(le.encashment_lapse)
-# 				for l in las:
-# 					if l.name != None:
-# 						doc = frappe.get_doc("Leave Allocation", l.name)
-# 						balance = -1*(flt(a.earned_leave_balance))
-# 						if self.docstatus == 2:
-# 							balance = a.earned_leave_balance
-# 						doc.db_set("new_leaves_allocated", balance)
-
-# 					self.create_additional_leave_ledger_entry(doc, balance, nowdate())
-
-# 	def create_additional_leave_ledger_entry(self, allocation, leaves, date):
-# 		''' Create leave ledger entry for leave types '''
-# 		allocation.new_leaves_allocated = leaves
-# 		allocation.from_date = date
-# 		allocation.unused_leaves = 0
-# 		allocation.create_leave_ledger_entry()
-
-# @frappe.whitelist()
-# def set_amount(benefit_type, employee):
-# 	salary_structure = frappe.db.get_value("Salary Structure",{"employee" :employee, "is_active":"Yes"},"name")
-	
-# 	basic_pay = frappe.db.get_value("Salary Detail",{"parent":salary_structure,"salary_component":"Basic Pay"},"amount")
-# 	# frappe.throw(str(basic_pay))
-# 	employee_grade = frappe.db.get_value("Employee",employee,"employee_subgroup")
-# 	tada_amount = frappe.db.get_value("Employee Grade",employee_grade,"dsa_per_day")
-	
-# 	if benefit_type =="Transfer Grant":
-# 		amount= basic_pay
-# 	elif benefit_type =="TADA-Incountry":
-# 		amount = tada_amount
-# 	elif benefit_type =="Leave Encashment":
-# 		amount = basic_pay
-# 	else:
-# 		amount =0
-# 	return amount
