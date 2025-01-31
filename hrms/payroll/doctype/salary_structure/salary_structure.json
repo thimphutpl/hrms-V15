@@ -196,6 +196,7 @@
    "read_only": 1
   },
   {
+   "fetch_from": "employee.employment_type",
    "fieldname": "employment_type",
    "fieldtype": "Link",
    "label": "Employment Type",
@@ -203,6 +204,7 @@
    "read_only": 1
   },
   {
+   "fetch_from": "employee.employee_group",
    "fieldname": "employee_group",
    "fieldtype": "Link",
    "label": "Employee Group",
@@ -210,6 +212,7 @@
    "read_only": 1
   },
   {
+   "fetch_from": "employee.employee_subgroup",
    "fieldname": "employee_grade",
    "fieldtype": "Link",
    "label": "Employee Grade",
@@ -217,6 +220,7 @@
    "read_only": 1
   },
   {
+   "fetch_from": "employee.designation",
    "fieldname": "designation",
    "fieldtype": "Link",
    "in_filter": 1,
@@ -234,6 +238,7 @@
    "options": "Company"
   },
   {
+   "fetch_from": "employee.branch",
    "fieldname": "branch",
    "fieldtype": "Link",
    "in_filter": 1,
@@ -245,6 +250,7 @@
    "read_only": 1
   },
   {
+   "fetch_from": "employee.department",
    "fieldname": "department",
    "fieldtype": "Link",
    "in_filter": 1,
@@ -1327,7 +1333,7 @@
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2025-01-22 11:39:36.183980",
+ "modified": "2025-01-31 16:54:32.229731",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
