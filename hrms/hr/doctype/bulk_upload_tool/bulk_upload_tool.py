@@ -277,7 +277,7 @@ def download_template(file_type, branch, month, fiscal_year, upload_type, unit):
 			row.append(d.month)
 			attendance_query = """        SELECT mr_employee, branch,
                DAY(date) AS day_of_date,
-               SUM(IFNULL(number_of_hours, 0)) AS number_of_hours,
+               SUM(IFNULL(number_of_hours_regular, 0)) AS number_of_hours,
                SUM(IFNULL(number_of_hours_special, 0)) AS number_of_hours_special
                FROM `tabMuster Roll Overtime Entry` WHERE branch = %s AND mr_employee = %s AND date BETWEEN %s AND %s
 			   group by mr_employee, day_of_date
