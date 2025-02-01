@@ -212,7 +212,7 @@
    "read_only": 1
   },
   {
-   "fetch_from": "employee.employee_subgroup",
+   "fetch_from": "employee.grade",
    "fieldname": "employee_grade",
    "fieldtype": "Link",
    "label": "Employee Grade",
@@ -1333,7 +1333,7 @@
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2025-01-31 16:54:32.229731",
+ "modified": "2025-02-01 15:55:40.904276",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",

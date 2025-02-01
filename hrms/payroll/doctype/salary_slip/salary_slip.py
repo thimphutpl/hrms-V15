@@ -146,7 +146,7 @@ class SalarySlip(TransactionBase):
 		self.cost_center        = emp.cost_center
 		self.designation        = emp.designation
 		self.section            = emp.section
-		self.employee_subgroup  = emp.grade
+		self.grade  = emp.grade
 		self.bank_name          = emp.bank_name
 		self.bank_account_no    = emp.bank_ac_no
 		self.gis_number         = emp.gis_number
