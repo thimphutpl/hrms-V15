@@ -201,21 +201,23 @@ class BulkUploadTool(Document):
 		else:
 			frappe.db.commit()
 
-		show_progress = 0
-		if count <= refresh_interval:
-			show_progress = 1
-		elif refresh_interval > total_count:
-			show_progress = 1
-		elif count % refresh_interval == 0:
-			show_progress = 1
-		elif count > total_count - refresh_interval:
-			show_progress = 1
+		show_progress = 1
+		count=1
+		total_count=1
+		# if count <= refresh_interval:
+		# 	show_progress = 1
+		# elif refresh_interval > total_count:
+		# 	show_progress = 1
+		# elif count % refresh_interval == 0:
+		# 	show_progress = 1
+		# elif count > total_count - refresh_interval:
+		# 	show_progress = 1
 
 		if show_progress:
-			description = " Processing OT Of {}({}): f".format(str(row[4]).strip('\''), row[3]) + "[" + str(count) + "/" + str(total_count) + "]"
+			description = " Processing MR Data Of: "+"..." + "[" + str(count) + "/" + str(total_count) + "]"
 			
 			frappe.publish_progress(count * 100 / total_count,
-									title=_("Posting Overtime Entry..."),
+									title=_("Posting MR Data Entry..."),
 									description=description)
 			pass
 		return {"messages": ret, "error": error}
@@ -277,7 +279,7 @@ def download_template(file_type, branch, month, fiscal_year, upload_type, unit):
 			row.append(d.month)
 			attendance_query = """        SELECT mr_employee, branch,
                DAY(date) AS day_of_date,
-               SUM(IFNULL(number_of_hours_regular, 0)) AS number_of_hours,
+               SUM(IFNULL(number_of_hours_regular, 0)) AS number_of_hours_regular,
                SUM(IFNULL(number_of_hours_special, 0)) AS number_of_hours_special
                FROM `tabMuster Roll Overtime Entry` WHERE branch = %s AND mr_employee = %s AND date BETWEEN %s AND %s
 			   group by mr_employee, day_of_date
@@ -454,6 +456,9 @@ def get_template_overtime(branch, month, fiscal_year):
 		
 		
 	writer = UnicodeWriter()
+	writer.writerow(["Notes:"])
+	writer.writerow(["Please do not change the template headings"])
+	writer.writerow(["RH-Regular Hour and SH-Special Hours"])
 	writer.writerow(fields)
 
 	return writer
