@@ -235,7 +235,7 @@ class LeaveEncashment(Document):
 				self.employee_name      = doc.employee_name
 				self.employment_type    = doc.employment_type
 				self.employee_group     = doc.employee_group
-				self.employee_subgroup  = doc.employee_subgroup
+				self.grade  = doc.grade
 				self.branch             = doc.branch
 				self.cost_center        = doc.cost_center
 				self.department         = doc.department

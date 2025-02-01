@@ -370,7 +370,7 @@ def get_employee_gis(employee):
 				from `tabEmployee Grade` a, `tabEmployee` b
 				where b.employee = %s
 				and b.employee_group = a.employee_group
-				and b.employee_subgroup = a.name
+				and b.grade = a.name
 				limit 1
 				""",employee);
 
