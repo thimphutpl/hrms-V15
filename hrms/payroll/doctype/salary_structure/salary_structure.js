@@ -89,6 +89,15 @@ frappe.ui.form.on('Salary Structure', {
 	eligible_for_psa: function(frm){
 		calculate_others(frm);
 	},
+	eligible_for_oneoff_5_indexation_gi: function(frm){
+		calculate_others(frm);
+	},
+	oneoff_5_indexation_gi_method: function(frm){
+		calculate_others(frm);
+	},
+	oneoff_5_indexation_gi: function(frm){
+		calculate_others(frm);
+	},
 	eligible_for_pda: function(frm){
 		calculate_others(frm);
 	},
