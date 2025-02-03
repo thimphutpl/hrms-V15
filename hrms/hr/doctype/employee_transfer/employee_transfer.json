@@ -394,7 +394,7 @@
    "read_only": 1
   },
   {
-   "fetch_from": "employee.employee_subgroup",
+   "fetch_from": "employee.grade",
    "fieldname": "grade",
    "fieldtype": "Link",
    "label": "Grade",
@@ -435,7 +435,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-28 12:30:02.341581",
+ "modified": "2025-02-02 16:26:46.967570",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Transfer",

@@ -129,12 +129,14 @@
   "travel_request_supervisor_notification_template",
   "travel_authorization_approval_notification_template",
   "travel_authorization_supervisor_notification_template",
-  "travel_authorization_status_notification_template",
-  "travel_claim_approval_notification_template",
   "travel_claim_supervisor_notification_template",
-  "travel_claim_status_notification_template",
   "column_break_110",
   "travel_request_status_notification_template",
+  "travel_authorization_status_notification_template",
+  "travel_claim_settings_section",
+  "travel_claim_approval_notification_template",
+  "column_break_cdhl",
+  "travel_claim_status_notification_template",
   "utility_bill_settings_section",
   "utility_bill_approval_notification_template",
   "column_break_114",
@@ -484,7 +486,7 @@
   {
    "fieldname": "sb_overtime",
    "fieldtype": "Section Break",
-   "label": "Overtime Notification Settings"
+   "label": "Overtime Application Notification Settings"
   },
   {
    "fieldname": "overtime_approval_notification_template",
@@ -719,11 +721,12 @@
   {
    "fieldname": "travel_request_settings_section",
    "fieldtype": "Section Break",
-   "label": "Travel Request Settings"
+   "label": "Travel Authorization Settings"
   },
   {
    "fieldname": "travel_request_approval_notification_template",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Travel Request Approval Notification Template",
    "options": "Email Template"
   },
@@ -734,6 +737,7 @@
   {
    "fieldname": "travel_request_status_notification_template",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Travel Request Status Notification Template",
    "options": "Email Template"
   },
@@ -846,6 +850,7 @@
   {
    "fieldname": "travel_request_supervisor_notification_template",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Travel Request Supervisor Notification Template",
    "options": "Email Template"
   },
@@ -1000,6 +1005,7 @@
   {
    "fieldname": "travel_authorization_supervisor_notification_template",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Travel Authorization Supervisor Notification Template",
    "options": "Email Template"
   },
@@ -1018,6 +1024,7 @@
   {
    "fieldname": "travel_claim_supervisor_notification_template",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Travel Claim Supervisor Notification Template",
    "options": "Email Template"
   },
@@ -1160,13 +1167,22 @@
    "fieldtype": "Data",
    "hidden": 1,
    "label": "Approver Name"
+  },
+  {
+   "fieldname": "travel_claim_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Travel Claim Settings"
+  },
+  {
+   "fieldname": "column_break_cdhl",
+   "fieldtype": "Column Break"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-01-29 11:30:12.816822",
+ "modified": "2025-02-02 12:09:44.269281",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",

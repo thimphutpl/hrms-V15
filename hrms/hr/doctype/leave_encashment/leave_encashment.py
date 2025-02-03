@@ -155,11 +155,10 @@ class LeaveEncashment(Document):
 		self.check_journal_entry()
 
 	def check_journal_entry(self):
-		if self.journal_entry:
-			pass
-			# for je in str(self.journal_entry).split(", "):
-			# 	if frappe.db.get_value("Journal Entry", je, "docstatus") < 2:
-			# 		frappe.throw("Please cancel/delete Journal Entry {} first".format(frappe.get_desk("Journal Entry", je)))
+		if self.journal_entry:			
+			for je in str(self.journal_entry).split(", "):
+				if frappe.db.get_value("Journal Entry", je, "docstatus") < 2:
+					frappe.throw("Please cancel/delete Journal Entry {} first".format(frappe.get_desk("Journal Entry", je)))
 
 	def post_expense_claim(self):
 		cost_center = frappe.get_value("Employee", self.employee, "cost_center")

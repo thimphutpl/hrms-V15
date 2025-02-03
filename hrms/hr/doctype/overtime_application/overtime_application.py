@@ -22,9 +22,11 @@ class OvertimeApplication(Document):
 		self.validate_submitter()
 		 	#self.check_budget()
 		self.post_journal_entry()
+		notify_workflow_states(self)
 
 	def on_cancel(self):
 		self.check_journal()
+		notify_workflow_states(self)
 	
 	def check_budget(self):
 		cc = get_branch_cc(self.branch)

@@ -197,6 +197,7 @@
   {
    "fieldname": "internal_work_history",
    "fieldtype": "Table",
+   "label": "INTERNAL WORK HISTORY",
    "options": "Employee Internal Work History"
   },
   {
@@ -270,7 +271,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-23 17:04:09.323770",
+ "modified": "2025-02-03 11:38:27.165904",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Operator",

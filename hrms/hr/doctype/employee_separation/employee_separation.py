@@ -21,12 +21,12 @@ class EmployeeSeparation(EmployeeBoardingController):
 		self.name = make_autoname(str(abb) + './.YYYY./.#####.')
 	def on_submit(self):
 		self.check_duplicate()
-		# notify_workflow_states(self)
+		notify_workflow_states(self)
 
 	def on_cancel(self):
 		if self.separation_clearance:
 			frappe.throw('Need to cancel separation clearance first')
-		# notify_workflow_states(self)
+		notify_workflow_states(self)
 
 	def check_duplicate(self):
 		duplicates = frappe.db.sql("""select name from 

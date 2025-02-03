@@ -9,16 +9,15 @@ from frappe.model.document import Document
 from frappe.utils import getdate
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from erpnext.custom_workflow import notify_workflow_states
 
 class EmployeeTransfer(Document):
 	def validate(self):
 		self.check_duplicate()
 		self.validate_transfer_date()
-
 		self.validate_employee_eligibility()
 		if frappe.get_value("Employee", self.employee, "status") == "Left":
-			frappe.throw(_("Cannot transfer Employee with status Left"))
-  
+			frappe.throw(_("Cannot transfer Employee with status Left"))		
 	def before_submit(self):
 		if getdate(self.transfer_date) > getdate():
 			frappe.throw(_("Employee Transfer cannot be submitted before Transfer Date "),
@@ -26,10 +25,12 @@ class EmployeeTransfer(Document):
 
 	def on_submit(self):
 		self.update_employee_master()
+		notify_workflow_states(self)
 
 		
 	def on_cancel(self):
 		self.update_employee_master(cancel=True)
+		notify_workflow_states(self)
   
 	def validate_transfer_date(self):
 		for t in frappe.db.get_all("Employee Transfer", {"employee": self.employee, "name": ("!=", self.name),

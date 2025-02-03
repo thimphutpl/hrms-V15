@@ -33,7 +33,7 @@ class TravelAuthorization(Document):
 		self.check_leave_applications()
 
 	def on_submit(self):
-		# notify_workflow_states(self)
+		notify_workflow_states(self)
 		self.validate_travel_dates(update=True)
 		self.create_attendance()
 		self.post_journal_entry()

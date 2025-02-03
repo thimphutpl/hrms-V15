@@ -46,7 +46,7 @@ def get_data(filters):
 	conditions, filters = get_conditions(filters)
 	data = frappe.db.sql("""select 
 				t1.employee as n, t3.employee_name, t1.designation, t3.passport_number, 
-				t3.date_of_birth, t3.date_of_joining, t3.employee_group, t1.employee_subgroup, t1.gis_number, t1.gis_policy_number,
+				t3.date_of_birth, t3.date_of_joining, t3.employee_group, t1.grade, t1.gis_number, t1.gis_policy_number,
 				sum(case when t2.salary_component = 'Basic Pay' then ifnull(t2.amount,0) else 0 end) as basicpay,
 				sum(case when t2.salary_component = 'GIS' then ifnull(t2.amount,0) else 0 end) as gisamount,
 							t1.company, t1.branch, t1.cost_center, t1.department, t1.division, t1.section,t1.fiscal_year, t1.month

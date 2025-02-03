@@ -213,17 +213,19 @@
   {
    "fieldname": "internal_work_history",
    "fieldtype": "Table",
+   "label": "INTERNAL WORK HISTORY",
    "options": "Employee Internal Work History",
    "read_only": 1
   },
   {
    "fieldname": "dfg_training_section",
    "fieldtype": "Section Break",
-   "label": "DFG Training"
+   "label": "DFG OR GFG Training"
   },
   {
    "fieldname": "training",
    "fieldtype": "Table",
+   "label": "DFG OR GFG Training",
    "options": "DFG Training"
   },
   {
@@ -309,9 +311,9 @@
    "mandatory_depends_on": "eval:doc.employee_type == \"GFG\""
   },
   {
+   "depends_on": "eval:doc.employee_type == \"DFG\"",
    "fieldname": "old_id",
    "fieldtype": "Data",
-   "hidden": 1,
    "label": "Old ID"
   },
   {
@@ -324,7 +326,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-22 17:08:49.737324",
+ "modified": "2025-02-03 12:36:04.051694",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "DFG AND GFG",

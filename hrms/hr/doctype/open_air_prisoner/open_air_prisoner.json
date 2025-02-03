@@ -67,7 +67,9 @@
   {
    "fieldname": "id_card",
    "fieldtype": "Data",
-   "label": "ID Card"
+   "label": "ID Card",
+   "reqd": 1,
+   "unique": 1
   },
   {
    "fetch_from": "village.gewog",
@@ -201,6 +203,7 @@
   {
    "fieldname": "internal_work_history",
    "fieldtype": "Table",
+   "label": "INTERNAL WORK HISTORY",
    "options": "Employee Internal Work History",
    "read_only": 1
   },
@@ -258,7 +261,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-31 10:01:20.002957",
+ "modified": "2025-02-03 11:50:31.977839",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Open Air Prisoner",

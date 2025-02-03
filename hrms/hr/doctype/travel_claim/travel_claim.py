@@ -31,11 +31,13 @@ class TravelClaim(Document):
 	def on_submit(self):
 		self.update_travel_authorization()
 		self.post_journal_entry()
+		notify_workflow_states(self)
 
 	def on_cancel(self):
 		self.check_journal_entry()
 		if self.training_event:
 			self.update_training_event(cancel=True)
+		notify_workflow_states(self)
 
 	def validate_duplicate(self):
 		existing = []
