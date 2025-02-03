@@ -23,6 +23,7 @@ class DispatchRegister(Document):
 				self.dispatch_serial = int(id[0][0]) + 1
 		if not self.transaction_dispatch_number:
 			self.transaction_dispatch_number = f'{self.dispatch_series_type}{self.dispatch_serial}'
+			self.file_no = self.transaction_dispatch_number
    
 @frappe.whitelist()
 def get_employees_by_department(transaction_type, transaction):
