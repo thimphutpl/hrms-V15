@@ -70,7 +70,8 @@ class LeaveAllocation(Document):
 					exclude_allocation=self.name,
 				)
 			leave_allocated += flt(self.new_leaves_allocated)
-			if leave_allocated > max_leaves_allowed:
+
+			if leave_allocated > max_leaves_allowed and not self.ignore_max_leave_allocated:
 				frappe.throw(
 					_(
 						"Total allocated leaves are more than maximum allocation allowed for {0} leave type for employee {1} in the period"

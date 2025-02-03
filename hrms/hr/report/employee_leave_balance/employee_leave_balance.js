@@ -18,6 +18,22 @@ frappe.query_reports["Employee Leave Balance"] = {
 			default: frappe.defaults.get_default("year_end_date"),
 		},
 		{
+			fieldname: "leave_type",
+			label: __("Leave Type"),
+			fieldtype: "Link",
+			options: "Leave Type",
+			reqd: 0,
+			
+		},
+		{
+			fieldname: "employee_type",
+			label: __("Employee Type"),
+			fieldtype: "Link",
+			options: "Employment Type",
+			reqd: 0,
+			
+		},
+		{
 			label: __("Company"),
 			fieldname: "company",
 			fieldtype: "Link",
