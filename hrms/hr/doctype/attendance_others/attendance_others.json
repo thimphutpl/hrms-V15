@@ -77,7 +77,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-24 11:50:24.219350",
+ "modified": "2025-02-04 10:12:16.258817",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Attendance Others",
@@ -86,7 +86,6 @@
  "permissions": [
   {
    "create": 1,
-   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,

@@ -7,8 +7,16 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import flt, getdate, cint, today, add_years, date_diff, nowdate
 from frappe.utils.data import get_first_day, get_last_day, add_days
+from frappe.model.naming import set_name_by_naming_series, make_autoname
 
 class OpenAirPrisoner(Document):
+	def autoname(self):
+		if self.old_id:
+			self.name = self.old_id
+			return
+		else:
+			series = 'OAP'
+			self.name = make_autoname(str(series) + ".YY.MM.###")
 	def validate(self):
 		self.calculate_rates()
 		self.populate_work_history()

@@ -2,7 +2,6 @@
  "actions": [],
  "allow_import": 1,
  "allow_rename": 1,
- "autoname": "OAP.####",
  "creation": "2024-12-11 10:30:38.322624",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -14,6 +13,7 @@
   "column_break_lank",
   "id_card",
   "gewog",
+  "old_id",
   "column_break_wbem",
   "status",
   "dzongkhag",
@@ -256,20 +256,23 @@
    "fieldname": "is_lifer",
    "fieldtype": "Check",
    "label": "Is Lifer"
+  },
+  {
+   "fieldname": "old_id",
+   "fieldtype": "Data",
+   "label": "Old ID"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-03 23:29:18.043325",
+ "modified": "2025-02-04 10:07:58.189239",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Open Air Prisoner",
- "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {
    "create": 1,
-   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
@@ -309,7 +312,8 @@
    "read": 1,
    "report": 1,
    "role": "HR User",
-   "share": 1
+   "share": 1,
+   "write": 1
   }
  ],
  "sort_field": "modified",

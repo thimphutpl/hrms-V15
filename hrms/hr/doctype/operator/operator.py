@@ -7,8 +7,17 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import flt, getdate, cint, today, add_years, date_diff, nowdate
 from frappe.utils.data import get_first_day, get_last_day, add_days
+from frappe.model.naming import make_autoname
 
 class Operator(Document):
+	def autoname(self):
+		if self.old_id:
+			self.name = self.old_id
+			return
+		else:
+			series = 'OPP'
+			self.name = make_autoname(str(series) + ".YY.MM.###")
+
 	def validate(self):
 		self.populate_work_history()
 		self.check_status()
