@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
  "creation": "2024-12-11 11:14:09.447137",
  "doctype": "DocType",
@@ -138,7 +139,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-04 21:01:27.394117",
+ "modified": "2025-02-04 21:44:23.718079",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Foreign Labourer",
