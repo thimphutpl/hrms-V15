@@ -4,13 +4,18 @@
 import frappe
 from frappe.model.document import Document
 
-# from frappe.utils import nowdate
+from frappe.utils import nowdate
 from frappe.utils import nowdate, today, getdate, add_days
-
-
-
+from frappe.model.naming import set_name_by_naming_series, make_autoname
 
 class ForeignLabourer(Document):
+	def autoname(self):
+		if self.old_id:
+			self.name = self.old_id
+			return
+		else:
+			series = 'FL'
+			self.name = make_autoname(str(series) + ".YY.MM.###")
 	def validate(self):
 		self.check_status()
 		self.populate_work_history()

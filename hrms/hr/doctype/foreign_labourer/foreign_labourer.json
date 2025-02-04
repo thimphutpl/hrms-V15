@@ -1,13 +1,13 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "FL.YY.####",
  "creation": "2024-12-11 11:14:09.447137",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "full_name",
   "branch",
+  "old_id",
   "date_of_separation",
   "column_break_mthl",
   "permit_no",
@@ -129,15 +129,19 @@
    "in_list_view": 1,
    "label": "Work Permit No",
    "reqd": 1
+  },
+  {
+   "fieldname": "old_id",
+   "fieldtype": "Data",
+   "label": "Old ID"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-22 16:56:50.764576",
+ "modified": "2025-02-04 16:41:46.406932",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Foreign Labourer",
- "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {
