@@ -28,8 +28,9 @@ class ForeignLabourer(Document):
 
 	# Following method introducted by SHIV on 04/10/2017
 	def populate_work_history(self):
-			if len(self.internal_work_history) == 0:
-				self.append("internal_work_history",{
+			if self.is_new() or len(self.internal_work_history) == 0:
+				# If the record is new or work history is empty, initialize work history
+				self.append("internal_work_history", {
 					"branch": self.branch,
 					"cost_center": self.cost_center,
 					"from_date": self.date_of_joining,
@@ -37,7 +38,7 @@ class ForeignLabourer(Document):
 					"creation": nowdate(),
 					"modified_by": frappe.session.user,
 					"modified": nowdate()
-			})
+				})
 			else:                        
 					# Fetching previous document from db
 					prev_doc = frappe.get_doc(self.doctype,self.name)
