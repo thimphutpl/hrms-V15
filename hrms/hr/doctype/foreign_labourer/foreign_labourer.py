@@ -19,6 +19,7 @@ class ForeignLabourer(Document):
 	def validate(self):
 		self.check_status()
 		self.populate_work_history()
+		
 
 	def check_status(self):
                 # Disabling Foreign Labourer record after status change to "Left"
