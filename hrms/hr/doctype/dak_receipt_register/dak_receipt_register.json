@@ -10,18 +10,22 @@
   "amended_from",
   "header_section",
   "date_of_receipt",
-  "postage",
   "column_break_rntg",
   "letter_no",
   "main_section",
   "from_whom_received",
   "column_break_xgos",
   "purpose",
+  "section_break_mqzt",
+  "remark",
   "forward_section",
   "employee",
   "column_break_sine",
   "employee_name",
-  "forward_id"
+  "forward_id",
+  "section_break_spbz",
+  "action_and_remark_column",
+  "items"
  ],
  "fields": [
   {
@@ -73,7 +77,7 @@
    "label": "Purpose"
   },
   {
-   "depends_on": "eval: frappe.user_roles.includes(\"AFD Head\")",
+   "depends_on": "eval: doc.workflow_state != \"Draft\"",
    "fieldname": "forward_section",
    "fieldtype": "Section Break",
    "label": "Forward To"
@@ -82,7 +86,7 @@
    "fieldname": "employee",
    "fieldtype": "Link",
    "label": "Employee",
-   "mandatory_depends_on": "eval: frappe.user_roles.includes(\"AFD Head\")",
+   "mandatory_depends_on": "eval: doc.workflow_state != \"Draft\"",
    "options": "Employee"
   },
   {
@@ -103,20 +107,38 @@
    "fetch_from": "employee.user_id",
    "fieldname": "forward_id",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "User ID",
-   "options": "User"
+   "options": "User",
+   "read_only": 1
   },
   {
-   "fieldname": "postage",
-   "fieldtype": "Data",
-   "label": "Postage "
+   "fieldname": "section_break_spbz",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "action_and_remark_column",
+   "fieldtype": "Column Break",
+   "label": "Action and Remark"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "options": "DAK Remark"
+  },
+  {
+   "fieldname": "section_break_mqzt",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "remark",
+   "fieldtype": "Long Text",
+   "label": "Remark"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-11-06 12:06:07.233258",
+ "modified": "2025-02-04 11:25:39.642070",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "DAK Receipt Register",

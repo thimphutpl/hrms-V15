@@ -4,28 +4,85 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-
+from frappe.utils import (
+	add_days,
+	cint,
+	cstr,
+	format_date,
+	get_datetime,
+	get_link_to_form,
+	getdate,
+	nowdate,
+)
 
 class DAKReceiptRegister(Document):
 	def validate(self):
 		self.check_action()
+		self.update_dak_remark()
 		
 	def on_submit(self):
 		pass
 
+	
+
 	def check_action(self):
+		
 		action = frappe.request.form.get('action')
 		if self.workflow_state=="Waiting AFD Review" and action=="Forward":
 			afd_head=frappe.get_value("Overall Settings", "afd_head")
 			if afd_head!=frappe.session.user:
 				frappe.throw("Only AFD can forward the Document")
+		# frappe.throw(str(self.get_db_value("workflow_state")))
+		if self.get_db_value("workflow_state")=="Pending":
+			forward_to = frappe.db.sql('''
+                               select forwarded_to from `tabDAK Remark` where parent="{}" order by creation DESC limit 1;
+                               '''.format(self.name), as_dict=True)
+			# frappe.throw(str(forward_to[0].get('forwarded_to')))
+			user = frappe.get_value("Employee",forward_to[0].get('forwarded_to'),'user_id')
+			if not user:
+				frappe.throw("Please set user id for employee {}".format(user))
+			
+			if frappe.session.user != user:
+				frappe.throw("Only {} can Submit or Reject as it was forwarded to him".format(user))
 		if action != "save":
 			self.send_notification()
-  
+   
+	def update_dak_remark(self):
+		user=""
+		emp=""
+		emp_name=""
+		design=""
+		action = frappe.request.form.get('action')
+		user=frappe.session.user
+		if not user:
+			frappe.throw("You are using without session")
+		emp=frappe.db.sql("select name from `tabEmployee` where user_id='{}'".format(user))
+		if not emp:
+			frappe.throw("You Cannot Apply If you are not an Employee")
+   
+		if action in ("Apply","Forward", "Receive", "Reject"):
+			emp_name=frappe.db.get_value('Employee', emp, 'employee_name')
+			design=frappe.db.get_value('Employee', emp, 'designation')
+			self.append("items",{
+				'user': user,
+				'employee': emp,
+				'employee_name':emp_name,
+				'designation': design,
+				'action': action,
+				'remark_date': getdate(nowdate()),
+				'remark': self.remark,
+				'forwarded_to': self.employee if action in ("Forward") else ''
+			})
+   
+			self.remark=""
+   
 	def send_notification(self):
 		action = frappe.request.form.get('action')  
 		
 		if action == "Apply":
+			self.employee=""
+			self.employee_name=""
+			self.forward_id=""
 			self.notify_afd_head()
 			self.notify_employee()
    
