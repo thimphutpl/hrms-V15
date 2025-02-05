@@ -9,15 +9,21 @@ from frappe.utils import add_years, cint, get_link_to_form, getdate
 from erpnext.setup.doctype.employee.employee import Employee
 
 
-class EmployeeMaster(Employee):
+class EmployeeMaster(Employee):	
 	def autoname(self):
 		if self.old_id:
 			self.employee = self.name = self.old_id
 		else:
 			if not self.date_of_joining:
 				frappe.throw("Date of Joining is required to generate the Employee ID.")
-			year = str(getdate(self.date_of_joining).year)[2:]
-			name = make_autoname(f'GYAL.{year}.###')
+			
+			# Extract year and month from date_of_joining
+			date_of_joining = getdate(self.date_of_joining)
+			year = str(date_of_joining.year)[2:]  # Get last two digits of the year
+			month = str(date_of_joining.month).zfill(2)  # Ensure month is two digits
+
+			# Generate Employee ID
+			name = make_autoname(f'GYAL.{year}.{month}.###')
 			self.employee = self.name = name
 
 
