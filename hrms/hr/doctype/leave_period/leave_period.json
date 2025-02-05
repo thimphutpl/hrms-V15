@@ -56,7 +56,7 @@
   }
  ],
  "links": [],
- "modified": "2025-02-05 10:55:15.622163",
+ "modified": "2025-02-05 11:01:02.778857",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Period",
@@ -100,16 +100,13 @@
    "write": 1
   },
   {
-   "create": 1,
    "email": 1,
    "export": 1,
    "print": 1,
    "read": 1,
    "report": 1,
    "role": "Employee",
-   "select": 1,
-   "share": 1,
-   "write": 1
+   "share": 1
   }
  ],
  "search_fields": "from_date, to_date, company",
