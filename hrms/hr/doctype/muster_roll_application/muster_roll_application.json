@@ -2,7 +2,6 @@
  "actions": [],
  "allow_import": 1,
  "allow_rename": 1,
- "autoname": "MRA.YY.###",
  "creation": "2022-12-23 11:42:28.915708",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -16,6 +15,7 @@
   "column_break_5",
   "project",
   "column_break_psie",
+  "old_id",
   "cost_center",
   "section_break_9",
   "requested_by",
@@ -213,16 +213,20 @@
   {
    "fieldname": "column_break_psie",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "old_id",
+   "fieldtype": "Data",
+   "label": "Old ID"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-02-04 10:11:27.231307",
+ "modified": "2025-02-05 23:11:29.638782",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Muster Roll Application",
- "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {

@@ -8,11 +8,19 @@ from frappe.model.document import Document
 from frappe.utils import today, nowdate
 from frappe.custom.doctype.property_setter.property_setter import make_property_setter
 import frappe
+from frappe.model.naming import set_name_by_naming_series, make_autoname
 
 
 
 
 class MusterRollApplication(Document):
+	def autoname(self):
+		if self.old_id:
+			self.name = self.old_id
+			return
+		else:
+			series = 'MRA'
+			self.name = make_autoname(str(series) + ".YY.MM.###")
 	def validate(self):
 		self.default_validations()
 	
