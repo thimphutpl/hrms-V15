@@ -14,6 +14,7 @@
   "column_break_fuml",
   "driver_name",
   "operator_salary",
+  "operator_name_not_gyalsuung",
   "section_break_2",
   "work_time",
   "from_time",
@@ -84,8 +85,7 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Driver Name",
-   "read_only": 1,
-   "reqd": 1
+   "read_only": 1
   },
   {
    "allow_on_submit": 1,
@@ -156,11 +156,16 @@
    "fieldname": "operator_salary",
    "fieldtype": "Currency",
    "label": "Operator Salary"
+  },
+  {
+   "fieldname": "operator_name_not_gyalsuung",
+   "fieldtype": "Data",
+   "label": "Operator Name (Not Gyalsuung)"
   }
  ],
  "istable": 1,
  "links": [],
- "modified": "2025-01-22 20:41:14.637114",
+ "modified": "2025-02-05 15:34:09.403509",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Vehicle Log",
