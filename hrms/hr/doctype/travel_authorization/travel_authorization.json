@@ -378,7 +378,6 @@
    "fieldname": "approver",
    "fieldtype": "Link",
    "label": "Approver",
-   "no_copy": 1,
    "options": "User",
    "read_only": 1
   },
@@ -390,7 +389,6 @@
    "fieldname": "approver_name",
    "fieldtype": "Data",
    "label": "Approver Name",
-   "no_copy": 1,
    "read_only": 1
   },
   {
@@ -401,7 +399,6 @@
    "fieldname": "approver_designation",
    "fieldtype": "Link",
    "label": "Approver Designation",
-   "no_copy": 1,
    "options": "Designation",
    "read_only": 1
   },
@@ -423,7 +420,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-23 15:21:35.516726",
+ "modified": "2025-02-05 12:26:03.579392",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",
