@@ -247,12 +247,14 @@ class LeaveEncashment(Document):
 		#le = get_le_settings()                                                                         # Line commented by SHIV on 2018/10/15
 		le = frappe.get_doc("Employee Group",frappe.db.get_value("Employee",self.employee,"employee_group")) # Line added by SHIV on 2018/10/15
 		if flt(self.balance_before) < flt(le.min_encashment_days):
-				msg = "Minimum leave balance {0} required to encash.".format(le.encashment_min)
-				# if self.employment_type =="Deputation" and flt(self.balance_before) < 30:
-				#         msg = "Minimum leave balance 30 required to encash."
-				# elif self.employment_type !="Deputation":
+			frappe.throw(str(self.balance_before))
 
-				#         msg = "Minimum leave balance {0} required to encash.".format(le.encashment_min)
+			msg = "Minimum leave balance {0} required to encash.".format(le.encashment_min)
+			# if self.employment_type =="Deputation" and flt(self.balance_before) < 30:
+			#         msg = "Minimum leave balance 30 required to encash."
+			# elif self.employment_type !="Deputation":
+
+			#         msg = "Minimum leave balance {0} required to encash.".format(le.encashment_min)
 
 		if flt(self.balance_after) < 0:
 				msg = "Insufficient leave balance"
@@ -298,9 +300,7 @@ class LeaveEncashment(Document):
 
 		if not frappe.db.get_value("Leave Type", self.leave_type, "allow_encashment"):
 			frappe.throw(_("Leave Type {0} is not encashable").format(self.leave_type))
-
-		allocation = self.get_leave_allocation()
-		##frappe.throw(str(allocation.total_leaves_allocated))
+		allocation = self.get_leave_allocation()		
 		leave_bal_mr_cl=self.get_laave_bal_mr()
 		
 		if not allocation or not leave_bal_mr_cl:
@@ -360,8 +360,7 @@ class LeaveEncashment(Document):
 		self.leave_allocation = allocation.name
 		return True
 
-	def get_leave_allocation(self):
-		#frappe.throw(self.leave_type)
+	def get_leave_allocation(self):		
 		date = self.encashment_date or getdate()
 
 		LeaveAllocation = frappe.qb.DocType("Leave Allocation")
@@ -384,11 +383,11 @@ class LeaveEncashment(Document):
 
 		return leave_allocation[0] if leave_allocation else None
 
-	def get_laave_bal_mr(self):
-		#frappe.throw(self.leave_type)
+	def get_laave_bal_mr(self):		
 		date = self.encashment_date or getdate()
 
 		Leavebal = frappe.qb.DocType("Leave Ledger Entry")
+		
 		leave_bal = (
 			frappe.qb.from_(Leavebal)
 			.select(
@@ -403,9 +402,9 @@ class LeaveEncashment(Document):
 				& (Leavebal.docstatus == 1)
 				& (Leavebal.leave_type == self.leave_type)
 				& (Leavebal.employee == self.employee)
-				& (Leavebal.transaction_type == 'Merge CL To EL')
+				# & (Leavebal.transaction_type == 'Merge CL To EL')
 			)
-		).run(as_dict=True)
+		).run(as_dict=True)	
 
 		return leave_bal[0] if leave_bal else None
 
