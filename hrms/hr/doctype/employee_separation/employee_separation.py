@@ -22,6 +22,17 @@ class EmployeeSeparation(EmployeeBoardingController):
 	def on_cancel(self):
 		super(EmployeeSeparation, self).on_cancel()
 		notify_workflow_states(self)
+
+	def before_save(self):
+		# Check if the employee is already associated with another Employee Separation document
+		existing_separation = frappe.db.exists("Employee Separation", {
+			"employee": self.employee,
+			"name": ("!=", self.name),  # Exclude the current document
+			"docstatus": ("!=", 2)  # Exclude cancelled documents
+		})
+
+		if existing_separation:
+			frappe.throw(f"Employee {self.employee} is already created with another Employee Separation document: {existing_separation}") 	
   
 @frappe.whitelist()
 def make_employee_benefit(source_name, target_doc=None, skip_item_mapping=False):
@@ -103,7 +114,7 @@ def get_permission_query_conditions(user):
 
 	if user == "Administrator":
 		return
-	if "HR User" in user_roles or "HR Manager" in user_roles:
+	if "HR User" in user_roles or "HR Manager" in user_roles or "Approver" in user_roles:
 		return
 
 	return """(

@@ -75,7 +75,7 @@ class EmployeePromotion(Document):
 		# 		'reference_docname': self.name
 		# 	}
 		# 	employee.append("internal_work_history", internal_work_history)
-
+	# @frappe.whitelist()
 	def get_promotion_details(self, employee):
 		data = []
 		#------Employee Details-------#
