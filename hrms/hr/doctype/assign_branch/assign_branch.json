@@ -12,10 +12,15 @@
   "user",
   "current_branch",
   "company",
+  "branch",
   "section_break_4",
   "get_all_branch",
   "section_break_8",
-  "items"
+  "items",
+  "section_break_usiq",
+  "get_project",
+  "assigned_project_list_section",
+  "assign_project"
  ],
  "fields": [
   {
@@ -50,6 +55,7 @@
    "read_only": 1
   },
   {
+   "fetch_from": "user.bio",
    "fieldname": "current_branch",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -92,11 +98,36 @@
    "in_list_view": 1,
    "label": "Employee Name",
    "read_only": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Assign Branch",
+   "options": "Branch"
+  },
+  {
+   "fieldname": "section_break_usiq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "get_project",
+   "fieldtype": "Button",
+   "label": "Get All Active Project"
+  },
+  {
+   "fieldname": "assigned_project_list_section",
+   "fieldtype": "Section Break",
+   "label": "Assigned Project List"
+  },
+  {
+   "fieldname": "assign_project",
+   "fieldtype": "Table",
+   "options": "Assign Project"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-30 11:34:39.649837",
+ "modified": "2025-02-06 10:15:54.565255",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Assign Branch",
