@@ -13,6 +13,7 @@
   "employee_name",
   "working_hours",
   "status",
+  "branch",
   "leave_type",
   "leave_application",
   "column_break0",
@@ -201,13 +202,19 @@
   {
    "fieldname": "column_break_18",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch"
   }
  ],
  "icon": "fa fa-ok",
  "idx": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-23 16:26:42.934159",
+ "modified": "2025-02-06 15:54:45.600662",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Attendance",
