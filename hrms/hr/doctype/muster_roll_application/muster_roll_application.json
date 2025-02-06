@@ -136,8 +136,7 @@
    "fieldname": "items",
    "fieldtype": "Table",
    "label": "Muster Roll Employees",
-   "options": "Muster Roll Application Item",
-   "reqd": 1
+   "options": "Muster Roll Application Item"
   },
   {
    "fieldname": "section_break_14",
@@ -223,7 +222,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-02-05 23:11:29.638782",
+ "modified": "2025-02-06 17:19:02.382243",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Muster Roll Application",
