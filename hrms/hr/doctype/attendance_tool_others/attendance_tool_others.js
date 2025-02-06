@@ -6,7 +6,7 @@ frappe.ui.form.on("Attendance Tool Others", {
 		frm.disable_save();
 	},
 	onload: function(frm) {
-		frm.set_value("date", frappe.utils.get_today());
+		frm.set_value("date", frappe.datetime.get_today());
 	},
 	date: function(frm) {
 		erpnext.attendance_tool_others.load_employees(frm);
