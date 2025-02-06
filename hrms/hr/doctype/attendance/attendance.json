@@ -204,6 +204,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "fetch_from": "employee.branch",
    "fieldname": "branch",
    "fieldtype": "Link",
    "label": "Branch",
@@ -214,7 +215,7 @@
  "idx": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-02-06 15:54:45.600662",
+ "modified": "2025-02-06 16:26:49.764065",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Attendance",
