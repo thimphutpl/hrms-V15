@@ -93,7 +93,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-01-16 17:18:27.700834",
+ "modified": "2025-02-06 10:20:37.328836",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Attendance Tool Others",
@@ -124,6 +124,15 @@
    "print": 1,
    "read": 1,
    "role": "HR Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "DFG User",
    "share": 1,
    "write": 1
   }
