@@ -327,7 +327,7 @@ class LeaveEncashment(Document):
 		else:			
 			self.balance_before=self.leave_balance+leave_bal_mr_cl.leaves
 		
-		self.balance_after=self.balance_before-self.leave_balance
+		self.balance_after=self.balance_before-encashable_days
 		if self.balance_before < flt(encashment_min):
 			frappe.msgprint(_("Minimum '{}' days is Mandatory for Encashment").format(cint(encashment_min)),title="Leave Balance")
 		
