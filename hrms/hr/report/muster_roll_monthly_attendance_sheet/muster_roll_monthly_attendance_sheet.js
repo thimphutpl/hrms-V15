@@ -22,7 +22,7 @@ frappe.query_reports["Muster Roll Monthly Attendance Sheet"] = {
 			"fieldname":"employee_type",
 			"label": __("Employee Type"),
 			"fieldtype": "Select",
-			"options": ['Muster Roll Employee'],
+			"options": ['Muster Roll Employee','Operator','Open Air Prisoner','DFG','GFG'],
 			"reqd": 1
 		},
 		{

@@ -81,14 +81,28 @@ def get_conditions(filters):
 	return conditions, filters
 
 def get_employee_details(employee_type):
+	#frappe.throw(employee_type)
 	emp_map = frappe._dict()
 	if employee_type == "Muster Roll Employee":
 		for d in frappe.db.sql("""select name, person_name, id_card
 			from `tabMuster Roll Employee`""", as_dict=1):
 			emp_map.setdefault(d.name, d)
-	elif employee_type == "YELP Employee":
+	elif employee_type == "Open Air Prisoner":
 		for d in frappe.db.sql("""select name, person_name, id_card
-			from `tabGEP Employee`""", as_dict=1):
+			from `tabOpen Air Prisoner`""", as_dict=1):
+			emp_map.setdefault(d.name, d)
+
+	elif employee_type == "Operator":
+		for d in frappe.db.sql("""select name, person_name, id_card
+			from `tabOperator`""", as_dict=1):
+			emp_map.setdefault(d.name, d)
+	elif employee_type == "DFG":
+		for d in frappe.db.sql("""select name, person_name, id_card
+			from `tabDFG AND GFG` where employee_type='DFG'""", as_dict=1):
+			emp_map.setdefault(d.name, d)
+	elif employee_type == "GFG":
+		for d in frappe.db.sql("""select name, person_name, id_card
+			from `tabDFG AND GFG`where employee_type='GFG'""", as_dict=1):
 			emp_map.setdefault(d.name, d)
 	else:
 		frappe.throw("Select a Employee Type")
