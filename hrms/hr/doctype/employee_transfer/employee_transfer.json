@@ -10,6 +10,7 @@
   "employee",
   "emp_name",
   "date_of_joining",
+  "employee_type",
   "column_break_3",
   "company",
   "transfer_type",
@@ -60,7 +61,6 @@
   {
    "fieldname": "employee",
    "fieldtype": "Link",
-   "in_list_view": 1,
    "label": "Employee",
    "options": "Employee",
    "reqd": 1
@@ -293,6 +293,7 @@
    "fetch_from": "employee.employee_name",
    "fieldname": "emp_name",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Employee Name",
    "read_only": 1
   },
@@ -378,12 +379,20 @@
    "label": "Employee Benefit Status",
    "options": "Not Claimed\nClaimed",
    "read_only": 1
+  },
+  {
+   "fetch_from": "employee.employment_type",
+   "fieldname": "employee_type",
+   "fieldtype": "Data",
+   "label": "Employee Type",
+   "read_only": 1,
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-03 16:54:33.700216",
+ "modified": "2025-02-06 10:11:45.458806",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Transfer",
