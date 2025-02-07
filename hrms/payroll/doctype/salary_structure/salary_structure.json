@@ -25,6 +25,7 @@
   "from_date",
   "to_date",
   "depend_salary_on_attendance",
+  "off_cycle_pf",
   "time_sheet_earning_detail",
   "salary_slip_based_on_timesheet",
   "cb_9",
@@ -1350,12 +1351,18 @@
    "fieldname": "tra_value",
    "fieldtype": "Int",
    "label": "Value"
+  },
+  {
+   "fieldname": "off_cycle_pf",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Off Cycle PF"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2025-02-07 11:07:15.558189",
+ "modified": "2025-02-07 15:04:48.767327",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
