@@ -51,14 +51,53 @@ erpnext.attendance_tool_others = {
 						hide_field('unmarked_attendance_section')
 					}
 
-					if(r.message['marked'].length > 0) {
-						unhide_field('marked_attendance_section')
-						if(!frm.marked_employee_area) {
-							frm.marked_employee_area = $('<div>')
-								.appendTo(frm.fields_dict.marked_attendance_html.wrapper);
+					// if(r.message['marked'].length > 0) {
+					// 	unhide_field('marked_attendance_section')
+					// 	if(!frm.marked_employee_area) {
+					// 		frm.marked_employee_area = $('<div>')
+					// 			.appendTo(frm.fields_dict.marked_attendance_html.wrapper);
+					// 	}
+					// 	frm.marked_employee = new erpnext.MarkedEmployee(frm, frm.marked_employee_area, r.message['marked'])
+					// }
+					if (r.message['marked'].length > 0) {
+						unhide_field('marked_attendance_section');
+					
+						if (!frm.marked_employee_area) {
+							frm.marked_employee_area = $('<div>').appendTo(frm.fields_dict.marked_attendance_html.wrapper);
 						}
-						frm.marked_employee = new erpnext.MarkedEmployee(frm, frm.marked_employee_area, r.message['marked'])
+					
+						let present_list = [];
+						let absent_list = [];
+						let half_day_list = [];
+					
+						r.message['marked'].forEach(emp => {
+							let id = emp.employee_id || emp.employee || emp.name || "N/A";  
+							let name = emp.employee_name || emp.full_name || emp.person_name || "Unknown";  
+							let status = emp.status || emp.attendance_status || "Unknown";  
+					
+							let display_text = `${name} (${id})`;
+					
+							// Apply colors based on status
+							if (status === "Present") {
+								present_list.push(`<span style="color: green;">${display_text}</span>`);
+							} else if (status === "Absent") {
+								absent_list.push(`<span style="color: red;">${display_text}</span>`);
+							} else if (status === "Half Day") {
+								half_day_list.push(`<span style="color: orange;">${display_text}</span>`);
+							}
+						});
+					
+						let html_content = `
+							<div><strong>Present:</strong> ${present_list.join(", ") || "None"}</div>
+							<div><strong>Absent:</strong> ${absent_list.join(", ") || "None"}</div>
+							<div><strong>Half Day:</strong> ${half_day_list.join(", ") || "None"}</div>
+						`;
+					
+						frm.marked_employee_area.html(html_content);
 					}
+					
+
+					
 					else{
 						hide_field('marked_attendance_section')
 					}
