@@ -456,7 +456,15 @@ def get_permission_query_conditions(user):
 		return
 	if "HR User" in user_roles or "HR Manager" in user_roles:
 		return
-
+	if "HR Support" in user_roles:
+		return """(
+			`tabLeave Encashment`.owner = '{user}'
+			or
+			exists(select 1
+			from `tabEmployee`
+			where `tabEmployee`.branch = `tabLeave Encashment`.branch
+			and `tabEmployee`.user_id = '{user}')
+		)""".format(user=user)
 	return """(
 		`tabLeave Encashment`.owner = '{user}'
 		or
