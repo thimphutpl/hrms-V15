@@ -15,6 +15,17 @@ frappe.ui.form.on("Assign Branch", {
 				frm.refresh_fields();
 			}
 		});
+	},
+	get_project: function(frm) {
+		//load_accounts(frm.doc.company)
+		return frappe.call({
+			method: "get_all_project",
+			doc: frm.doc,
+			callback: function(r, rt) {
+				frm.refresh_field("assign_project");
+				frm.refresh_fields();
+			}
+		});
 	}
 });
 

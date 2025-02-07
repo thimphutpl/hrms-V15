@@ -1535,3 +1535,4 @@ def get_permission_query_conditions(user):
 		or
 		(`tabLeave Application`.leave_approver = '{user}' and `tabLeave Application`.workflow_state not in ('Draft','Approved','Rejected','Cancelled'))
 	)""".format(user=user)
+

@@ -40,7 +40,11 @@ class AssignBranch(Document):
 		for a in self.items:
 			for b in self.items:
 				if a.branch == b.branch and a.idx != b.idx:
-					frappe.throw("Duplicate Entries in row " + str(a.idx) + " and " + str(b.idx))
+					frappe.throw("Duplicate Entries for Branch in row " + str(a.idx) + " and " + str(b.idx))
+		for a in self.assign_project:
+			for b in self.assign_project:
+				if a.project == b.project and a.idx != b.idx:
+					frappe.throw("Duplicate Entries for Project in row " + str(a.idx) + " and " + str(b.idx))
 
 	def assign_branch(self):
 		#Clear user branch permissions 
@@ -67,4 +71,32 @@ class AssignBranch(Document):
 		for d in entries:
 			row = self.append('items', {})
 			row.update(d)
+	@frappe.whitelist()
+	def get_all_project(self):
+		if not self.action:
+			frappe.throw("Choose Action First")
+		if not self.branch:
+			if self.action =="Add":
+				entries = frappe.db.sql("""select name as project 
+					from `tabProject` 
+					where project_engineer!='{}'
+					""".format(self.employee),as_dict=True)
+				self.set('assign_project', [])
+				for d in entries:
+					row = self.append('assign_project', {})
+					row.update(d)
+			else:
+				self.set('assign_project', [])
+		else:
+			if self.action =="Add":
+				entries = frappe.db.sql("""select name as project 
+					from `tabProject` 
+					where branch='{}'
+					""".format(self.branch),as_dict=True)
+				for d in entries:
+					row = self.append('assign_project', {})
+					row.update(d)
+			else:
+				self.set('assign_project', [])
+
 
