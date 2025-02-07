@@ -110,7 +110,7 @@ class BulkUploadTool(Document):
 						date_str = f"{year}-{str(month_number).zfill(2)}-{day}"
 						month_str = str(month_number).zfill(2)
 						#frappe.throw(str(month_str))
-						pay_details = get_pay_details(employee,year,month_str)
+						pay_details = get_pay_details(employee)
 						#frappe.throw(str(pay_details))
 						if pay_details:
 							
