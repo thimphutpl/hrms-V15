@@ -61,6 +61,9 @@
   "eligible_for_lumpsum_pay_revision",
   "lumpsum_pay_revision_method",
   "lump_sum_revision",
+  "eligible_for_tra",
+  "eligible_for_tra_method",
+  "tra_value",
   "cb_10",
   "eligible_for_difficulty",
   "difficulty_method",
@@ -1328,12 +1331,31 @@
    "fieldname": "depend_salary_on_attendance",
    "fieldtype": "Check",
    "label": "Depend Salary On Attendance"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_tra",
+   "fieldtype": "Check",
+   "label": "Eligible for TRA"
+  },
+  {
+   "depends_on": "eligible_for_tra",
+   "fieldname": "eligible_for_tra_method",
+   "fieldtype": "Select",
+   "label": "Payment Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_tra",
+   "fieldname": "tra_value",
+   "fieldtype": "Int",
+   "label": "Value"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2025-02-01 15:55:40.904276",
+ "modified": "2025-02-07 11:07:15.558189",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",

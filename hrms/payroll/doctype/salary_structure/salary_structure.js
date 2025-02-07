@@ -179,6 +179,10 @@ frappe.ui.form.on('Salary Structure', {
 	eligible_for_uniform_allowance: function(frm){
 		calculate_others(frm);
 	},
+	eligible_for_tra: function(frm){
+		calculate_others(frm);
+	},
+
 	eligible_for_house_rent_deduction: function(frm){
 		calculate_others(frm);
 	},
