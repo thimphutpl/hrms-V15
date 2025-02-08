@@ -1526,13 +1526,13 @@ def get_permission_query_conditions(user):
 		return
 	if "HR Support" in user_roles:
 		return """(
-		`tabLeave Application`.owner = '{user}'
-		or
-		exists(select 1
-			from `tabEmployee`
-			where `tabEmployee`.branch = `tabLeave Application`.branch
-			and `tabEmployee`.user_id = '{user}')
-	)""".format(user=user)
+			`tabLeave Application`.owner = '{user}'
+			or
+			exists(select 1
+				from `tabEmployee`
+				where `tabEmployee`.branch = `tabLeave Application`.branch
+				and `tabEmployee`.user_id = '{user}')
+		)""".format(user=user)
 
 	return """(
 		`tabLeave Application`.owner = '{user}'

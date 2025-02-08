@@ -469,9 +469,9 @@ def get_permission_query_conditions(user):
 		`tabLeave Encashment`.owner = '{user}'
 		or
 		exists(select 1
-				from `tabEmployee`
-				where `tabEmployee`.name = `tabLeave Encashment`.employee
-				and `tabEmployee`.user_id = '{user}')
+			from `tabEmployee`
+			where `tabEmployee`.name = `tabLeave Encashment`.employee
+			and `tabEmployee`.user_id = '{user}')
 		or
 		(`tabLeave Encashment`.approver = '{user}' and `tabLeave Encashment`.workflow_state not in ('Draft','Rejected','Approved','Cancelled'))
 	)""".format(user=user)
