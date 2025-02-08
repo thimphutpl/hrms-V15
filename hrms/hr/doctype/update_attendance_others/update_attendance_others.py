@@ -22,11 +22,11 @@ class UpdateAttendanceOthers(Document):
 					if not row.emp_cat:
 						frappe.throw("Employee Category is required when employee type is DFG AND GFG")
 					else:
-						attendance = frappe.db.get_value("Attendance Others",{"date":row.date, "employee_type":row.employee_type,"cost_center":self.cost_center,"emp_cat":row.emp_cat},"name")
+						attendance = frappe.db.get_value("Attendance Others",{"date":row.date, "employee_type":row.employee_type,"cost_center":self.cost_center,"emp_cat":row.emp_cat,"employee":row.employee},"name")
 				else:
 					frappe.throw("Please Select Same Employee Type")
 			else:
-				attendance = frappe.db.get_value("Attendance Others",{"date":row.date, "employee_type":row.employee_type,"cost_center":self.cost_center},"name")
+				attendance = frappe.db.get_value("Attendance Others",{"date":row.date, "employee_type":row.employee_type,"cost_center":self.cost_center,"employee":row.employee},"name")
 			if not attendance:
 				frappe.throw("Attendance record not found")
 
