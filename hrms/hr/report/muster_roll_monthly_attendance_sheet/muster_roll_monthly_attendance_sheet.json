@@ -9,7 +9,7 @@
  "idx": 5,
  "is_standard": "Yes",
  "letterhead": null,
- "modified": "2025-02-06 10:31:17.835225",
+ "modified": "2025-02-08 10:24:32.302442",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Muster Roll Monthly Attendance Sheet",
@@ -40,6 +40,9 @@
   },
   {
    "role": "HR Support"
+  },
+  {
+   "role": "DFG User"
   }
  ]
 }
