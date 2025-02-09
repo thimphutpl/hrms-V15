@@ -20,15 +20,19 @@
   "based_on",
   "amount",
   "depends_on_payment_days",
-  "is_tax_applicable",
   "is_loan_component",
+  "is_income_tax_component",
   "is_pf_component",
   "round_to_the_nearest_integer",
   "remove_if_zero_valued",
   "accounts_section",
   "accounts",
   "accounts_posting_tab",
+  "make_party_entry",
   "is_remittable",
+  "default_bank_for_remittance",
+  "column_break_ueqn",
+  "clubbed_component",
   "salary_structure_field_mapping_tab",
   "field_name",
   "column_break_zljg",
@@ -61,13 +65,6 @@
    "label": "Type",
    "options": "Earning\nDeduction",
    "reqd": 1
-  },
-  {
-   "default": "1",
-   "depends_on": "eval:doc.type == \"Earning\"",
-   "fieldname": "is_tax_applicable",
-   "fieldtype": "Check",
-   "label": "Is Tax Applicable"
   },
   {
    "default": "1",
@@ -107,6 +104,7 @@
    "default": "0",
    "fieldname": "round_to_the_nearest_integer",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Round to the Nearest Integer"
   },
   {
@@ -189,16 +187,47 @@
   },
   {
    "default": "0",
-   "depends_on": "eval:doc.type == \"Earning\"",
+   "depends_on": "eval:doc.type == \"Deduction\"",
    "fieldname": "is_pf_component",
    "fieldtype": "Check",
    "label": "Is PF Component"
+  },
+  {
+   "default": "0",
+   "description": "Employee wise entries shall be created under Journal Entry at the time of salary posting, For example like `Salary Advance Deductions`. Applicable for only type `Deduction`",
+   "fieldname": "make_party_entry",
+   "fieldtype": "Check",
+   "label": " Make Party Wise Entries?"
+  },
+  {
+   "fieldname": "default_bank_for_remittance",
+   "fieldtype": "Link",
+   "label": "Default Institution For Preparing Remittance Document/Forwarding Letter",
+   "options": "Bank"
+  },
+  {
+   "fieldname": "column_break_ueqn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Entries will be accumulated with clubbed component and posted to accounts. Applicable for only type `Deduction`. <br><b style=\"color: red;\">* Please make sure you do not club the parent component with any other component.</b>",
+   "fieldname": "clubbed_component",
+   "fieldtype": "Link",
+   "label": "Club with Salary Component",
+   "options": "Salary Component"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.type == \"Deduction\"",
+   "fieldname": "is_income_tax_component",
+   "fieldtype": "Check",
+   "label": "Is Income Tax Component"
   }
  ],
  "icon": "fa fa-flag",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-09 19:29:24.128556",
+ "modified": "2025-02-05 17:04:38.580994",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Component",

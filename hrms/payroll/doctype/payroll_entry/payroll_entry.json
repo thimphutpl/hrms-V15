@@ -9,23 +9,22 @@
  "field_order": [
   "select_payroll_period",
   "company",
+  "processing_branch",
   "cost_center",
   "column_break_5",
-  "posting_date",
+  "fiscal_year",
+  "month",
   "status",
   "currency",
   "exchange_rate",
-  "payroll_payable_account",
   "section_break_cypo",
-  "salary_slip_based_on_timesheet",
   "payroll_frequency",
+  "posting_date",
   "start_date",
   "end_date",
   "column_break_13",
   "salary_slips_created",
   "salary_slips_submitted",
-  "deduct_tax_for_unclaimed_employee_benefits",
-  "deduct_tax_for_unsubmitted_tax_exemption_proof",
   "employees_tab",
   "section_break_17",
   "branch",
@@ -42,21 +41,19 @@
   "failure_details_section",
   "error_message",
   "section_break_41",
-  "amended_from",
-  "connections_tab"
+  "amended_from"
  ],
  "fields": [
   {
-   "default": "Today",
    "fieldname": "posting_date",
    "fieldtype": "Date",
-   "label": "Posting Date",
-   "reqd": 1
+   "hidden": 1,
+   "label": "Posting Date"
   },
   {
-   "depends_on": "eval:doc.salary_slip_based_on_timesheet == 0",
    "fieldname": "payroll_frequency",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Payroll Frequency",
    "mandatory_depends_on": "eval:doc.salary_slip_based_on_timesheet == 0",
    "options": "\nMonthly"
@@ -111,13 +108,6 @@
    "fieldtype": "HTML"
   },
   {
-   "default": "0",
-   "fieldname": "salary_slip_based_on_timesheet",
-   "fieldtype": "Check",
-   "hidden": 1,
-   "label": "Salary Slip Based on Timesheet"
-  },
-  {
    "fieldname": "select_payroll_period",
    "fieldtype": "Tab Break",
    "label": "Overview"
@@ -126,30 +116,17 @@
    "fieldname": "start_date",
    "fieldtype": "Date",
    "label": "Start Date",
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fieldname": "end_date",
    "fieldtype": "Date",
    "label": "End Date",
-   "reqd": 1
-  },
-  {
-   "default": "0",
-   "fieldname": "deduct_tax_for_unclaimed_employee_benefits",
-   "fieldtype": "Check",
-   "hidden": 1,
-   "label": "Deduct Tax For Unclaimed Employee Benefits"
-  },
-  {
-   "default": "0",
-   "fieldname": "deduct_tax_for_unsubmitted_tax_exemption_proof",
-   "fieldtype": "Check",
-   "hidden": 1,
-   "label": "Deduct Tax For Unsubmitted Tax Exemption Proof"
+   "read_only": 1
   },
   {
    "default": ":Company",
+   "fetch_from": "processing_branch.cost_center",
    "fieldname": "cost_center",
    "fieldtype": "Link",
    "label": "Cost Center",
@@ -197,14 +174,6 @@
    "hidden": 1,
    "label": "Exchange Rate",
    "precision": "9"
-  },
-  {
-   "depends_on": "company",
-   "fieldname": "payroll_payable_account",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Payroll Payable Account",
-   "options": "Account"
   },
   {
    "collapsible": 1,
@@ -270,22 +239,35 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "connections_tab",
-   "fieldtype": "Tab Break",
-   "label": "Connections",
-   "show_dashboard": 1
-  },
-  {
    "fieldname": "employee",
    "fieldtype": "Link",
    "label": "Employee",
    "options": "Employee"
+  },
+  {
+   "fieldname": "fiscal_year",
+   "fieldtype": "Link",
+   "label": "Fiscal Year",
+   "options": "Fiscal Year"
+  },
+  {
+   "fieldname": "month",
+   "fieldtype": "Select",
+   "label": "Month",
+   "options": "\nJanuary\nFebruary\nMarch\nApril\nMay\nJune\nJuly\nAugust\nSeptember\nOctober\nNovember\nDecember"
+  },
+  {
+   "fieldname": "processing_branch",
+   "fieldtype": "Link",
+   "label": "Processing Branch",
+   "options": "Branch",
+   "reqd": 1
   }
  ],
  "icon": "fa fa-cog",
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-11 00:00:50.877688",
+ "modified": "2025-02-05 16:43:36.815870",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Payroll Entry",

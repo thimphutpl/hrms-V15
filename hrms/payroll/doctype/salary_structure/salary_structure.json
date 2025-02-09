@@ -16,19 +16,27 @@
   "column_break1",
   "is_active",
   "from_date",
+  "to_date",
+  "currency",
   "section_break_cprd",
   "eligible_for_contract_allowance",
   "contract_allowance_method",
   "contract_allowance",
+  "eligible_for_conveyance_allowance",
+  "conveyance_allowance_method",
+  "conveyance_allowance",
   "column_break_yjrq",
   "eligible_for_corporate_allowance",
   "corporate_allowance_method",
   "corporate_allowance",
+  "eligible_for_fixed_allowance",
   "column_break_mehf",
   "eligible_for_communication_allowance",
   "communication_allowance_method",
   "communication_allowance",
-  "fixed_allowance",
+  "eligible_for_monthly_variable_compensation",
+  "mvc_method",
+  "mvc",
   "benefits_deductions_section",
   "eligible_for_gis",
   "eligible_for_pf",
@@ -208,7 +216,7 @@
   {
    "depends_on": "eval:doc.eligible_for_contract_allowance",
    "fieldname": "contract_allowance",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "label": "Value (Contract Allowance)"
   },
   {
@@ -222,7 +230,7 @@
   {
    "depends_on": "eval:doc.eligible_for_corporate_allowance",
    "fieldname": "corporate_allowance",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "label": "Value (Corporate Allowance)"
   },
   {
@@ -235,13 +243,8 @@
   {
    "depends_on": "eval:doc.eligible_for_communication_allowance",
    "fieldname": "communication_allowance",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "label": "Value (Communication Allowance)"
-  },
-  {
-   "fieldname": "fixed_allowance",
-   "fieldtype": "Currency",
-   "label": "Fixed Allowance"
   },
   {
    "fieldname": "benefits_deductions_section",
@@ -303,19 +306,82 @@
    "fieldname": "employee_grade",
    "fieldtype": "Link",
    "label": "Employee Grade",
-   "options": "Employee Grade"
+   "options": "Employee Grade",
+   "read_only": 1
   },
   {
+   "fetch_from": "employee.date_of_joining",
    "fieldname": "from_date",
    "fieldtype": "Date",
    "label": "From Date",
    "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_conveyance_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Conveyance Allowance"
+  },
+  {
+   "default": "Lumpsum",
+   "depends_on": "eval:doc.eligible_for_conveyance_allowance",
+   "fieldname": "conveyance_allowance_method",
+   "fieldtype": "Select",
+   "label": "Payment Method(Conveyance Allowance)",
+   "options": "Lumpsum\nPercent"
+  },
+  {
+   "depends_on": "eval:doc.eligible_for_conveyance_allowance",
+   "fieldname": "conveyance_allowance",
+   "fieldtype": "Float",
+   "label": "Value (Conveyance Allowance)"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_fixed_allowance",
+   "fieldtype": "Check",
+   "label": " Eligible for Fixed Allowance (Increment)"
+  },
+  {
+   "depends_on": "eval:doc.eligible_for_monthly_variable_compensation",
+   "fieldname": "mvc",
+   "fieldtype": "Float",
+   "label": "Value (MVC)"
+  },
+  {
+   "default": "0",
+   "description": "(Monthly Variable Compensation)",
+   "fieldname": "eligible_for_monthly_variable_compensation",
+   "fieldtype": "Check",
+   "label": "Eligible for MVC"
+  },
+  {
+   "default": "Lumpsum",
+   "depends_on": "eval:doc.eligible_for_monthly_variable_compensation",
+   "fieldname": "mvc_method",
+   "fieldtype": "Select",
+   "label": "Payment Method (MVC)",
+   "options": "Lumpsum\nPercent"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "label": "Currency",
+   "options": "Currency",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.employee && doc.is_active == \"No\"",
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "To Date"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2025-01-10 21:33:34.613941",
+ "modified": "2025-02-03 19:56:16.692290",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",

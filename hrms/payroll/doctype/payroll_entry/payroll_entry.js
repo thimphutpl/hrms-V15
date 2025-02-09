@@ -153,10 +153,6 @@ frappe.ui.form.on("Payroll Entry", {
 				frm.add_custom_button(__("Make Bank Entry"), function () {
 					make_bank_entry(frm);
 				}).addClass("btn-primary");
-			} else if (!r.message.has_bank_entries_for_withheld_salaries) {
-				frm.add_custom_button(__("Release Withheld Salaries"), function () {
-					make_bank_entry(frm, (for_withheld_salaries = 1));
-				}).addClass("btn-primary");
 			}
 		});
 	},
@@ -232,13 +228,6 @@ frappe.ui.form.on("Payroll Entry", {
 		return filters;
 	},
 
-	/** Monthly Fortnightly Bimonthly Weekly Daily */
-	payroll_frequency: function (frm) {
-		frm.trigger("set_start_end_dates").then(() => {
-			frm.events.clear_employee_table(frm);
-		});
-	},
-
 	company: function (frm) {
 		frm.events.clear_employee_table(frm);
 		// erpnext.accounts.dimensions.update_dimension(frm, frm.doctype);
@@ -258,52 +247,62 @@ frappe.ui.form.on("Payroll Entry", {
 		frm.events.clear_employee_table(frm);
 	},
 
-	start_date: function (frm) {
-		if (!in_progress && frm.doc.start_date) {
-			frm.trigger("set_end_date");
-		} else {
-			in_progress = false;
-		}
+	fiscal_year: function (frm) {
 		frm.events.clear_employee_table(frm);
 	},
 
-	project: function (frm) {
-		frm.events.clear_employee_table(frm);
+	month: function (frm) {
+		frm.trigger("set_start_end_dates").then(() => {
+			frm.events.clear_employee_table(frm);
+		});
 	},
+
+	// posting_date: function (frm) {
+	// 	frm.trigger("set_start_end_dates").then(() => {
+	// 		frm.events.clear_employee_table(frm);
+	// 	});
+	// },
+
+	// start_date: function (frm) {
+	// 	if (!in_progress && frm.doc.start_date) {
+	// 		frm.trigger("set_end_date");
+	// 	} else {
+	// 		in_progress = false;
+	// 	}
+	// 	frm.events.clear_employee_table(frm);
+	// },
 
 	set_start_end_dates: function (frm) {
-		if (!frm.doc.salary_slip_based_on_timesheet) {
-			frappe.call({
-				method: "hrms.payroll.doctype.payroll_entry.payroll_entry.get_start_end_dates",
-				args: {
-					payroll_frequency: frm.doc.payroll_frequency,
-					start_date: frm.doc.posting_date,
-				},
-				callback: function (r) {
-					if (r.message) {
-						in_progress = true;
-						frm.set_value("start_date", r.message.start_date);
-						frm.set_value("end_date", r.message.end_date);
-					}
-				},
-			});
-		}
-	},
-
-	set_end_date: function (frm) {
 		frappe.call({
-			method: "hrms.payroll.doctype.payroll_entry.payroll_entry.get_end_date",
+			method: "hrms.payroll.doctype.payroll_entry.payroll_entry.get_start_end_dates",
 			args: {
-				frequency: frm.doc.payroll_frequency,
-				start_date: frm.doc.start_date,
+				fiscal_year: frm.doc.fiscal_year,
+				month: frm.doc.month,
 			},
 			callback: function (r) {
 				if (r.message) {
+					in_progress = true;
+					frm.set_value("start_date", r.message.start_date);
 					frm.set_value("end_date", r.message.end_date);
 				}
 			},
 		});
 	},
+
+	// set_end_date: function (frm) {
+	// 	frappe.call({
+	// 		method: "hrms.payroll.doctype.payroll_entry.payroll_entry.get_end_date",
+	// 		args: {
+	// 			frequency: frm.doc.payroll_frequency,
+	// 			start_date: frm.doc.start_date,
+	// 		},
+	// 		callback: function (r) {
+	// 			if (r.message) {
+	// 				frm.set_value("end_date", r.message.end_date);
+	// 			}
+	// 		},
+	// 	});
+	// },
 
 	validate_attendance: function (frm) {
 		if (frm.doc.validate_attendance && frm.doc.employees?.length > 0) {
@@ -352,29 +351,26 @@ const submit_salary_slip = function (frm) {
 	);
 };
 
-let make_bank_entry = function (frm, for_withheld_salaries = 0) {
+let make_bank_entry = function (frm) {
 	const doc = frm.doc;
-	if (doc.payment_account) {
-		return frappe.call({
-			method: "run_doc_method",
-			args: {
-				method: "make_bank_entry",
-				dt: "Payroll Entry",
-				dn: frm.doc.name,
-				args: { for_withheld_salaries: for_withheld_salaries },
-			},
-			callback: function () {
-				frappe.set_route("List", "Journal Entry", {
-					"Journal Entry Account.reference_name": frm.doc.name,
-				});
-			},
-			freeze: true,
-			freeze_message: __("Creating Payment Entries......"),
-		});
-	} else {
-		frappe.msgprint(__("Payment Account is mandatory"));
-		frm.scroll_to_field("payment_account");
-	}
+	return frappe.call({
+		method: "run_doc_method",
+		args: {
+			method: "make_bank_entry",
+			dt: "Payroll Entry",
+			dn: frm.doc.name,
+		},
+		callback: function () {
+			// frappe.set_route("List", "Journal Entry", {
+			// 	"Journal Entry Account.reference_name": frm.doc.name,
+			// });
+			frappe.set_route(
+				'List', 'Journal Entry', {"reference_type": frm.doc.doctype, "reference_name": frm.doc.name}
+			);
+		},
+		freeze: true,
+		freeze_message: __("Creating Payment Entries......"),
+	});
 };
 
 let render_employee_attendance = function (frm, data) {

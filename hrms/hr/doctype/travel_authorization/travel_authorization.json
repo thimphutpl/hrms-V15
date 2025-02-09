@@ -1,32 +1,34 @@
 {
  "actions": [],
- "allow_rename": 1,
+ "autoname": "TA-.YY.-.MM.-.####",
  "creation": "2025-01-09 23:16:04.777280",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "employee_information_section",
   "employee",
   "employee_name",
   "column_break_djsx",
+  "posting_date",
   "branch",
   "cost_center",
-  "column_break_txbe",
-  "posting_date",
-  "currency",
   "section_break_qlai",
+  "travel_type",
+  "column_break_djfc",
   "purpose_of_travel",
+  "column_break_xlsv",
+  "mode_of_travel",
   "section_break_tvvk",
   "items",
-  "section_break_7i81",
+  "additional_information_section",
   "company",
+  "status",
   "column_break_stkr",
+  "currency",
+  "exchange_rate",
   "amended_from"
  ],
  "fields": [
-  {
-   "fieldname": "section_break_7i81",
-   "fieldtype": "Section Break"
-  },
   {
    "fieldname": "amended_from",
    "fieldtype": "Link",
@@ -51,7 +53,8 @@
    "fieldname": "employee_name",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Employee Name"
+   "label": "Employee Name",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_djsx",
@@ -72,11 +75,8 @@
    "fieldname": "cost_center",
    "fieldtype": "Link",
    "label": "Cost Center",
-   "options": "Cost Center"
-  },
-  {
-   "fieldname": "column_break_txbe",
-   "fieldtype": "Column Break"
+   "options": "Cost Center",
+   "read_only": 1
   },
   {
    "default": "Today",
@@ -103,11 +103,13 @@
    "fieldname": "currency",
    "fieldtype": "Link",
    "label": "Currency",
-   "options": "Currency"
+   "options": "Currency",
+   "reqd": 1
   },
   {
    "fieldname": "items",
    "fieldtype": "Table",
+   "label": "Travel Itinerary",
    "options": "Travel Authorization Item"
   },
   {
@@ -118,19 +120,74 @@
    "fieldname": "purpose_of_travel",
    "fieldtype": "Link",
    "label": "Purpose of Travel",
-   "options": "Purpose of Travel"
+   "options": "Purpose of Travel",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "depends_on": "currency",
+   "description": "Rate at which currency is converted to company's base currency",
+   "fieldname": "exchange_rate",
+   "fieldtype": "Float",
+   "label": "Exchange Rate",
+   "print_hide": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "additional_information_section",
+   "fieldtype": "Section Break",
+   "label": "Additional Information"
+  },
+  {
+   "fieldname": "travel_type",
+   "fieldtype": "Select",
+   "label": "Travel Type",
+   "options": "\nDomestic\nInternational",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_djfc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_xlsv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "mode_of_travel",
+   "fieldtype": "Select",
+   "label": "Mode of Travel",
+   "options": "\nOffice Car\nPersonal Car",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "employee_information_section",
+   "fieldtype": "Section Break",
+   "label": "Employee Information"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "no_copy": 1,
+   "options": "Draft\nSubmitted\nClaimed\nCancelled",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-09 23:38:07.555876",
+ "modified": "2025-02-06 21:55:44.516140",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -142,9 +199,46 @@
    "share": 1,
    "submit": 1,
    "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Employee",
+   "share": 1,
+   "write": 1
   }
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

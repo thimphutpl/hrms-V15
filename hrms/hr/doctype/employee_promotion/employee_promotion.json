@@ -13,8 +13,11 @@
   "column_break_3",
   "promotion_date",
   "company",
+  "fiscal_year",
+  "month",
   "details_section",
   "promotion_details",
+  "promotion_entry",
   "salary_details_section",
   "current_ctc",
   "column_break_12",
@@ -114,11 +117,33 @@
    "fieldtype": "Currency",
    "label": "Revised CTC",
    "options": "salary_currency"
+  },
+  {
+   "fieldname": "fiscal_year",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Fiscal Year",
+   "options": "Fiscal Year",
+   "reqd": 1
+  },
+  {
+   "fieldname": "month",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Month",
+   "options": "January\nJuly",
+   "reqd": 1
+  },
+  {
+   "fieldname": "promotion_entry",
+   "fieldtype": "Link",
+   "label": "Promotion Entry",
+   "options": "Promotion Entry"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2023-05-30 15:15:11.806546",
+ "modified": "2025-02-06 15:33:00.493120",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Promotion",
@@ -162,7 +187,6 @@
    "write": 1
   }
  ],
- "quick_entry": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],

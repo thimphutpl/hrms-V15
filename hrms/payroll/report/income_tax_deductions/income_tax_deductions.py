@@ -42,7 +42,7 @@ def get_columns(is_indian_company: bool) -> list[dict]:
 		)
 
 	columns += [
-		{"label": _("Income Tax Component"), "fieldname": "it_comp", "fieldtype": "Data", "width": 170},
+		{"label": _("Income Tax Component"), "fieldname": "it_comp", "fieldtype": "Data", "width": 180},
 		{
 			"label": _("Income Tax Amount"),
 			"fieldname": "it_amount",

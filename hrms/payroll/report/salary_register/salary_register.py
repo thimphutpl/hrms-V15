@@ -51,7 +51,6 @@ def execute(filters=None):
 			"absent_days": ss.absent_days,
 			"payment_days": ss.payment_days,
 			"currency": currency or company_currency,
-			"total_loan_repayment": ss.total_loan_repayment,
 		}
 
 		update_column_width(ss, columns)
@@ -128,7 +127,7 @@ def get_columns(earning_types, ded_types):
 			"label": _("Date of Joining"),
 			"fieldname": "data_of_joining",
 			"fieldtype": "Date",
-			"width": 80,
+			"width": 100,
 		},
 		{
 			"label": _("Branch"),
@@ -225,13 +224,6 @@ def get_columns(earning_types, ded_types):
 	columns.extend(
 		[
 			{
-				"label": _("Loan Repayment"),
-				"fieldname": "total_loan_repayment",
-				"fieldtype": "Currency",
-				"options": "currency",
-				"width": 120,
-			},
-			{
 				"label": _("Total Deduction"),
 				"fieldname": "total_deduction",
 				"fieldtype": "Currency",
@@ -278,11 +270,17 @@ def get_salary_slips(filters, company_currency):
 	if filters.get("docstatus"):
 		query = query.where(salary_slip.docstatus == doc_status[filters.get("docstatus")])
 
-	if filters.get("from_date"):
-		query = query.where(salary_slip.start_date >= filters.get("from_date"))
+	if filters.get("fiscal_year"):
+		query = query.where(salary_slip.fiscal_year == filters.get("fiscal_year"))
 
-	if filters.get("to_date"):
-		query = query.where(salary_slip.end_date <= filters.get("to_date"))
+	if filters.get("month"):
+		query = query.where(salary_slip.month == filters.get("month"))
+
+	# if filters.get("from_date"):
+	# 	query = query.where(salary_slip.start_date >= filters.get("from_date"))
+
+	# if filters.get("to_date"):
+	# 	query = query.where(salary_slip.end_date <= filters.get("to_date"))
 
 	if filters.get("company"):
 		query = query.where(salary_slip.company == filters.get("company"))

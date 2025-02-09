@@ -78,7 +78,7 @@ def prepare_data(entry, component_type_dict):
 		component_type = component_type_dict.get(d.salary_component)
 
 		if data_list.get(d.name):
-			data_list[d.name][component_type] = d.amount
+			data_list[d.name][type] = d.amount
 		else:
 			data_list.setdefault(
 				d.name,
@@ -86,7 +86,7 @@ def prepare_data(entry, component_type_dict):
 					"employee": d.employee,
 					"employee_name": d.employee_name,
 					"pf_account": employee_account_dict.get(d.employee),
-					component_type: d.amount,
+					type: d.amount,
 				},
 			)
 
@@ -108,8 +108,8 @@ def get_data(filters):
 
 	component_type_dict = frappe._dict(
 		frappe.db.sql(
-			""" select name, component_type from `tabSalary Component`
-		where component_type in ('Provident Fund', 'Additional Provident Fund', 'Provident Fund Loan')"""
+			""" select name, type from `tabSalary Component`
+		where type in ('Deduction', 'Additional Provident Fund', 'Provident Fund Loan')"""
 		)
 	)
 

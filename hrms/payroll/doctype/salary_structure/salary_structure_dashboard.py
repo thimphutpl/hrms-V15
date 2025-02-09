@@ -4,6 +4,6 @@ def get_data():
 		"non_standard_fieldnames": {"Employee Grade": "default_salary_structure"},
 		"transactions": [
 			{"items": ["Salary Slip"]},
-			{"items": ["Employee Grade"]},
+			# {"items": ["Employee Grade"]},
 		],
 	}

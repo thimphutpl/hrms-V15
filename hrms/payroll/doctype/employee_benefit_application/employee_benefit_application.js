@@ -47,7 +47,7 @@ frappe.ui.form.on("Employee Benefit Application", {
 	get_employee_currency: function (frm) {
 		if (frm.doc.employee) {
 			frappe.call({
-				method: "hrms.payroll.doctype.salary_structure_assignment.salary_structure_assignment.get_employee_currency",
+				method: "hrms.payroll.doctype.salary_structure.salary_structure.get_employee_currency",
 				args: {
 					employee: frm.doc.employee,
 				},

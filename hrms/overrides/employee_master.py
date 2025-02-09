@@ -18,14 +18,13 @@ class EmployeeMaster(Employee):
 			if not self.date_of_joining:
 				frappe.throw(_("Date of Joining is required to generate a new Employee ID."))
 			try:
-				year_month_day = self.date_of_joining[:4] + self.date_of_joining[5:7] + self.date_of_joining[8:10]
+				year_month_day = self.date_of_joining[:4] + self.date_of_joining[5:7]
 			except IndexError:
 				frappe.throw(_("Date of Joining must be in YYYY-MM-DD format."))
 			
-			unique_suffix = make_autoname('EMP.####')[3:]
+			unique_suffix = make_autoname('EMP.##')[3:]
 			new_name = f"{year_month_day}{unique_suffix}"
 			self.employee = self.name = new_name
-
 
 		# naming_method = frappe.db.get_value("HR Settings", None, "emp_created_by")
 		# if not naming_method:

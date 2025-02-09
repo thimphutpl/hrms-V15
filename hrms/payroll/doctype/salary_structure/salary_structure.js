@@ -27,12 +27,18 @@ frappe.ui.form.on("Salary Structure", {
 	eligible_for_communication_allowance: function(frm){
 		calculate_others(frm);
 	},
+	eligible_for_monthly_variable_compensation: function(frm){
+		calculate_others(frm);
+	},
 
 	// Payment Method
 	contract_allowance_method: function(frm){
 		calculate_others(frm);
 	},
 	corporate_allowance_method: function(frm){
+		calculate_others(frm);
+	},
+	mvc_method: function(frm){
 		calculate_others(frm);
 	},
 
@@ -43,9 +49,24 @@ frappe.ui.form.on("Salary Structure", {
 	corporate_allowance: function(frm){
 		calculate_others(frm);
 	},
+	mvc: function(frm){
+		calculate_others(frm);
+	},
 
 	// Benefits & Deduction
+	eligible_for_fixed_allowance: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_pf: function(frm){
+		calculate_others(frm);
+	},
 	eligible_for_gis: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_sws: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_health_contribution: function(frm){
 		calculate_others(frm);
 	},
 

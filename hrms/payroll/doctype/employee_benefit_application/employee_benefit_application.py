@@ -17,7 +17,10 @@ from hrms.payroll.doctype.payroll_period.payroll_period import (
 	get_payroll_period_days,
 	get_period_factor,
 )
-from hrms.payroll.doctype.salary_structure_assignment.salary_structure_assignment import (
+# from hrms.payroll.doctype.salary_structure_assignment.salary_structure_assignment import (
+# 	get_assigned_salary_structure,
+# )
+from hrms.payroll.doctype.salary_structure.salary_structure import (
 	get_assigned_salary_structure,
 )
 

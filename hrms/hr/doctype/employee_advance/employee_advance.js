@@ -172,8 +172,8 @@ frappe.ui.form.on("Employee Advance", {
 
 	get_employee_currency: function (frm) {
 		frappe.db.get_value(
-			"Salary Structure Assignment",
-			{ employee: frm.doc.employee, docstatus: 1 },
+			"Salary Structure",
+			{ employee: frm.doc.employee},
 			"currency",
 			(r) => {
 				if (r.currency) frm.set_value("currency", r.currency);
