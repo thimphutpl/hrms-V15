@@ -412,7 +412,7 @@ def get_permission_query_conditions(user):
 		or
 		exists(select 1
 				from `tabEmployee`
-				where `tabEmployee`.branch = `tabPurchase Order`.branch
+				where `tabEmployee`.branch = `tabTravel Authorization`.branch
 				and `tabEmployee`.user_id = '{user}')
 		)""".format(user=user)
 	
