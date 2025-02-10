@@ -378,6 +378,19 @@ def get_permission_query_conditions(user):
 
 	if "HR Master" in user_roles or "HR Manager" in user_roles or "Accounts User" in user_roles or "Accounts Master" in user_roles:
 		return
+	if "HR Support" in user_roles:
+		return """(
+			exists(select 1
+					from `tabAssign Branch`, `tabBranch Item`
+					where `tabAssign Branch`.name = `tabBranch Item`.parent 
+					and `tabBranch Item`.branch = `tabTravel Claim`.branch
+					and `tabAssign Branch`.user = '{user}')
+			or
+			exists(select 1
+					from `tabEmployee`
+					where `tabEmployee`.branch = `tabTravel Claim`.branch
+					and `tabEmployee`.user_id = '{user}')
+			)""".format(user=user)
 
 	return """(
 		`tabTravel Claim`.owner = '{user}'
