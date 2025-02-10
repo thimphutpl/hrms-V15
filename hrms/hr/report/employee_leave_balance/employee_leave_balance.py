@@ -84,7 +84,7 @@ def get_columns() -> list[dict]:
 
 
 def get_data(filters: Filters) -> list:
-	leave_types = get_leave_types()
+	leave_types = get_leave_types(filters)
 	active_employees = get_employees(filters)
 
 	precision = cint(frappe.db.get_single_value("System Settings", "float_precision"))
@@ -130,9 +130,14 @@ def get_data(filters: Filters) -> list:
 	return data
 
 
-def get_leave_types() -> list[str]:
+def get_leave_types(filters=None) -> list[str]:
 	LeaveType = frappe.qb.DocType("Leave Type")
-	return (frappe.qb.from_(LeaveType).select(LeaveType.name).orderby(LeaveType.name)).run(pluck="name")
+	query = frappe.qb.from_(LeaveType).select(LeaveType.name) # new add code
+	if filters.get("leave_type"): # new add code
+		query = query.where(LeaveType.name == filters.get("leave_type")) # new add code
+	query = query.orderby(LeaveType.name) # new add code
+	return query.run(pluck="name")
+	#return (frappe.qb.from_(LeaveType).select(LeaveType.name).orderby(LeaveType.name)).run(pluck="name")
 
 
 def get_employees(filters: Filters) -> list[dict]:
@@ -152,6 +157,8 @@ def get_employees(filters: Filters) -> list[dict]:
 
 	if filters.get("employee_status"):
 		query = query.where(Employee.status == filters.get("employee_status"))
+	if filters.get("employee_type"):
+		query = query.where(Employee.employment_type == filters.get("employee_type"))
 
 	return query.run(as_dict=True)
 
