@@ -214,7 +214,6 @@ class SalarySlip(TransactionBase):
 						
 						# working_days  -= len(calc_holidays)					
 					
-					frappe.throw(str(working_days))	 
 					if ss_doc.depend_salary_on_attendance:
 						absent_days = self.calculate_absent_days(start_date, end_date)
 					
