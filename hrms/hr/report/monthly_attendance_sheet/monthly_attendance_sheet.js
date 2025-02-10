@@ -53,6 +53,12 @@ frappe.query_reports["Monthly Attendance Sheet"] = {
 			reqd: 1,
 		},
 		{
+			fieldname: "employment_type",
+			label: __("Employment Type"),
+			fieldtype: "Link",
+			options: "Employment Type",
+		},
+		{
 			fieldname: "group_by",
 			label: __("Group By"),
 			fieldtype: "Select",

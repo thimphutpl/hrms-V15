@@ -65,87 +65,136 @@ def get_message() -> str:
 	return message
 
 
+# def get_columns(filters: Filters) -> list[dict]:
+# 	columns = []
+
+# 	if filters.group_by:
+# 		options_mapping = {
+# 			"Branch": "Branch",
+# 			"Grade": "Employee Grade",
+# 			"Department": "Department",
+# 			"Designation": "Designation",
+# 			"Employment Type": "Employment Type",
+# 		}
+# 		options = options_mapping.get(filters.group_by)
+# 		columns.append(
+# 			{
+# 				"label": _(filters.group_by),
+# 				"fieldname": frappe.scrub(filters.group_by),
+# 				"fieldtype": "Link",
+# 				"options": options,
+# 				"width": 120,
+# 			}
+# 		)
+
+# 	columns.extend(
+# 		[
+# 			{
+# 				"label": _("Employee"),
+# 				"fieldname": "employee",
+# 				"fieldtype": "Link",
+# 				"options": "Employee",
+# 				"width": 135,
+# 			},
+# 			{"label": _("Employee Name"), "fieldname": "employee_name", "fieldtype": "Data", "width": 120},
+# 		]
+# 	)
+
+# 	if filters.summarized_view:
+# 		columns.extend(
+# 			[
+# 				{
+# 					"label": _("Total Present"),
+# 					"fieldname": "total_present",
+# 					"fieldtype": "Float",
+# 					"width": 110,
+# 				},
+# 				{"label": _("Total Leaves"), "fieldname": "total_leaves", "fieldtype": "Float", "width": 110},
+# 				{"label": _("Total Absent"), "fieldname": "total_absent", "fieldtype": "Float", "width": 110},
+# 				{
+# 					"label": _("Total Holidays"),
+# 					"fieldname": "total_holidays",
+# 					"fieldtype": "Float",
+# 					"width": 120,
+# 				},
+# 				{
+# 					"label": _("Unmarked Days"),
+# 					"fieldname": "unmarked_days",
+# 					"fieldtype": "Float",
+# 					"width": 130,
+# 				},
+# 			]
+# 		)
+# 		columns.extend(get_columns_for_leave_types())
+# 		columns.extend(
+# 			[
+# 				{
+# 					"label": _("Total Late Entries"),
+# 					"fieldname": "total_late_entries",
+# 					"fieldtype": "Float",
+# 					"width": 140,
+# 				},
+# 				{
+# 					"label": _("Total Early Exits"),
+# 					"fieldname": "total_early_exits",
+# 					"fieldtype": "Float",
+# 					"width": 140,
+# 				},
+# 			]
+# 		)
+# 	else:
+# 		columns.append({"label": _("Shift"), "fieldname": "shift", "fieldtype": "Data", "width": 120})
+# 		columns.extend(get_columns_for_days(filters))
+
+# 	return columns
 def get_columns(filters: Filters) -> list[dict]:
-	columns = []
+    columns = []
 
-	if filters.group_by:
-		options_mapping = {
-			"Branch": "Branch",
-			"Grade": "Employee Grade",
-			"Department": "Department",
-			"Designation": "Designation",
-		}
-		options = options_mapping.get(filters.group_by)
-		columns.append(
-			{
-				"label": _(filters.group_by),
-				"fieldname": frappe.scrub(filters.group_by),
-				"fieldtype": "Link",
-				"options": options,
-				"width": 120,
-			}
-		)
+    if filters.group_by:
+        options_mapping = {
+            "Branch": "Branch",
+            "Grade": "Employee Grade",
+            "Department": "Department",
+            "Designation": "Designation",
+            "Employment Type": "Employment Type",
+        }
+        options = options_mapping.get(filters.group_by)
+        columns.append(
+            {
+                "label": _(filters.group_by),
+                "fieldname": frappe.scrub(filters.group_by),
+                "fieldtype": "Link",
+                "options": options,
+                "width": 120,
+            }
+        )
 
-	columns.extend(
-		[
-			{
-				"label": _("Employee"),
-				"fieldname": "employee",
-				"fieldtype": "Link",
-				"options": "Employee",
-				"width": 135,
-			},
-			{"label": _("Employee Name"), "fieldname": "employee_name", "fieldtype": "Data", "width": 120},
-		]
-	)
+    columns.extend(
+        [
+            {
+                "label": _("Employee"),
+                "fieldname": "employee",
+                "fieldtype": "Link",
+                "options": "Employee",
+                "width": 135,
+            },
+            {"label": _("Employee Name"), "fieldname": "employee_name", "fieldtype": "Data", "width": 120},
+        ]
+    )
 
-	if filters.summarized_view:
-		columns.extend(
-			[
-				{
-					"label": _("Total Present"),
-					"fieldname": "total_present",
-					"fieldtype": "Float",
-					"width": 110,
-				},
-				{"label": _("Total Leaves"), "fieldname": "total_leaves", "fieldtype": "Float", "width": 110},
-				{"label": _("Total Absent"), "fieldname": "total_absent", "fieldtype": "Float", "width": 110},
-				{
-					"label": _("Total Holidays"),
-					"fieldname": "total_holidays",
-					"fieldtype": "Float",
-					"width": 120,
-				},
-				{
-					"label": _("Unmarked Days"),
-					"fieldname": "unmarked_days",
-					"fieldtype": "Float",
-					"width": 130,
-				},
-			]
-		)
-		columns.extend(get_columns_for_leave_types())
-		columns.extend(
-			[
-				{
-					"label": _("Total Late Entries"),
-					"fieldname": "total_late_entries",
-					"fieldtype": "Float",
-					"width": 140,
-				},
-				{
-					"label": _("Total Early Exits"),
-					"fieldname": "total_early_exits",
-					"fieldtype": "Float",
-					"width": 140,
-				},
-			]
-		)
-	else:
-		columns.append({"label": _("Shift"), "fieldname": "shift", "fieldtype": "Data", "width": 120})
-		columns.extend(get_columns_for_days(filters))
+    columns.extend(get_columns_for_days(filters))
 
-	return columns
+    # Add Total Absent, Present, and Payable Days columns
+    columns.extend(
+        [
+            {"label": _("Total Absent Days"), "fieldname": "total_absent_days", "fieldtype": "Float", "width": 150},
+            {"label": _("Total Present Days"), "fieldname": "total_present_days", "fieldtype": "Float", "width": 150},
+            {"label": _("Total Payable Days"), "fieldname": "total_payable_days", "fieldtype": "Float", "width": 150},
+        ]
+    )
+
+    return columns
+
 
 
 def get_columns_for_leave_types() -> list[dict]:
@@ -177,44 +226,65 @@ def get_columns_for_days(filters: Filters) -> list[dict]:
 def get_total_days_in_month(filters: Filters) -> int:
 	return monthrange(cint(filters.year), cint(filters.month))[1]
 
-
 def get_data(filters: Filters, attendance_map: dict) -> list[dict]:
-	employee_details, group_by_param_values = get_employee_related_details(filters)
-	holiday_map = get_holiday_map(filters)
-	data = []
+    employee_details, group_by_param_values = get_employee_related_details(filters)
+    holiday_map = get_holiday_map(filters)
+    data = []
 
-	if filters.group_by:
-		group_by_column = frappe.scrub(filters.group_by)
+    if filters.group_by:
+        group_by_column = frappe.scrub(filters.group_by)
 
-		for value in group_by_param_values:
-			if not value:
-				continue
+        for value in group_by_param_values:
+            if not value:
+                continue
 
-			records = get_rows(employee_details[value], filters, holiday_map, attendance_map)
+            records = get_rows(employee_details[value], filters, holiday_map, attendance_map)
 
-			if records:
-				data.append({group_by_column: value})
-				data.extend(records)
-	else:
-		data = get_rows(employee_details, filters, holiday_map, attendance_map)
+            if records:
+                data.append({group_by_column: value})
+                data.extend(records)
+    else:
+        data = get_rows(employee_details, filters, holiday_map, attendance_map)
 
-	return data
+    # Now calculate totals for each employee
+    for row in data:
+        total_present = 0
+        total_absent = 0
+        total_payable = 0
+
+        # Iterate over the days and count present, absent, etc.
+        for day in range(1, get_total_days_in_month(filters) + 1):
+            status = row.get(cstr(day))
+
+            if status in ["P", "H", "T", None, ""]:  # Present, Holiday, Tour, or Empty
+                total_present += 1
+            elif status == "A":  # Absent
+                total_absent += 1
+
+        total_payable = total_present  # Payable days = Present + Holiday + Tour + Empty
+
+        # Add the totals to the row
+        row["total_absent_days"] = total_absent
+        row["total_present_days"] = total_present
+        row["total_payable_days"] = total_payable
+
+    return data
 
 
 def get_attendance_map(filters: Filters) -> dict:
 	"""Returns a dictionary of employee wise attendance map as per shifts for all the days of the month like
 	{
-	    'employee1': {
-	            'Morning Shift': {1: 'Present', 2: 'Absent', ...}
-	            'Evening Shift': {1: 'Absent', 2: 'Present', ...}
-	    },
-	    'employee2': {
-	            'Afternoon Shift': {1: 'Present', 2: 'Absent', ...}
-	            'Night Shift': {1: 'Absent', 2: 'Absent', ...}
-	    },
-	    'employee3': {
-	            None: {1: 'On Leave'}
-	    }
+		'employee1': {
+				'Morning Shift': {1: 'Present', 2: 'Absent', ...}
+				'Evening Shift': {1: 'Absent', 2: 'Present', ...}
+		},
+		'employee2': {
+				'Afternoon Shift': {1: 'Present', 2: 'Absent', ...}
+				'Night Shift': {1: 'Absent', 2: 'Absent', ...}
+		},
+		'employee3': {
+				None: {1: 'On Leave'}
+		}
 	}
 	"""
 	attendance_list = get_attendance_records(filters)
@@ -287,12 +357,16 @@ def get_employee_related_details(filters: Filters) -> tuple[dict, list]:
 			Employee.branch,
 			Employee.company,
 			Employee.holiday_list,
+			Employee.employment_type,
 		)
 		.where(Employee.company == filters.company)
 	)
 
 	if filters.employee:
 		query = query.where(Employee.name == filters.employee)
+
+	if filters.employment_type:
+		query = query.where(Employee.employment_type == filters.employment_type)
 
 	group_by = filters.group_by
 	if group_by:
@@ -323,14 +397,14 @@ def get_holiday_map(filters: Filters) -> dict[str, list[dict]]:
 	Returns a dict of holidays falling in the filter month and year
 	with list name as key and list of holidays as values like
 	{
-	        'Holiday List 1': [
-	                {'day_of_month': '0' , 'weekly_off': 1},
-	                {'day_of_month': '1', 'weekly_off': 0}
-	        ],
-	        'Holiday List 2': [
-	                {'day_of_month': '0' , 'weekly_off': 1},
-	                {'day_of_month': '1', 'weekly_off': 0}
-	        ]
+			'Holiday List 1': [
+					{'day_of_month': '0' , 'weekly_off': 1},
+					{'day_of_month': '1', 'weekly_off': 0}
+			],
+			'Holiday List 2': [
+					{'day_of_month': '0' , 'weekly_off': 1},
+					{'day_of_month': '1', 'weekly_off': 0}
+			]
 	}
 	"""
 	# add default holiday list too
@@ -492,8 +566,8 @@ def get_attendance_status_for_detailed_view(
 ) -> list[dict]:
 	"""Returns list of shift-wise attendance status for employee
 	[
-	        {'shift': 'Morning Shift', 1: 'A', 2: 'P', 3: 'A'....},
-	        {'shift': 'Evening Shift', 1: 'P', 2: 'A', 3: 'P'....}
+			{'shift': 'Morning Shift', 1: 'A', 2: 'P', 3: 'A'....},
+			{'shift': 'Evening Shift', 1: 'P', 2: 'A', 3: 'P'....}
 	]
 	"""
 	total_days = get_total_days_in_month(filters)
