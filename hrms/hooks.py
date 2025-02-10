@@ -233,8 +233,8 @@ scheduler_events = {
 		"hrms.hr.doctype.daily_work_summary_group.daily_work_summary_group.send_summary",
 		"hrms.hr.doctype.interview.interview.send_daily_feedback_reminder",
 		"hrms.hr.doctype.job_opening.job_opening.close_expired_job_openings",
-		"hrms.hr.hr_custom_functions.post_leave_credits",
-		"hrms.hr.hr_custom_functions.post_earned_leaves",
+		#"hrms.hr.hr_custom_functions.post_leave_credits",
+		
 		
 	],
 	"daily_long": [
@@ -246,8 +246,9 @@ scheduler_events = {
 	"weekly": ["hrms.controllers.employee_reminders.send_reminders_in_advance_weekly"],
 	
 	"monthly": [
-	"hrms.hr.doctype.leave_allocation.leave_allocation.post_earned_leaves",
-	"hrms.controllers.employee_reminders.send_reminders_in_advance_monthly",	
+	
+	"hrms.controllers.employee_reminders.send_reminders_in_advance_monthly",
+	"hrms.hr.hr_custom_functions.post_earned_leaves",	
 	],
 }
 
