@@ -159,13 +159,9 @@ class TravelClaim(Document):
 				item.mileage_amount = flt(item.mileage_rate) * flt(item.distance)
 								
 				# Out-Country logic for last day - Custom DSA percent calculations
-			if item.is_last_day and self.place_type == "Out-Country":				
-				if item.dsa_percent == 100:					
-					item.amount = flt(item.no_days) * flt(item.dsa)  # Full DSA
-				elif item.dsa_percent == 50:
-					item.amount = flt(item.no_days) * flt(item.dsa) * 0.50  # 50% of DSA
-				elif item.dsa_percent == 20:
-					item.amount = flt(item.no_days) * flt(item.dsa) * 0.20  # 20% of DSA
+			if self.place_type == "Out-Country":				
+				if item.dsa_percent:
+					item.amount = flt(item.no_days) * flt(item.dsa) * flt(item.dsa_percent) * 0.01
 				else:
 					# Default to 100% of DSA if no valid percent is provided
 					item.amount = flt(item.no_days) * flt(item.dsa)

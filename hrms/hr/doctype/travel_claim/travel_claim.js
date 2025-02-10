@@ -119,7 +119,13 @@ frappe.ui.form.on("Travel Claim Item", {
     dsa: function (frm, cdt, cdn) {		
         frm.trigger("calculate", cdt, cdn);
     },
-
+	dsa_percent: function(frm, cdt, cdn){
+		var item = locals[cdt][cdn];
+		if(frm.doc.place_type == "Out-Country"){
+			frappe.model.set_value(cdt, cdn, "amount", flt(flt(item.dsa)*flt(item.no_days)*flt(item.dsa_percent)*0.01,2));
+			frm.refresh_fields();
+		}
+	},
     amount: function (frm, cdt, cdn) {
         frm.trigger("calculate", cdt, cdn);
     },
