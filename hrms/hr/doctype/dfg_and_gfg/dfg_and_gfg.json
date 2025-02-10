@@ -76,7 +76,8 @@
   {
    "fieldname": "id_card",
    "fieldtype": "Data",
-   "label": "ID Card"
+   "label": "ID Card",
+   "reqd": 1
   },
   {
    "fetch_from": "village.gewog",
@@ -90,7 +91,8 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Active\nLeft"
+   "options": "Active\nLeft",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_tpjc",
@@ -116,7 +118,8 @@
   {
    "fieldname": "date_of_joining",
    "fieldtype": "Date",
-   "label": "Date of Joining"
+   "label": "Date of Joining",
+   "reqd": 1
   },
   {
    "fieldname": "gender",
@@ -167,7 +170,8 @@
    "fieldname": "bank",
    "fieldtype": "Link",
    "label": "Bank",
-   "options": "Financial Institution"
+   "options": "Financial Institution",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_xawc",
@@ -176,13 +180,15 @@
   {
    "fieldname": "rate_per_hour",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Rate Per Hour",
    "read_only": 1
   },
   {
    "fieldname": "account_no",
    "fieldtype": "Data",
-   "label": "Account No."
+   "label": "Account No.",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_qycz",
@@ -191,6 +197,7 @@
   {
    "fieldname": "gratuity_fund",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Gratuity Fund",
    "read_only": 1
   },
@@ -203,7 +210,8 @@
    "depends_on": "eval:doc.status==\"Left\"",
    "fieldname": "date_of_separation",
    "fieldtype": "Date",
-   "label": "Date of Separation"
+   "label": "Date of Separation",
+   "mandatory_depends_on": "eval:doc.status==\"Left\""
   },
   {
    "fieldname": "internal_work_history_section",
@@ -314,6 +322,7 @@
    "depends_on": "eval:doc.employee_type == \"DFG\"",
    "fieldname": "old_id",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Old ID"
   },
   {
@@ -326,7 +335,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-03 12:36:04.051694",
+ "modified": "2025-02-10 14:34:51.638315",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "DFG AND GFG",
