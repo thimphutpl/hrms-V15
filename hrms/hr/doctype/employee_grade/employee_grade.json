@@ -13,6 +13,7 @@
   "currency",
   "default_base_pay",
   "government_grade",
+  "maximum_grade",
   "column_break_vaoa",
   "sub_level",
   "gis",
@@ -175,11 +176,18 @@
    "fieldname": "retirement_age",
    "fieldtype": "Int",
    "label": "Retirement Age"
+  },
+  {
+   "fieldname": "maximum_grade",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Maximum Grade",
+   "options": "Employee Grade"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-20 09:21:19.235329",
+ "modified": "2025-02-07 14:56:50.922734",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Grade",
