@@ -109,6 +109,31 @@ frappe.ui.form.on('Promotion Entry', {
 		frm.clear_table('employees');
 		frm.refresh();
 	},
+	// Validate when new_employee_grade is changed in the child table
+    new_employee_grade: function(frm, cdt, cdn) {
+        var child = locals[cdt][cdn];
+
+        // Check if the new_employee_grade is the same as the maximum_grade
+        if (child.new_employee_grade === child.maximum_grade) {
+            frappe.msgprint(__("The new employee grade cannot be the same as the maximum grade for employee {0}.", [child.employee]));
+            frappe.model.set_value(cdt, cdn, 'new_employee_grade', ''); // Clear the field
+        }
+    },
+
+    // Validate the entire form on submission
+    validate: function(frm) {
+        frm.doc.employees.forEach(function(employee) {
+            // Check if the employee_grade is already the maximum_grade
+            if (employee.employee_grade === employee.maximum_grade) {
+                frappe.throw(__("Employee {0} has already reached the maximum grade. Promotion is not allowed.", [employee.employee]));
+            }
+
+            // Check if the new_employee_grade is the same as the maximum_grade
+            if (employee.new_employee_grade === employee.maximum_grade) {
+                frappe.throw(__("The new employee grade for {0} cannot be the same as the maximum grade.", [employee.employee]));
+            }
+        });
+    }
 });
 // Submit salary slips
 

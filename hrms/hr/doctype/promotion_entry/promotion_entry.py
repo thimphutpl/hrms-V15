@@ -27,6 +27,15 @@ class PromotionEntry(Document):
 		self.set_month_dates()
 		self.check_increment_cycle()
 
+		for employee in self.employees:
+			# Check if the employee_grade is already the maximum_grade
+			if employee.employee_grade == employee.maximum_grade:
+				frappe.throw(_("Employee {0} has already reached the maximum grade. Promotion is not allowed.").format(employee.employee))
+
+			# Check if the new_employee_grade is the same as the maximum_grade
+			if employee.new_employee_grade == employee.maximum_grade:
+				frappe.throw(_("The new employee grade for {0} cannot be the same as the maximum grade.").format(employee.employee))
+
 	def on_submit(self):
 		if self.month_name != "July":
 			self.check_increment()
@@ -92,7 +101,7 @@ class PromotionEntry(Document):
 		# 	{}
 		# 	order by t1.branch, t1.name
 		# """.format(pe_date, self.month_name, cond)
-		query = """select t1.name as employee, t1.employee_name, t1.department, t1.designation, t1.grade as employee_grade 
+		query = """select t1.name as employee, t1.employee_name, t1.department, t1.designation, t1.grade as employee_grade, t1.maximum_grade 
 					from `tabEmployee` t1 
 					where t1.status = 'Active' 
 					and t1.employment_type not in ('Contract','Probation') 
@@ -153,7 +162,7 @@ class PromotionEntry(Document):
 					salary_structure = frappe.db.sql("select sd.amount as amount, ss.employee_grade from `tabSalary Detail` sd, `tabSalary Structure` ss where sd.parent = ss.name and ss.employee = '{0}' and ss.is_active = 'Yes' and sd.salary_component = 'Basic Pay'".format(e.employee), as_dict = True)
 
 					new_grade, new_increment, new_basic_pay = self.get_additional_details(e.employee, salary_structure[0].amount)
-					emp.append({"employee":e.employee, "employee_name": e.employee_name, "department": e.department, "designation": e.designation, "employee_grade": e.employee_grade, "current_basic_pay": salary_structure[0].amount, "new_increment": new_increment, "new_basic_pay": new_basic_pay, "new_employee_grade": new_grade})
+					emp.append({"employee":e.employee, "employee_name": e.employee_name, "department": e.department, "designation": e.designation, "employee_grade": e.employee_grade, "maximum_grade": e.maximum_grade, "current_basic_pay": salary_structure[0].amount, "new_increment": new_increment, "new_basic_pay": new_basic_pay, "new_employee_grade": new_grade})
 			else:
 				# is_eligible = frappe.db.sql("""
 				# 	select 1 from
@@ -171,11 +180,12 @@ class PromotionEntry(Document):
 					salary_structure = frappe.db.sql("select sd.amount as amount,  ss.employee_grade from `tabSalary Detail` sd, `tabSalary Structure` ss where sd.parent = ss.name and ss.employee = '{0}' and ss.is_active = 'Yes' and sd.salary_component = 'Basic Pay'".format(e.employee), as_dict = True)
 
 					new_grade, new_increment, new_basic_pay, new_promot_date = self.get_additional_details(e.employee, salary_structure[0].amount)
-					emp.append({"employee":e.employee, "employee_name": e.employee_name, "department": e.department, "designation": e.designation, "employee_grade": e.employee_grade, "current_basic_pay": salary_structure[0].amount, "new_increment": new_increment,"new_basic_pay": new_basic_pay, "new_employee_grade": new_grade, "next_promotion_date":new_promot_date})		
+					emp.append({"employee":e.employee, "employee_name": e.employee_name, "department": e.department, "designation": e.designation, "employee_grade": e.employee_grade, "maximum_grade": e.maximum_grade, "current_basic_pay": salary_structure[0].amount, "new_increment": new_increment,"new_basic_pay": new_basic_pay, "new_employee_grade": new_grade, "next_promotion_date":new_promot_date})		
 		# it = iter(emp)
 		# emp_dict = dict(zip(it, it))
 		# frappe.msgprint(str(emp))
 		return emp
+	
 
 	def get_additional_details(self, employee, basic_pay):
 		emp = frappe.get_doc("Employee", employee)
