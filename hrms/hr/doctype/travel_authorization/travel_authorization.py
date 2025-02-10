@@ -407,7 +407,7 @@ def get_permission_query_conditions(user):
 		exists(select 1
 				from `tabAssign Branch`, `tabBranch Item`
 				where `tabAssign Branch`.name = `tabBranch Item`.parent 
-				and `tabBranch Item`.branch = `tabPurchase Order`.branch
+				and `tabBranch Item`.branch = `tabTravel Authorization`.branch
 				and `tabAssign Branch`.user = '{user}')
 		or
 		exists(select 1
