@@ -18,7 +18,7 @@ from erpnext.accounts.doctype.hr_accounts_settings.hr_accounts_settings import g
 from hrms.hr.doctype.leave_application.leave_application import get_leave_balance_on
 
 class LeaveEncashment(Document):
-	def validate(self):		
+	def validate(self):			
 		set_employee_name(self)
 		validate_active_employee(self.employee)		
 		self.get_leave_balance()
@@ -271,15 +271,38 @@ class LeaveEncashment(Document):
 				self.encashment_days  = group_doc.min_encashment_days				
 				self.balance_before = get_leave_balance_on(self.employee, self.leave_type, str(self.encashment_date))				
 				self.balance_after  = flt(self.balance_before) - flt(self.encashment_days)			
-
 	
 	def check_duplicate_entry(self):
-		count = frappe.db.count(self.doctype,{"employee": self.employee, "leave_period": self.leave_period, "leave_type": self.leave_type, "docstatus": 1}) \
-		if frappe.db.count(self.doctype,{"employee": self.employee, "leave_period": self.leave_period, "leave_type": self.leave_type, "docstatus": 1}) else 0				
-		employee_grp = frappe.db.get_value("Employee",self.employee,"employee_group")
-		frequency = frappe.db.get_value("Employee Group",employee_grp,"encashment_frequency")		
-		if flt(count) >= flt(frequency):
-			frappe.throw("You had already Encash {} time for leave period {}".format(frappe.bold(count), frappe.bold(self.leave_period)))
+		# Check if there's already a draft entry
+		draft_count = frappe.db.count(self.doctype, {
+			"employee": self.employee,
+			"leave_period": self.leave_period,
+			"leave_type": self.leave_type,
+			"docstatus": 0  # Check only for draft documents
+		})
+
+		if draft_count > 0:
+			frappe.throw("You already have a draft encashment request for leave period {}. Please submit or cancel it before creating a new one.".format(
+				frappe.bold(self.leave_period)
+			))
+
+		# Count submitted entries
+		submitted_count = frappe.db.count(self.doctype, {
+			"employee": self.employee,
+			"leave_period": self.leave_period,
+			"leave_type": self.leave_type,
+			"docstatus": 1  # Check only for submitted documents
+		}) or 0  # Default to 0 if no records found
+
+		# Get employee group and frequency
+		employee_grp = frappe.db.get_value("Employee", self.employee, "employee_group")
+		frequency = frappe.db.get_value("Employee Group", employee_grp, "encashment_frequency")
+
+		if flt(submitted_count) >= flt(frequency):
+			frappe.throw("You had already encashed {} time(s) for leave period {}.".format(
+				frappe.bold(submitted_count), frappe.bold(self.leave_period)
+			))
+
 
 	@frappe.whitelist()
 	def get_leave_details_for_encashment(self):
