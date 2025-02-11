@@ -128,14 +128,16 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Designation",
-   "options": "Designation"
+   "options": "Designation",
+   "read_only": 1
   },
   {
    "fetch_from": "employee.grade",
    "fieldname": "employee_grade",
    "fieldtype": "Link",
    "label": "Employee Grade",
-   "options": "Employee Grade"
+   "options": "Employee Grade",
+   "read_only": 1
   },
   {
    "fieldname": "table_for_activity",
@@ -338,7 +340,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-22 12:39:16.113225",
+ "modified": "2025-02-11 17:47:40.038428",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Separation",
