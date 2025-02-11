@@ -25,6 +25,12 @@ frappe.query_reports["Salary Payable Report"] = {
 			"options": "Financial Institution"
 		},
 		{
+			"fieldname":"employment_type",
+			"label": __("Employment Type"),
+			"fieldtype": "Link",
+			"options": "Employment Type"
+		},
+		{
 			"fieldname": "company",
 			"label": __("Company"),
 			"fieldtype": "Link",
