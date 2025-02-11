@@ -21,7 +21,7 @@ class LeaveEncashment(Document):
 	def validate(self):			
 		set_employee_name(self)
 		validate_active_employee(self.employee)		
-		self.get_leave_balance()
+		#self.get_leave_balance()
 		self.validate_balances()
 		self.check_duplicate_entry()
 		if not self.encashment_date:
@@ -246,6 +246,7 @@ class LeaveEncashment(Document):
 
 	def validate_balances(self):		
 		msg = ''
+		#frappe.throw(str(self.balance_after))
 		#le = get_le_settings()                                                                         # Line commented by SHIV on 2018/10/15
 		le = frappe.get_doc("Employee Group",frappe.db.get_value("Employee",self.employee,"employee_group")) # Line added by SHIV on 2018/10/15
 		if flt(self.balance_before) <= flt(le.min_encashment_days):
@@ -255,10 +256,11 @@ class LeaveEncashment(Document):
 			        msg = "Minimum leave balance {0} required to encash.".format(le.encashment_min)
 			elif self.employment_type !="Deputation":
 			        msg = "Minimum leave balance {0} required to encash.".format(le.encashment_min)
-
+		msg = ""
+		InsufficientError=""
 		if flt(self.balance_after) < 0:
-				msg = "Insufficient leave balance"
-				InsufficientError="Insufficient leave balance"
+				frapp.throw(str(self.balance_after))
+				InsufficientError="Insufficient leave balance"				
 
 		if msg:
 				frappe.throw(_("{0}").format(msg), InsufficientError)
@@ -272,11 +274,16 @@ class LeaveEncashment(Document):
 	
 	def check_duplicate_entry(self):
 		# Check if there's already a draft entry
+		#frappe.throw(self.workflow_state)
 		draft_count = frappe.db.count(self.doctype, {
 			"employee": self.employee,
 			"leave_period": self.leave_period,
 			"leave_type": self.leave_type,
-			"docstatus": 0  # Check only for draft documents
+			"docstatus": ["<", 1],
+			"workflow_state": ["in", ["Draft", "Waiting Approval"]],
+			"name": ["!=", self.name] # Exclude the current document
+			 # Check only for draft documents
+			
 		})
 
 		if draft_count > 0:
@@ -300,7 +307,6 @@ class LeaveEncashment(Document):
 			frappe.throw("You had already encashed {} time(s) for leave period {}.".format(
 				frappe.bold(submitted_count), frappe.bold(self.leave_period)
 			))
-
 
 	@frappe.whitelist()
 	def get_leave_details_for_encashment(self):
