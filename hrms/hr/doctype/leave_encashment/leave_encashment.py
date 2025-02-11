@@ -273,23 +273,7 @@ class LeaveEncashment(Document):
 				self.balance_after  = flt(self.balance_before) - flt(self.encashment_days)			
 
 	
-	def check_duplicate_entry(self):		
-		from_date, to_date = self.get_current_year_dates()
-		ref_docs = ''                
-		encashed_list = frappe.db.sql("""
-				select name from `tabLeave Encashment`
-				where employee = %s and leave_type = %s and docstatus < 2
-				and encashment_date between %s and %s
-				""",(self.employee, self.leave_type, from_date, to_date), as_dict=1)
-
-		for row in encashed_list:
-			ref_docs += '<br /><a style="color: green" href="#Form/Leave Encashment/{0}">{0}</a>'.format(row.name)
-		
-		if ref_docs:
-			ref_docs = "<br /><br />Reference: {0}".format(ref_docs)
-			#frappe.throw(_("Employee has already encashed for the current year.{0}").format(ref_docs), OverlapError)
-			frappe.throw(_("Employee has already encashed for the current year.{0}").format(ref_docs))
-
+	def check_duplicate_entry(self):
 		count = frappe.db.count(self.doctype,{"employee": self.employee, "leave_period": self.leave_period, "leave_type": self.leave_type, "docstatus": 1}) \
 		if frappe.db.count(self.doctype,{"employee": self.employee, "leave_period": self.leave_period, "leave_type": self.leave_type, "docstatus": 1}) else 0				
 		employee_grp = frappe.db.get_value("Employee",self.employee,"employee_group")
