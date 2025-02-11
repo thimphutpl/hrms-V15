@@ -20,11 +20,11 @@ class LeaveEncashment(Document):
 	def validate(self):		
 		set_employee_name(self)
 		validate_active_employee(self.employee)
-		self.get_leave_details_for_encashment()
+		#self.get_leave_details_for_encashment()
 		# employee_group = frappe.db.get_value("Employee", self.employee, "employee_group")
 		# encashment_min = frappe.db.get_value("Employee Group", employee_group, "encashment_min")
-		if self.balance_before < encashment_min:
-			frappe.throw(encashment_min+" ")
+		# if self.balance_before < encashment_min:
+		# 	frappe.throw(encashment_min+" ")
 		self.get_leave_balance()
 		self.validate_balances()
 		self.check_duplicate_entry()
