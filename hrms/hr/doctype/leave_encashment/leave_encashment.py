@@ -14,18 +14,22 @@ from hrms.payroll.doctype.salary_structure.salary_structure import get_basic_and
 from hrms.hr.hr_custom_functions import get_salary_tax
 from erpnext.custom_workflow import notify_workflow_states
 from erpnext.accounts.doctype.hr_accounts_settings.hr_accounts_settings import get_bank_account
-# from hrms.hr.doctype.leave_application.leave_application import get_leave_balance_on
+from hrms.hr.doctype.leave_application.leave_application import get_leave_balance_on
 
 class LeaveEncashment(Document):
 	def validate(self):		
 		set_employee_name(self)
 		validate_active_employee(self.employee)
-		#self.get_leave_details_for_encashment()
-		# self.get_leave_balance()
+		self.get_leave_details_for_encashment()
+		# employee_group = frappe.db.get_value("Employee", self.employee, "employee_group")
+		# encashment_min = frappe.db.get_value("Employee Group", employee_group, "encashment_min")
+		if self.balance_before < encashment_min:
+			frappe.throw(encashment_min+" ")
+		self.get_leave_balance()
 		self.validate_balances()
 		self.check_duplicate_entry()
-		# if not self.encashment_date:
-		# 	self.encashment_date = getdate(nowdate())
+		if not self.encashment_date:
+		 	self.encashment_date = getdate(nowdate())
 		if self.workflow_state != "Approved":
 			notify_workflow_states(self)
 
@@ -246,9 +250,10 @@ class LeaveEncashment(Document):
 		#le = get_le_settings()                                                                         # Line commented by SHIV on 2018/10/15
 		le = frappe.get_doc("Employee Group",frappe.db.get_value("Employee",self.employee,"employee_group")) # Line added by SHIV on 2018/10/15
 		if flt(self.balance_before) < flt(le.min_encashment_days):
-			frappe.throw(str(self.balance_before))
+			#frappe.throw(str(self.balance_before))
 
 			msg = "Minimum leave balance {0} required to encash.".format(le.encashment_min)
+			frappe.throw(msg)
 			# if self.employment_type =="Deputation" and flt(self.balance_before) < 30:
 			#         msg = "Minimum leave balance 30 required to encash."
 			# elif self.employment_type !="Deputation":
@@ -257,6 +262,7 @@ class LeaveEncashment(Document):
 
 		if flt(self.balance_after) < 0:
 				msg = "Insufficient leave balance"
+				InsufficientError="Insufficient leave balance"
 
 		if msg:
 				frappe.throw(_("{0}").format(msg), InsufficientError)
@@ -329,7 +335,7 @@ class LeaveEncashment(Document):
 		
 		self.balance_after=self.balance_before-encashable_days
 		if self.balance_before < flt(encashment_min):
-			frappe.msgprint(_("Minimum '{}' days is Mandatory for Encashment").format(cint(encashment_min)),title="Leave Balance")
+			frappe.throw(_("Minimum '{}' days is Mandatory for Encashment").format(cint(encashment_min)),title="Leave Balance")
 		
 		# self.encashable_days = encashable_days if encashable_days > 0 else 0
 		self.encashable_days = encashable_days if encashable_days and encashable_days > 0 else 0
