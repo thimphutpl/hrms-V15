@@ -270,10 +270,11 @@
    "read_only": 1
   },
   {
+   "depends_on": "eval:doc.leave_type == 'Medical Leave'",
    "fieldname": "upload_medical_document",
    "fieldtype": "Attach",
    "label": "Upload Medical Document",
-   "reqd": 1
+   "mandatory_depends_on": "eval:doc.leave_type == 'Medical Leave'"
   }
  ],
  "icon": "fa fa-calendar",
@@ -281,7 +282,7 @@
  "is_submittable": 1,
  "links": [],
  "max_attachments": 3,
- "modified": "2025-02-11 16:43:32.293945",
+ "modified": "2025-02-11 17:39:45.176121",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Application",
