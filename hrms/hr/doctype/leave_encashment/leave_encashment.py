@@ -30,8 +30,7 @@ class LeaveEncashment(Document):
 			notify_workflow_states(self)
 
 	def before_submit(self):
-		if self.encashment_amount <= 0:
-			return
+		if self.encashment_amount <= 0:			
 			frappe.throw(_("You can only submit Leave Encashment for a valid encashment amount"))
 
 	def on_submit(self):
@@ -251,11 +250,10 @@ class LeaveEncashment(Document):
 		le = frappe.get_doc("Employee Group",frappe.db.get_value("Employee",self.employee,"employee_group")) # Line added by SHIV on 2018/10/15
 		if flt(self.balance_before) <= flt(le.min_encashment_days):
 			msg = "Minimum leave balance {0} required to encash.".format(le.encashment_min)
-			frappe.throw(msg)
-			if self.employment_type =="Deputation" and flt(self.balance_before) < 30:
-			        msg = "Minimum leave balance 30 required to encash."
+			# frappe.throw(msg)
+			if self.employment_type =="Deputation" and flt(self.balance_before) < flt(encashment_min):
+			        msg = "Minimum leave balance {0} required to encash.".format(le.encashment_min)
 			elif self.employment_type !="Deputation":
-
 			        msg = "Minimum leave balance {0} required to encash.".format(le.encashment_min)
 
 		if flt(self.balance_after) < 0:
@@ -350,8 +348,7 @@ class LeaveEncashment(Document):
 			self.balance_before=self.leave_balance+leave_bal_mr_cl.leaves
 		
 		self.balance_after=self.balance_before-encashable_days
-		# if self.balance_before <= flt(encashment_min):
-		if self.balance_before <= 20:
+		if self.balance_before < flt(encashment_min):		
 			frappe.throw(_("Minimum '{}' days is Mandatory for Encashment").format(cint(encashment_min)),title="Leave Balance")
 		
 		# self.encashable_days = encashable_days if encashable_days > 0 else 0
