@@ -11,6 +11,7 @@
   "naming_series",
   "employee",
   "employee_name",
+  "upload_medical_document",
   "column_break_4",
   "leave_type",
   "company",
@@ -267,6 +268,12 @@
    "fieldtype": "Data",
    "label": "Leave Approver Designation",
    "read_only": 1
+  },
+  {
+   "fieldname": "upload_medical_document",
+   "fieldtype": "Attach",
+   "label": "Upload Medical Document",
+   "reqd": 1
   }
  ],
  "icon": "fa fa-calendar",
@@ -274,7 +281,7 @@
  "is_submittable": 1,
  "links": [],
  "max_attachments": 3,
- "modified": "2025-01-22 12:52:32.609512",
+ "modified": "2025-02-11 16:43:32.293945",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Application",
