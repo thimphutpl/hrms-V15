@@ -75,6 +75,7 @@ class TravelAuthorization(Document):
 				"bond_period_to_date": self.bond_period_to_date
 
 			})
+			emp_doc.flags.ignore_permissions = 1
 			emp_doc.save()
 
 	def on_cancel(self):
