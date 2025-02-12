@@ -90,6 +90,7 @@
   {
    "fieldname": "status",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Status",
    "options": "Active\nLeft",
    "reqd": 1
@@ -124,6 +125,7 @@
   {
    "fieldname": "gender",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Gender",
    "options": "\nMale\nFemale"
   },
@@ -187,8 +189,8 @@
   {
    "fieldname": "account_no",
    "fieldtype": "Data",
-   "label": "Account No.",
-   "reqd": 1
+   "in_list_view": 1,
+   "label": "Account No."
   },
   {
    "fieldname": "column_break_qycz",
@@ -304,6 +306,7 @@
    "read_only": 1
   },
   {
+   "columns": 2,
    "fieldname": "employee_type",
    "fieldtype": "Select",
    "in_list_view": 1,
@@ -335,7 +338,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-10 14:34:51.638315",
+ "modified": "2025-02-12 16:24:52.632689",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "DFG AND GFG",
