@@ -74,13 +74,13 @@ class OvertimeApplication(Document):
 	# Allow only the approver to submit the document
 	##
 	def validate_employee_grade(self):		
-		allowed_grades = ['O1', 'O2', 'O3', 'O4', 'O5', 'O6', 'O7']
+		allowed_grades = ['O1', 'O2', 'O3', 'O4', 'O5', 'O6', 'O7', 'GCE-1', 'GCE-2', 'GCE-3', 'GCE-4', 'GCE-5']
 		# Fetch the employee's grade
 		employee = frappe.get_doc('Employee', self.employee)		
 		if not employee.grade:
 			frappe.throw(_("The selected employee does not have a grade assigned."))
 		if employee.grade not in allowed_grades:
-			frappe.throw(_("Overtime Application can only be processed for employees with grades O1 to O8. Your Current grade is: {0}").format(employee.grade))
+			frappe.throw(_("Overtime Application can only be processed for employees with grades O level and GCE level. Your Current grade is: {0}").format(employee.grade))
 
 	def validate_submitter(self):
 		if self.approver != frappe.session.user:			
