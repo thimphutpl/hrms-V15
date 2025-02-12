@@ -16,6 +16,7 @@ from hrms.hr.hr_custom_functions import get_salary_tax
 from erpnext.custom_workflow import notify_workflow_states
 from erpnext.accounts.doctype.hr_accounts_settings.hr_accounts_settings import get_bank_account
 from hrms.hr.doctype.leave_application.leave_application import get_leave_balance_on
+from frappe.query_builder import DocType, Order
 
 class LeaveEncashment(Document):
 	def validate(self):			
@@ -132,8 +133,6 @@ class LeaveEncashment(Document):
 					"cost_center": self.cost_center,
 					"credit_in_account_currency": flt(self.payable_amount,2),
 					"credit": flt(self.payable_amount,2),
-					"party_type": "Employee",
-					"party": self.employee,
 				})
 		jebp.insert()
 		je_references += ", "+jebp.name
@@ -326,7 +325,10 @@ class LeaveEncashment(Document):
 
 		if not frappe.db.get_value("Leave Type", self.leave_type, "allow_encashment"):
 			frappe.throw(_("Leave Type {0} is not encashable").format(self.leave_type))
-		allocation = self.get_leave_allocation()		
+		allocation = self.get_leave_allocation()
+		# frappe.msgprint(f"Allocation: {allocation}")
+		# for al in allocation:
+		# 	 frappe.msgprint(f"Total Leaves Allocated: {al.total_leaves_allocated}")		
 		leave_bal_mr_cl=self.get_laave_bal_mr()		
 		
 		if not allocation:
@@ -359,13 +361,15 @@ class LeaveEncashment(Document):
 		
 		# self.encashable_days = encashable_days if encashable_days > 0 else 0
 		self.encashable_days = encashable_days if encashable_days and encashable_days > 0 else 0
-
+		# frappe.throw(str(self.encashable_days))
 		self.encashment_days = frappe.db.get_value("Employee Group", employee_group, "max_encashment_days")
 		# per_day_encashment = frappe.db.get_value("Salary Structure", salary_structure, "leave_encashment_amount_per_day")
 		
 		# getting encashment amount from salary structure
 		pay = get_basic_and_gross_pay(employee=self.employee, effective_date=today())
+		
 		leave_encashment_type = frappe.db.get_value("Employee Group", employee_group, "leave_encashment_type")
+		# frappe.throw(str(flt(leave_encashment_type)))
 		if leave_encashment_type == "Flat Amount":
 			self.flat_amount	   	= flt(employee_group.leave_encashment_amount)
 			self.encashment_amount 	= flt(employee_group.leave_encashment_amount)
@@ -388,25 +392,40 @@ class LeaveEncashment(Document):
 		self.leave_allocation = allocation.name
 		return True
 
-	def get_leave_allocation(self):		
+	def get_leave_allocation(self):
+		from frappe.query_builder.functions import Sum		
 		date = self.encashment_date or getdate()
 
 		LeaveAllocation = frappe.qb.DocType("Leave Allocation")
 		leave_allocation = (
 			frappe.qb.from_(LeaveAllocation)
+			# .select(
+			# 	LeaveAllocation.name,
+			# 	LeaveAllocation.from_date,
+			# 	LeaveAllocation.to_date,
+			# 	LeaveAllocation.total_leaves_allocated,
+			# 	LeaveAllocation.carry_forwarded_leaves_count,
+			# )
+			# .where(
+			# 	((LeaveAllocation.from_date <= date) & (date <= LeaveAllocation.to_date))
+			# 	& (LeaveAllocation.docstatus == 1)
+			# 	& (LeaveAllocation.leave_type == self.leave_type)
+			# 	& (LeaveAllocation.employee == self.employee)
+			# ).orderby(LeaveAllocation.name, order=Order.desc)
 			.select(
 				LeaveAllocation.name,
 				LeaveAllocation.from_date,
 				LeaveAllocation.to_date,
-				LeaveAllocation.total_leaves_allocated,
+				Sum(LeaveAllocation.total_leaves_allocated).as_("total_leaves_allocated"),
 				LeaveAllocation.carry_forwarded_leaves_count,
-			)
+				)
 			.where(
-				((LeaveAllocation.from_date <= date) & (date <= LeaveAllocation.to_date))
+				(LeaveAllocation.from_date <= date)
+				& (date <= LeaveAllocation.to_date)
 				& (LeaveAllocation.docstatus == 1)
 				& (LeaveAllocation.leave_type == self.leave_type)
 				& (LeaveAllocation.employee == self.employee)
-			)
+				)
 		).run(as_dict=True)
 
 		return leave_allocation[0] if leave_allocation else None
