@@ -67,18 +67,17 @@ class EmployeeSeparationClearance(Document):
 			id.reason_for_resignation = ''
 			id.save()
 
-	def check_signatures(self):	
-		pass	
-		# if self.supervisor_clearance == 0:
-		# 	frappe.throw("Supervisor {} has not granted clearance.".format(self.supervisor))
-		# if self.finance_clearance == 0:
-		# 	frappe.throw("Finance Manager {} has not granted clearance.".format(self.fd))
-		# if self.erp_clearance == 0:
-		# 	frappe.throw("ERP Approver {} has not granted clearance.".format(self.erp))
-		# if self.hra_clearance == 0:
-		# 	frappe.throw("HR Approver {} has not granted clearance.".format(self.hra))
-		# if self.adm_clearance == 0:
-		# 	frappe.throw("Asset Administrator {} has not granted clearance.".format(self.adm))
+	def check_signatures(self):			
+		if self.supervisor_clearance == 0:
+			frappe.throw("Supervisor {} has not granted clearance.".format(self.supervisor))
+		if self.finance_clearance == 0:
+			frappe.throw("Finance Manager {} has not granted clearance.".format(self.fd))
+		if self.erp_clearance == 0:
+			frappe.throw("ERP Approver {} has not granted clearance.".format(self.erp))
+		if self.hra_clearance == 0:
+			frappe.throw("HR Approver {} has not granted clearance.".format(self.hra))
+		if self.adm_clearance == 0:
+			frappe.throw("Asset Administrator {} has not granted clearance.".format(self.adm))
 
 	def update_reference(self):
 		id = frappe.get_doc("Employee Separation",self.employee_separation_id)
@@ -93,9 +92,8 @@ class EmployeeSeparationClearance(Document):
 		duplicates = frappe.db.sql("""
 			select name from `tabEmployee Separation Clearance` where employee = '{0}'  and name != '{1}' and docstatus != 2
 				""".format(self.employee,self.name))
-		if duplicates:
-			pass
-			# frappe.throw("Separation Clearance already created for the Employee '{}'".format(self.employee))
+		if duplicates:			
+			frappe.throw("Separation Clearance already created for the Employee '{}'".format(self.employee))
 	@frappe.whitelist()
 	def check_logged_in_user_role(self):
 		#return values initialization-----------------
@@ -124,8 +122,7 @@ class EmployeeSeparationClearance(Document):
 		return supervisor, fd, erp, hra, adm 
 
 	@frappe.whitelist()	
-	def set_approvers(self):
-		# frappe.throw(self.employee)
+	def set_approvers(self):		
 		#----------------------------Supervisor------------------------------------------------------------------------------------------------------------------------------------------------------------|
 		self.supervisor = frappe.db.get_value("Employee",frappe.db.get_value("Employee",self.employee,"reports_to"),"user_id")
 		#--------------------------- Finance Manager-----------------------------------------------------------------------------------------------------------------------------------------------------|
