@@ -65,33 +65,80 @@ class PayrollEntry(Document):
 
 	# ver.2020.10.20 Begins
 	# following method copied from NRDCL by SHIV on 2020/10/20
+	# def get_emp_list(self, process_type=None):
+	# 	emp_cond = " and 1 = 1"	
+	# 	self.set_month_dates()
+	# 	if self.employment_type == 'GCE':
+	# 		emp_cond = " and employment_type = 'GCE'"
+	# 	if self.employment_type == 'Others':
+	# 		emp_cond = " and employment_type != 'GCE'"
+
+	# 	cond = self.get_filter_condition()
+	# 	cond += self.get_joining_relieving_condition()
+	# 	emp_list = frappe.db.sql("""
+	# 		select t1.name as employee, t1.employee_name, t1.department, t1.designation
+	# 		from `tabEmployee` t1
+	# 		where not exists(select 1
+	# 				from `tabSalary Slip` as t3
+	# 				where t3.employee = t1.name
+	# 				and t3.docstatus != 2
+	# 				and t3.fiscal_year = '{}'
+	# 				and t3.month = '{}')
+	# 		{}
+	# 		and t1.status = '{}'
+	# 		order by t1.branch, t1.name
+	# 	""".format(self.fiscal_year, self.month, cond, self.status), as_dict=True)
+
+	# 	if not emp_list:
+	# 		frappe.msgprint(_("No employees found for processing or Salary Slips already created"))
+	# 	return emp_list	
+
 	def get_emp_list(self, process_type=None):
-		emp_cond = " and 1 = 1"	
-		self.set_month_dates()
+		emp_cond = " and 1 = 1"  # Default condition
+		self.set_month_dates()  # Set fiscal year and month
+
+		# Condition based on employment type
 		if self.employment_type == 'GCE':
 			emp_cond = " and employment_type = 'GCE'"
-		if self.employment_type == 'Others':
+		elif self.employment_type == 'Others':
 			emp_cond = " and employment_type != 'GCE'"
+			# Add condition to check for active salary structure
+			emp_cond += """
+				and exists (
+					select 1
+					from `tabSalary Structure` ss
+					where ss.employee = t1.name
+					and ss.is_active = 'Yes'
+				)
+			"""
 
+		# Additional conditions
 		cond = self.get_filter_condition()
 		cond += self.get_joining_relieving_condition()
+
+		# Main SQL query
 		emp_list = frappe.db.sql("""
 			select t1.name as employee, t1.employee_name, t1.department, t1.designation
 			from `tabEmployee` t1
-			where not exists(select 1
-					from `tabSalary Slip` as t3
-					where t3.employee = t1.name
-					and t3.docstatus != 2
-					and t3.fiscal_year = '{}'
-					and t3.month = '{}')
+			where not exists (
+				select 1
+				from `tabSalary Slip` as t3
+				where t3.employee = t1.name
+				and t3.docstatus != 2
+				and t3.fiscal_year = %s
+				and t3.month = %s
+			)
 			{}
-			and t1.status = '{}'
+			and t1.status = %s
+			{}
 			order by t1.branch, t1.name
-		""".format(self.fiscal_year, self.month, cond, self.status), as_dict=True)
+		""".format(cond, emp_cond), (self.fiscal_year, self.month, self.status), as_dict=True)
 
+		# Handle case when no employees are found
 		if not emp_list:
 			frappe.msgprint(_("No employees found for processing or Salary Slips already created"))
-		return emp_list	
+
+		return emp_list
 
 	@frappe.whitelist()
 	def fill_employee_details(self):
