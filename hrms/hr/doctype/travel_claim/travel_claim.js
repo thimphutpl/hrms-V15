@@ -119,13 +119,28 @@ frappe.ui.form.on("Travel Claim Item", {
     dsa: function (frm, cdt, cdn) {		
         frm.trigger("calculate", cdt, cdn);
     },
+	// dsa_percent: function(frm, cdt, cdn){
+	// 	var item = locals[cdt][cdn];
+	// 	if(frm.doc.place_type == "Out-Country"){
+	// 		frappe.model.set_value(cdt, cdn, "amount", flt(flt(item.dsa)*flt(item.no_days)*flt(item.dsa_percent)*0.01,2));
+	// 		frm.refresh_fields();
+	// 	}
+	// },
+
 	dsa_percent: function(frm, cdt, cdn){
 		var item = locals[cdt][cdn];
-		if(frm.doc.place_type == "Out-Country"){
-			frappe.model.set_value(cdt, cdn, "amount", flt(flt(item.dsa)*flt(item.no_days)*flt(item.dsa_percent)*0.01,2));
+		
+		// Correct condition to check for either "Out-Country" or "In-Country"
+		if(frm.doc.place_type == "Out-Country" || frm.doc.place_type == "In-Country"){
+			frappe.model.set_value(cdt, cdn, "amount", 
+				flt(flt(item.dsa) * flt(item.no_days) * flt(item.dsa_percent) * 0.01, 2)
+			);
 			frm.refresh_fields();
 		}
 	},
+	
+	
+
     amount: function (frm, cdt, cdn) {
         frm.trigger("calculate", cdt, cdn);
     },
