@@ -172,8 +172,7 @@
    "fieldname": "bank",
    "fieldtype": "Link",
    "label": "Bank",
-   "options": "Financial Institution",
-   "reqd": 1
+   "options": "Financial Institution"
   },
   {
    "fieldname": "column_break_xawc",
@@ -338,7 +337,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-12 16:24:52.632689",
+ "modified": "2025-02-13 11:49:50.446052",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "DFG AND GFG",
