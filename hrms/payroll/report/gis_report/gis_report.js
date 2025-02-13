@@ -25,6 +25,12 @@ frappe.query_reports["GIS Report"] = {
 			"options": "Employee",
 		},
 		{
+			"fieldname": "employee_type",
+			"label": __("Employment Type"),
+			"fieldtype": "Link",
+			"options": "Employment Type"
+		},
+		{
 			"fieldname": "cost_center",
 			"label": __("Cost Center"),
 			"fieldtype": "Link",

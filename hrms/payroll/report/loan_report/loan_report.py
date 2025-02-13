@@ -72,6 +72,7 @@ def get_conditions(filters):
 	if filters.get("fiscal_year"): conditions += " and t1.fiscal_year = {}".format(filters.get("fiscal_year"))
 	if filters.get("company"): conditions += " and t1.company = '{}'".format(filters.get("company"))
 	if filters.get("employee"): conditions += " and t1.employee = '{}'".format(filters.get("employee"))
+	if filters.get("employee_type"): conditions += " and t1.employment_type = '{}'".format(filters.get("employee_type"))
 	if filters.get("bank"): conditions += "and t2.institution_name = '{0}'".format(filters.bank)
 	if filters.get("cost_center"): conditions += " and exists(select 1 from `tabCost Center` cc where t1.cost_center = cc.name and (cc.parent_cost_center = '{0}' or cc.name = '{0}'))".format(filters.cost_center)
 

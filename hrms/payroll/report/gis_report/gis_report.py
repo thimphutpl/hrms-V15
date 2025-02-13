@@ -73,5 +73,7 @@ def get_conditions(filters):
 	if filters.get("company"): conditions += " and t1.company = %(company)s"
 	if filters.get("employee"): 
 		conditions += " and t1.employee = %(employee)s "
+	if filters.get("employee_type"): 
+		conditions += " and t1.employment_type = %(employee_type)s "
 	if filters.get("cost_center"): conditions += " and exists(select 1 from `tabCost Center` cc where t1.cost_center = cc.name and (cc.parent_cost_center = '{0}' or cc.name = '{0}'))".format(filters.cost_center)
 	return conditions, filters
