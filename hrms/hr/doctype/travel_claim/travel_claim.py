@@ -83,111 +83,107 @@ class TravelClaim(Document):
 		if len(self.get("items")) > 1:
 			self.items[-1].is_last_day = 1
 
-	# def update_amounts(self):
-	# 	# frappe.throw('hi')
-	# 	lastday_dsa_percent = flt(frappe.db.get_single_value("HR Settings", "return_day_dsa")) 
+	
+	# def update_amounts(self):		
 	# 	total_claim_amount = 0
+	# 	extra_claim_amount = 0
 	# 	company_currency = frappe.db.get_value("Company", self.company, "default_currency")
-	# 	# count=1
-	# 	row_count = len(self.get("items"))
-	# 	# frappe.throw(str(row_count))
+	# 	row_count = len(self.get("items"))  # Total number of rows in the table
 	# 	for item in self.get("items"):
-	# 		#count=1
-	# 		# exchange_rate = 1 if self.currency == company_currency else get_exchange_rate(self.currency, company_currency)
 	# 		item.dsa = flt(item.dsa)
 	# 		if item.is_last_day:
-	# 			item.dsa_percent = flt(lastday_dsa_percent)
-			
+	# 			if self.place_type == 'Out-Country':					
+	# 				item.dsa_percent = flt(item.dsa_percent)					 
+	# 			elif self.place_type == 'In-Country':					
+	# 				lastday_dsa_percent = flt(frappe.db.get_single_value("HR Settings", "return_day_dsa")) 
+	# 				item.dsa_percent = flt(lastday_dsa_percent)					 
+
 	# 		if self.mode_of_travel == "Personal Car":
-	# 			item.amount = (flt(item.no_days) * (flt(item.dsa) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
-	# 			item.mileage_amount = (flt(item.mileage_rate) * (flt(item.distance)))
-	# 		# if item.is_last_day and self.place_type == 'Out-Country':				
-	# 		# 	item.amount = flt(item.no_days) * (flt(item.dsa))				
-	# 		# 	#  * flt(item.dsa_percent) / 100)
-	# 		# 	item.base_amount = flt(item.amount)				
-	# 		# 	# total_claim_amount += flt(item.base_amount)
-	# 		# 	# frappe.throw(str(count))
-
-	# 		if item.is_last_day and self.place_type == "Out-Country":
-	# 			item.amount = flt(item.no_days) * flt(item.dsa)        
-	# 			# Check if it's the last row
-	# 			if item.idx == row_count:
-	# 				# Assign base_amount = amount without exchange rate multiplication
-	# 				item.base_amount = flt(item.amount)
+	# 			item.amount = (
+	# 				flt(item.no_days) * 
+	# 				(flt(item.dsa) * flt(item.dsa_percent) / 100) +
+	# 				flt(item.mileage_rate) * flt(item.distance)
+	# 			)
+	# 			item.mileage_amount = flt(item.mileage_rate) * flt(item.distance)
+								
+	# 			# Out-Country logic for last day - Custom DSA percent calculations
+	# 		if self.place_type == "Out-Country":				
+	# 			if item.dsa_percent:
+	# 				item.amount = flt(item.no_days) * flt(item.dsa) * flt(item.dsa_percent) * 0.01
 	# 			else:
-	# 				# Multiply with exchange rate for other rows
+	# 				# Default to 100% of DSA if no valid percent is provided
+	# 				item.amount = flt(item.no_days) * flt(item.dsa)
+	# 			# Calculate the base amount, applying exchange rate if not the last row
+	# 			if item.idx == row_count:
+	# 				item.base_amount = flt(item.amount)  # Don't multiply by exchange rate for last row
+	# 			else:
 	# 				item.base_amount = flt(item.amount) * flt(self.exchange_rate)
-	# 			break
-
 	# 		else:
-	# 			# frappe.throw('hi')
-	# 			item.amount = flt(item.no_days) * (flt(item.dsa))
-	# 			#  * flt(item.dsa_percent) / 100)
-	# 		item.base_amount = flt(item.amount) * flt(self.exchange_rate)
+	# 			if self.place_type == "In-Country":
+	# 				# frappe.throw('hi')
+	# 				item.amount = flt(item.no_days) * flt(item.dsa) * flt(item.dsa_percent) * 0.01
+	# 			# Standard calculation for other rows
+	# 			item.amount = flt(item.no_days) * flt(item.dsa)
+	# 			item.base_amount = flt(item.amount) * flt(self.exchange_rate) + flt(item.mileage_amount)
+	# 			# frappe.throw(str(item.base_amount))
+
+	# 		# Add to total claim amount
 	# 		total_claim_amount += flt(item.base_amount)
-	# 		# count +=1
-	# 		# if item.idx == row_count:
-	# 		# 	frappe.msgprint(f"This is the last row: {item.idx}")
 
-
+	# 	# Assign calculated values to the document fields
 	# 	self.total_claim_amount = flt(total_claim_amount)
-	# 	self.balance_amount = (flt(self.total_claim_amount) + flt(self.extra_claim_amount) - flt(self.advance_amount))
-		
+	# 	self.balance_amount = (
+	# 		flt(self.total_claim_amount) +
+	# 		flt(self.extra_claim_amount) -
+	# 		flt(self.advance_amount)
+	# 	)
+
+	# 	# Check for negative balance amount
 	# 	if flt(self.balance_amount) < 0:
 	# 		frappe.throw(_("Balance Amount cannot be a negative value."), title="Invalid Amount")
 
 
-	def update_amounts(self):		
+	def update_amounts(self):        
 		total_claim_amount = 0
+		extra_claim_amount = 0
 		company_currency = frappe.db.get_value("Company", self.company, "default_currency")
 		row_count = len(self.get("items"))  # Total number of rows in the table
+
 		for item in self.get("items"):
 			item.dsa = flt(item.dsa)
 			if item.is_last_day:
-				if self.place_type == 'Out-Country':					
-					item.dsa_percent = flt(item.dsa_percent)					 
-				elif self.place_type == 'In-Country':					
-					lastday_dsa_percent = flt(frappe.db.get_single_value("HR Settings", "return_day_dsa")) 
-					item.dsa_percent = flt(lastday_dsa_percent)					 
+				if self.place_type == "Out-Country":                    
+					item.dsa_percent = flt(item.dsa_percent)                     
+				elif self.place_type == "In-Country":                    
+					item.dsa_percent = flt(frappe.db.get_single_value("HR Settings", "return_day_dsa"))                     
+
+			item.mileage_amount = flt(item.mileage_rate) * flt(item.distance) if self.mode_of_travel == "Personal Car" else 0
 
 			if self.mode_of_travel == "Personal Car":
 				item.amount = (
-					flt(item.no_days) * 
-					(flt(item.dsa) * flt(item.dsa_percent) / 100) +
-					flt(item.mileage_rate) * flt(item.distance)
+					flt(item.no_days) * (flt(item.dsa) * flt(item.dsa_percent) / 100) +
+					item.mileage_amount
 				)
-				item.mileage_amount = flt(item.mileage_rate) * flt(item.distance)
-								
-				# Out-Country logic for last day - Custom DSA percent calculations
-			if self.place_type == "Out-Country":				
-				if item.dsa_percent:
-					item.amount = flt(item.no_days) * flt(item.dsa) * flt(item.dsa_percent) * 0.01
-				else:
-					# Default to 100% of DSA if no valid percent is provided
-					item.amount = flt(item.no_days) * flt(item.dsa)
-				# Calculate the base amount, applying exchange rate if not the last row
-				if item.idx == row_count:
-					item.base_amount = flt(item.amount)  # Don't multiply by exchange rate for last row
-				else:
-					item.base_amount = flt(item.amount) * flt(self.exchange_rate)
-			else:
-				# Standard calculation for other rows
-				item.amount = flt(item.no_days) * flt(item.dsa)
-				item.base_amount = flt(item.amount) * flt(self.exchange_rate) + flt(item.mileage_amount)
-				# frappe.throw(str(item.base_amount))
+			
+			elif self.place_type == "Out-Country":
+				item.amount = (
+					flt(item.no_days) * flt(item.dsa) * (flt(item.dsa_percent) / 100)
+					if item.dsa_percent
+					else flt(item.no_days) * flt(item.dsa)
+				)
+				item.base_amount = flt(item.amount) if item.idx == row_count else flt(item.amount) * flt(self.exchange_rate)
 
-			# Add to total claim amount
+			elif self.place_type == "In-Country":
+				item.amount = flt(item.no_days) * flt(item.dsa) * (flt(item.dsa_percent) / 100)
+
+			item.base_amount = flt(item.amount) * flt(self.exchange_rate) + item.mileage_amount
 			total_claim_amount += flt(item.base_amount)
 
-		# Assign calculated values to the document fields
 		self.total_claim_amount = flt(total_claim_amount)
 		self.balance_amount = (
-			flt(self.total_claim_amount) +
-			flt(self.extra_claim_amount) -
-			flt(self.advance_amount)
+			flt(self.total_claim_amount) + flt(self.extra_claim_amount) - flt(self.advance_amount)
 		)
 
-		# Check for negative balance amount
 		if flt(self.balance_amount) < 0:
 			frappe.throw(_("Balance Amount cannot be a negative value."), title="Invalid Amount")
 
