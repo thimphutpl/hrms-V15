@@ -7,9 +7,11 @@
  "engine": "InnoDB",
  "field_order": [
   "rb_type",
+  "share",
+  "relationship",
+  "column_break_hmyd",
   "nomine_name",
-  "cid",
-  "share"
+  "cid"
  ],
  "fields": [
   {
@@ -36,12 +38,21 @@
    "fieldtype": "Int",
    "in_list_view": 1,
    "label": "Share (%)"
+  },
+  {
+   "fieldname": "relationship",
+   "fieldtype": "Data",
+   "label": "Relationship"
+  },
+  {
+   "fieldname": "column_break_hmyd",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-02-13 11:11:47.007911",
+ "modified": "2025-02-13 11:47:33.197393",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Retirement Benefits Nominees",
