@@ -17,7 +17,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Benefits Type",
-   "options": "\nGratuity\nGPF\nGPA\nPension\nGroup Insurance"
+   "options": "\nSWS\nGratuity\nGPF\nGPA\nPension\nGroup Insurance"
   },
   {
    "fieldname": "nomine_name",
@@ -41,7 +41,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-01-19 15:37:33.923579",
+ "modified": "2025-02-13 11:11:47.007911",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Retirement Benefits Nominees",
