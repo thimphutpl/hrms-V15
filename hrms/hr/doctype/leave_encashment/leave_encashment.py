@@ -118,9 +118,11 @@ class LeaveEncashment(Document):
 	def check_journal_entry(self):
 		if self.journal_entry:
 			status_je = frappe.db.get_value("Journal Entry", self.journal_entry, "docstatus")		
-			if status_je !=2:
-				frappe.throw("Please cancel/Delete Journal Entry {} first".format(self.journal_entry))
-
+			# if status_je !=2:
+			# 	frappe.throw("Please cancel/Delete Journal Entry {} first".format(self.journal_entry))
+			# else:
+			# 	frappe.db.sql("""Delete from `tabGL Entry` where voucher_no='{} '""".format(self.name))
+			# 	self.db_set("journal_entry","")
 	def post_expense_claim(self):
 		cost_center = frappe.get_value("Employee", self.employee, "cost_center")
 		branch = frappe.get_value("Employee", self.employee, "branch")
@@ -296,6 +298,13 @@ class LeaveEncashment(Document):
 		leave_bal_mr_cl=self.get_laave_bal_mr()		
 		
 		if not allocation:
+			frappe.throw(
+				_("No Leaves Allocated to Employee: {0} for Leave Type: {1}").format(
+					self.employee, self.leave_type
+				)
+			)
+
+		if not leave_bal_mr_cl:
 			frappe.throw(
 				_("No Leaves Allocated to Employee: {0} for Leave Type: {1}").format(
 					self.employee, self.leave_type
