@@ -48,7 +48,7 @@ class LeaveEncashment(Document):
 			frappe.throw("Setup Leave Encashment Account in Company")
 
 		tax_account = frappe.db.get_single_value("HR Accounts Settings", "salary_tax_account")
-		expense_bank_account = get_bank_account(self.branch)
+		expense_bank_account = frappe.db.get_value('Branch', self.branch, 'expense_bank_account')
 		if not expense_bank_account:
 			frappe.throw("Setup Default Expense Bank Account for your Branch")
 		if not tax_account:
@@ -304,12 +304,12 @@ class LeaveEncashment(Document):
 				)
 			)
 
-		if not leave_bal_mr_cl:
-			frappe.throw(
-				_("No Leaves Allocated to Employee: {0} for Leave Type: {1}").format(
-					self.employee, self.leave_type
-				)
-			)
+		# if not leave_bal_mr_cl:
+		# 	frappe.throw(
+		# 		_("No Leaves Allocated to Employee: {0} for Leave Type: {1}").format(
+		# 			self.employee, self.leave_type
+		# 		)
+		# 	)
 		
 		self.leave_balance = (
 			allocation.total_leaves_allocated
