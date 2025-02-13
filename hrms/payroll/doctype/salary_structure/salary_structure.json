@@ -314,7 +314,6 @@
    "oldfieldtype": "Date"
   },
   {
-   "depends_on": "eval:doc.employee && doc.is_active == \"No\"",
    "fieldname": "to_date",
    "fieldtype": "Date",
    "in_list_view": 1,
@@ -1362,7 +1361,7 @@
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2025-02-07 15:04:48.767327",
+ "modified": "2025-02-13 18:18:25.864278",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
