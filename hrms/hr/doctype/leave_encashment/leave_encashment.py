@@ -85,7 +85,7 @@ class LeaveEncashment(Document):
 					"reference_name": self.name,
 					"cost_center": self.cost_center,
 			})
-		payable_account= frappe.db.get_single_value("HR Accounts Settings", "salary_payable_account")
+		payable_account= frappe.db.get_single_value("HR Accounts Settings", "leave_encashment_account")
 		# payable_account = frappe.db.get_value("Company",self.company, "default_expense_claim_payable_account") #Added by Thukten
 		if flt(self.payable_amount) > 0:
 			je.append("accounts", {
@@ -123,7 +123,7 @@ class LeaveEncashment(Document):
 				"party_type": "Employee",
 				"party": self.employee,
 		})
-		payable_account= frappe.db.get_single_value("HR Accounts Settings", "salary_payable_account")
+		payable_account= frappe.db.get_single_value("HR Accounts Settings", "leave_encashment_account")
 		# payable_account = frappe.db.get_value("Company",self.company, "default_expense_claim_payable_account") #Added by Thukten
 		if flt(self.payable_amount) > 0:
 			jebp.append("accounts", {
