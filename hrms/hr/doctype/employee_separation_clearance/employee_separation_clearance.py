@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe import _
 from frappe.model.document import Document
+from erpnext.custom_workflow import notify_workflow_states
 from frappe.model.naming import make_autoname
 class EmployeeSeparationClearance(Document):
 	def validate(self):
@@ -25,6 +26,7 @@ class EmployeeSeparationClearance(Document):
 		self.check_duplicates()
 		self.update_reference()
 		# self.notify_employee()
+		notify_workflow_states(self)
 		self.update_seperation_clearence_reference()
 		self.update_update_employee()
 
@@ -32,6 +34,7 @@ class EmployeeSeparationClearance(Document):
 		self.check_employee_benefit()
 		self.update_reference()
 		# self.notify_employee()
+		notify_workflow_states(self)
 		self.update_seperation_clearence_reference()
 		self.update_update_employee(cancel=True)
   
