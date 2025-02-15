@@ -83,7 +83,7 @@ class OvertimeApplication(Document):
 			frappe.throw(_("Overtime Application can only be processed for employees with grades O level and GCE level. Your Current grade is: {0}").format(employee.grade))
 
 	def validate_submitter(self):
-		if self.approver != frappe.session.user:			
+		if self.ot_approver != frappe.session.user:			
 			frappe.throw("Only the selected Approver can submit this document")
 	
 	def post_journal_entry(self):	
