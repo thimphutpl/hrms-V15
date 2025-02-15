@@ -415,6 +415,15 @@ def get_permission_query_conditions(user):
 				where `tabEmployee`.branch = `tabTravel Authorization`.branch
 				and `tabEmployee`.user_id = '{user}')
 		)""".format(user=user)
+
+	if "Accounts User" in user_roles or "GM" in user_roles:
+		return """(
+			exists(select 1
+			from `tabAssign Branch`, `tabBranch Item`
+			where `tabAssign Branch`.name = `tabBranch Item`.parent 
+			and `tabBranch Item`.branch = `tabTravel Authorization`.branch
+			and `tabAssign Branch`.user = '{user}')
+		)""".format(user=user)
 	
 	return """(
 		`tabTravel Authorization`.owner = '{user}'
