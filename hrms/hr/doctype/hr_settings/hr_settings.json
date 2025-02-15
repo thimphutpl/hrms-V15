@@ -88,6 +88,10 @@
   "employee_separation_approval_notification_template",
   "column_break_62",
   "employee_separation_status_notification_template",
+  "employee_separation_clearance_settings_section",
+  "employee_separation_clearance_approval_notification_template",
+  "column_break_hxlf",
+  "employee_separation_clearance_status_notification_template",
   "sb_overtime",
   "overtime_approval_notification_template",
   "cb_ns_01",
@@ -1176,13 +1180,34 @@
   {
    "fieldname": "column_break_cdhl",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "employee_separation_clearance_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Employee Separation Clearance Settings"
+  },
+  {
+   "fieldname": "employee_separation_clearance_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Employee Separation Clearance Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "column_break_hxlf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "employee_separation_clearance_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Employee Separation Clearance Status Notification Template",
+   "options": "Email Template"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-02-02 12:09:44.269281",
+ "modified": "2025-02-16 01:12:14.758653",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",
