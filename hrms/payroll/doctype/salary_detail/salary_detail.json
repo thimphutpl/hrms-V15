@@ -95,7 +95,7 @@
    "fieldname": "institution_name",
    "fieldtype": "Link",
    "label": " Financial Institution",
-   "options": "Bank"
+   "options": "Financial Institution"
   },
   {
    "fieldname": "reference_type",
@@ -248,7 +248,7 @@
  ],
  "istable": 1,
  "links": [],
- "modified": "2025-02-16 21:20:35.650010",
+ "modified": "2025-02-18 15:06:42.430033",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Detail",
