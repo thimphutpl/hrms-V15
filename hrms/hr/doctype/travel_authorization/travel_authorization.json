@@ -147,7 +147,7 @@
    "fieldname": "mode_of_travel",
    "fieldtype": "Select",
    "label": "Mode of Travel",
-   "options": "\nOffice Car\nPersonal Car\nFlight",
+   "options": "\nOffice Car\nPersonal Car\nPublic Transport\nFlight",
    "reqd": 1
   },
   {
@@ -420,7 +420,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-02-05 12:26:03.579392",
+ "modified": "2025-02-19 00:08:38.963844",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",
