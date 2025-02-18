@@ -153,7 +153,7 @@ class TravelClaim(Document):
 					else flt(item.no_days) * flt(item.dsa)
 				)
 
-				# Apply the special logic for last row
+				# Set base_amount correctly for Out-Country last row
 				if item.idx == row_count:
 					item.base_amount = flt(item.amount)
 				else:
@@ -162,8 +162,10 @@ class TravelClaim(Document):
 			elif self.place_type == "In-Country":
 				item.amount = flt(item.no_days) * flt(item.dsa) * (flt(item.dsa_percent) / 100)
 
-			# else:
-			item.base_amount = flt(item.amount) * flt(self.exchange_rate) + item.mileage_amount
+			# Ensure that base_amount is NOT overwritten for Out-Country last row
+			if not (self.place_type == "Out-Country" and item.idx == row_count):
+				item.base_amount = flt(item.amount) * flt(self.exchange_rate) + item.mileage_amount
+
 			total_claim_amount += flt(item.base_amount)
 
 		self.total_claim_amount = flt(total_claim_amount)
