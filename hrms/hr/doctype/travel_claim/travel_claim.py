@@ -83,99 +83,41 @@ class TravelClaim(Document):
 		if len(self.get("items")) > 1:
 			self.items[-1].is_last_day = 1
 		
-	# def update_amounts(self):
-	# 	total_claim_amount = 0
-	# 	extra_claim_amount = 0
-	# 	company_currency = frappe.db.get_value("Company", self.company, "default_currency")
-	# 	row_count = len(self.get("items"))  # Total number of rows in the table
-	# 	for item in self.get("items"):
-	# 		item.dsa = flt(item.dsa)
-	# 		item.mileage_amount = (
-	# 			flt(item.mileage_rate) * flt(item.distance)
-	# 			if self.mode_of_travel == "Personal Car"
-	# 			else 0
-	# 		)
-
-	# 		if self.mode_of_travel == "Personal Car":
-	# 			item.amount = (
-	# 				flt(item.no_days) * (flt(item.dsa) * flt(item.dsa_percent) / 100)
-	# 			)
-			
-	# 		elif self.place_type == "Out-Country":
-	# 			item.amount = (
-	# 				flt(item.no_days) * flt(item.dsa) * (flt(item.dsa_percent) / 100)
-	# 				if item.dsa_percent
-	# 				else flt(item.no_days) * flt(item.dsa)
-	# 			)
-	# 			item.base_amount = (
-	# 				flt(item.amount)
-	# 				if item.idx == row_count
-	# 				else flt(item.amount) * flt(self.exchange_rate)
-	# 			)
-
-	# 		elif self.place_type == "In-Country":
-	# 			item.amount = flt(item.no_days) * flt(item.dsa) * (flt(item.dsa_percent) / 100)
-
-	# 		item.base_amount = flt(item.amount) * flt(self.exchange_rate) + item.mileage_amount
-	# 		total_claim_amount += flt(item.base_amount)
-
-	# 	self.total_claim_amount = flt(total_claim_amount)
-	# 	self.balance_amount = (
-	# 		flt(self.total_claim_amount) + flt(self.extra_claim_amount) - flt(self.advance_amount)
-	# 	)
-
-	# 	if flt(self.balance_amount) < 0:
-	# 		frappe.throw(_("Balance Amount cannot be a negative value."), title="Invalid Amount")
-
+		
 	def update_amounts(self):
 		total_claim_amount = 0
-		extra_claim_amount = 0
+		return_day_dsa = flt(frappe.db.get_single_value("HR Settings", "return_day_dsa"))
 		company_currency = frappe.db.get_value("Company", self.company, "default_currency")
-		row_count = len(self.get("items"))  # Total number of rows in the table
-
-		for item in self.get("items"):
+		row_count = len(self.get("items"))
+		for idx, item in enumerate(self.get("items"), start=1):
 			item.dsa = flt(item.dsa)
-			item.mileage_amount = (
-				flt(item.mileage_rate) * flt(item.distance)
-				if self.mode_of_travel == "Personal Car"
-				else 0
-			)
+			is_last_row = idx == row_count  # Check if it's the last row
+			item.mileage_amount = flt(item.mileage_rate) * flt(item.distance) if self.mode_of_travel == "Personal Car" else 0
 
+			# Default amount calculation
 			if self.mode_of_travel == "Personal Car":
-				item.amount = (
-					flt(item.no_days) * (flt(item.dsa) * flt(item.dsa_percent) / 100)
-				)
+				item.amount = flt(item.no_days) * item.dsa * (flt(item.dsa_percent) / 100)
 
-			elif self.place_type == "Out-Country":
+			elif self.place_type in ["Out-Country", "In-Country"]:
 				item.amount = (
-					flt(item.no_days) * flt(item.dsa) * (flt(item.dsa_percent) / 100)
+					flt(item.no_days) * item.dsa * (flt(item.dsa_percent) / 100)
 					if item.dsa_percent
-					else flt(item.no_days) * flt(item.dsa)
-				)
-
-				# Set base_amount correctly for Out-Country last row
-				if item.idx == row_count:
-					item.base_amount = flt(item.amount)
-				else:
-					item.base_amount = flt(item.amount) * flt(self.exchange_rate)
-
-			elif self.place_type == "In-Country":
-				item.amount = flt(item.no_days) * flt(item.dsa) * (flt(item.dsa_percent) / 100)
-
-			# Ensure that base_amount is NOT overwritten for Out-Country last row
-			if not (self.place_type == "Out-Country" and item.idx == row_count):
+					else flt(item.no_days) * item.dsa
+				)						
+			if is_last_row:
+				item.amount = flt(item.dsa) * (flt(return_day_dsa) / 100)  # Correctly apply the percentage				
+				item.base_amount = flt(item.amount) + item.mileage_amount  # No exchange rate applied
+			else:
+				# Multiply by exchange rate for all other rows
 				item.base_amount = flt(item.amount) * flt(self.exchange_rate) + item.mileage_amount
-
 			total_claim_amount += flt(item.base_amount)
-
 		self.total_claim_amount = flt(total_claim_amount)
 		self.balance_amount = (
 			flt(self.total_claim_amount) + flt(self.extra_claim_amount) - flt(self.advance_amount)
 		)
 
-		if flt(self.balance_amount) < 0:
+		if self.balance_amount < 0:
 			frappe.throw(_("Balance Amount cannot be a negative value."), title="Invalid Amount")
-
 
 	def check_double_date_inside(self):
 		for i in self.get('items'):

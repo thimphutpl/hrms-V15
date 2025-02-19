@@ -320,7 +320,8 @@ def make_travel_claim(source_name, target_doc=None):
 		dsa_percent = frappe.db.get_single_value("HR Settings", "return_day_dsa")
 		for d in target.items:
 			if d.is_last_day == 1:
-				d.dsa = flt(d.dsa) * flt(dsa_percent)/100
+				d.dsa = flt(d.dsa)
+				# * flt(dsa_percent)/100
 				
 	doc = get_mapped_doc("Travel Authorization", source_name, {
 			"Travel Authorization": {
