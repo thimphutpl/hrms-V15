@@ -99,7 +99,6 @@
    "in_list_view": 1,
    "label": " DSA (Company Currency)",
    "options": "currency",
-   "read_only_depends_on": "eval:doc.place_type != 'In-Country'",
    "reqd": 1
   },
   {
@@ -234,7 +233,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-02-19 15:34:03.568561",
+ "modified": "2025-02-19 17:09:12.175008",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim Item",
