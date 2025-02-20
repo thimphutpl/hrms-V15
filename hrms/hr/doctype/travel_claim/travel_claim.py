@@ -37,6 +37,8 @@ class TravelClaim(Document):
 			je_doc = frappe.get_doc("Journal Entry", a)
 			if je_doc.docstatus == 1:
 				je_doc.cancel()
+			elif je_doc.docstatus == 0:
+				je_doc.delete_doc(ignore_permissions=True)
 		frappe.db.sql("update `tabGL Entry` set voucher_no = NULL where voucher_no = '{}'".format(self.name))
 		frappe.db.sql("update `tabGL Entry` set against_voucher = NULL where against_voucher = '{}'".format(self.name))
 		frappe.db.sql("update `tabPayment Ledger Entry` set voucher_no = NULL where voucher_no = '{}'".format(self.name))
