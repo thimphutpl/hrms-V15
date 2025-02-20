@@ -136,142 +136,97 @@ class EmployeeBenefits(Document):
 		allocation.from_date = date
 		allocation.unused_leaves = 0
 		allocation.create_leave_ledger_entry()
-
+	
 	def post_journal(self):
 		emp = frappe.get_doc("Employee", self.employee)
-
 		je = frappe.new_doc("Journal Entry")
-		je.flags.ignore_permissions=1
+		je.flags.ignore_permissions = 1
 		je.branch = emp.branch
 		je.posting_date = self.posting_date
-		je.title = str(self.purpose) + " Employee Benefits Payable (" + str(self.employee_name) + ")"
-		je.voucher_type = "Journal Entry"
+		je.title = f"{self.purpose} Employee Benefits Payment ({self.employee_name})"
+		je.voucher_type = "Bank Entry"		
 		je.naming_series = "Journal Voucher"
-		je.remark = str(self.purpose) + 'Benefit payments for ' + str(self.employee_name) + "("+str(self.employee)+")"
-
+		je.remark = f"Benefit payment for {self.employee_name} ({self.employee})"		
+		# Get Accounts
 		expense_bank_account = get_bank_account(self.branch)
-		# tax_account = frappe.db.get_value("Company", self.company, "salary_tax_account")
 		tax_account = frappe.db.get_single_value("HR Accounts Settings", "salary_tax_account")
-		# frappe.throw(str(tax_account))
+		payable_account = frappe.db.get_value("Company", self.company, "default_payroll_payable_account")
+		total_amount = 0
 
-		
-		total_amount = tax_amount = 0
-		# Benefits
+		# Process Benefits
 		for a in self.items:
 			if not flt(a.amount):
 				continue
-
 			account_type = frappe.db.get_value("Account", a.gl_account, "account_type")
 			party_type, party = None, None
 			if account_type in ('Payable', 'Receivable'):
 				party_type = "Employee"
 				party = self.employee
 
-			if a.benefit_type != "Gratuity":
-				total_amount = flt(total_amount,2) + flt(a.payable_amount,2)
+			total_amount += flt(a.payable_amount, 2)
+			# Debit Employee Benefit Expenses
+			je.append("accounts", {
+				"account": a.gl_account,
+				"reference_type": "Employee Benefits",
+				"reference_name": self.name,
+				"cost_center": emp.cost_center,
+				"debit_in_account_currency": flt(a.amount),
+				"debit": flt(a.amount),
+				"party_type": party_type,
+				"party": party,
+				"party_type": "Employee",
+				"party": self.employee,
+			})
+
+			# Tax Deduction
+			if flt(a.tax_amount) > 0:
+				if not tax_account:
+					frappe.throw("Setup Tax Account in HR Accounts Setting")
+
 				je.append("accounts", {
-					"account": a.gl_account,
+					"account": tax_account,
+					"credit_in_account_currency": flt(a.tax_amount, 2),
+					"credit": flt(a.tax_amount, 2),
 					"reference_type": "Employee Benefits",
 					"reference_name": self.name,
 					"cost_center": emp.cost_center,
-					"debit_in_account_currency": flt(a.amount),
-					"debit": flt(a.amount),
-					"party_type": party_type,
-					"party": party,
-					# "business_activity": emp.business_activity,
 				})
 
-				if flt(a.tax_amount > 0):
-					if not tax_account:
-						frappe.throw("Setup Tax Account in HR Accounts Setting")
-
-					je.append("accounts", {
-						"account": tax_account,
-						"credit_in_account_currency": flt(a.tax_amount,2),
-						"credit": flt(a.tax_amount,2),
-						"reference_type": "Employee Benefits",
-						"reference_name": self.name,
-						"cost_center": emp.cost_center,
-						# "business_activity": emp.business_activity,
-					})
-					tax_amount += flt(a.tax_amount)
-
-		# Deductions
+		# Process Deductions
 		for b in self.deduction_details:
 			if not flt(b.amount):
 				continue
-
 			account_type = frappe.db.get_value("Account", b.deduction_account, "account_type")
 			party_type, party = None, None
 			if account_type in ('Payable', 'Receivable'):
 				party_type = "Employee"
 				party = self.employee
+			total_amount -= flt(b.amount, 2)
 
-			total_amount = flt(total_amount) - flt(b.amount,2)
 			je.append("accounts", {
 				"account": b.deduction_account,
-				"credit_in_account_currency": flt(b.amount,2),
-				"credit": flt(b.amount,2),
+				"credit_in_account_currency": flt(b.amount, 2),
+				"credit": flt(b.amount, 2),
 				"party_type": party_type,
 				"party": party,
 				"cost_center": emp.cost_center,
-				# "business_activity": emp.business_activity,
 				"reference_type": "Employee Benefits",
 				"reference_name": self.name,
 			})
 
-		# Credit Account
-		payable_account = frappe.db.get_value("Company", self.company, "default_payroll_payable_account")
-
+		# Credit Bank Account (Final Payment)
 		if flt(total_amount):
 			je.append("accounts", {
-				"account": payable_account,
-				"cost_center": emp.cost_center,
-				"credit_in_account_currency": flt(total_amount),
-				"credit": flt(total_amount),
-				# "business_activity": emp.business_activity,
-				"party_type": "Employee",
-				"party": self.employee,
-			})
-		je.insert()
-		je.submit()
-		je_references = str(je.name)
-
-		if flt(total_amount):
-			jeb = frappe.new_doc("Journal Entry")
-			jeb.flags.ignore_permissions = 1
-			jeb.title = self.purpose+" Employee Benefits Payment(" + self.employee_name + "  " + self.name + ")"
-			jeb.voucher_type = "Bank Entry"
-			jeb.naming_series = "Bank Payment Voucher"
-			jeb.remark = 'Benefit payment against : ' + self.name
-			jeb.posting_date = self.posting_date
-			jeb.branch = emp.branch
-			jeb.append("accounts", {
-				"account": payable_account,
-				"reference_type": "Journal Entry",
-				"reference_name": je.name,
-				"cost_center": emp.cost_center,
-				"debit_in_account_currency": flt(total_amount),
-				"debit": flt(total_amount),
-				# "business_activity": emp.business_activity,
-				"party_type": "Employee",
-				"party": self.employee,
-			})
-
-			jeb.append("accounts", {
 				"account": expense_bank_account,
 				"cost_center": emp.cost_center,
-				"reference_type": "Employee Benefits",
-				"reference_name": self.name,
 				"credit_in_account_currency": flt(total_amount),
 				"credit": flt(total_amount),
-				# "business_activity": emp.business_activity,
-			})
-			jeb.insert()
-
-			je_references = je_references + ", "+ str(jeb.name)
-
-		self.db_set("journal", je_references)
+				"reference_type": "Employee Benefits",
+				"reference_name": self.name,				
+			})		
+		je.insert()
+		# Link the Journal Entry to Employee Benefits
+		self.db_set("journal", je.name)
 
 	def update_employee(self):
 		emp = frappe.get_doc("Employee", self.employee)
@@ -299,16 +254,13 @@ class EmployeeBenefits(Document):
 	def on_cancel(self):
 		self.check_journal()
 		self.check_leave_encashment()
-
-	def check_journal(self):
-		if self.journal:
-			je = str(self.journal).split(", ")
-			for a in je:
-				docstatus = frappe.db.get_value("Journal Entry", a, "docstatus")
-				if docstatus and docstatus != 2:
-					frappe.throw("Cancel Journal Entry {0} before cancelling this document".format(frappe.get_desk_link("Journal Entry", a)))
-		self.db_set("journal",None)
-
+		
+	def check_journal(self):		
+		if self.journal:			
+			docstatus = frappe.db.get_value("Journal Entry", self.journal, "docstatus")			#
+			if docstatus and docstatus != 2:				
+				frappe.throw("Cancel Journal Entry {0} before cancelling this document".format(frappe.get_desk_link("Journal Entry", self.journal)))		
+		self.db_set("journal", None)
 
 @frappe.whitelist()
 def get_basic_salary(employee):
