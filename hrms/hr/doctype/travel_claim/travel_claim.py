@@ -33,8 +33,16 @@ class TravelClaim(Document):
 		self.post_journal_entry()
 		notify_workflow_states(self)
 
-	def on_cancel(self):
-		self.check_journal_entry()
+	def before_cancel(self):
+		cl_status = frappe.db.get_value("Journal Entry", self.claim_journal, "docstatus")
+		if cl_status and cl_status != 2:
+			frappe.throw("You need to cancel the claim journal entry first!")
+		
+		travel_authorization = frappe.get_doc("Travel Authorization", self.travel_authorization)
+		travel_authorization.db_set("travel_claim", "")
+
+	def on_cancel(self):		
+		self.check_journal_entry()				
 		if self.training_event:
 			self.update_training_event(cancel=True)
 		notify_workflow_states(self)
@@ -74,11 +82,21 @@ class TravelClaim(Document):
 				frappe.db.sql("""
 					update `tabTraining Event Employee` set travel_claim_id = NULL where name = '{}'
 					""".format(self.training_event_child_ref))
-
+	
 	def check_journal_entry(self):
-		if self.claim_journal and frappe.db.exists("Journal Entry", {"name": self.claim_journal, "docstatus": ("<","2")}):
-			frappe.throw(_("You need to cancel {} first").format(frappe.get_desk_link("Journal Entry", self.claim_journal)))
-
+		if self.claim_journal:
+			journal_entries = str(self.claim_journal).split(", ")			
+			for index, je in enumerate(journal_entries):				
+				docstatus = frappe.db.get_value("Journal Entry", je, "docstatus")				
+				if index > 0 and docstatus == 1:
+					frappe.throw(f"Cannot cancel this document because Journal Entry {frappe.get_desk_link('Journal Entry', je)} is submitted.")
+								
+				if docstatus and docstatus != 2:  
+					frappe.throw(f"Cancel Journal Entry {frappe.get_desk_link('Journal Entry', je)} before cancelling this document.")
+			
+			# Clear the field after verification
+			self.db_set("claim_journal", None)
+		
 	def validate_travel_last_day(self):
 		if len(self.get("items")) > 1:
 			self.items[-1].is_last_day = 1
@@ -105,8 +123,8 @@ class TravelClaim(Document):
 					else flt(item.no_days) * item.dsa
 				)						
 			if is_last_row:
-				item.amount = flt(item.dsa) * (flt(return_day_dsa) / 100)  # Correctly apply the percentage				
-				item.base_amount = flt(item.amount) + item.mileage_amount  # No exchange rate applied
+				item.amount = flt(item.dsa) * (flt(return_day_dsa) / 100)				
+				item.base_amount = flt(item.amount) + item.mileage_amount
 			else:
 				# Multiply by exchange rate for all other rows
 				item.base_amount = flt(item.amount) * flt(self.exchange_rate) + item.mileage_amount
