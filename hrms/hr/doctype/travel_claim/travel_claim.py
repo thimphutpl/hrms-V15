@@ -17,6 +17,7 @@ class TravelClaim(Document):
 	def validate(self):
 		validate_workflow_states(self)
 		self.validate_travel_last_day()
+		self.validate_dsa_ceiling()
 		self.update_amounts()
 		self.validate_dates()
 		self.validate_duplicate()
@@ -30,12 +31,25 @@ class TravelClaim(Document):
 	def on_submit(self):
 		self.update_travel_authorization()
 		self.post_journal_entry()
-
+	def before_cancel(self):
+		self.unlink_travel_authorization()
+		for a in str(self.claim_journal).split(", "):
+			je_doc = frappe.get_doc("Journal Entry", a)
+			if je_doc.docstatus == 1:
+				je_doc.cancel()
+		frappe.db.sql("update `tabGL Entry` set voucher_no = NULL where voucher_no = '{}'".format(self.name))
+		frappe.db.sql("update `tabGL Entry` set against_voucher = NULL where against_voucher = '{}'".format(self.name))
+		frappe.db.sql("update `tabPayment Ledger Entry` set voucher_no = NULL where voucher_no = '{}'".format(self.name))
+		frappe.db.sql("update `tabPayment Ledger Entry` set against_voucher_no = NULL where against_voucher_no = '{}'".format(self.name))
 	def on_cancel(self):
 		self.check_journal_entry()
 		if self.training_event:
 			self.update_training_event(cancel=True)
-
+		self.db_set("workflow_state", "Cancelled")
+	def unlink_travel_authorization(self):
+		if self.travel_authorization:
+			travel_a = frappe.get_doc("Travel Authorization", self.travel_authorization)
+			travel_a.db_set("travel_claim","")
 	def validate_duplicate(self):
 		existing = []
 		existing = frappe.db.sql("""
@@ -80,30 +94,174 @@ class TravelClaim(Document):
 		if len(self.get("items")) > 1:
 			self.items[-1].is_last_day = 1
 
+	def validate_dsa_ceiling(self):
+		max_days_per_month  = 0
+		tt_list = []
+		local_count = {}
+		claimed_count = {}
+		mapped_count = {}
+		months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+		cond1 = ""
+		cond2 = ""
+		cond3 = ""
+		format_string = ""
+		lastday_dsa_percent = frappe.db.get_single_value("HR Settings", "return_day_dsa")
+		
+		if self.place_type.lower().replace("-","") == "incountry":
+			max_days_per_month = frappe.db.get_single_value("HR Settings", "max_days_incountry")
+			if max_days_per_month:
+				tt_list = frappe.db.sql_list("select travel_type from `tabHR Settings Incountry`")
+		else:
+			max_days_per_month = frappe.db.get_single_value("HR Settings", "max_days_outcountry")
+			if max_days_per_month:
+				tt_list = frappe.db.sql_list("select travel_type from `tabHR Settings Outcountry`")
+
+		if tt_list:
+			format_string = ("'"+"','".join(['%s'] * len(tt_list))+"'") % tuple(tt_list)
+			cond1 += "and t1.travel_type in ({0}) ".format(format_string, self.travel_type)
+
+		if max_days_per_month and (not tt_list or self.travel_type in (format_string)):
+			local_count = self.get_monthly_count(self.items)
+			for k in local_count:
+				cond2 += " '{0}' between date_format(t2.`from_date`,'%Y%m') and date_format(ifnull(t2.`to_date`,t2.`date`),'%Y%m') or".format(k)
+			cond2 = cond2.rsplit(' ',1)[0]
+			cond2 = "and (" + cond2 + ")"
+			cond3 = "and t2.is_last_day = 0" if not lastday_dsa_percent else ""
+
+			query = """
+					select
+							t2.from_date,
+							t2.to_date,
+							t2.no_days
+					from
+							`tabTravel Claim` as t1,
+							`tabTravel Claim Item` as t2
+					where t1.employee = '{0}'
+					and t1.docstatus = 1
+					and t1.place_type = '{1}'
+					{2}
+					and t2.parent = t1.name
+					{3}
+					{4}
+				""".format(self.employee, self.place_type, cond1, cond2, cond3)
+
+			tc_list = frappe.db.sql(query, as_dict=True)
+
+			if tc_list:
+				claimed_count = self.get_monthly_count(tc_list)
+
+			for k,v in local_count.items():
+				mapped_count[k] = {'local': v, 'claimed': claimed_count.get(k,0), 'balance': flt(max_days_per_month)-flt(claimed_count.get(k,0))}
+
+			for i in self.get("items"):
+				i.remarks = ""
+				i.days_allocated = 0
+				if i.is_last_day and not lastday_dsa_percent:
+					i.days_allocated = 0
+					continue
+				
+				record_count = self.get_monthly_count([i])
+				for k,v in record_count.items():
+					lapsed  = 0
+					counter = 0
+					if mapped_count[k]['balance'] >= v:
+						i.days_allocated = flt(i.days_allocated) + v
+						mapped_count[k]['balance'] -= v
+					else:
+						if mapped_count[k]['balance'] < 0:
+							lapsed = v
+						else:
+							lapsed = v - mapped_count[k]['balance']
+							i.days_allocated = flt(i.days_allocated) + mapped_count[k]['balance']
+							mapped_count[k]['balance'] = 0
+								
+						if lapsed:
+							counter += 1
+							frappe.msgprint(_("Row#{0}: You have crossed the DSA({4} days) limit by {1} days for the month {2}-{3}").format(i.idx, int(lapsed), months[int(str(k)[4:])-1], str(k)[:4],max_days_per_month))
+							i.remarks = str(i.remarks)+"{3}) {0} Day(s) lapsed for the month {1}-{2}\n".format(int(lapsed), months[int(str(k)[4:])-1], str(k)[:4], counter)
+		else:
+			for i in self.get("items"):
+				i.remarks = ""
+				i.days_allocated = 0 if i.is_last_day and not lastday_dsa_percent else i.no_days 
+
 	def update_amounts(self):
 		lastday_dsa_percent = flt(frappe.db.get_single_value("HR Settings", "return_day_dsa")) 
 		total_claim_amount = 0
 		company_currency = frappe.db.get_value("Company", self.company, "default_currency")
-		
+		dsa_ceilings = {}
+		total_claim_days = 0
 		for item in self.get("items"):
-			# exchange_rate = 1 if self.currency == company_currency else get_exchange_rate(self.currency, company_currency)
+			# if str(item.date).split("-")[1]==str(item.till_date).split("-")[1]:
+			# 	if str(item.date).split("-")[1] not in dsa_ceilings:
+			# 		dsa_ceilings.update({str(item.date).split("-")[1]: {"days": date_diff(item.till_date, item.date)+1}})
+			# 	else:
+			# 		dsa_ceilings[str(item.date).split("-")[1]]['days'] += date_diff(item.till_date, item.date)+1
+			# else:
+			# 	for m in range(int(str(item.date).split("-")[1]), int(str(item.till_date).split("-")[1])+1):
+			# 		if m == int(str(item.date).split("-")[1]):
+			# 			if str(item.date).split("-")[1] not in dsa_ceilings:
+			# 				dsa_ceilings.update({str(item.date).split("-")[1]: {"days": date_diff(item, item.date)+1}})
+			# 			else:
+			# 				dsa_ceilings[str(item.date).split("-")[1]]['days'] += date_diff(item.till_date, item.date)+1
+			# 		elif m ==  int(str(item.till_date).split("-")[1]):
+			# 			if str(item.date).split("-")[1] not in dsa_ceilings:
+			# 				dsa_ceilings.update({str(item.date).split("-")[1]: {"days": date_diff(item.till_date, item.date)+1}})
+			# 			else:
+			# 				dsa_ceilings[str(item.date).split("-")[1]]['days'] += date_diff(item.till_date, item.date)+1
+			# 		else:
+			# 			if str(m) not in dsa_ceilings:
+			# 				dsa_ceilings.update({str(m): {"days": 15}})
+			# 			else:
+			# 				dsa_ceilings[str(item.date).split("-")[1]]['days'] += 15
+				# exchange_rate = 1 if self.currency == company_currency else get_exchange_rate(self.currency, company_currency)
 			item.dsa = flt(item.dsa)
 			if item.is_last_day:
 				item.dsa_percent = flt(lastday_dsa_percent)
 			
-			if self.mode_of_travel == "Personal Car":
-				item.amount = (flt(item.no_days) * (flt(item.dsa) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
-			else:
-				item.amount = flt(item.no_days) * (flt(item.dsa) * flt(item.dsa_percent) / 100)
+			# if self.mode_of_travel == "Personal Car":
+			item.amount = (flt(item.days_allocated) * (flt(item.dsa) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
+			total_claim_days += item.days_allocated
+			# else:
+			# 	item.amount = flt(item.days_allocated) * (flt(item.dsa) * flt(item.dsa_percent) / 100)
 			item.base_amount = flt(item.amount) * flt(self.exchange_rate)
 			total_claim_amount += flt(item.base_amount)
 		
 		self.total_claim_amount = flt(total_claim_amount)
+		self.total_claim_days = flt(total_claim_days)
 		self.balance_amount = (flt(self.total_claim_amount) + flt(self.extra_claim_amount) - flt(self.advance_amount))
 		
 		if flt(self.balance_amount) < 0:
 			frappe.throw(_("Balance Amount cannot be a negative value."), title="Invalid Amount")
 
+	def get_monthly_count(self, items):
+		counts = {}
+		for i in items:
+			i.to_date = i.from_date if not i.to_date else i.to_date
+			from_month = str(i.from_date)[5:7]
+			to_month = str(i.to_date)[5:7]
+			from_year = str(i.from_date)[:4]
+			to_year = str(i.to_date)[:4]
+			from_monthyear = str(from_year)+str(from_month)
+			to_monthyear = str(to_year)+str(to_month)
+
+			if int(to_monthyear) >= int(from_monthyear):
+				for y in range(int(from_year), int(to_year)+1):
+					m_start = from_month if str(y) == str(from_year) else '01'
+					m_end = to_month if str(y) == str(to_year) else '12'
+									
+					for m in range(int(m_start), int(m_end)+1):
+						key = str(y)+str(m).rjust(2,str('0'))
+						m_start_date = key[:4]+'-'+key[4:]+'-01'
+						m_start_date = i.from_date if str(y)+str(m).rjust(2,str('0')) == str(from_year)+str(from_month) else m_start_date
+						m_end_date = i.to_date if str(y)+str(m).rjust(2,str('0')) == str(to_year)+str(to_month) else get_last_day(m_start_date)
+						if key in counts:
+							counts[key] += date_diff(m_end_date, m_start_date)+1
+						else:
+							counts[key] = date_diff(m_end_date, m_start_date)+1
+			else:
+				frappe.throw(_("Row#{0} : Till Date cannot be before from date.").format(i.idx), title="Invalid Data")
+		return collections.OrderedDict(sorted(counts.items()))
+		
 	def check_double_date_inside(self):
 		for i in self.get('items'):
 			for j in self.get('items'):

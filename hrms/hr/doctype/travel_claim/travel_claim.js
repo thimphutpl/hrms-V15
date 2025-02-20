@@ -4,6 +4,7 @@
 cur_frm.add_fetch("employee", "branch", "branch");
 frappe.ui.form.on('Travel Claim', {
 	onload: function (frm) {
+		frm.ignore_doctypes_on_cancel_all = ['Travel Authorization', 'GL Entry', 'Payment Ledger Entry']
 		let grid = frm.fields_dict['items'].grid;
         grid.cannot_add_rows = true;
 	},

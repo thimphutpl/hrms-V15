@@ -12,6 +12,7 @@
   "column_break_4",
   "to_date",
   "no_days",
+  "days_allocated",
   "column_break_9",
   "halt_at",
   "travel_to",
@@ -214,12 +215,18 @@
    "hidden": 1,
    "label": "Is Last Day",
    "read_only": 1
+  },
+  {
+   "fieldname": "days_allocated",
+   "fieldtype": "Int",
+   "label": "No. of Days Accepted For Claim",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-01-14 16:01:12.499681",
+ "modified": "2025-02-19 11:49:35.602500",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim Item",
