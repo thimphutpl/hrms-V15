@@ -364,15 +364,14 @@
   },
   {
    "fieldname": "travel_authorization",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "Travel Authorization",
-   "options": "Travel Authorization",
    "read_only": 1
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-02-19 10:34:07.882636",
+ "modified": "2025-02-20 21:09:43.355187",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim",
