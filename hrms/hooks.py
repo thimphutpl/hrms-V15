@@ -12,7 +12,7 @@ source_link = "http://github.com/frappe/hrms"
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/hrms/css/hrms.css"
+app_include_css = "/assets/hrms/css/hrms.css"
 app_include_js = [
 	"hrms.bundle.js",
 ]
@@ -122,6 +122,7 @@ before_app_uninstall = "hrms.setup.before_app_uninstall"
 
 permission_query_conditions = {
 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",	
+	"End User Training": "hrms.hr.doctype.end_user_training.end_user_training.get_permission_query_conditions",
 	"Leave Application": "hrms.hr.doctype.leave_application.leave_application.get_permission_query_conditions",
 	"Travel Authorization": "hrms.hr.doctype.travel_authorization.travel_authorization.get_permission_query_conditions",
 	"Travel Claim": "hrms.hr.doctype.travel_claim.travel_claim.get_permission_query_conditions",	
@@ -213,7 +214,7 @@ scheduler_events = {
 	"cron": {
 		"* * * * *": [
 			
-			# "hrms.hr.hr_custom_functions.post_leave_credits",
+			#"hrms.hr.doctype.leave_allocation.leave_allocation.post_earned_leaves",
 		],
 
 	},
@@ -233,6 +234,7 @@ scheduler_events = {
 		"hrms.hr.doctype.daily_work_summary_group.daily_work_summary_group.send_summary",
 		"hrms.hr.doctype.interview.interview.send_daily_feedback_reminder",
 		"hrms.hr.doctype.job_opening.job_opening.close_expired_job_openings",
+		#"hrms.hr.doctype.leave_allocation.leave_allocation.post_earned_leaves",
 		#"hrms.hr.hr_custom_functions.post_leave_credits",
 		
 		

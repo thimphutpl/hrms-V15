@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "EUT.#####",
  "creation": "2025-02-16 20:11:41.669716",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -153,10 +154,11 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-02-16 20:35:56.992727",
+ "modified": "2025-02-24 09:08:16.528267",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "End User Training",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {
