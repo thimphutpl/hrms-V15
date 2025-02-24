@@ -65,6 +65,9 @@
   "eligible_for_tra",
   "eligible_for_tra_method",
   "tra_value",
+  "eligible_for_contract_allowance_cdcl",
+  "payment_methpod_cdcl",
+  "value_cdcl",
   "cb_10",
   "eligible_for_difficulty",
   "difficulty_method",
@@ -1356,12 +1359,29 @@
    "fieldtype": "Data",
    "hidden": 1,
    "label": "Off Cycle PF"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_contract_allowance_cdcl",
+   "fieldtype": "Check",
+   "label": "Eligible for Contract Allowance (CDCL)"
+  },
+  {
+   "fieldname": "payment_methpod_cdcl",
+   "fieldtype": "Select",
+   "label": "Payment Method",
+   "options": "Lumpsum\nPercent"
+  },
+  {
+   "fieldname": "value_cdcl",
+   "fieldtype": "Int",
+   "label": "Value"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2025-02-13 18:18:25.864278",
+ "modified": "2025-02-20 17:00:18.398252",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
