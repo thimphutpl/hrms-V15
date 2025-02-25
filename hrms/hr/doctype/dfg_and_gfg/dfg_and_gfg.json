@@ -61,8 +61,7 @@
    "fieldname": "dessung_id",
    "fieldtype": "Data",
    "label": "Dessung ID",
-   "mandatory_depends_on": "eval:doc.employee_type == \"DFG\"",
-   "unique": 1
+   "mandatory_depends_on": "eval:doc.employee_type == \"DFG\""
   },
   {
    "fieldname": "village",
@@ -320,8 +319,7 @@
    "fieldname": "gyalsup_id",
    "fieldtype": "Data",
    "label": "Gyalsup ID",
-   "mandatory_depends_on": "eval:doc.employee_type == \"GFG\"",
-   "unique": 1
+   "mandatory_depends_on": "eval:doc.employee_type == \"GFG\""
   },
   {
    "depends_on": "eval:doc.employee_type == \"DFG\"",
@@ -340,7 +338,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-25 15:22:41.476056",
+ "modified": "2025-02-25 15:41:23.181927",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "DFG AND GFG",
