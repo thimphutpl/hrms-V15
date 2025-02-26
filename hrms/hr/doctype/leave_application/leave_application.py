@@ -462,13 +462,13 @@ class LeaveApplication(Document, PWANotificationsMixin):
 					self.throw_overlap_error(d)
 			else:
 				self.throw_overlap_error(d)
-
-	def throw_overlap_error(self, d):		
+	
+	def throw_overlap_error(self, d):
 		form_link = get_link_to_form("Leave Application", d.name)
 		msg = _("Employee {0} has already applied for {1} between {2} and {3} : {4}").format(
 			self.employee, d["leave_type"], formatdate(d["from_date"]), formatdate(d["to_date"]), form_link
 		)
-		frappe.throw(msg, OverlapError)
+		frappe.throw(msg, OverlapError)		
 
 	def get_total_leaves_on_half_day(self):
 		leave_count_on_half_day_date = frappe.db.sql(
