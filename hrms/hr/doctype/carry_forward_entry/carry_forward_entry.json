@@ -51,7 +51,8 @@
    "fieldname": "branch",
    "fieldtype": "Link",
    "label": "Branch",
-   "options": "Branch"
+   "options": "Branch",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_frxo",
@@ -83,7 +84,8 @@
   {
    "fieldname": "from_date",
    "fieldtype": "Date",
-   "label": "From Date"
+   "label": "From Date",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_vmox",
@@ -92,7 +94,8 @@
   {
    "fieldname": "to_date",
    "fieldtype": "Date",
-   "label": "To Date"
+   "label": "To Date",
+   "reqd": 1
   },
   {
    "fieldname": "section_break_gujv",
@@ -113,12 +116,13 @@
    "fieldname": "employment_type",
    "fieldtype": "Link",
    "label": "Employee Type",
-   "options": "Employment Type"
+   "options": "Employment Type",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-16 11:38:33.286856",
+ "modified": "2025-02-14 19:53:30.064819",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Carry Forward Entry",

@@ -76,11 +76,18 @@ class CarryForwardEntry(Document):
 			# frappe.throw('hi')
 			#leaves allocated
 			leaves_allocated = 0.0
-			allocation   = get_leave_allocation_records(to_date, employee.name).get(employee.name, frappe._dict()).get(self.leave_type, frappe._dict())
+			leaves=0.0
+			#allocation   = get_leave_allocation_records(to_date, employee.name).get(employee.name, frappe._dict()).get(self.leave_type, frappe._dict())
 			# frappe.msgprint(str(allocation))
-
+			emp=employee.name
+			allocation=self.get_leave_allocation(emp,self.from_date,self.to_date)
+			mr_cl_to_el=self.get_laave_bal_mr(emp,self.from_date,self.to_date)
+			
+			if mr_cl_to_el:
+				leaves=mr_cl_to_el.leaves
+			#frappe.throw(str(leaves))
 			if allocation:
-				leaves_allocated = allocation['total_leaves_allocated']
+				leaves_allocated = allocation['total_leaves_allocated'] + leaves
 
 			# leaves taken
 			leaves_taken = get_approved_leaves_for_period(employee.name, self.leave_type, from_date, to_date)
@@ -104,7 +111,56 @@ class CarryForwardEntry(Document):
 					where employee = '{2}' and leave_type = 'Earned Leave' and docstatus = 1 
 					order by to_date desc limit 1""".format(em.leave_balance, em.parent, em.employee))
 		frappe.msgprint(" Updated Leave Allocation Record ")
+	
+	def get_leave_allocation(self,emp,from_date,to_date):
+		from frappe.query_builder.functions import Sum		
+		
 
+		LeaveAllocation = frappe.qb.DocType("Leave Allocation")
+		leave_allocation = (
+			frappe.qb.from_(LeaveAllocation)
+			
+			.select(
+				LeaveAllocation.name,
+				LeaveAllocation.from_date,
+				LeaveAllocation.to_date,
+				Sum(LeaveAllocation.total_leaves_allocated).as_("total_leaves_allocated"),
+				LeaveAllocation.carry_forwarded_leaves_count,
+				)
+			.where(
+				(LeaveAllocation.from_date <= from_date)
+				& (to_date <= LeaveAllocation.to_date)
+				& (LeaveAllocation.docstatus == 1)
+				& (LeaveAllocation.leave_type == "Earned Leave")
+				& (LeaveAllocation.employee == emp)
+				)
+		).run(as_dict=True)
+
+		return leave_allocation[0] if leave_allocation else None
+
+	def get_laave_bal_mr(self,emp,from_date,to_date):		
+
+		Leavebal = frappe.qb.DocType("Leave Ledger Entry")
+		
+		leave_bal = (
+			frappe.qb.from_(Leavebal)
+			.select(
+				Leavebal.name,
+				Leavebal.from_date,
+				Leavebal.to_date,
+				
+				Leavebal.leaves
+			)
+			.where(
+				((Leavebal.from_date <= from_date) & (to_date <= Leavebal.to_date))
+				& (Leavebal.docstatus == 1)
+				& (Leavebal.leave_type == "Earned Leave")
+				& (Leavebal.employee == emp)
+				& (Leavebal.transaction_type == 'Merge CL To EL')
+			)
+		).run(as_dict=True)	
+
+		return leave_bal[0] if leave_bal else None
 	def on_cancel(self):
 		for em in self.get('items'):
 				frappe.db.sql("""
