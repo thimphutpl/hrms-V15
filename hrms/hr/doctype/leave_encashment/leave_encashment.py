@@ -224,7 +224,7 @@ class LeaveEncashment(Document):
 		msg = ""
 		InsufficientError=""
 		if flt(self.balance_after) < 0:
-				frapp.throw(str(self.balance_after))
+				#frappe.throw(str(self.balance_after))
 				InsufficientError="Insufficient leave balance"				
 
 		if msg:
@@ -310,7 +310,7 @@ class LeaveEncashment(Document):
 		# 			self.employee, self.leave_type
 		# 		)
 		# 	)
-		
+		#frappe.throw(str(allocation.total_leaves_allocated))
 		self.leave_balance = (
 			allocation.total_leaves_allocated
 			- allocation.carry_forwarded_leaves_count
@@ -366,7 +366,8 @@ class LeaveEncashment(Document):
 		return True
 
 	def get_leave_allocation(self):
-		from frappe.query_builder.functions import Sum		
+		from frappe.query_builder.functions import Sum
+		
 		date = self.encashment_date or getdate()
 
 		LeaveAllocation = frappe.qb.DocType("Leave Allocation")
@@ -393,8 +394,8 @@ class LeaveEncashment(Document):
 				LeaveAllocation.carry_forwarded_leaves_count,
 				)
 			.where(
-				(LeaveAllocation.from_date <= date)
-				& (date <= LeaveAllocation.to_date)
+				((LeaveAllocation.from_date <= date)
+				 & (date<=LeaveAllocation.to_date))
 				& (LeaveAllocation.docstatus == 1)
 				& (LeaveAllocation.leave_type == self.leave_type)
 				& (LeaveAllocation.employee == self.employee)
