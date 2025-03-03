@@ -75,8 +75,8 @@ class OvertimeApplication(Document):
 		# notify_workflow_states(self)
 		self.update_salary_structure(True)
 
-	def on_submit(self):
-		self.update_salary_structure()
+	# def on_submit(self):
+	# 	self.update_salary_structure()
 		
 		# notify_workflow_states(self)
 	def update_salary_structure(self, cancel=False):
