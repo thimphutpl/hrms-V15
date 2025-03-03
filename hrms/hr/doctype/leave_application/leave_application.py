@@ -829,159 +829,43 @@ def get_allocation_expiry_for_cf_leaves(
 		)
 		.limit(1)
 	).run()
-	# frappe.throw(str(expiry))
-
 	return expiry[0][0] if expiry else ""
-
-
-# def get_allocation_expiry_for_cf_leaves(employee, leave_type, from_date, to_date):
-# 	"""Returns leave entries between from_date and to_date."""
-# 	return frappe.db.sql(
-# 		"""
-# 		SELECT
-# 			employee, leave_type, from_date, to_date, leaves, transaction_name, transaction_type, holiday_list,
-# 			is_carry_forward, is_expired
-# 		FROM tabLeave Ledger Entry
-# 		WHERE employee=%(employee)s AND leave_type=%(leave_type)s
-# 			AND docstatus=1
-# 			AND (leaves<0
-# 				OR is_expired=1)
-# 			AND (from_date between %(from_date)s AND %(to_date)s
-# 				OR to_date between %(from_date)s AND %(to_date)s
-# 				OR (from_date < %(from_date)s AND to_date > %(to_date)s))
-# 	""",
-# 		{"from_date": from_date, "to_date": to_date, "employee": employee, "leave_type": leave_type},
-# 		as_dict=1,
-# 	)	
-
-
-
-
-# def get_allocation_expiry_for_cf_leaves(employee, leave_type, from_date, to_date):
-# 	frappe.throw(str(employee))
-#     """
-#     Returns leave entries between from_date and to_date for a given employee and leave type.
-
-#     Parameters:
-#         employee (str): The employee ID.
-#         leave_type (str): The type of leave (e.g., "Earned Leave").
-#         from_date (datetime.date): The start of the date range.
-#         to_date (datetime.date): The end of the date range.
-
-#     Returns:
-#         list[dict]: A list of dictionaries containing leave ledger entries.
-#     """
-	
-#     return frappe.db.sql(
-#         """
-#         SELECT
-#             employee, leave_type, from_date, to_date, leaves, transaction_name, transaction_type, holiday_list,
-#             is_carry_forward, is_expired
-#         FROM `tabLeave Ledger Entry`
-#         WHERE employee = %(employee)s AND leave_type = %(leave_type)s
-#             AND docstatus = 1
-#             AND (leaves < 0 OR is_expired = 1)
-#             AND (
-#                 from_date BETWEEN %(from_date)s AND %(to_date)s
-#                 OR to_date BETWEEN %(from_date)s AND %(to_date)s
-#                 OR (from_date < %(from_date)s AND to_date > %(to_date)s)
-#             )
-#         """,
-#         {
-#             "from_date": from_date,
-#             "to_date": to_date,
-#             "employee": employee,
-#             "leave_type": leave_type,
-#         },
-#         as_dict=True,
-#     )
-	
-
-
-# def get_allocation_expiry_for_cf_leaves(employee, leave_type, from_date, to_date):
-#     """
-#     Fetches leave ledger entries for the given employee and leave type between a date range.
-
-#     Parameters:
-#         employee (str): Employee ID.
-#         leave_type (str): Type of leave (e.g., "Earned Leave").
-#         from_date (datetime.date): Start of the date range.
-#         to_date (datetime.date): End of the date range.
-
-#     Returns:
-#         list[dict]: A list of dictionaries containing leave ledger entries.
-#     """
-#     try:
-#         # Debugging Input Parameters
-#         frappe.msgprint(f"Inputs: Employee={employee}, Leave Type={leave_type}, From={from_date}, To={to_date}")
-
-#         # Execute Query
-#         results = frappe.db.sql(
-#             """
-#             SELECT
-#                 employee, leave_type, from_date, to_date, leaves, transaction_name, transaction_type, holiday_list,
-#                 is_carry_forward, is_expired
-#             FROM `tabLeave Ledger Entry`
-#             WHERE
-#                 employee = %(employee)s AND leave_type = %(leave_type)s
-#                 AND docstatus = 1
-#                 AND (leaves < 0 OR is_expired = 1)
-#                 AND (
-#                     from_date BETWEEN %(from_date)s AND %(to_date)s
-#                     OR to_date BETWEEN %(from_date)s AND %(to_date)s
-#                     OR (from_date < %(from_date)s AND to_date > %(to_date)s)
-#                 )
-#             """,
-#             {
-#                 "from_date": from_date,
-#                 "to_date": to_date,
-#                 "employee": employee,
-#                 "leave_type": leave_type,
-#             },
-#             as_dict=1,
-#         )
-
-#         # Debugging Query Results
-#         frappe.msgprint(f"Query Results: {results}")
-
-#         return results
-
-#     except Exception as e:
-#         frappe.log_error(message=f"Error in get_allocation_expiry_for_cf_leaves: {str(e)}", title="Leave Ledger Query Error")
-#         return []
-
-
-
-
 
 @frappe.whitelist()
 def get_number_of_leave_days(
-	employee: str,
-	leave_type: str,
-	from_date: datetime.date,
-	to_date: datetime.date,
-	half_day: int | str | None = None,
-	half_day_date: datetime.date | str | None = None,
-	holiday_list: str | None = None,
+    employee: str,
+    leave_type: str,
+    from_date: datetime.date,
+    to_date: datetime.date,
+    half_day: int | str | None = None,
+    half_day_date: datetime.date | str | None = None,
+    holiday_list: str | None = None,
 ) -> float:
-	"""Returns number of leave days between 2 dates after considering half day and holidays
-	(Based on the include_holiday setting in Leave Type)"""
-	number_of_days = 0
-	if cint(half_day) == 1:
-		if getdate(from_date) == getdate(to_date):
-			number_of_days = 0.5
-		elif half_day_date and getdate(from_date) <= getdate(half_day_date) <= getdate(to_date):
-			number_of_days = date_diff(to_date, from_date) + 0.5
-		else:
-			number_of_days = date_diff(to_date, from_date) + 1
-	else:
-		number_of_days = date_diff(to_date, from_date) + 1
+    """Returns number of leave days between 2 dates after considering half day and holidays.
+    Holidays are included only for specific leave types: Casual Leave, Earn Leave, and Bereavement Leave.
+    For all other leave types, holidays are excluded."""
+	   
+    if from_date > to_date:
+        frappe.throw("From Date cannot be greater than To Date") 
+    half_day = cint(half_day)
 
-	if not frappe.db.get_value("Leave Type", leave_type, "include_holiday"):
-		number_of_days = flt(number_of_days) - flt(
-			get_holidays(employee, from_date, to_date, holiday_list=holiday_list)
-		)
-	return number_of_days
+    # Calculate total days
+    if half_day == 1:
+        if getdate(from_date) == getdate(to_date):
+            number_of_days = 0.5
+        elif half_day_date and getdate(from_date) <= getdate(half_day_date) <= getdate(to_date):
+            number_of_days = date_diff(to_date, from_date) + 0.5
+        else:
+            number_of_days = date_diff(to_date, from_date) + 1
+    else:
+        number_of_days = date_diff(to_date, from_date) + 1    
+    leave_types_with_holidays = ["Casual Leave", "Earned Leave", "Bereavement Leave"]    
+    if leave_type in leave_types_with_holidays:        
+        holidays = get_holidays(employee, from_date, to_date, holiday_list=holiday_list)
+        number_of_days = flt(number_of_days) - flt(holidays)
+    else:       
+        pass
+    return number_of_days
 
 
 @frappe.whitelist()
