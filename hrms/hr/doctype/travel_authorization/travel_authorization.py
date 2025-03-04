@@ -393,6 +393,28 @@ def get_exchange_rate(from_currency, to_currency, date=None):
 		frappe.throw("No Exchange Rate defined in Currency Exchange for the date {}! Kindly contact your accounts section".format(date))
 	else:
 		return ex_rate[0][0]
+	
+
+@frappe.whitelist()
+def get_employee_dsa(country, grade):
+    Doc = frappe.qb.DocType("Country")
+    Child = frappe.qb.DocType("Country DSA Detail")
+    
+    query = (
+        frappe.qb.from_(Doc)
+        .join(Child).on(Child.parent == Doc.name)
+        .where(
+            (Doc.name == country) &
+            (Child.grade == grade)
+        )
+        .select(
+            Doc.currency,
+            Child.dsa
+        )
+    )
+    
+    return query.run(as_dict=True)
+
 
 # Following code added by SHIV on 2020/09/21
 def get_permission_query_conditions(user):

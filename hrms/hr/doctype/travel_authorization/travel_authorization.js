@@ -11,6 +11,11 @@ cur_frm.add_fetch("employee", "cost_center", "cost_center")
 
 frappe.ui.form.on('Travel Authorization', {
 	refresh: function (frm) {
+		// frm.add_custom_button(__("Travel Claim"), function () {
+		// 	frm.trigger("create_travel_claim");
+		// 	},
+		// 	__("Create")
+		// );
 		if (frm.doc.docstatus == 1 && !frm.doc.travel_claim) {
 			if (frm.doc.end_date_auth < frappe.datetime.get_today()) {
 				if (!frm.doc.travel_claim) {
@@ -137,20 +142,33 @@ frappe.ui.form.on('Travel Authorization', {
 });
 
 frappe.ui.form.on("Travel Authorization Item", {
+	
+	onload: function(frm, cdt, cdn) {
+		set_employee_dsa(frm, cdt, cdn);
+	},
+
+	items_add: function(frm, cdt, cdn) {
+		set_employee_dsa(frm, cdt, cdn);
+	},
+
+	country: function(frm, cdt, cdn) {
+		set_employee_dsa(frm, cdt, cdn);
+	},
+
 	form_render: function (frm, cdt, cdn) {
 		let item = locals[cdt][cdn];
 
 		// Set query for 'country' field if place_type is "In-Country"
-		if (frm.doc.place_type === "In-Country") {
-			console.log(frm.doc.place_type);
-			frm.set_query('country', 'items', function () {
-				return {
-					filters: {
-						name: ['in', ['Bhutan']]
-					}
-				};
-			});
-		}
+		// if (frm.doc.place_type === "In-Country") {
+		// 	console.log(frm.doc.place_type);
+		// 	frm.set_query('country', 'items', function () {
+		// 		return {
+		// 			filters: {
+		// 				name: ['in', ['Bhutan']]
+		// 			}
+		// 		};
+		// 	});
+		// }
 
 		// Get docfields for dynamic control
 		let halt = frappe.meta.get_docfield("Travel Authorization Item", "halt", cur_frm.doc.name);
@@ -203,6 +221,7 @@ frappe.ui.form.on("Travel Authorization Item", {
 
 		frm.refresh_fields();
 		frm.refresh_field("items");
+		set_employee_dsa(frm, cdt, cdn);
 	},
 
 	to_date: function (frm, cdt, cdn) {
@@ -244,6 +263,33 @@ frappe.ui.form.on("Travel Authorization Item", {
 		}
 	},
 });
+
+const set_employee_dsa = (frm, cdt, cdn) => {
+	if (frm.doc.employee) {
+		let child = locals[cdt][cdn];
+
+		if (!child.country || !frm.doc.grade) {
+			return;
+		}
+
+		frappe.call({
+			method: "hrms.hr.doctype.travel_authorization.travel_authorization.get_employee_dsa",
+			args: {
+				country: child.country,
+				grade: frm.doc.grade,
+			},
+			callback: function(r) {					
+				if (r.message && r.message.length > 0) {
+					frappe.model.set_value(cdt, cdn, "dsa", r.message[0].dsa);
+					frappe.model.set_value(cdt, cdn, "currency", r.message[0].currency);
+				} else {
+					frappe.model.set_value(cdt, cdn, "dsa", "");
+					frappe.model.set_value(cdt, cdn, "currency", "");
+				}
+			},
+		});
+	}
+};
 
 function calculate_advance(frm) {
 	frappe.call({

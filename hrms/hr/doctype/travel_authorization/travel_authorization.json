@@ -9,6 +9,7 @@
   "employee_information",
   "employee",
   "employee_name",
+  "grade",
   "cost_center",
   "column_break_6",
   "division",
@@ -16,6 +17,7 @@
   "column_break_kkkk",
   "posting_date",
   "dsa_per_day",
+  "dsa_per_out_country",
   "travel_purpose_information",
   "travel_type",
   "training_event",
@@ -151,7 +153,6 @@
    "reqd": 1
   },
   {
-   "allow_in_quick_entry": 1,
    "fieldname": "items",
    "fieldtype": "Table",
    "ignore_user_permissions": 1,
@@ -344,7 +345,8 @@
   {
    "fieldname": "dsa_per_day",
    "fieldtype": "Currency",
-   "label": "DSA Per Day",
+   "hidden": 1,
+   "label": "DSA Per Day (In Country)",
    "read_only": 1
   },
   {
@@ -416,11 +418,25 @@
    "label": "Travel Adjustment",
    "no_copy": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "dsa_per_out_country",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "DSA Per Day (Out Country)"
+  },
+  {
+   "fetch_from": "employee.grade",
+   "fieldname": "grade",
+   "fieldtype": "Link",
+   "label": "Grade",
+   "options": "Employee Grade",
+   "read_only": 1
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-02-18 17:29:30.100889",
+ "modified": "2025-03-04 12:42:38.882850",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",
