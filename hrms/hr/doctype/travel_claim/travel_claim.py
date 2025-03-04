@@ -223,7 +223,8 @@ class TravelClaim(Document):
 			
 			# if self.mode_of_travel == "Personal Car":
 			item.amount = (flt(item.days_allocated) * (flt(item.dsa) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
-			total_claim_days += item.days_allocated
+			total_claim_days += flt(item.days_allocated)
+			# total_claim_days += item.days_allocated
 			# else:
 			# 	item.amount = flt(item.days_allocated) * (flt(item.dsa) * flt(item.dsa_percent) / 100)
 			item.base_amount = flt(item.amount) * flt(self.exchange_rate)
