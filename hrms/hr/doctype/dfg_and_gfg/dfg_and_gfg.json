@@ -79,8 +79,7 @@
    "fieldname": "id_card",
    "fieldtype": "Data",
    "label": "ID Card",
-   "reqd": 1,
-   "unique": 1
+   "reqd": 1
   },
   {
    "fetch_from": "village.gewog",
@@ -353,7 +352,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-05 14:12:43.790263",
+ "modified": "2025-03-05 14:34:33.239777",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "DFG AND GFG",
