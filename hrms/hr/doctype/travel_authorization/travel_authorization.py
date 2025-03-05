@@ -310,10 +310,11 @@ def make_travel_claim(source_name, target_doc=None):
 			target.no_days = 1
 			target.halt_at = None
 
-		if source_parent.currency == "BTN":
-			target.dsa = source_parent.dsa_per_day
-		else:
-			target.base_dsa = source_parent.dsa_per_day
+		for item in source_parent.items:
+			if source_parent.currency == "BTN":
+				target.dsa = item.dsa
+			else:
+				target.base_dsa = item.dsa
 
 		target.country=obj.country
 		
