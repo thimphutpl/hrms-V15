@@ -44,6 +44,8 @@
   "gratuity_fund",
   "tpn_number",
   "date_of_separation",
+  "black_listed",
+  "remarks",
   "old_id",
   "internal_work_history_section",
   "internal_work_history",
@@ -334,11 +336,24 @@
    "hidden": 1,
    "label": "Series",
    "options": "DFG.YY\nGFG.YY"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.status==\"Left\"",
+   "fieldname": "black_listed",
+   "fieldtype": "Check",
+   "label": "Black listed"
+  },
+  {
+   "depends_on": "eval:doc.black_listed==\"1\"",
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-25 17:15:51.711554",
+ "modified": "2025-03-05 14:12:43.790263",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "DFG AND GFG",
