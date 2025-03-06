@@ -345,6 +345,7 @@
   {
    "fieldname": "dsa_per_day",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "DSA Per Day (In Country)",
    "read_only": 1
   },
@@ -435,7 +436,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-03-04 14:56:27.899573",
+ "modified": "2025-03-06 09:35:07.370787",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",
