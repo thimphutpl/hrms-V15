@@ -97,8 +97,8 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		self.notify_approval_status()
 
 	def on_submit(self):
-		if self.status in ["Open", "Cancelled"]:
-			frappe.throw(_("Only Leave Applications with status 'Approved' and 'Rejected' can be submitted"))
+		# if self.status in ["Open", "Cancelled"]:
+		# 	frappe.throw(_("Only Leave Applications with status 'Approved' and 'Rejected' can be submitted"))
 
 		self.validate_back_dated_application()
 		self.update_attendance()
@@ -872,7 +872,7 @@ def get_leave_details(employee, date):
 
 	return {
 		"leave_allocation": leave_allocation,
-		"leave_approver": get_leave_approver(employee),
+		# "leave_approver": get_leave_approver(employee),
 		"lwps": lwp,
 	}
 
@@ -1292,7 +1292,8 @@ def add_holidays(events, start, end, employee, company):
 def get_mandatory_approval(doctype):
 	mandatory = ""
 	if doctype == "Leave Application":
-		mandatory = frappe.db.get_single_value("HR Settings", "leave_approver_mandatory_in_leave_application")
+		# mandatory = frappe.db.get_single_value("HR Settings", "leave_approver_mandatory_in_leave_application")
+		return
 	else:
 		mandatory = frappe.db.get_single_value("HR Settings", "expense_approver_mandatory_in_expense_claim")
 

@@ -43,11 +43,11 @@
   {
    "fieldname": "naming_series",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Series",
    "no_copy": 1,
    "options": "HR-LAP-.YYYY.-",
    "print_hide": 1,
-   "reqd": 1,
    "set_only_once": 1
   },
   {
@@ -179,6 +179,7 @@
    "no_copy": 1,
    "options": "Open\nApproved\nRejected\nCancelled",
    "permlevel": 1,
+   "read_only": 1,
    "reqd": 1
   },
   {
@@ -204,6 +205,7 @@
    "default": "1",
    "fieldname": "follow_via_email",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Follow via Email",
    "print_hide": 1
   },
@@ -248,6 +250,7 @@
    "collapsible": 1,
    "fieldname": "sb_other_details",
    "fieldtype": "Section Break",
+   "hidden": 1,
    "label": "Other Details"
   },
   {
@@ -262,7 +265,7 @@
  "is_submittable": 1,
  "links": [],
  "max_attachments": 3,
- "modified": "2024-09-25 15:40:58.009472",
+ "modified": "2024-10-08 12:42:58.541018",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Application",
