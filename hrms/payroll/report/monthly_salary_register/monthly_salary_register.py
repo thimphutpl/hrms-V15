@@ -21,7 +21,9 @@ def execute(filters=None):
 	ss_earning_map = get_ss_earning_map(salary_slips)
 	ss_ded_map = get_ss_ded_map(salary_slips)
 	
+	count = 0
 	for ss in salary_slips:
+		count+=1
 		status = ""
 		if ss.docstatus == 1:
 				status = "Submitted"
@@ -34,7 +36,7 @@ def execute(filters=None):
 		
 		cid, joining_date = frappe.db.get_value("Employee", ss.employee, ["passport_number","date_of_joining"])
 						
-		row = [ss.employee, ss.employee_name, ss.employment_type, cid, joining_date,
+		row = [str(count), ss.employee, ss.employee_name, ss.employment_type, cid, joining_date,
 			ss.bank_name, ss.bank_account_no, 
 			ss.cost_center, ss.branch, ss.department,
 						 ss.division, ss.employee_grade, ss.designation, 
@@ -57,6 +59,7 @@ def execute(filters=None):
 	
 def get_columns(salary_slips):
 	columns = [
+		_("SL.No") + "::50", 
 		_("Employee") + ":Link/Employee:120", 
 		_("Employee Name") + "::140", 
 		_("Employment Type") + ":Link/Employment Type:120",
@@ -126,6 +129,7 @@ def get_conditions(filters):
 	if filters.get("fiscal_year"): conditions += " and fiscal_year = %(fiscal_year)s"
 	if filters.get("company"): conditions += " and company = %(company)s"
 	if filters.get("employee"): conditions += " and employee = %(employee)s"
+	if filters.get("employee_group"): conditions += " and employee_group = %(employee_group)s"
 	# if filters.get("division"): conditions += " and division = %(division)s"
 	# if filters.get("cost_center"):
 	# 	all_ccs = get_child_cost_centers(filters.cost_center)

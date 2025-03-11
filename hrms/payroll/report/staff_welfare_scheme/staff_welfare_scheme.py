@@ -45,6 +45,14 @@ def get_conditions(filters):
 	if filters.get("fiscal_year"): conditions += " and ss.fiscal_year = '{0}'".format(filters.fiscal_year)
 	if filters.get("company"): conditions += " and ss.company = '{0}'".format(filters.company)
 	if filters.get("employee"): conditions += " and ss.employee = '{0}'".format(filters.employee)
+	if filters.get("process_status") == "All":
+			conditions += " and ss.docstatus = ss.docstatus"
+	elif filters.get("process_status") == "Submitted":
+			conditions += " and ss.docstatus = 1"
+	elif filters.get("process_status") == "Draft":
+			conditions += " and ss.docstatus = 0"
+	elif filters.get("process_status") == "Cancelled":
+			conditions += " and ss.docstatus = 2"
 	if filters.get("branch"): conditions += " and ss.branch = '{0}'".format(filters.branch)
 	#frappe.msgprint("{0}".format(conditions))
 	return conditions, filters

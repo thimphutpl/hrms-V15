@@ -32,6 +32,13 @@ frappe.query_reports["Monthly Salary Register"] = {
 			"default": frappe.defaults.get_user_default("Company")
 		},
 		{
+			"fieldname": "employee_group",
+			"label": __("Employee Group"),
+			"fieldtype": "Link",
+			"options": "Employee Group",
+			
+		},
+		{
 			"fieldname": "process_status",
 			"label": __("Status"),
 			"fieldtype": "Select",

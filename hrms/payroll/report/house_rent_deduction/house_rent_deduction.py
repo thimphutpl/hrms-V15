@@ -1,5 +1,6 @@
-# Copyright (c) 2024, Frappe Technologies Pvt. Ltd. and contributors
+# Copyright (c) 2025, Frappe Technologies Pvt. Ltd. and contributors
 # For license information, please see license.txt
+
 import frappe
 from frappe.utils import flt, cstr
 from frappe import msgprint, _
@@ -16,8 +17,8 @@ def get_columns(data):
 	columns = [
 		("Employee") + ":Link/Employee:100",
 		("Employee Name") + "::160",
-			("Designation") + ":Link/Designation:150",
-				("Branch") + ":Link/Branch:120",
+        	("Designation") + ":Link/Designation:150",
+                ("Branch") + ":Link/Branch:120",
 		("Amount") + ":Currency:100",
 	]
 
@@ -27,9 +28,9 @@ def get_data(filters):
 	conditions, filters = get_conditions(filters)
 
 	data = frappe.db.sql(""" SELECT ss.employee, ss.employee_name,  ss.designation, ss.branch, sd.amount
-				FROM `tabSalary Slip` AS ss , `tabSalary Detail` AS sd
-				WHERE ss.name= sd.parent
-				AND sd.salary_component ='Western SWS' {0} and ss.docstatus =1""".format(conditions))
+		FROM `tabSalary Slip` AS ss , `tabSalary Detail` AS sd
+		WHERE ss.name= sd.parent and ss.docstatus = 1
+		AND sd.salary_component ='House Rent Deduction' {0}""".format(conditions))
 
 	return data
 
@@ -44,6 +45,7 @@ def get_conditions(filters):
 	if filters.get("fiscal_year"): conditions += " and ss.fiscal_year = '{0}'".format(filters.fiscal_year)
 	if filters.get("company"): conditions += " and ss.company = '{0}'".format(filters.company)
 	if filters.get("employee"): conditions += " and ss.employee = '{0}'".format(filters.employee)
+	if filters.get("branch"): conditions += " and ss.branch = '{0}'".format(filters.branch)
 	if filters.get("process_status") == "All":
 			conditions += " and ss.docstatus = ss.docstatus"
 	elif filters.get("process_status") == "Submitted":
@@ -52,6 +54,5 @@ def get_conditions(filters):
 			conditions += " and ss.docstatus = 0"
 	elif filters.get("process_status") == "Cancelled":
 			conditions += " and ss.docstatus = 2"
-	if filters.get("branch"): conditions += " and ss.branch = '{0}'".format(filters.branch)
 	#frappe.msgprint("{0}".format(conditions))
 	return conditions, filters

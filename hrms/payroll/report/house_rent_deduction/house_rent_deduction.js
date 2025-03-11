@@ -1,7 +1,7 @@
-// Copyright (c) 2024, Frappe Technologies Pvt. Ltd. and contributors
+// Copyright (c) 2025, Frappe Technologies Pvt. Ltd. and contributors
 // For license information, please see license.txt
 
-frappe.query_reports["Central SWS"] = {
+frappe.query_reports["House Rent Deduction"] = {
 	"filters": [
 		{
 			"fieldname": "fiscal_year",
@@ -37,7 +37,6 @@ frappe.query_reports["Central SWS"] = {
 			"options": "\nAll\nDraft\nSubmitted\nCancelled",
 			"default": "All"
 		},
-		
 
 	]
-}
+};
