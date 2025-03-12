@@ -244,8 +244,8 @@ class LeaveApplication(Document, PWANotificationsMixin):
 			)
 
 	def update_attendance(self):
-		if self.status != "Approved":
-			return
+		# if self.status != "Approved":
+		# 	return
 
 		holiday_dates = []
 		if not frappe.db.get_value("Leave Type", self.leave_type, "include_holiday"):
@@ -659,8 +659,8 @@ class LeaveApplication(Document, PWANotificationsMixin):
 				pass
 
 	def create_leave_ledger_entry(self, submit=True):
-		if self.status != "Approved" and submit:
-			return
+		# if self.status != "Approved" and submit:
+		# 	return
 
 		expiry_date = get_allocation_expiry_for_cf_leaves(
 			self.employee, self.leave_type, self.to_date, self.from_date
