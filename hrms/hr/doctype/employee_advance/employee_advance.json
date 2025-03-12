@@ -12,29 +12,47 @@
   "employee_name",
   "column_break_4",
   "posting_date",
-  "company",
   "department",
+  "branch",
+  "cost_center",
   "currency_section",
   "currency",
   "column_break_crso",
   "exchange_rate",
   "section_break_8",
+  "gross_pay",
+  "basic_pay",
+  "net_pay",
   "purpose",
   "column_break_11",
   "advance_amount",
+  "no_of_installments",
+  "deduction_amount",
   "paid_amount",
   "pending_amount",
   "claimed_amount",
   "return_amount",
-  "section_break_7",
-  "column_break_18",
-  "advance_account",
-  "mode_of_payment",
-  "column_break_nhlv",
-  "repay_unclaimed_amount_from_salary",
+  "section_break_pivz",
+  "recovery_start_date",
+  "column_break_gdxw",
+  "recovery_end_date",
+  "section_break_wcig",
+  "approver",
+  "column_break_ymya",
+  "approver_name",
+  "column_break_psbu",
+  "approver_designation",
   "more_info_section",
+  "advance_account",
   "status",
+  "journal_entry",
+  "journal_entry_html",
+  "journal_entry_status",
   "column_break_kimx",
+  "salary_structure",
+  "repay_unclaimed_amount_from_salary",
+  "company",
+  "mode_of_payment",
   "amended_from"
  ],
  "fields": [
@@ -95,7 +113,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "description": "Amount of expense",
    "fieldname": "advance_amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
@@ -116,15 +133,11 @@
    "description": "Amount claimed via Expense Claim",
    "fieldname": "claimed_amount",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Claimed Amount",
    "no_copy": 1,
    "options": "currency",
    "read_only": 1
-  },
-  {
-   "fieldname": "section_break_7",
-   "fieldtype": "Section Break",
-   "label": "Accounting"
   },
   {
    "fieldname": "status",
@@ -153,10 +166,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "column_break_18",
-   "fieldtype": "Column Break"
-  },
-  {
    "fetch_from": "company.default_employee_advance_account",
    "fieldname": "advance_account",
    "fieldtype": "Link",
@@ -168,6 +177,7 @@
   {
    "fieldname": "mode_of_payment",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Mode of Payment",
    "options": "Mode of Payment"
   },
@@ -185,6 +195,7 @@
    "default": "0",
    "fieldname": "repay_unclaimed_amount_from_salary",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Repay Unclaimed Amount from Salary"
   },
   {
@@ -192,6 +203,7 @@
    "description": "Pending (unpaid) amount from previous advances",
    "fieldname": "pending_amount",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Pending Amount",
    "no_copy": 1,
    "options": "currency",
@@ -215,11 +227,6 @@
    "reqd": 1
   },
   {
-   "fieldname": "column_break_nhlv",
-   "fieldtype": "Column Break"
-  },
-  {
-   "collapsible": 1,
    "fieldname": "more_info_section",
    "fieldtype": "Section Break",
    "label": "More Info"
@@ -237,11 +244,138 @@
   {
    "fieldname": "column_break_crso",
    "fieldtype": "Column Break"
+  },
+  {
+   "description": "Monthly Deduction",
+   "fieldname": "deduction_amount",
+   "fieldtype": "Currency",
+   "label": "Deduction Amount",
+   "read_only": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "no_of_installments",
+   "fieldtype": "Int",
+   "label": "No. of Installments"
+  },
+  {
+   "fetch_from": "employee.branch",
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch",
+   "read_only": 1
+  },
+  {
+   "fieldname": "gross_pay",
+   "fieldtype": "Currency",
+   "label": "Gross Pay",
+   "read_only": 1
+  },
+  {
+   "fieldname": "net_pay",
+   "fieldtype": "Currency",
+   "label": "Net Pay",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_pivz",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "recovery_start_date",
+   "fieldtype": "Date",
+   "label": "Recovery Start Date"
+  },
+  {
+   "fieldname": "column_break_gdxw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "recovery_end_date",
+   "fieldtype": "Date",
+   "label": "Recovery End Date"
+  },
+  {
+   "fieldname": "basic_pay",
+   "fieldtype": "Currency",
+   "label": "Basic Pay",
+   "read_only": 1
+  },
+  {
+   "fieldname": "salary_structure",
+   "fieldtype": "Link",
+   "label": "Salary Structure",
+   "options": "Salary Structure",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "journal_entry",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Journal Entry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "journal_entry_html",
+   "fieldtype": "HTML",
+   "label": "Journal Entry",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "journal_entry_status",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Journal Entry Status",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "branch.cost_center",
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_wcig",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "approver",
+   "fieldtype": "Link",
+   "label": "Approver",
+   "no_copy": 1,
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_ymya",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approver_name",
+   "fieldtype": "Data",
+   "label": "Approver Name",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_psbu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approver_designation",
+   "fieldtype": "Link",
+   "label": "Approver Designation",
+   "options": "Designation"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-04-12 13:53:55.442187",
+ "modified": "2025-03-10 23:37:06.155310",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Advance",
@@ -270,6 +404,30 @@
    "read": 1,
    "report": 1,
    "role": "Expense Approver",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
    "share": 1,
    "submit": 1,
    "write": 1

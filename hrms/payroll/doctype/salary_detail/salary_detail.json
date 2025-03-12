@@ -14,6 +14,8 @@
   "additional_amount",
   "section_break_5",
   "total_deductible_amount",
+  "institution_name",
+  "reference_number",
   "column_break_11",
   "total_deducted_amount",
   "total_outstanding_amount",
@@ -137,11 +139,23 @@
   {
    "fieldname": "column_break_joth",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "institution_name",
+   "fieldtype": "Link",
+   "label": "Institution Name",
+   "options": "Bank"
+  },
+  {
+   "fieldname": "reference_number",
+   "fieldtype": "Data",
+   "label": "Reference Number",
+   "print_hide": 1
   }
  ],
  "istable": 1,
  "links": [],
- "modified": "2025-02-05 17:15:37.530480",
+ "modified": "2025-03-04 09:46:25.507687",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Detail",

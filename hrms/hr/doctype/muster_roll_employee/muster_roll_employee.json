@@ -1,0 +1,336 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "format:{id_card}",
+ "creation": "2025-02-14 16:59:33.126662",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "employee_information_section",
+  "column_break_slzv",
+  "cid_number",
+  "passport_number",
+  "employee_name",
+  "muster_roll_group",
+  "muster_roll_type",
+  "column_break_hvnx",
+  "status",
+  "date_of_joining",
+  "gender",
+  "relieving_date",
+  "image",
+  "payment_details_section",
+  "daily_rate",
+  "payment_mode",
+  "bank_accounts",
+  "section_break_qyjp",
+  "bank_name",
+  "bank_branch",
+  "column_break_ogwq",
+  "bank_account_type",
+  "bank_ac_no",
+  "more_info_section",
+  "company",
+  "column_break_rhlf",
+  "branch",
+  "cost_center",
+  "profile_tab",
+  "cell_number",
+  "column_break_vzxd",
+  "personal_email",
+  "holiday_list",
+  "history_in_company_section",
+  "internal_work_history"
+ ],
+ "fields": [
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Active\nInactive\nTerminated",
+   "reqd": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_hvnx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "more_info_section",
+   "fieldtype": "Section Break",
+   "label": "More Info"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_slzv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_rhlf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "branch.cost_center",
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center",
+   "read_only": 1
+  },
+  {
+   "fieldname": "muster_roll_group",
+   "fieldtype": "Select",
+   "label": "Muster Roll Group",
+   "options": "\nNational\nInternational",
+   "reqd": 1,
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "muster_roll_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Muster Roll Type",
+   "options": "Muster Roll Type",
+   "reqd": 1
+  },
+  {
+   "fieldname": "date_of_joining",
+   "fieldtype": "Date",
+   "label": "Date of Joining",
+   "reqd": 1
+  },
+  {
+   "fieldname": "employee_information_section",
+   "fieldtype": "Section Break",
+   "label": "Employee Information"
+  },
+  {
+   "fieldname": "payment_details_section",
+   "fieldtype": "Section Break",
+   "label": "Payment Details"
+  },
+  {
+   "fieldname": "payment_mode",
+   "fieldtype": "Select",
+   "label": "Payment Mode",
+   "options": "\nCash\nBank",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_qyjp",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode == \"Bank\"",
+   "fieldname": "bank_name",
+   "fieldtype": "Link",
+   "label": "Bank Name",
+   "options": "Bank"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode == \"Bank\"",
+   "fieldname": "bank_branch",
+   "fieldtype": "Link",
+   "label": "Bank Branch",
+   "options": "Bank Branch"
+  },
+  {
+   "fieldname": "column_break_ogwq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode == \"Bank\"",
+   "fieldname": "bank_account_type",
+   "fieldtype": "Link",
+   "label": "Bank Account Type",
+   "options": "Bank Account Type"
+  },
+  {
+   "depends_on": "eval:doc.payment_mode == \"Bank\"",
+   "fieldname": "bank_ac_no",
+   "fieldtype": "Data",
+   "label": "Bank A/C No."
+  },
+  {
+   "depends_on": "eval:doc.payment_mode == \"Bank\"",
+   "fieldname": "bank_accounts",
+   "fieldtype": "Table",
+   "label": "Employee Bank Account",
+   "options": "Employee Bank Account"
+  },
+  {
+   "fieldname": "gender",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Gender",
+   "options": "Gender"
+  },
+  {
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Full Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "profile_tab",
+   "fieldtype": "Tab Break",
+   "label": "Profile"
+  },
+  {
+   "fieldname": "cell_number",
+   "fieldtype": "Phone",
+   "label": "Mobile"
+  },
+  {
+   "fieldname": "column_break_vzxd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "personal_email",
+   "fieldtype": "Data",
+   "label": "Personal Email"
+  },
+  {
+   "depends_on": "eval:doc.muster_roll_group == \"National\"",
+   "fieldname": "cid_number",
+   "fieldtype": "Data",
+   "label": "CID Number",
+   "mandatory_depends_on": "eval:doc.muster_roll_group == \"National\"",
+   "set_only_once": 1
+  },
+  {
+   "depends_on": "eval:doc.muster_roll_group == \"International\"",
+   "fieldname": "passport_number",
+   "fieldtype": "Data",
+   "label": "Passport/Work Permit Number",
+   "mandatory_depends_on": "eval:doc.muster_roll_group == \"International\"",
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "holiday_list",
+   "fieldtype": "Link",
+   "label": "Holiday List",
+   "options": "Holiday List"
+  },
+  {
+   "fieldname": "history_in_company_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "internal_work_history",
+   "fieldtype": "Table",
+   "label": "History In Company",
+   "options": "Muster Roll Internal Work History"
+  },
+  {
+   "depends_on": "eval:doc.status == 'Terminated'",
+   "fieldname": "relieving_date",
+   "fieldtype": "Date",
+   "label": "Relieving Date",
+   "mandatory_depends_on": "eval:doc.status == 'Terminated'"
+  },
+  {
+   "fieldname": "daily_rate",
+   "fieldtype": "Currency",
+   "label": "Daily Rate"
+  },
+  {
+   "fieldname": "image",
+   "fieldtype": "Attach Image",
+   "hidden": 1,
+   "in_preview": 1,
+   "label": "Image",
+   "options": "image",
+   "print_hide": 1
+  }
+ ],
+ "image_field": "image",
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "make_attachments_public": 1,
+ "modified": "2025-02-25 17:09:20.342818",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Muster Roll Employee",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts User",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "employee_name",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

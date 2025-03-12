@@ -78,3 +78,57 @@ def get_month_details(year, month):
 		})
 	else:
 		frappe.throw(_("Fiscal Year {0} not found").format(year))
+
+@frappe.whitelist()
+def get_basic_and_gross_pay(employee, effective_date):
+	SalaryStructure = frappe.qb.DocType("Salary Structure")
+	SalaryDetail = frappe.qb.DocType("Salary Detail")
+	query = (
+		frappe.qb.from_(SalaryStructure)
+		.join(SalaryDetail)
+		.on(SalaryStructure.name == SalaryDetail.parent)
+		.select(
+			SalaryStructure.net_pay, 
+			SalaryStructure.total_earning, 
+			SalaryDetail.amount.as_("basic_pay")
+		)
+		.where(
+			(SalaryStructure.is_active == "Yes")
+			& (SalaryStructure.employee == employee)
+			& (SalaryDetail.salary_component == "Basic Pay")
+		)
+	)
+	
+	results = query.run(as_dict=True)
+	return results[0] if results else None
+
+
+@frappe.whitelist()
+def get_start_end_dates(fiscal_year, month, company=None):
+	"""Returns dict of start and end dates for given month and fisacl year"""
+
+	months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+	month = str(int(months.index(month))+1).rjust(2, "0")
+
+	start_date = "-".join([str(fiscal_year), month, "01"])
+	end_date   = get_last_day(start_date)
+
+	return frappe._dict({"start_date": start_date, "end_date": end_date})
+
+
+def get_officiating_employee(employee):
+	if not employee:
+		frappe.throw("Employee is Mandatory")
+		
+	qry = "select officiating_employee from `tabOfficiating Employee` where docstatus = 1 and revoked != 1 and %(today)s between from_date and to_date and employee = %(employee)s order by creation desc limit 1"
+	officiate = frappe.db.sql(qry, {"today": nowdate(), "employee": employee}, as_dict=True)
+
+	if officiate:
+		flag = True
+		while flag:
+			temp = frappe.db.sql(qry, {"today": nowdate(), "employee": officiate[0].officiate}, as_dict=True)
+			if temp:
+				officiate = temp
+			else:
+				flag = False
+	return officiate

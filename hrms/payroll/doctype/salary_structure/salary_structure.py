@@ -7,7 +7,7 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.model.mapper import get_mapped_doc
-from frappe.utils import cint, cstr, flt, getdate
+from frappe.utils import cint, cstr, flt, getdate, get_first_day, today
 from frappe.model.naming import make_autoname
 from hrms.hr.hr_custom_function import get_payroll_settings, get_salary_tax, get_month_details
 import math

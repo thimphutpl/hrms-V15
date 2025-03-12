@@ -155,10 +155,11 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2021-07-30 14:03:51.218791",
+ "modified": "2025-02-27 12:27:48.526869",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Separation",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {
@@ -175,11 +176,23 @@
    "share": 1,
    "submit": 1,
    "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Employee",
+   "share": 1,
+   "write": 1
   }
  ],
  "quick_entry": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
+ "states": [],
  "title_field": "employee_name",
  "track_changes": 1
 }

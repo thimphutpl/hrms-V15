@@ -7,7 +7,14 @@ from frappe import _
 def get_dashboard_for_employee(data):
 	data["transactions"].extend(
 		[
-			{"label": _("Attendance"), "items": ["Attendance", "Attendance Request", "Employee Checkin"]},
+			{
+				"label": _("Attendance"), 
+				"items": [
+					"Attendance", 
+					# "Attendance Request", 
+					# "Employee Checkin"
+				]
+			},
 			{
 				"label": _("Leave"),
 				"items": ["Leave Application", "Leave Allocation", "Leave Policy Assignment"],
@@ -15,10 +22,10 @@ def get_dashboard_for_employee(data):
 			{
 				"label": _("Lifecycle"),
 				"items": [
-					"Employee Onboarding",
+					# "Employee Onboarding",
 					"Employee Transfer",
 					"Employee Promotion",
-					"Employee Grievance",
+					# "Employee Grievance",
 				],
 			},
 			{
@@ -27,10 +34,10 @@ def get_dashboard_for_employee(data):
 					"Employee Separation",
 					"Exit Interview",
 					"Full and Final Statement",
-					"Salary Withholding",
+					# "Salary Withholding",
 				],
 			},
-			{"label": _("Shift"), "items": ["Shift Request", "Shift Assignment"]},
+			# {"label": _("Shift"), "items": ["Shift Request", "Shift Assignment"]},
 			{"label": _("Expense"), "items": ["Expense Claim", "Travel Authorization", "Employee Advance"]},
 			{"label": _("Benefit"), "items": ["Employee Benefit Application", "Employee Benefit Claim"]},
 			{
@@ -39,17 +46,17 @@ def get_dashboard_for_employee(data):
 					"Salary Structure",
 					"Salary Slip",
 					# "Additional Salary",
-					"Timesheet",
-					"Employee Incentive",
-					"Retention Bonus",
-					"Bank Account",
+					# "Timesheet",
+					# "Employee Incentive",
+					# "Retention Bonus",
+					# "Bank Account",
 				],
 			},
-			{
-				"label": _("Training"),
-				"items": ["Training Event", "Training Result", "Training Feedback", "Employee Skill Map"],
-			},
-			{"label": _("Evaluation"), "items": ["Appraisal"]},
+			# {
+			# 	"label": _("Training"),
+			# 	"items": ["Training Event", "Training Result", "Training Feedback", "Employee Skill Map"],
+			# },
+			# {"label": _("Evaluation"), "items": ["Appraisal"]},
 		]
 	)
 

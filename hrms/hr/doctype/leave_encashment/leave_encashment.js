@@ -23,6 +23,8 @@ frappe.ui.form.on("Leave Encashment", {
 		});
 	},
 	refresh: function (frm) {
+		refresh_html(frm);
+		
 		cur_frm.set_intro("");
 		if (frm.doc.__islocal && !frappe.user_roles.includes("Employee")) {
 			frm.set_intro(__("Fill the form and save it"));
@@ -61,7 +63,7 @@ frappe.ui.form.on("Leave Encashment", {
 
 	get_employee_currency: function (frm) {
 		frappe.call({
-			method: "hrms.payroll.doctype.salary_structure_assignment.salary_structure_assignment.get_employee_currency",
+			method: "hrms.payroll.doctype.salary_structure.salary_structure.get_employee_currency",
 			args: {
 				employee: frm.doc.employee,
 			},
@@ -74,3 +76,14 @@ frappe.ui.form.on("Leave Encashment", {
 		});
 	},
 });
+
+var refresh_html = function(frm){
+	var journal_entry_status = "";
+	if(frm.doc.journal_entry_status){
+		journal_entry_status = '<div style="font-style: italic; font-size: 0.8em; ">* '+frm.doc.journal_entry_status+'</div>';
+	}
+	
+	if(frm.doc.journal_entry){
+		$(cur_frm.fields_dict.journal_entry_html.wrapper).html('<label class="control-label" style="padding-right: 0px;">Journal Entry</label><br><b>'+'<a href="/desk/Form/Journal Entry/'+frm.doc.journal_entry+'">'+frm.doc.journal_entry+"</a> "+"</b>"+journal_entry_status);
+	}	
+}

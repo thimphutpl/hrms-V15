@@ -72,6 +72,7 @@
    "default": "0",
    "fieldname": "eligible_for_overtime",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Eligible for Overtime"
   },
   {
@@ -147,7 +148,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-06 19:33:05.835966",
+ "modified": "2025-02-17 12:45:05.847365",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Grade",

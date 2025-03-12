@@ -12,6 +12,10 @@
   "posting_date",
   "branch",
   "cost_center",
+  "currency_section",
+  "currency",
+  "column_break_ahsz",
+  "exchange_rate",
   "section_break_qlai",
   "travel_type",
   "column_break_djfc",
@@ -20,12 +24,16 @@
   "mode_of_travel",
   "section_break_tvvk",
   "items",
+  "approver_detial_section",
+  "approver",
+  "column_break_aysp",
+  "approver_name",
+  "column_break_esiv",
+  "approver_designation",
   "additional_information_section",
   "company",
   "status",
   "column_break_stkr",
-  "currency",
-  "exchange_rate",
   "amended_from"
  ],
  "fields": [
@@ -103,8 +111,7 @@
    "fieldname": "currency",
    "fieldtype": "Link",
    "label": "Currency",
-   "options": "Currency",
-   "reqd": 1
+   "options": "Currency"
   },
   {
    "fieldname": "items",
@@ -121,7 +128,6 @@
    "fieldtype": "Link",
    "label": "Purpose of Travel",
    "options": "Purpose of Travel",
-   "read_only": 1,
    "reqd": 1
   },
   {
@@ -129,9 +135,7 @@
    "description": "Rate at which currency is converted to company's base currency",
    "fieldname": "exchange_rate",
    "fieldtype": "Float",
-   "label": "Exchange Rate",
-   "print_hide": 1,
-   "reqd": 1
+   "label": "Exchange Rate"
   },
   {
    "fieldname": "additional_information_section",
@@ -143,7 +147,6 @@
    "fieldtype": "Select",
    "label": "Travel Type",
    "options": "\nDomestic\nInternational",
-   "read_only": 1,
    "reqd": 1
   },
   {
@@ -158,8 +161,7 @@
    "fieldname": "mode_of_travel",
    "fieldtype": "Select",
    "label": "Mode of Travel",
-   "options": "\nOffice Car\nPersonal Car",
-   "read_only": 1,
+   "options": "\nOffice Car\nPersonal Car\nPublic Transport\nFlight",
    "reqd": 1
   },
   {
@@ -174,18 +176,75 @@
    "no_copy": 1,
    "options": "Draft\nSubmitted\nClaimed\nCancelled",
    "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "currency_section",
+   "fieldtype": "Section Break",
+   "label": "Currency"
+  },
+  {
+   "fieldname": "column_break_ahsz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approver_detial_section",
+   "fieldtype": "Section Break",
+   "label": "Approver Detial"
+  },
+  {
+   "fieldname": "approver",
+   "fieldtype": "Link",
+   "label": "Approver",
+   "no_copy": 1,
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_aysp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approver_name",
+   "fieldtype": "Data",
+   "label": "Approver Name",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_esiv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approver_designation",
+   "fieldtype": "Link",
+   "label": "Approver Designation",
+   "no_copy": 1,
+   "options": "Designation",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-02-06 21:55:44.516140",
+ "modified": "2025-03-04 12:00:47.591600",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",
  "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Employee",
+   "share": 1,
+   "write": 1
+  },
   {
    "cancel": 1,
    "create": 1,
@@ -226,15 +285,14 @@
    "write": 1
   },
   {
-   "create": 1,
    "email": 1,
    "export": 1,
+   "permlevel": 1,
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "Employee",
-   "share": 1,
-   "write": 1
+   "role": "All",
+   "share": 1
   }
  ],
  "sort_field": "modified",

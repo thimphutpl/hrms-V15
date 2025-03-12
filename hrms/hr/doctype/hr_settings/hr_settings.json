@@ -53,7 +53,11 @@
   "allow_employee_checkin_from_mobile_app",
   "allow_geolocation_tracking",
   "unlink_payment_section",
-  "unlink_payment_on_cancellation_of_employee_advance"
+  "unlink_payment_on_cancellation_of_employee_advance",
+  "approver_settings_tab",
+  "hr_manager",
+  "column_break_zguo",
+  "hr_manager_name"
  ],
  "fields": [
   {
@@ -331,25 +335,47 @@
    "fieldname": "unlink_payment_on_cancellation_of_employee_advance",
    "fieldtype": "Check",
    "label": " Unlink Payment on Cancellation of Employee Advance"
-},
-{
- "default": "0",
- "fieldname": "prevent_self_leave_approval",
- "fieldtype": "Check",
- "label": "Prevent self approval for leaves even if user has permissions"
+  },
+  {
+   "default": "0",
+   "fieldname": "prevent_self_leave_approval",
+   "fieldtype": "Check",
+   "label": "Prevent self approval for leaves even if user has permissions"
   },
   {
    "fieldname": "return_day_dsa",
    "fieldtype": "Select",
    "label": "Return Day DSA (%)",
    "options": "\n100\n70\n50\n20\n0"
+  },
+  {
+   "fieldname": "approver_settings_tab",
+   "fieldtype": "Tab Break",
+   "label": "Approver Settings"
+  },
+  {
+   "fieldname": "hr_manager",
+   "fieldtype": "Link",
+   "label": "HR Manager",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "column_break_zguo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "hr_manager.employee_name",
+   "fieldname": "hr_manager_name",
+   "fieldtype": "Data",
+   "label": "HR Manager Name",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-02-06 14:55:29.123762",
+ "modified": "2025-03-05 12:01:39.179935",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",

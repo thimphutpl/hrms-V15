@@ -8,7 +8,7 @@ frappe.ui.form.on("Travel Claim", {
 	},
     
 	refresh(frm) {
-
+		refresh_html(frm);
 	},
 
 	employee: function (frm) {
@@ -67,3 +67,30 @@ frappe.ui.form.on("Travel Claim", {
 		});
 	},
 });
+
+frappe.ui.form.on("Travel Claim Item", {
+	mileage_rate: function (frm, cdt, cdn) {
+		frm.trigger("calculate", cdt, cdn);
+	},
+
+	distance: function (frm, cdt, cdn) {
+		frm.trigger("calculate", cdt, cdn);
+	},
+
+	calculate: function (frm, cdt, cdn) {
+        let row = frappe.get_doc(cdt, cdn);
+        frappe.model.set_value(cdt, cdn, "mileage_amount", flt(row.mileage_rate) * flt(row.distance));
+        frappe.model.set_value(cdt, cdn, "amount", flt(row.mileage_amount) + flt(row.amount));
+    },
+});
+
+var refresh_html = function(frm){
+	var journal_entry_status = "";
+	if(frm.doc.journal_entry_status){
+		journal_entry_status = '<div style="font-style: italic; font-size: 0.8em; ">* '+frm.doc.journal_entry_status+'</div>';
+	}
+	
+	if(frm.doc.journal_entry){
+		$(cur_frm.fields_dict.journal_entry_html.wrapper).html('<label class="control-label" style="padding-right: 0px;">Journal Entry</label><br><b>'+'<a href="/desk/Form/Journal Entry/'+frm.doc.journal_entry+'">'+frm.doc.journal_entry+"</a> "+"</b>"+journal_entry_status);
+	}	
+}

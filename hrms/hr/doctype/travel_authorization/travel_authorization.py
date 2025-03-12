@@ -23,6 +23,7 @@ from frappe.utils import (
 	rounded,
 	nowdate
 )
+from erpnext.custom_workflow import validate_workflow_states, notify_workflow_states
 
 class TravelAuthorization(Document):
 	def validate(self):
@@ -31,6 +32,7 @@ class TravelAuthorization(Document):
 		self.validate_travel_last_day()
 		self.validate_exchange_rate()
 		self.set_status()
+		validate_workflow_states(self)
 
 	def on_update(self):
 		self.check_date_overlap()
@@ -104,25 +106,35 @@ class TravelAuthorization(Document):
 
 	def validate_duplicate_entry(self):
 		duplicate_query = """
-			SELECT t3.idx, t1.name AS authorization_name, t2.from_date, t2.to_date
+			SELECT 
+				t3.idx, 
+				t1.name AS authorization_name, 
+				t2.from_date, 
+				t2.to_date 
 			FROM `tabTravel Authorization` t1
 			JOIN `tabTravel Authorization Item` t2 ON t2.parent = t1.name
 			JOIN `tabTravel Authorization Item` t3 ON t3.parent = %s
-			WHERE t1.employee = %s
-			AND t1.docstatus != 2
-			AND t1.name != %s
-			AND t2.from_date <= t3.to_date
-			AND t2.to_date >= t3.from_date
+			WHERE 
+				t1.employee = %s
+				AND t1.docstatus != 2
+				AND t1.workflow_state != 'Rejected'
+				AND t1.name != %s
+				AND t2.from_date <= t3.to_date
+				AND t2.to_date >= t3.from_date
 		"""
 
 		overlaps = frappe.db.sql(duplicate_query, (self.name, self.employee, self.name), as_dict=True)
+
 		if overlaps:
 			t = overlaps[0]
 			frappe.throw(
-				_("Row#{}: This request overlaps with {} ({} to {}).").format(
-					t.idx, frappe.get_desk_link("Travel Authorization", t.authorization_name), t.from_date, t.to_date
+				_("Row #{}: This request overlaps with {} ({} to {}).").format(
+					t.idx, 
+					frappe.get_desk_link("Travel Authorization", t.authorization_name), 
+					t.from_date, 
+					t.to_date
 				),
-				title="Duplicate Travel Entry"
+				title=_("Duplicate Travel Entry")
 			)
 
 	def validate_travel_last_day(self):
@@ -133,7 +145,7 @@ class TravelAuthorization(Document):
 			items[-1].is_last_day = 1
 
 	def validate_exchange_rate(self):
-		if not self.exchange_rate:
+		if not self.exchange_rate and self.travel_type != 'Domestic':
 			frappe.throw(_("Exchange Rate cannot be zero."), title="Missing Exchange Rate")
 
 	@frappe.whitelist()
@@ -152,13 +164,3 @@ class TravelAuthorization(Document):
 		return {
 			"has_travel_claim": bool(travel_claim)
 		}
-
-
-@frappe.whitelist()
-def make_travel_advance(dt, dn):
-	"""
-	Creates a Travel Advance document linked to the given Travel Authorization.
-	"""
-	doc = frappe.get_doc(dt, dn)
-	travel_advance = frappe.new_doc("Travel Advance")
-	return travel_advance.as_dict()

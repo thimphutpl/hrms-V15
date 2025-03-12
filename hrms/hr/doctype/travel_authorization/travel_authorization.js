@@ -81,7 +81,7 @@ frappe.ui.form.on("Travel Authorization", {
 	},
 
 	make_travel_advance: function (frm) {
-		let method = "hrms.hr.doctype.travel_authorization.travel_authorization.make_travel_advance";
+		let method = "hrms.hr.doctype.travel_advance.travel_advance.make_travel_advance";
 		return frappe.call({
 			method: method,
 			args: {

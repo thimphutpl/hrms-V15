@@ -1,0 +1,206 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-02-15 01:25:39.731889",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "employee",
+  "employee_name",
+  "column_break_dbnp",
+  "fiscal_year",
+  "month",
+  "branch",
+  "cost_center",
+  "section_break_ofce",
+  "working_days",
+  "payment_days",
+  "absent_days",
+  "column_break_mzzr",
+  "daily_rate",
+  "total_earning",
+  "net_pay",
+  "more_info_section",
+  "start_date",
+  "end_date",
+  "column_break_ovko",
+  "company",
+  "journal_entry",
+  "column_break_alih",
+  "amended_from",
+  "muster_roll_payment_entry"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Muster Roll Employee",
+   "options": "Muster Roll Employee"
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_dbnp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "fiscal_year",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Fiscal Year",
+   "options": "Fiscal Year",
+   "reqd": 1
+  },
+  {
+   "fieldname": "month",
+   "fieldtype": "Select",
+   "label": "Month",
+   "options": "\nJanuary\nFebruary\nMarch\nApril\nMay\nJune\nJuly\nAugust\nSeptember\nOctober\nNovember\nDecember"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "column_break_ovko",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "muster_roll_payment_entry",
+   "fieldtype": "Link",
+   "label": "Muster Roll Payment Entry",
+   "options": "Muster Roll Payment Entry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_ofce",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "net_pay",
+   "fieldtype": "Currency",
+   "label": "Net Pay",
+   "read_only": 1
+  },
+  {
+   "fieldname": "more_info_section",
+   "fieldtype": "Section Break",
+   "label": "More Info"
+  },
+  {
+   "fieldname": "column_break_mzzr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_earning",
+   "fieldtype": "Currency",
+   "label": "Total Earning",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.branch",
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch",
+   "reqd": 1
+  },
+  {
+   "fieldname": "journal_entry",
+   "fieldtype": "Data",
+   "label": "journal Entry"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Pay Slip",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "label": "Start Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "End Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_alih",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "working_days",
+   "fieldtype": "Float",
+   "label": "Working Days",
+   "read_only": 1
+  },
+  {
+   "fieldname": "payment_days",
+   "fieldtype": "Float",
+   "label": "Payment Days",
+   "read_only": 1
+  },
+  {
+   "fieldname": "absent_days",
+   "fieldtype": "Float",
+   "label": "Absent Days",
+   "read_only": 1
+  },
+  {
+   "fieldname": "daily_rate",
+   "fieldtype": "Currency",
+   "label": "Daily Rate",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "branch.cost_center",
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-02-21 17:55:19.032566",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Pay Slip",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "employee_name"
+}

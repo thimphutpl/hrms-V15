@@ -1,6 +1,6 @@
 {
  "actions": [],
- "autoname": "TC-.-.YY.-.MM.-.####",
+ "autoname": "TC.-.YY.-.MM.-.####",
  "creation": "2025-01-09 23:41:51.888321",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -12,21 +12,43 @@
   "posting_date",
   "branch",
   "cost_center",
+  "currency_section",
+  "currency",
+  "column_break_ilyo",
+  "exchange_rate",
   "section_break_iymj",
   "travel_type",
   "column_break_iitp",
-  "mode_of_travel",
-  "column_break_sody",
   "purpose_of_travel",
+  "column_break_sody",
+  "mode_of_travel",
   "section_break_svpy",
   "items",
+  "section_break_bfou",
+  "advances",
+  "section_break_kzfj",
+  "total_amount",
+  "net_amount",
+  "column_break_ogjw",
+  "advance_amount",
+  "column_break_lbpf",
+  "miscellaneous_amount",
+  "miscellaneous_claim_reason",
+  "approver_detail_section",
+  "approver",
+  "column_break_xaqc",
+  "approver_name",
+  "column_break_ukmq",
+  "approver_designation",
   "additional_information_section",
+  "column_break_fkti",
+  "journal_entry_html",
+  "journal_entry",
+  "journal_entry_status",
+  "column_break_zzku",
   "company",
   "travel_authorization",
-  "column_break_zzku",
-  "currency",
-  "amended_from",
-  "exchange_rate"
+  "amended_from"
  ],
  "fields": [
   {
@@ -100,6 +122,7 @@
   {
    "fieldname": "items",
    "fieldtype": "Table",
+   "label": "Travel Itinerary",
    "options": "Travel Claim Item"
   },
   {
@@ -131,16 +154,16 @@
    "fieldname": "mode_of_travel",
    "fieldtype": "Select",
    "label": "Mode of Travel",
-   "options": "\nOffice Car\nPersonal Car",
+   "options": "\nOffice Car\nPersonal Car\nPublic Transport\nFlight",
    "reqd": 1
   },
   {
    "columns": 2,
    "fieldname": "travel_type",
-   "fieldtype": "Select",
+   "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Travel Type",
-   "options": "\nDomestic\nInternational",
+   "options": "Travel Type",
    "reqd": 1
   },
   {
@@ -158,13 +181,140 @@
    "fieldname": "travel_authorization",
    "fieldtype": "Link",
    "label": "Travel Authorization",
-   "options": "Travel Authorization"
+   "options": "Travel Authorization",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_kzfj",
+   "fieldtype": "Section Break",
+   "label": "Amount Details"
+  },
+  {
+   "fieldname": "advances",
+   "fieldtype": "Table",
+   "label": "Advance",
+   "options": "Travel Claim Advance",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "currency_section",
+   "fieldtype": "Section Break",
+   "label": "Currency"
+  },
+  {
+   "fieldname": "column_break_ilyo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "label": "Total Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "advance_amount",
+   "fieldtype": "Currency",
+   "label": "Advance Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_ogjw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "net_amount",
+   "fieldtype": "Currency",
+   "label": "Net Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_fkti",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_bfou",
+   "fieldtype": "Section Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "journal_entry",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Journal Entry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "journal_entry_html",
+   "fieldtype": "HTML",
+   "label": "Journal Entry",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "journal_entry_status",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Journal Entry Status",
+   "read_only": 1
+  },
+  {
+   "fieldname": "miscellaneous_amount",
+   "fieldtype": "Currency",
+   "label": "Miscellaneous Amount"
+  },
+  {
+   "fieldname": "column_break_lbpf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.miscellaneous_amount",
+   "fieldname": "miscellaneous_claim_reason",
+   "fieldtype": "Small Text",
+   "label": "Miscellaneous Claim Reason",
+   "mandatory_depends_on": "eval:doc.miscellaneous_amount"
+  },
+  {
+   "fieldname": "approver_detail_section",
+   "fieldtype": "Section Break",
+   "label": "Approver Detail"
+  },
+  {
+   "fieldname": "approver",
+   "fieldtype": "Link",
+   "label": "Approver",
+   "no_copy": 1,
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_xaqc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approver_name",
+   "fieldtype": "Data",
+   "label": "Approver Name",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_ukmq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approver_designation",
+   "fieldtype": "Link",
+   "label": "Approver Designation",
+   "no_copy": 1,
+   "options": "Designation",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-02-06 22:02:27.244256",
+ "modified": "2025-03-05 12:32:29.990674",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim",
@@ -180,6 +330,41 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Employee",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Manager",
    "share": 1,
    "submit": 1,
    "write": 1

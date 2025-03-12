@@ -12,17 +12,31 @@
   "posting_date",
   "branch",
   "cost_center",
+  "currency_section",
+  "currency",
+  "column_break_fglx",
+  "exchange_rate",
   "amount_details_section",
   "column_break_wxtd",
+  "from_date",
+  "to_date",
   "column_break_djfc",
+  "estimated_amount",
   "advance_amount",
   "paid_amount",
+  "approver_detail_section",
+  "approver",
+  "column_break_eqtn",
+  "approver_name",
+  "column_break_alnr",
+  "approver_designation",
   "additional_information_section",
+  "journal_entry_html",
+  "journal_entry",
+  "journal_entry_status",
+  "column_break_stkr",
   "company",
   "travel_authorization",
-  "column_break_stkr",
-  "currency",
-  "exchange_rate",
   "amended_from"
  ],
  "fields": [
@@ -90,7 +104,8 @@
    "fieldname": "company",
    "fieldtype": "Link",
    "label": "Company",
-   "options": "Company"
+   "options": "Company",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_stkr",
@@ -157,12 +172,94 @@
    "fieldtype": "Link",
    "label": "Travel Authorization",
    "options": "Travel Authorization"
+  },
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "label": "From Date"
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "label": "To Date"
+  },
+  {
+   "fieldname": "estimated_amount",
+   "fieldtype": "Currency",
+   "label": "Estimated Amount"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "currency_section",
+   "fieldtype": "Section Break",
+   "label": "Currency"
+  },
+  {
+   "fieldname": "column_break_fglx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "journal_entry",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Journal Entry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "journal_entry_html",
+   "fieldtype": "HTML",
+   "label": "Journal Entry",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "journal_entry_status",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Journal Entry Status",
+   "read_only": 1
+  },
+  {
+   "fieldname": "approver_detail_section",
+   "fieldtype": "Section Break",
+   "label": "Approver Detail"
+  },
+  {
+   "fieldname": "approver",
+   "fieldtype": "Link",
+   "label": "Approver",
+   "no_copy": 1,
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_eqtn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approver_name",
+   "fieldtype": "Data",
+   "label": "Approver Name",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_alnr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approver_designation",
+   "fieldtype": "Link",
+   "label": "Approver Designation",
+   "no_copy": 1,
+   "options": "Designation"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-02-06 19:29:16.157517",
+ "modified": "2025-03-05 12:34:28.609239",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Advance",

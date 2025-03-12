@@ -11,6 +11,8 @@
   "employee",
   "employee_name",
   "designation",
+  "devision",
+  "section",
   "column_break_obdl",
   "company",
   "department",
@@ -92,6 +94,8 @@
   "column_break_ieob",
   "bank_name",
   "bank_account_no",
+  "gis_number",
+  "gis_policy_number",
   "leave_details_section",
   "leave_details"
  ],
@@ -687,13 +691,39 @@
    "fieldname": "employer_pf_contribution",
    "fieldtype": "Currency",
    "label": "Employer PF Contribution"
+  },
+  {
+   "fieldname": "devision",
+   "fieldtype": "Link",
+   "label": "Division",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section",
+   "fieldtype": "Link",
+   "label": "Section",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fieldname": "gis_number",
+   "fieldtype": "Data",
+   "label": "GIS Number",
+   "read_only": 1
+  },
+  {
+   "fieldname": "gis_policy_number",
+   "fieldtype": "Data",
+   "label": "GIS Policy Number",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 9,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-02-05 16:43:19.318768",
+ "modified": "2025-03-04 10:13:18.723218",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Slip",

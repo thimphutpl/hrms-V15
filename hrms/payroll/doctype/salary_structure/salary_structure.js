@@ -11,7 +11,7 @@ frappe.ui.form.on("Salary Structure", {
 		});
 		frm.set_query("salary_component", "deductions", function () {
 			return {
-				filters: { type: "deductions", company: frm.doc.company },
+				filters: { type: "deduction", company: frm.doc.company },
 				// query: "hrms.payroll.doctype.salary_structure.salary_structure.get_salary_component",
 			};
 		});

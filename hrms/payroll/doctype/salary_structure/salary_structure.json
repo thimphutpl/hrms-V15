@@ -283,6 +283,7 @@
    "default": "0",
    "fieldname": "eligible_for_overtime_and_payment",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Eligible for Overtime and Payment"
   },
   {
@@ -381,7 +382,7 @@
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2025-02-03 19:56:16.692290",
+ "modified": "2025-02-17 12:37:37.676526",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",

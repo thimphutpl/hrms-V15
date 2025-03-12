@@ -6,6 +6,7 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.model.mapper import get_mapped_doc
 from hrms.hr.utils import validate_active_employee
+from erpnext.custom_workflow import validate_workflow_states, notify_workflow_states
 
 
 class TravelAdjustment(Document):
@@ -13,6 +14,7 @@ class TravelAdjustment(Document):
         """Validate the document before saving."""
         validate_active_employee(self.employee)
         self._validate_travel_last_day()
+        validate_workflow_states(self)
 
     def on_update(self):
         """Check for date overlaps when the document is updated."""

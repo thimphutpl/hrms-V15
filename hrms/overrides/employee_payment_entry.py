@@ -21,7 +21,7 @@ class EmployeePaymentEntry(PaymentEntry):
 		if self.party_type == "Customer":
 			return ("Sales Order", "Sales Invoice", "Journal Entry", "Dunning", "Payment Entry")
 		elif self.party_type == "Supplier":
-			return ("Purchase Order", "Purchase Invoice", "Journal Entry", "Payment Entry")
+			return ("Purchase Order", "Purchase Invoice", "Journal Entry", "Payment Entry", "Repair And Service Invoice")
 		elif self.party_type == "Shareholder":
 			return ("Journal Entry",)
 		elif self.party_type == "Employee":

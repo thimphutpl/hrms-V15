@@ -16,6 +16,12 @@
   "halt",
   "halt_at",
   "no_of_days",
+  "mileage_details_section",
+  "mileage_rate",
+  "column_break_fyrg",
+  "distance",
+  "column_break_vumb",
+  "mileage_amount",
   "amount_details_section",
   "dsa_percent",
   "column_break_mwyx",
@@ -111,6 +117,7 @@
    "in_list_view": 1,
    "label": "DSA (%)",
    "options": "100\n70\n50\n20\n0",
+   "read_only": 1,
    "reqd": 1
   },
   {
@@ -124,12 +131,43 @@
    "in_list_view": 1,
    "label": "Days",
    "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "mileage_details_section",
+   "fieldtype": "Section Break",
+   "label": "Mileage Details"
+  },
+  {
+   "fieldname": "mileage_rate",
+   "fieldtype": "Select",
+   "label": "Mileage Rate",
+   "options": "\n16\n6"
+  },
+  {
+   "fieldname": "column_break_fyrg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "distance",
+   "fieldtype": "Float",
+   "label": "Distance (KM)"
+  },
+  {
+   "fieldname": "column_break_vumb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "mileage_amount",
+   "fieldtype": "Currency",
+   "label": "Mileage Amount",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-02-06 15:27:14.028712",
+ "modified": "2025-03-04 16:24:44.768528",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim Item",
