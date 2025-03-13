@@ -128,6 +128,7 @@ class MusterRollApplication(Document):
 				doc.rate_per_day = a.rate_per_day
 				doc.rate_per_hour = a.rate_per_hour
 				doc.designation = a.designation
+				doc.mobile_number=a.mobile_number
 
 			if cancel:
 				frappe.db.sql("""delete from `tabEmployee Internal Work History` 
@@ -182,6 +183,7 @@ class MusterRollApplication(Document):
 						"company": self.company,
 						"bank_account_type": a.bank_account_type,
 						"nationality":a.nationality,
+						"mobile_number":a.mobile_number,
 					}
 
 					if a.is_existing == 1:

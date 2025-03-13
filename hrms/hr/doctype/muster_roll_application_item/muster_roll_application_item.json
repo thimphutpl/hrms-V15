@@ -17,6 +17,7 @@
   "column_break_3",
   "designation",
   "gender",
+  "mobile_number",
   "column_break_8",
   "joining_date",
   "qualification",
@@ -201,12 +202,17 @@
    "label": "Nationality",
    "options": "Bhutanese\nForeigner",
    "reqd": 1
+  },
+  {
+   "fieldname": "mobile_number",
+   "fieldtype": "Data",
+   "label": "Mobile Number"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-01-22 19:31:06.395598",
+ "modified": "2025-03-13 10:20:03.180044",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Muster Roll Application Item",
