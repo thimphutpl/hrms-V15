@@ -1394,19 +1394,41 @@ def on_doctype_update():
 def get_permission_query_conditions(user):
 	if not user: user = frappe.session.user
 	user_roles = frappe.get_roles(user)
-	if "HR User" in user_roles or "HR Manager" in user_roles or "Accounts User" in user_roles or "CEO" in user_roles:
+	if "HR User" in user_roles or "HR Manager" in user_roles or "CEO" in user_roles:
 		return
 	
-	return """(
-		owner = '{user}'
-		or
-		name in (select la.name
-				from `tabEmployee` e, `tabLeave Application` la
-				where e.name = la.employee
-				and e.user_id = '{user}')
-		or
-		(leave_approver = '{user}' and workflow_state not in ('Draft','Rejected','Cancelled'))
-	)""".format(user=user)
+	if "HR Support" in user_roles:
+		return """(
+			owner = '{user}'
+			or
+			name in (select la.name
+					from `tabEmployee` e, `tabLeave Application` la
+					where e.name = la.employee
+					and e.user_id = '{user}')
+			or
+			(leave_approver = '{user}' and workflow_state not in ('Draft','Rejected','Cancelled'))
+			or
+			employee in (select e.name
+				from `tabEmployee` e
+				where e.branch in (
+					select bi.branch
+					from `tabEmployee` a, `tabAssign Branch` ab, `tabBranch Item` bi
+					where ab.user = '{user}'
+					and ab.employee = a.name
+					and bi.parent = ab.name
+				))
+		)""".format(user=user)
+	else:
+		return """(
+			owner = '{user}'
+			or
+			name in (select la.name
+					from `tabEmployee` e, `tabLeave Application` la
+					where e.name = la.employee
+					and e.user_id = '{user}')
+			or
+			(leave_approver = '{user}' and workflow_state not in ('Draft','Rejected','Cancelled'))
+		)""".format(user=user)
 	
 	""" 
 		or
