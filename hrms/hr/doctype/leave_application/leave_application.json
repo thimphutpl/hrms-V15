@@ -160,11 +160,9 @@
    "fieldname": "leave_approver",
    "fieldtype": "Link",
    "label": "Leave Approver",
-   "options": "User",
-   "read_only": 1
+   "options": "User"
   },
   {
-   "fetch_from": "employee.second_approver_name",
    "fieldname": "leave_approver_name",
    "fieldtype": "Data",
    "label": "Leave Approver Name",
@@ -270,7 +268,7 @@
    "read_only": 1
   },
   {
-   "depends_on": "eval:doc.leave_type == 'Medical Leave' || doc.leave_type == 'Escort Leave'\r\n",
+   "depends_on": "eval:doc.leave_type == 'Medical Leave' || doc.leave_type == 'Escort Leave' || doc.leave_type == 'Bereavement Leave' || doc.leave_type == 'Paternity Leave' || doc.leave_type == 'Maternity leave'\r\n",
    "fieldname": "upload_medical_document",
    "fieldtype": "Attach",
    "label": "Upload Medical Document",
@@ -282,7 +280,7 @@
  "is_submittable": 1,
  "links": [],
  "max_attachments": 3,
- "modified": "2025-02-25 13:42:20.118657",
+ "modified": "2025-03-17 11:06:24.168387",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Application",
