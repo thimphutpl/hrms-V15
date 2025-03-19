@@ -147,7 +147,7 @@ frappe.ui.form.on("Travel Authorization Item", {
 			frm.set_query('country', 'items', function () {
 				return {
 					filters: {
-						name: ['in', ['Bhutan']]
+						// name: ['in', ['Bhutan']]
 					}
 				};
 			});
