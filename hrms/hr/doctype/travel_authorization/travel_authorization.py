@@ -217,6 +217,9 @@ class TravelAuthorization(Document):
 			from_date = item.from_date
 			to_date   = item.from_date if not item.to_date else item.to_date
 			item.no_days   = date_diff(to_date, from_date) + 1
+			# Validate that no_days does not exceed 30
+			if item.no_days > 30:
+				frappe.throw(_("Row#{0}: <b>No of Days</b> cannot be more than 30 days.").format(item.idx), title="Invalid Travel Duration")
 			if update:
 				frappe.db.set_value("Travel Authorization Item", item.name, "no_days", item.no_days)
 		if self.items:
