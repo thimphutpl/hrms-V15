@@ -2,100 +2,147 @@
 // For license information, please see license.txt
 
 cur_frm.add_fetch("employee", "branch", "branch");
-frappe.ui.form.on('Travel Claim', {
-	onload: function (frm) {
-		let grid = frm.fields_dict['items'].grid;
-        grid.cannot_add_rows = true;
-	},
-	
-	refresh: function (frm) {
-		if (frm.doc.docstatus == 1) {
-			if (frappe.model.can_read("Journal Entry")) {
-				cur_frm.add_custom_button('Bank Entries', function () {
-					frappe.route_options = {
-						"Journal Entry Account.reference_type": frm.doc.doctype,
-						"Journal Entry Account.reference_name": frm.doc.name,
-					};
-					frappe.set_route("List", "Journal Entry");
-				}, __("View"));
-			}
-		}
-	},
+frappe.ui.form.on('Travel Claim', {    
+    onload: function (frm) {
+        let grid = frm.fields_dict['items'].grid;
+        grid.cannot_add_rows = true;    
+        let lastRowIndex = frm.doc.items.length - 1;  
+        frm.doc.items.forEach((row, index) => {
+            if (frm.doc.items.length === 1 || index === lastRowIndex) {                
+                let valid_dsa_values = ["100.0", "50.0", "20.0"];                
+                if (valid_dsa_values.includes("50.0")) {
+                    frappe.model.set_value(row.doctype, row.name, "dsa_percent", "50.0");
+                }
+            }            
+            frappe.after_ajax(() => {
+                if (row.dsa && row.no_days && row.dsa_percent) {
+                    let amount = flt(row.dsa) * flt(row.no_days) * flt(row.dsa_percent) / 100;
+                    let base_amount = flt(frm.doc.exchange_rate) * flt(amount);
+    
+                    frappe.model.set_value(row.doctype, row.name, "amount", amount);
+                    frappe.model.set_value(row.doctype, row.name, "base_amount", base_amount);
+                }
+            });
+        });        
+        frm.trigger("calculate_total");
+    },    
+    
+    refresh: function (frm) {
+        if (frm.doc.docstatus == 1) {
+            if (frappe.model.can_read("Journal Entry")) {
+                cur_frm.add_custom_button('Bank Entries', function () {
+                    frappe.route_options = {
+                        "Journal Entry Account.reference_type": frm.doc.doctype,
+                        "Journal Entry Account.reference_name": frm.doc.name,
+                    };
+                    frappe.set_route("List", "Journal Entry");
+                }, __("View"));
+            }
+        }
+    },
 
-	currency: (frm) => {
+    currency: (frm) => {
         let company_currency = erpnext.get_currency(frm.doc.company);
-		if (company_currency != frm.doc.company) {
-			frappe.call({
-				method: "erpnext.setup.utils.get_exchange_rate",
-				args: {
-					from_currency: company_currency,
-					to_currency: frm.doc.currency,
-				},
-				callback: function (r) {
-					if (r.message) {
-						frm.set_value("exchange_rate", flt(r.message));
-						frm.set_df_property(
-							"exchange_rate",
-							"description",
-							"1 " + frm.doc.currency + " = [?] " + company_currency
-						);
-					}
-				},
-			});
-		} else {
-			frm.set_value("exchange_rate", 1.0);
-			frm.set_df_property("exchange_rate", "hidden", 1);
-			frm.set_df_property("exchange_rate", "description", "");
-		}
+        if (company_currency != frm.doc.company) {
+            frappe.call({
+                method: "erpnext.setup.utils.get_exchange_rate",
+                args: {
+                    from_currency: company_currency,
+                    to_currency: frm.doc.currency,
+                },
+                callback: function (r) {
+                    if (r.message) {
+                        frm.set_value("exchange_rate", flt(r.message));
+                        frm.set_df_property(
+                            "exchange_rate",
+                            "description",
+                            "1 " + frm.doc.currency + " = [?] " + company_currency
+                        );
+                    }
+                },
+            });
+        } else {
+            frm.set_value("exchange_rate", 1.0);
+            frm.set_df_property("exchange_rate", "hidden", 1);
+            frm.set_df_property("exchange_rate", "description", "");
+        }
 
-		frm.trigger("amount");
-		frm.trigger("set_dynamic_field_label");
-	},
+        frm.trigger("amount");
+        frm.trigger("set_dynamic_field_label");
+    },
 
-	set_dynamic_field_label: function (frm) {
-		frm.trigger("change_grid_labels");
-		frm.trigger("change_form_labels");
-	},
+    set_dynamic_field_label: function (frm) {
+        frm.trigger("change_grid_labels");
+        frm.trigger("change_form_labels");
+    },
 
-	change_form_labels: function (frm) {
-		let company_currency = erpnext.get_currency(frm.doc.company);
-		frm.set_currency_labels(["base_amount"], company_currency);
-		frm.set_currency_labels(["amount"], frm.doc.currency);
+    change_form_labels: function (frm) {
+        let company_currency = erpnext.get_currency(frm.doc.company);
+        frm.set_currency_labels(["base_amount"], company_currency);
+        frm.set_currency_labels(["amount"], frm.doc.currency);
 
-		frm.toggle_display(
-			["exchange_rate", "base_amount"],
-			frm.doc.currency != company_currency
-		);
-	},
+        frm.toggle_display(
+            ["exchange_rate", "base_amount"],
+            frm.doc.currency != company_currency
+        );
+    },
 
     change_grid_labels: function (frm) {
-		let company_currency = erpnext.get_currency(frm.doc.company);
-		frm.set_currency_labels(["base_amount"], company_currency, "items");
-		frm.set_currency_labels(["amount"], frm.doc.currency, "items");
+        let company_currency = erpnext.get_currency(frm.doc.company);
+        frm.set_currency_labels(["base_amount"], company_currency, "items");
+        frm.set_currency_labels(["amount"], frm.doc.currency, "items");
 
-		let item_grid = frm.fields_dict.items.grid;
-		$.each(["base_amount"], function (i, fname) {
-			if (frappe.meta.get_docfield(item_grid.doctype, fname))
-				item_grid.set_column_disp(fname, frm.doc.currency != company_currency);
-		});
-		frm.refresh_fields();
-	},
+        let item_grid = frm.fields_dict.items.grid;
+        $.each(["base_amount"], function (i, fname) {
+            if (frappe.meta.get_docfield(item_grid.doctype, fname))
+                item_grid.set_column_disp(fname, frm.doc.currency != company_currency);
+        });
+        frm.refresh_fields();
+    },    
 
-	calculate_total: function (frm) {
-		let total = 0,
-			base_total = 0;
-		frm.doc.items.forEach((item) => {
-			total += item.amount;
-			base_total += item.base_amount;
-		});
+    // calculate_total: function (frm) {
+    //     let total = 0,
+    //         base_total = 0;
+        
+    //     frm.doc.items.forEach((item) => {
+    //         total += item.amount + item.mileage_amount;
+    //         base_total += item.base_amount;
+    //     });
+    
+    //     let total_claim_amount = base_total; 
+    
+    //     frm.set_value({
+    //         total_amount: flt(total),
+    //         base_total_amount: flt(base_total),
+    //         total_claim_amount: flt(total_claim_amount)
+    //     });
+    // },    
 
-		frm.set_value({
-			total_amount: flt(total),
-			base_total_amount: flt(base_total),
-		});
-	},
+    calculate_total: function (frm) {
+        let total = 0,
+            base_total = 0;
+        
+        if (frm.doc.items && frm.doc.items.length > 0) {
+            frm.doc.items.forEach((item) => {
+                total += flt(item.amount) + flt(item.mileage_amount);
+                base_total += flt(item.base_amount);
+            });
+        }
+    
+        let total_claim_amount = base_total; 
+    
+        frm.set_value({
+            total_amount: flt(total),
+            base_total_amount: flt(base_total),
+            total_claim_amount: flt(total_claim_amount)
+        });
+    },
+    
+    
 });
-frappe.ui.form.on("Travel Claim Item", { 
+
+frappe.ui.form.on("Travel Claim Item", {
+    
     mode_of_travel: function (frm, cdt, cdn) {
         let row = frappe.get_doc(cdt, cdn);
         // Toggle the visibility of fields based on mode_of_travel
@@ -107,30 +154,72 @@ frappe.ui.form.on("Travel Claim Item", {
         frm.fields_dict[row.name].grid.toggle_display("distance", is_personal_car);
         frm.fields_dict[row.name].grid.toggle_display("mileage_rate", is_personal_car);
     },
+    // calculate: function (frm, cdt, cdn) {
+    //     let row = frappe.get_doc(cdt, cdn);
+    //     frappe.model.set_value(cdt, cdn, "amount", flt(row.dsa) * flt(row.no_days) * flt(row.dsa_percent) / 100);
+    //     frappe.model.set_value(cdt, cdn, "base_amount", flt(frm.doc.exchange_rate) * flt(row.amount) + flt(row.mileage_amount));
+	// 	frappe.model.set_value(cdt, cdn, "mileage_amount", flt(row.mileage_rate) * flt(row.distance));
+    //     frm.trigger("calculate_total");
+    //     frm.trigger("set_dynamic_field_label");
+    // },
 
     calculate: function (frm, cdt, cdn) {
-        let row = frappe.get_doc(cdt, cdn);
+        let row = frappe.get_doc(cdt, cdn);    
+        // If currency is BTN, set exchange rate to 1
+        if (row.currency === "BTN") {
+            frappe.model.set_value(cdt, cdn, "exchange_rate", 1);
+        }    
+        // Calculate the values
         frappe.model.set_value(cdt, cdn, "amount", flt(row.dsa) * flt(row.no_days) * flt(row.dsa_percent) / 100);
-        frappe.model.set_value(cdt, cdn, "base_amount", flt(frm.doc.exchange_rate) * flt(row.amount));
-        // frm.trigger("calculate_total");
+        frappe.model.set_value(cdt, cdn, "mileage_amount", flt(row.mileage_rate) * flt(row.distance));    
+        // Use updated exchange rate if manually set or from row
+        let exchange_rate = row.currency === "BTN" ? 1 : flt(frm.doc.exchange_rate);
+        frappe.model.set_value(cdt, cdn, "base_amount", exchange_rate * flt(row.amount) + flt(row.mileage_amount));    
+        // Trigger related updates
+        frm.trigger("calculate_total");
         frm.trigger("set_dynamic_field_label");
-    },
+    },    
 
     dsa: function (frm, cdt, cdn) {		
         frm.trigger("calculate", cdt, cdn);
+    },	
+
+    currency: function (frm, cdt, cdn) {		
+        frm.trigger("calculate", cdt, cdn);
+    },	
+
+	mileage_rate: function(frm, cdt, cdn) {
+        let row = frappe.get_doc(cdt, cdn);       
+        let amount = flt(row.mileage_rate) * flt(row.distance);        
+        let base_amount = flt(frm.doc.exchange_rate) * flt(amount);        
+        // Set the calculated values
+        frappe.model.set_value(cdt, cdn, "amount", amount);
+        frappe.model.set_value(cdt, cdn, "base_amount", base_amount);        
+        // Trigger total calculation
+        frm.trigger("calculate");
     },
-	
+
+    distance: function(frm, cdt, cdn) {
+        let row = frappe.get_doc(cdt, cdn);       
+        let amount = flt(row.mileage_rate) * flt(row.distance);        
+        let base_amount = flt(frm.doc.exchange_rate) * flt(amount);        
+        frappe.model.set_value(cdt, cdn, "amount", amount);
+        frappe.model.set_value(cdt, cdn, "base_amount", base_amount);        
+        // Trigger total calculation
+        frm.trigger("calculate");
+    },
+	base_amount: function(frm, cdt, cdn) {
+		frm.trigger("calculate", cdt, cdn)
+	},	
 	 // Combined dsa_percent function
 	dsa_percent: function(frm, cdt, cdn){
 		var item = locals[cdt][cdn];
-
 		if(frm.doc.place_type == "Out-Country" || frm.doc.place_type == "In-Country") {
 			// Calculate amount based on place_type and dsa_percent
 			frappe.model.set_value(cdt, cdn, "amount", flt(flt(item.dsa) * flt(item.no_days) * flt(item.dsa_percent) * 0.01, 2));
 			frm.refresh_fields();
 		}
-    },	
-
+    },
     amount: function (frm, cdt, cdn) {
         frm.trigger("calculate", cdt, cdn);
     },
