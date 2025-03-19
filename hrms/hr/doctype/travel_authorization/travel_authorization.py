@@ -75,7 +75,7 @@ class TravelAuthorization(Document):
 				"bond_period_to_date": self.bond_period_to_date
 
 			})
-			emp_doc.save()
+			emp_doc.save(ignore_permissions=1)
 
 	def on_cancel(self):
 		self.cancel_attendance()	
@@ -422,6 +422,15 @@ def get_permission_query_conditions(user):
 
 	if "Accounts User" in user_roles or "GM" in user_roles:
 		return """(
+			`tabTravel Authorization`.owner = '{user}'
+		or
+			exists(select 1
+				from `tabEmployee`
+				where `tabEmployee`.name = `tabTravel Authorization`.employee
+				and `tabEmployee`.user_id = '{user}' and `tabTravel Authorization`.docstatus != 2)
+		or
+			(`tabTravel Authorization`.approver = '{user}' and `tabTravel Authorization`.workflow_state not in ('Draft','Rejected','Cancelled'))
+		or
 			exists(select 1
 			from `tabAssign Branch`, `tabBranch Item`
 			where `tabAssign Branch`.name = `tabBranch Item`.parent 
