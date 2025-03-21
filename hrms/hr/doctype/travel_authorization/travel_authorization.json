@@ -197,9 +197,10 @@
   },
   {
    "depends_on": "eval:doc.need_advance",
+   "description": "If the amount is in dollars, include the exchange rate above.",
    "fieldname": "advance_amount",
    "fieldtype": "Currency",
-   "label": "Advance Amount (Company Currency)",
+   "label": "Advance Amount (Nu/Dollar)",
    "options": "currency"
   },
   {
@@ -354,7 +355,7 @@
    "fieldtype": "Column Break"
   },
   {
-   "depends_on": "eval:doc.need_advance && doc.currency!=\"BTN\"",
+   "depends_on": "eval:doc.need_advance ",
    "fieldname": "base_advance_amount",
    "fieldtype": "Currency",
    "label": "Advance Amount",
@@ -436,7 +437,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-03-06 09:35:07.370787",
+ "modified": "2025-03-21 13:32:00.424156",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",

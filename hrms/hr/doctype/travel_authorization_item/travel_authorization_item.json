@@ -15,11 +15,14 @@
   "halt_at",
   "dsa",
   "currency",
+  "exchange_rate",
+  "dsa_nu_per_day",
   "column_break_4",
   "to_date",
   "no_days",
   "country",
-  "is_last_day"
+  "is_last_day",
+  "total_dsa"
  ],
  "fields": [
   {
@@ -112,20 +115,37 @@
   {
    "fieldname": "dsa",
    "fieldtype": "Currency",
-   "label": "DSA"
+   "label": "DSA per day"
   },
   {
    "fieldname": "currency",
    "fieldtype": "Link",
    "label": "Currency",
-   "options": "Currency",
-   "read_only": 1
+   "options": "Currency"
+  },
+  {
+   "fieldname": "total_dsa",
+   "fieldtype": "Currency",
+   "label": "Total DSA"
+  },
+  {
+   "default": "1.00",
+   "depends_on": "eval:parent.place_type=='Out-Country'",
+   "fieldname": "exchange_rate",
+   "fieldtype": "Currency",
+   "label": "Exchange Rate"
+  },
+  {
+   "depends_on": "eval:parent.place_type=='Out-Country'",
+   "fieldname": "dsa_nu_per_day",
+   "fieldtype": "Currency",
+   "label": "DSA Nu. Per Day"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-03-04 16:05:15.358568",
+ "modified": "2025-03-20 12:51:12.130032",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization Item",

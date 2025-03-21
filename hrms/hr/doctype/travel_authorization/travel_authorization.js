@@ -56,9 +56,12 @@ frappe.ui.form.on('Travel Authorization', {
 			frm.set_value("posting_date", frappe.datetime.get_today());
 		}
 
-		if(frm.doc.currency=="BTN"){
-			frm.set_value("exchange_rate", 1);
-		}
+		// if(frm.doc.currency=="BTN"){
+		// 	frm.set_value("exchange_rate", 1);
+		// }
+		if(frm.doc.travel_type=="In-Country"){
+				frm.set_value("exchange_rate", 1);
+			}
 
 		frm.set_query("employee", erpnext.queries.employee);
 	},
@@ -93,7 +96,7 @@ frappe.ui.form.on('Travel Authorization', {
 				},
 				callback: function (r) {
 					if (r.message) {
-						frm.set_value("exchange_rate", flt(r.message));
+						// frm.set_value("exchange_rate", flt(r.message));
 						frm.set_df_property(
 							"exchange_rate",
 							"description",
@@ -246,6 +249,7 @@ frappe.ui.form.on("Travel Authorization Item", {
 		frm.refresh_field("items");
 	},
 
+
 	exchange_rate: function (frm, cdt, cdn) {
 		frm.refresh_field("items");
 		frm.refresh_fields();
@@ -262,6 +266,16 @@ frappe.ui.form.on("Travel Authorization Item", {
 			frappe.model.set_value(cdt, cdn, "no_days", 1 + cint(frappe.datetime.get_day_diff(item.to_date, item.from_date)))
 		}
 	},
+
+	exchange_rate: function(frm, cdt, cdn) {
+        calculate_total_dsa(frm, cdt, cdn);
+    },
+	dsa: function(frm, cdt, cdn) {
+        calculate_total_dsa(frm, cdt, cdn);
+    },
+    no_days: function(frm, cdt, cdn) {
+        calculate_total_dsa(frm, cdt, cdn);
+    }
 });
 
 const set_employee_dsa = (frm, cdt, cdn) => {
@@ -300,4 +314,21 @@ function calculate_advance(frm) {
 			frm.refresh_field("estimated_amount");
 		}
 	});
+}
+
+function calculate_total_dsa(frm, cdt, cdn) {
+    var item = locals[cdt][cdn];
+	if (!(item.exchange_rate)){
+		item.exchange_rate=1
+ 
+	}
+    if (item.dsa && item.no_days) {
+        var total_dsa = item.dsa * item.no_days * item.exchange_rate;
+		var total_Dsa_anu = item.dsa * item.exchange_rate;
+		// console.log(total_dsa)
+        frappe.model.set_value(cdt, cdn, "total_dsa", total_dsa);
+		frappe.model.set_value(cdt, cdn, "dsa_nu_per_day", total_Dsa_anu)
+        frm.refresh_field("total_dsa");
+		frm.refresh_field("dsa_nu_per_day");
+    }
 }

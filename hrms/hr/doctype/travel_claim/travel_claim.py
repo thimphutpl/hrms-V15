@@ -16,7 +16,7 @@ from datetime import datetime, timedelta
 
 class TravelClaim(Document):
 	def validate(self):
-		validate_workflow_states(self)
+		# validate_workflow_states(self)
 		self.validate_travel_last_day()
 		self.validate_dsa_ceiling()
 		self.update_amounts()
@@ -24,6 +24,9 @@ class TravelClaim(Document):
 		self.validate_duplicate()
 		if self.training_event:
 			self.update_training_event()
+		if self.place_type == 'Out-Country':
+			if self.exchange_rate == 0.00:
+				frappe.throw("Please Enter Exchange rate")
 
 	def on_update(self):
 		self.check_double_dates()
@@ -217,23 +220,26 @@ class TravelClaim(Document):
 			# 			else:
 			# 				dsa_ceilings[str(item.date).split("-")[1]]['days'] += 15
 				# exchange_rate = 1 if self.currency == company_currency else get_exchange_rate(self.currency, company_currency)
-			item.dsa = flt(item.dsa)
+			item.dsa = flt(item.total_dsa)
 			if item.is_last_day:
 				item.dsa_percent = flt(lastday_dsa_percent)
 			
 			# if self.mode_of_travel == "Personal Car":
-			item.amount = (flt(item.days_allocated) * (flt(item.dsa) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
+			# item.amount = (flt(item.days_allocated) * (flt(item.dsa) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
+			item.amount = (flt(flt(item.dsa) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
+			# frappe.msgprint(str(item.amount))
 			total_claim_days += flt(item.days_allocated)
 			# total_claim_days += item.days_allocated
 			# else:
 			# 	item.amount = flt(item.days_allocated) * (flt(item.dsa) * flt(item.dsa_percent) / 100)
-			item.base_amount = flt(item.amount) * flt(self.exchange_rate)
+			# item.base_amount = flt(item.amount) * flt(self.exchange_rate)
+			item.base_amount = flt(item.amount)
 			total_claim_amount += flt(item.base_amount)
 		
 		self.total_claim_amount = flt(total_claim_amount)
 		self.total_claim_days = flt(total_claim_days)
 		self.balance_amount = (flt(self.total_claim_amount) + flt(self.extra_claim_amount) - flt(self.advance_amount))
-		
+		# frappe.throw(str(self.total_claim_amount))
 		if flt(self.balance_amount) < 0:
 			frappe.throw(_("Balance Amount cannot be a negative value."), title="Invalid Amount")
 

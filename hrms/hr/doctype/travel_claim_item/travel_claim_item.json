@@ -19,7 +19,7 @@
   "is_last_day",
   "section_break_10",
   "col_break_currency",
-  "dsa",
+  "total_dsa",
   "mileage_rate",
   "column_break_12",
   "base_dsa",
@@ -87,15 +87,6 @@
    "fieldname": "distance",
    "fieldtype": "Data",
    "label": "Distance (in KM)"
-  },
-  {
-   "columns": 2,
-   "fieldname": "dsa",
-   "fieldtype": "Currency",
-   "in_list_view": 1,
-   "label": " DSA (Company Currency)",
-   "options": "currency",
-   "reqd": 1
   },
   {
    "fieldname": "section_break_18",
@@ -221,12 +212,21 @@
    "fieldtype": "Int",
    "label": "No. of Days Accepted For Claim",
    "read_only": 1
+  },
+  {
+   "columns": 2,
+   "fieldname": "total_dsa",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": " DSA (In Country)",
+   "options": "currency",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-03-05 10:50:43.621760",
+ "modified": "2025-03-21 11:53:38.790936",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim Item",

@@ -16,22 +16,43 @@ from erpnext.accounts.doctype.accounts_settings.accounts_settings import get_ban
 
 class TravelAuthorization(Document):
 	def validate(self):
-		validate_workflow_states(self)
+		# validate_workflow_states(self)
 		self.validate_travel_last_day()
 		self.assign_end_date()
 		self.validate_advance()
 		self.set_travel_period()
+		self.check_advance()
+		self.check_total_dsa()
 		self.validate_travel_dates(update=True)
+		self.check_exchange_rate()
 		if self.training_event:
 			self.update_training_event()
 		if self.workflow_state != "Approved":
 			notify_workflow_states(self)
 
+	def check_exchange_rate(self):
+		if self.place_type == 'Out-Country':
+			if self.exchange_rate == 0.00:
+				frappe.throw("Please Enter Exchange rate")
+		ninety_percent = self.estimated_amount * 0.90  # Fixing percentage calculation
+
+		if self.base_advance_amount > flt(ninety_percent):
+			frappe.throw("Advance amount exceeds the estimated amount")
 	def on_update(self):
 		self.validate_travel_dates()
 		self.check_date_overlap()
 		self.check_leave_applications()
-
+	def check_total_dsa(self):
+		for i in self.items:
+			if self.place_type == "In-Country":
+				i.total_dsa = flt(i.dsa) * flt(i.no_days)
+			if self.place_type == "Out-Country":
+				i.total_dsa = flt(i.dsa_nu_per_day) * flt(i.no_days)
+	def check_advance(self):
+		if self.need_advance:
+			if self.place_type!='Out-Country':
+				self.exchange_rate = 1
+			self.base_advance_amount = self.advance_amount * self.exchange_rate
 	def on_submit(self):
 		notify_workflow_states(self)
 		self.validate_travel_dates(update=True)
@@ -286,15 +307,24 @@ class TravelAuthorization(Document):
 	def set_estimate_amount(self):
 		if not self.need_advance:
 			return
-		
-		if len(self.items) > 1:
-			first_day = self.items[0].from_date
-			last_second_day = self.items[len(self.items) - 2].to_date
-			total_days = date_diff(last_second_day, first_day) + 1
-			self.estimated_amount = flt(total_days) * flt(self.dsa_per_day)
+
+		if self.place_type == 'Out-Country':
+			total_dsa = 0
+			for i in self.items:
+				if i.is_last_day == 0:
+					total_dsa += i.total_dsa
+			self.estimated_amount = total_dsa
+			return self.estimated_amount if total_dsa else 0.0
 		else:
-			self.estimated_amount = self.dsa_per_day
-		return self.estimated_amount if self.currency == "BTN" else 0.0
+			
+			if len(self.items) > 1:
+				first_day = self.items[0].from_date
+				last_second_day = self.items[len(self.items) - 2].to_date
+				total_days = date_diff(last_second_day, first_day) + 1
+				self.estimated_amount = flt(total_days) * flt(self.dsa_per_day)
+			else:
+				self.estimated_amount = self.dsa_per_day
+			return self.estimated_amount if self.currency == "BTN" else 0.0
 
 @frappe.whitelist()
 def make_travel_claim(source_name, target_doc=None):
