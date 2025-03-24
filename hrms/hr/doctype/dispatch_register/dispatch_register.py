@@ -7,11 +7,11 @@ from frappe.model.document import Document
 
 class DispatchRegister(Document):
 
-	# def validate(self):
-	# 	self.generate_dispatch_no()
-	
-	def on_submit(self):
+	def validate(self):
 		self.generate_dispatch_no()
+	
+	# def on_submit(self):
+	# 	self.generate_dispatch_no()
   
 	def generate_dispatch_no(self):
 		if self.manual_dispatch and self.dispatch_series_type:
