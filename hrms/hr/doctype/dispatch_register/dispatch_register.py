@@ -7,15 +7,17 @@ from frappe.model.document import Document
 
 class DispatchRegister(Document):
 
-	def validate(self):
+	# def validate(self):
+	# 	self.generate_dispatch_no()
+	
+	def on_submit(self):
 		self.generate_dispatch_no()
-	
-	
+  
 	def generate_dispatch_no(self):
 		if self.manual_dispatch and self.dispatch_series_type:
 			id = frappe.db.sql('''
-						select dispatch_serial from `tabDispatch Register` where dispatch_series_type='{0}' and fiscal_year='{1}' and docstatus=1 order by creation desc limit 1;
-						'''.format(self.dispatch_series_type,self.fiscal_year))
+						select dispatch_serial from `tabDispatch Register` where docstatus=1 order by dispatch_serial desc limit 1;
+						''')
 			if not id or not id[0][0]:
 			    self.dispatch_serial = 1
 			else:
