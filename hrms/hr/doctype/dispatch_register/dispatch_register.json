@@ -11,6 +11,7 @@
   "fiscal_year",
   "column_break_dush",
   "company",
+  "employee",
   "department",
   "section_break_eibt",
   "manual_dispatch",
@@ -37,6 +38,7 @@
    "label": "Date"
   },
   {
+   "default": "Today",
    "fieldname": "date",
    "fieldtype": "Date",
    "label": "Date"
@@ -64,7 +66,7 @@
   {
    "fieldname": "place",
    "fieldtype": "Data",
-   "label": "Place"
+   "label": "Sending Place"
   },
   {
    "fieldname": "remarks_section",
@@ -94,6 +96,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "fetch_from": "employee.department",
    "fieldname": "department",
    "fieldtype": "Link",
    "label": "Department",
@@ -165,12 +168,18 @@
    "fieldtype": "Int",
    "label": "Dispatch Serial",
    "read_only": 1
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-02-03 11:45:36.201172",
+ "modified": "2025-03-24 13:23:32.050407",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Dispatch Register",

@@ -48,3 +48,27 @@ def get_employees_by_department(transaction_type, transaction):
 
 		# Return the result if found, else return None
 		return dispatch_no[0]['dispatch_number'] if dispatch_no else None
+
+@frappe.whitelist()
+def get_date_depart(company,date,user):
+	fiscal_year = frappe.db.sql('''
+                             select fy.name,fyc.company from `tabFiscal Year` fy inner join `tabFiscal Year Company` 
+                             fyc on fy.name = fyc.parent where fyc.company="{}" 
+                             and '{}' between fy.year_start_date and fy.year_end_date;
+                             '''.format(company,date),as_dict=True)
+	if not fiscal_year:
+		frappe.throw("Fiscal Year for your company not set for this date")
+	if user != "Administrator":
+		id = frappe.db.sql('''
+                     select name from `tabEmployee` where user_id='{}';
+                     '''.format(user),as_dict=True)
+		if not id:
+			frappe.throw("You dont have employee id mapped with your user")
+		
+
+	return {
+        # 'dispatch_number': dispatch_no[0]['dispatch_number'] if dispatch_no else None,
+        'fiscal_year': fiscal_year[0].name,
+        'employee_id': id[0]['name'] if id else None
+    }
+	
