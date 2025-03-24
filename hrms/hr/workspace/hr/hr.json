@@ -1,11 +1,6 @@
 {
- "charts": [
-  {
-   "chart_name": "Hiring vs Attrition Count",
-   "label": "Hiring vs Attrition Count"
-  }
- ],
- "content": "[{\"id\":\"bBbTEBH8q2\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Hiring vs Attrition Count\",\"col\":12}},{\"id\":\"ERp6x41Dov\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"HBQa5zgqhu\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Employee\",\"col\":3}},{\"id\":\"l-gX9_vLMU\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Leave Application\",\"col\":3}},{\"id\":\"s7nv5Eg_PW\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"HR Dashboard\",\"col\":3}},{\"id\":\"bxUg--RX0k\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Recruitment Dashboard\",\"col\":3}},{\"id\":\"OXRfo25FEL\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Employee Lifecycle Dashboard\",\"col\":3}},{\"id\":\"f2wcHUgL7l\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Attendance Dashboard\",\"col\":3}},{\"id\":\"lUrh6WVVSw\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Expense Claims Dashboard\",\"col\":3}},{\"id\":\"9Q5k7xe2ml\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"Dtseg_98HF\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Reports &amp; Masters</b></span>\",\"col\":12}},{\"id\":\"4PbOaaRTiQ\",\"type\":\"card\",\"data\":{\"card_name\":\"Setup\",\"col\":4}},{\"id\":\"4cC_MJaVZV\",\"type\":\"card\",\"data\":{\"card_name\":\"Employee\",\"col\":4}},{\"id\":\"j3KPSWijhw\",\"type\":\"card\",\"data\":{\"card_name\":\"Leaves\",\"col\":4}},{\"id\":\"ij5uawJpAp\",\"type\":\"card\",\"data\":{\"card_name\":\"Settings\",\"col\":4}},{\"id\":\"yrHojZuWD7\",\"type\":\"card\",\"data\":{\"card_name\":\"Attendance\",\"col\":4}},{\"id\":\"J4caTjRlVP\",\"type\":\"card\",\"data\":{\"card_name\":\"Expense Claim\",\"col\":4}},{\"id\":\"AZtI-f1Q3a\",\"type\":\"card\",\"data\":{\"card_name\":\"Key Reports\",\"col\":4}},{\"id\":\"iNb8rmILXV\",\"type\":\"card\",\"data\":{\"card_name\":\"Other Reports\",\"col\":4}}]",
+ "charts": [],
+ "content": "[{\"id\":\"9k1rDm2C0l\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"vikWSkNm6_\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Shortcuts</b></span>\",\"col\":12}},{\"id\":\"B7-uxs8tkU\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"tHb3yxthkR\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Reports &amp; Masters</b></span>\",\"col\":12}}]",
  "creation": "2020-03-02 15:48:58.322521",
  "custom_blocks": [],
  "docstatus": 0,
@@ -17,47 +12,6 @@
  "is_hidden": 0,
  "label": "HR",
  "links": [
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Settings",
-   "link_count": 3,
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "dependencies": "",
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "HR Settings",
-   "link_count": 0,
-   "link_to": "HR Settings",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "dependencies": "",
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Daily Work Summary Group",
-   "link_count": 0,
-   "link_to": "Daily Work Summary Group",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "dependencies": "",
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Team Updates",
-   "link_count": 0,
-   "link_to": "team-updates",
-   "link_type": "Page",
-   "onboard": 0,
-   "type": "Link"
-  },
   {
    "hidden": 0,
    "is_query_report": 0,
@@ -93,90 +47,6 @@
    "link_count": 0,
    "link_to": "Employee Grade",
    "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Key Reports",
-   "link_count": 7,
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "dependencies": "Attendance",
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Monthly Attendance Sheet",
-   "link_count": 0,
-   "link_to": "Monthly Attendance Sheet",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "dependencies": "Staffing Plan",
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Recruitment Analytics",
-   "link_count": 0,
-   "link_to": "Recruitment Analytics",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "dependencies": "Employee",
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Employee Analytics",
-   "link_count": 0,
-   "link_to": "Employee Analytics",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "dependencies": "Employee",
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Employee Leave Balance",
-   "link_count": 0,
-   "link_to": "Employee Leave Balance",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "dependencies": "Employee",
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Employee Leave Balance Summary",
-   "link_count": 0,
-   "link_to": "Employee Leave Balance Summary",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "dependencies": "Employee Advance",
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Employee Advance Summary",
-   "link_count": 0,
-   "link_to": "Employee Advance Summary",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Employee Exits",
-   "link_count": 0,
-   "link_to": "Employee Exits",
-   "link_type": "Report",
    "onboard": 0,
    "type": "Link"
   },
@@ -235,56 +105,6 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Setup",
-   "link_count": 4,
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "dependencies": "",
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Company",
-   "link_count": 0,
-   "link_to": "Company",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "dependencies": "",
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Branch",
-   "link_count": 0,
-   "link_to": "Branch",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Department",
-   "link_count": 0,
-   "link_to": "Department",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Designation",
-   "link_count": 0,
-   "link_to": "Designation",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
    "label": "Leaves",
    "link_count": 2,
    "onboard": 0,
@@ -306,44 +126,6 @@
    "label": "Compensatory Leave Request",
    "link_count": 0,
    "link_to": "Compensatory Leave Request",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Attendance",
-   "link_count": 3,
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Attendance",
-   "link_count": 0,
-   "link_to": "Attendance",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Attendance Request",
-   "link_count": 0,
-   "link_to": "Attendance Request",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Employee Checkin",
-   "link_count": 0,
-   "link_to": "Employee Checkin",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -378,7 +160,7 @@
    "type": "Link"
   }
  ],
- "modified": "2025-03-06 14:57:52.983575",
+ "modified": "2025-03-18 10:14:03.390013",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR",
@@ -390,57 +172,6 @@
  "restrict_to_domain": "",
  "roles": [],
  "sequence_id": 11.0,
- "shortcuts": [
-  {
-   "format": "{} Open",
-   "label": "HR Dashboard",
-   "link_to": "Human Resource",
-   "stats_filter": "{\n    \"status\": \"Open\"\n}",
-   "type": "Dashboard"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Leave Application",
-   "link_to": "Leave Application",
-   "type": "DocType"
-  },
-  {
-   "color": "Green",
-   "format": "{} Active",
-   "label": "Employee",
-   "link_to": "Employee",
-   "stats_filter": "{\"status\":\"Active\"}",
-   "type": "DocType"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Expense Claims Dashboard",
-   "link_to": "Expense Claims",
-   "type": "Dashboard"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Recruitment Dashboard",
-   "link_to": "Recruitment",
-   "type": "Dashboard"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Employee Lifecycle Dashboard",
-   "link_to": "Employee Lifecycle",
-   "type": "Dashboard"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Attendance Dashboard",
-   "link_to": "Attendance",
-   "type": "Dashboard"
-  }
- ],
+ "shortcuts": [],
  "title": "HR"
 }

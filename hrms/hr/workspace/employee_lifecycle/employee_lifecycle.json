@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"8VsWbOyrrI\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"gMxTqU4MRn\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Employee Onboarding\",\"col\":3}},{\"id\":\"sWq5wxwy_Z\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Employee Separation\",\"col\":3}},{\"id\":\"alTxAhOlJ9\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Employee Grievance\",\"col\":3}},{\"id\":\"c17WO8kljb\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dashboard\",\"col\":3}},{\"id\":\"Bhu75SMrad\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"4psaIfzMKP\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Masters &amp; Reports</b></span>\",\"col\":12}},{\"id\":\"VUAi4wuWaQ\",\"type\":\"card\",\"data\":{\"card_name\":\"Journey\",\"col\":4}},{\"id\":\"XSAenqXL_g\",\"type\":\"card\",\"data\":{\"card_name\":\"Grievance\",\"col\":4}},{\"id\":\"xqlh4RShmj\",\"type\":\"card\",\"data\":{\"card_name\":\"Exit\",\"col\":4}},{\"id\":\"ADXOsMCf4_\",\"type\":\"card\",\"data\":{\"card_name\":\"Daily Work Summary\",\"col\":4}},{\"id\":\"Qfib1z1qFv\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":4}}]",
+ "content": "[{\"id\":\"8VsWbOyrrI\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"sWq5wxwy_Z\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Employee Separation\",\"col\":3}},{\"id\":\"alTxAhOlJ9\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Separation Clearance\",\"col\":3}},{\"id\":\"b6JhHyASS0\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Employee Benefits\",\"col\":3}},{\"id\":\"Bhu75SMrad\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"4psaIfzMKP\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Masters &amp; Reports</b></span>\",\"col\":12}},{\"id\":\"VUAi4wuWaQ\",\"type\":\"card\",\"data\":{\"card_name\":\"Journey\",\"col\":4}},{\"id\":\"xqlh4RShmj\",\"type\":\"card\",\"data\":{\"card_name\":\"Exit\",\"col\":4}},{\"id\":\"ADXOsMCf4_\",\"type\":\"card\",\"data\":{\"card_name\":\"Daily Work Summary\",\"col\":4}},{\"id\":\"Qfib1z1qFv\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":4}}]",
  "creation": "2022-08-20 14:06:34.309347",
  "custom_blocks": [],
  "docstatus": 0,
@@ -12,82 +12,6 @@
  "is_hidden": 0,
  "label": "Employee Lifecycle",
  "links": [
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Grievance",
-   "link_count": 2,
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Grievance Type",
-   "link_count": 0,
-   "link_to": "Grievance Type",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Employee Grievance",
-   "link_count": 0,
-   "link_to": "Employee Grievance",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Exit",
-   "link_count": 4,
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Employee Separation Template",
-   "link_count": 0,
-   "link_to": "Employee Separation Template",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Employee Separation",
-   "link_count": 0,
-   "link_to": "Employee Separation",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Full and Final Settlement",
-   "link_count": 0,
-   "link_to": "Full and Final Statement",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Exit Interview",
-   "link_count": 0,
-   "link_to": "Exit Interview",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
   {
    "hidden": 0,
    "is_query_report": 0,
@@ -177,8 +101,57 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Journey",
+   "label": "Exit",
    "link_count": 4,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Employee Separation",
+   "link_count": 0,
+   "link_to": "Employee Separation",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Employee Separation Clearance",
+   "link_count": 0,
+   "link_to": "Employee Separation Clearance",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Employee Benefits",
+   "link_count": 0,
+   "link_to": "Employee Benefits",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Exit Interview",
+   "link_count": 0,
+   "link_to": "Exit Interview",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Journey",
+   "link_count": 6,
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
@@ -222,10 +195,30 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Employee",
+   "link_count": 0,
+   "link_to": "Employee",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Employee Advance",
+   "link_count": 0,
+   "link_to": "Employee Advance",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2025-03-06 14:57:53.114129",
- "modified_by": "Administrator",
+ "modified": "2025-03-18 15:42:08.328837",
+ "modified_by": "tshering.lham@thimphutechpark.bt",
  "module": "HR",
  "name": "Employee Lifecycle",
  "number_cards": [],
@@ -237,37 +230,29 @@
  "sequence_id": 13.0,
  "shortcuts": [
   {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Dashboard",
-   "link_to": "Employee Lifecycle",
-   "type": "Dashboard"
-  },
-  {
-   "color": "Orange",
-   "doc_view": "List",
-   "format": "{} Pending",
-   "label": "Employee Onboarding",
-   "link_to": "Employee Onboarding",
-   "stats_filter": "{\"boarding_status\":[\"=\",\"Pending\"]}",
-   "type": "DocType"
-  },
-  {
    "color": "Orange",
    "doc_view": "List",
    "format": "{} Pending",
    "label": "Employee Separation",
    "link_to": "Employee Separation",
-   "stats_filter": "{\"boarding_status\":[\"=\",\"Pending\"]}",
+   "stats_filter": "[]",
    "type": "DocType"
   },
   {
-   "color": "Orange",
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Employee Benefits",
+   "link_to": "Employee Benefits",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
    "doc_view": "List",
    "format": "{} Open",
-   "label": "Employee Grievance",
-   "link_to": "Employee Grievance",
-   "stats_filter": "{\"status\":[\"=\",\"Open\"]}",
+   "label": "Separation Clearance",
+   "link_to": "Employee Separation Clearance",
+   "stats_filter": "[]",
    "type": "DocType"
   }
  ],

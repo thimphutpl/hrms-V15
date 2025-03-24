@@ -116,32 +116,30 @@ def get_salary_slips(filters):
 	return salary_slips
 	
 def get_conditions(filters):
-	conditions = ""
-	if filters.get("month"):
-		month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", 
-			"Dec"].index(filters["month"]) + 1
-		filters["month"] = month
-		conditions += " and month = %(month)s"
-	
-	if filters.get("fiscal_year"): conditions += " and fiscal_year = %(fiscal_year)s"
-	if filters.get("company"): conditions += " and company = %(company)s"
-	if filters.get("employee"): conditions += " and employee = %(employee)s"
-	# if filters.get("division"): conditions += " and division = %(division)s"
-	# if filters.get("cost_center"):
-	# 	all_ccs = get_child_cost_centers(filters.cost_center)
-	# 	conditions += " and cost_center in {0} ".format(tuple(all_ccs))
-		
-	if filters.get("process_status") == "All":
-			conditions += " and docstatus = docstatus"
-	elif filters.get("process_status") == "Submitted":
-			conditions += " and docstatus = 1"
-	elif filters.get("process_status") == "Draft":
-			conditions += " and docstatus = 0"
-	elif filters.get("process_status") == "Cancelled":
-			conditions += " and docstatus = 2"
+    conditions = ""
+    
+    if filters.get("month"):
+        month = filters.get("month")
+        conditions += " and month = %(month)s"
+    
+    if filters.get("fiscal_year"): 
+        conditions += " and fiscal_year = %(fiscal_year)s"
+    if filters.get("company"): 
+        conditions += " and company = %(company)s"
+    if filters.get("employee"): 
+        conditions += " and employee = %(employee)s"
 
-	
-	return conditions, filters
+    if filters.get("process_status") == "All":
+        conditions += " and docstatus = docstatus"
+    elif filters.get("process_status") == "Submitted":
+        conditions += " and docstatus = 1"
+    elif filters.get("process_status") == "Draft":
+        conditions += " and docstatus = 0"
+    elif filters.get("process_status") == "Cancelled":
+        conditions += " and docstatus = 2"
+
+    return conditions, filters
+
 	
 def get_ss_earning_map(salary_slips):
 	ss_earning_map = {}

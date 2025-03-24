@@ -57,7 +57,16 @@
   "approver_settings_tab",
   "hr_manager",
   "column_break_zguo",
-  "hr_manager_name"
+  "hr_manager_name",
+  "separation_clearance_approver_section",
+  "afd",
+  "ama",
+  "icthr",
+  "internal_audit",
+  "ada",
+  "pc",
+  "sws",
+  "column_break_wguy"
  ],
  "fields": [
   {
@@ -369,13 +378,64 @@
    "fieldtype": "Data",
    "label": "HR Manager Name",
    "read_only": 1
+  },
+  {
+   "fieldname": "separation_clearance_approver_section",
+   "fieldtype": "Section Break",
+   "label": "Separation Clearance Approver"
+  },
+  {
+   "fieldname": "column_break_wguy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "afd",
+   "fieldtype": "Link",
+   "label": "Accounts & Finance",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "ama",
+   "fieldtype": "Link",
+   "label": "Asset Management",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "icthr",
+   "fieldtype": "Link",
+   "label": "Human Resource & Administration",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "internal_audit",
+   "fieldtype": "Link",
+   "label": "Internal Audit",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "ada",
+   "fieldtype": "Link",
+   "label": "Asset Declaration Administrator",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "pc",
+   "fieldtype": "Link",
+   "label": "Procurement and Contracts",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "sws",
+   "fieldtype": "Link",
+   "label": "SWS Treasurer",
+   "options": "Employee"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-03-05 12:01:39.179935",
+ "modified": "2025-03-18 12:58:52.060684",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",

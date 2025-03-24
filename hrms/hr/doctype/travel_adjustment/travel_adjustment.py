@@ -14,7 +14,7 @@ class TravelAdjustment(Document):
         """Validate the document before saving."""
         validate_active_employee(self.employee)
         self._validate_travel_last_day()
-        validate_workflow_states(self)
+        # validate_workflow_states(self)
 
     def on_update(self):
         """Check for date overlaps when the document is updated."""

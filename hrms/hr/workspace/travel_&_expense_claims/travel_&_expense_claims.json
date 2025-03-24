@@ -93,45 +93,6 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Claims",
-   "link_count": 3,
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Travel Claim",
-   "link_count": 0,
-   "link_to": "Travel Claim",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Expense Claim",
-   "link_count": 0,
-   "link_to": "Expense Claim",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Expense Claim Type",
-   "link_count": 0,
-   "link_to": "Expense Claim Type",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
    "label": "Reports",
    "link_count": 2,
    "link_type": "DocType",
@@ -206,10 +167,29 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Claims",
+   "link_count": 1,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Travel Claim",
+   "link_count": 0,
+   "link_to": "Travel Claim",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2025-03-06 14:57:53.291009",
- "modified_by": "Administrator",
+ "modified": "2025-03-18 14:57:53.525474",
+ "modified_by": "tshering.lham@thimphutechpark.bt",
  "module": "HR",
  "name": "Travel & Expense Claims",
  "number_cards": [],
