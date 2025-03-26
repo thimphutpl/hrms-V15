@@ -83,74 +83,125 @@ class DAKReceiptRegister(Document):
 			self.employee=""
 			self.employee_name=""
 			self.forward_id=""
-			self.notify_afd_head()
-			self.notify_employee()
+			self.send_email(afd_head=True)
+			
    
 		elif action == "Forward":
 			if not self.employee:
 				frappe.throw("You have not set whom to forward")
-			self.notify_forward_to()
-			self.notify_employee()
+			# self.notify_forward_to()
+			# self.notify_employee()
+			self.send_email(afd_head=False)
    
 		elif action != "Save":
-			self.notify_employee()
+			self.send_email(afd_head=False)
    
-	def notify_afd_head(self):
-		self.doc = self
-		parent_doc = frappe.get_doc(self.doc.doctype, self.doc.name)
-		args = parent_doc.as_dict()
+	def send_email(self,afd_head=False):
+		head = frappe.db.sql('''
+                        select department_head from `tabDepartment` where name="His Majesty's Secretariat - HMS";
+                        ''')
+		if afd_head:
+			
+			if head[0][0]:
+				email = frappe.db.sql('''
+					select user_id from `tabEmployee` where name={};
+                          '''.format(head[0][0]))
+				if email:
+					recipient = email[0][0]
+				else:
+					frappe.throw("Please set email for AFD HEAD employee")
+			else:
+				frappe.throw("Please set Department Head for company His Majesty's Secretariat - HMS")
+		else:
+			if self.employee:
+				recipient = self.forward_id
+			else:
+				frappe.throw("please set employee to whom you are sending")
 
-		args.update({
-			"workflow_state": self.doc.workflow_state
-		})
-		afd_head=frappe.get_value("Overall Settings", "afd_head")
-		try:
-			email_template = frappe.get_doc("Email Template", 'DAK Receipt Notification')
-			message = frappe.render_template(email_template.response, args)
-			recipients = afd_head
-			subject = email_template.subject
-			self.send_mail(recipients, message, subject)
-		except :
-			frappe.msgprint(_("DAK Receipt Notification is missing."))
+			 
+		subject = "New DAK Receipt"
+		from_whom = self.from_whom_received if self.from_whom_received else 'Unknown'
+  
+		if head[0][0] and afd_head:
+			message = f"""
+			<p>Dear Dasho,</p>
+			<p>This is to inform you that a new DAK Receipt has been created in ERPNext. The DAK Receipt is from <b>{from_whom}</b>.</p>
+			<p>Please review the details at your earliest convenience at
+   			<a href="https://erp.ogz.bt/app/dak-receipt-register/{self.name}" target="_blank">Click Here</a>.</p>
+			<p>Thank you,<br>
+			<strong>ERP HMS</strong></p>
+		"""
+		else:
+			message = f"""
+				<p>Dear Sir/Madam,</p>
+				<p>This is to inform you that a new DAK Receipt has been forwarded to you in ERPNext.The DAK Receipt is from <b>{from_whom}</b></p>
+				<p>Please review the details at your earliest convenience at 
+    			<a href="https://erp.ogz.bt/app/dak-receipt-register/{self.name}" target="_blank">Click Here</a>.</p>
+				<p>Thank you,<br>
+				<strong>ERP HMS</strong></p>
+			"""
+
+		frappe.sendmail(
+			recipients = recipient,
+			subject=subject,
+			message=message
+		)
+	# def notify_afd_head(self):
+	# 	self.doc = self
+	# 	parent_doc = frappe.get_doc(self.doc.doctype, self.doc.name)
+	# 	args = parent_doc.as_dict()
+
+	# 	args.update({
+	# 		"workflow_state": self.doc.workflow_state
+	# 	})
+	# 	afd_head=frappe.get_value("Overall Settings", "afd_head")
+	# 	try:
+	# 		email_template = frappe.get_doc("Email Template", 'DAK Receipt Notification')
+	# 		message = frappe.render_template(email_template.response, args)
+	# 		recipients = afd_head
+	# 		subject = email_template.subject
+	# 		self.send_mail(recipients, message, subject)
+	# 	except :
+	# 		frappe.msgprint(_("DAK Receipt Notification is missing."))
 	
-	def notify_employee(self):
-		self.doc = self
-		parent_doc = frappe.get_doc(self.doc.doctype, self.doc.name)
-		args = parent_doc.as_dict()
-		args.update({
-			"workflow_state": self.doc.workflow_state
-		})
+	# def notify_employee(self):
+	# 	self.doc = self
+	# 	parent_doc = frappe.get_doc(self.doc.doctype, self.doc.name)
+	# 	args = parent_doc.as_dict()
+	# 	args.update({
+	# 		"workflow_state": self.doc.workflow_state
+	# 	})
 		
-		try:
-			email_template = frappe.get_doc("Email Template", 'DAK Receipt Status Notification')
-			message = frappe.render_template(email_template.response, args)
-			recipients = self.doc.owner
-			subject = email_template.subject
-			self.send_mail(recipients, message, subject)
-		except :
-			frappe.msgprint(_("DAK Receipt Status Notification is missing."))
+	# 	try:
+	# 		email_template = frappe.get_doc("Email Template", 'DAK Receipt Status Notification')
+	# 		message = frappe.render_template(email_template.response, args)
+	# 		recipients = self.doc.owner
+	# 		subject = email_template.subject
+	# 		self.send_mail(recipients, message, subject)
+	# 	except :
+	# 		frappe.msgprint(_("DAK Receipt Status Notification is missing."))
 		
-	def notify_forward_to(self):
+	# def notify_forward_to(self):
 		
-		parent_doc = frappe.get_doc(self.doctype, self.name)
-		args = parent_doc.as_dict()
+	# 	parent_doc = frappe.get_doc(self.doctype, self.name)
+	# 	args = parent_doc.as_dict()
 		
-		try:
-			email_template = frappe.get_doc("Email Template", "DAK Receipt Forwarded Notification")
-			message = frappe.render_template(email_template.response, args)
-			subject = email_template.subject
-			self.send_mail(self.forward_id,message,subject)
-		except :
-			frappe.msgprint(_("DAK Receipt Forwarded Notification."))
+	# 	try:
+	# 		email_template = frappe.get_doc("Email Template", "DAK Receipt Forwarded Notification")
+	# 		message = frappe.render_template(email_template.response, args)
+	# 		subject = email_template.subject
+	# 		self.send_mail(self.forward_id,message,subject)
+	# 	except :
+	# 		frappe.msgprint(_("DAK Receipt Forwarded Notification."))
 		
 	   
 	
-	def send_mail(self, recipients, message, subject):
+	# def send_mail(self, recipients, message, subject):
 		
-		frappe.sendmail(
-				recipients=recipients,
-				subject=_(subject),
-				message= _(message),
+	# 	frappe.sendmail(
+	# 			recipients=recipients,
+	# 			subject=_(subject),
+	# 			message= _(message),
 				
-			)
+	# 		)
 

@@ -14,6 +14,7 @@
   "letter_no",
   "main_section",
   "from_whom_received",
+  "attachment",
   "column_break_xgos",
   "purpose",
   "section_break_mqzt",
@@ -133,12 +134,19 @@
    "fieldname": "remark",
    "fieldtype": "Long Text",
    "label": "Remark"
+  },
+  {
+   "fieldname": "attachment",
+   "fieldtype": "Attach",
+   "in_list_view": 1,
+   "label": "Attachment",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-02-04 11:25:39.642070",
+ "modified": "2025-03-26 12:18:01.527908",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "DAK Receipt Register",
