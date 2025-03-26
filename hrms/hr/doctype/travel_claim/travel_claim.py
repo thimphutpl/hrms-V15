@@ -16,7 +16,7 @@ from datetime import datetime, timedelta
 
 class TravelClaim(Document):
 	def validate(self):
-		# validate_workflow_states(self)
+		validate_workflow_states(self)
 		self.validate_travel_last_day()
 		self.validate_dsa_ceiling()
 		self.update_amounts()
@@ -24,9 +24,7 @@ class TravelClaim(Document):
 		self.validate_duplicate()
 		if self.training_event:
 			self.update_training_event()
-		if self.place_type == 'Out-Country':
-			if self.exchange_rate == 0.00:
-				frappe.throw("Please Enter Exchange rate")
+		
 
 	def on_update(self):
 		self.check_double_dates()
@@ -42,12 +40,16 @@ class TravelClaim(Document):
 			if je_doc.docstatus == 1:
 				je_doc.cancel()
 			elif je_doc.docstatus == 0:
-				je_doc.delete_doc(ignore_permissions=True)
+				je_doc.delete(ignore_permissions=True)
 		frappe.db.sql("update `tabGL Entry` set voucher_no = NULL where voucher_no = '{}'".format(self.name))
 		frappe.db.sql("update `tabGL Entry` set against_voucher = NULL where against_voucher = '{}'".format(self.name))
 		frappe.db.sql("update `tabPayment Ledger Entry` set voucher_no = NULL where voucher_no = '{}'".format(self.name))
 		frappe.db.sql("update `tabPayment Ledger Entry` set against_voucher_no = NULL where against_voucher_no = '{}'".format(self.name))
 	def on_cancel(self):
+		# self.ignore_linked_doctypes = (
+		# 	"GL Entry"
+		# )
+		# super().on_cancel()
 		self.check_journal_entry()
 		if self.training_event:
 			self.update_training_event(cancel=True)

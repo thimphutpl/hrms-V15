@@ -17,7 +17,7 @@ frappe.ui.form.on('Travel Authorization', {
 		// 	__("Create")
 		// );
 		if (frm.doc.docstatus == 1 && !frm.doc.travel_claim) {
-			if (frm.doc.end_date_auth < frappe.datetime.get_today()) {
+			// if (frm.doc.end_date_auth < frappe.datetime.get_today()) {
 				if (!frm.doc.travel_claim) {
 					frm.add_custom_button(__("Travel Claim"), function () {
 						frm.trigger("create_travel_claim");
@@ -31,7 +31,7 @@ frappe.ui.form.on('Travel Authorization', {
 						}, __("Create")
 					);
 				}
-			}
+			// }
 		}
 
 		cur_frm.set_df_property("items", "read_only", frm.doc.travel_claim ? 1 : 0)
@@ -107,8 +107,8 @@ frappe.ui.form.on('Travel Authorization', {
 			});
 		} else {
 			frm.set_value("exchange_rate", 1.0);
-			frm.set_df_property("exchange_rate", "hidden", 1);
-			frm.set_df_property("exchange_rate", "description", "");
+			// frm.set_df_property("exchange_rate", "hidden", 1);
+			// frm.set_df_property("exchange_rate", "description", "");
 		}
 
 		frm.trigger("advance_amount");

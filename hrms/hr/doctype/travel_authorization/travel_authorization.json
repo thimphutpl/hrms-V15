@@ -244,11 +244,6 @@
    "reqd": 1
   },
   {
-   "fieldname": "exchange_rate",
-   "fieldtype": "Currency",
-   "label": "Exchange Rate"
-  },
-  {
    "fieldname": "training_event",
    "fieldtype": "Data",
    "label": "Training Event",
@@ -433,11 +428,16 @@
    "label": "Grade",
    "options": "Employee Grade",
    "read_only": 1
+  },
+  {
+   "fieldname": "exchange_rate",
+   "fieldtype": "Currency",
+   "label": "Exchange Rate"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-03-21 13:32:00.424156",
+ "modified": "2025-03-25 23:28:09.935190",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",

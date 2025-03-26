@@ -4,6 +4,20 @@
 
 cur_frm.add_fetch("employee", "branch", "branch");
 frappe.ui.form.on('Travel Claim', {
+	setup: function (frm) {
+		frm.set_query("approver", function () {
+			return {
+				query: "hrms.hr.doctype.department_approver.department_approver.get_approvers",
+				filters: {
+					employee: frm.doc.employee,
+					doctype: frm.doc.doctype,
+				},
+			};
+		});
+
+		frm.set_query("employee", erpnext.queries.employee);
+	},
+
 	onload: function (frm) {
 		frm.ignore_doctypes_on_cancel_all = ['Travel Authorization', 'GL Entry', 'Payment Ledger Entry']
 		let grid = frm.fields_dict['items'].grid;
