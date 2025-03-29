@@ -215,6 +215,9 @@ class SalaryStructure(Document):
 								frappe.throw('Add Payment Method, Calculation Based, Amount in salary component in HRA')
 							if payment_method == 'Percent' and cal_based == 'Basic Pay' and amount:
 								calc_amt = (flt(basic_pay) * flt(amount) / 100)
+							if payment_method == 'Lumpsum' and amount:
+								# frappe.throw(str(amount))
+								calc_amt = (flt(amount))
 							# calc_amt = roundoff(hra_amount)
 							# frappe.throw(str(calc_amt))
 							# calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
