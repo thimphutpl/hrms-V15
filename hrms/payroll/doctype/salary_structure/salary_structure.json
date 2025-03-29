@@ -9,6 +9,7 @@
   "employee",
   "employee_name",
   "employee_grade",
+  "employment_type",
   "column_break_nhoy",
   "company",
   "branch",
@@ -377,12 +378,19 @@
    "fieldtype": "Date",
    "in_list_view": 1,
    "label": "To Date"
+  },
+  {
+   "fetch_from": "employee.employment_type",
+   "fieldname": "employment_type",
+   "fieldtype": "Link",
+   "label": "Employment Type",
+   "options": "Employment Type"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2025-02-17 12:37:37.676526",
+ "modified": "2025-03-29 16:23:32.848436",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
