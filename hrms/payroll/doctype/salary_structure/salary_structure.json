@@ -42,6 +42,7 @@
   "eligible_for_gis",
   "eligible_for_pf",
   "eligible_for_health_contribution",
+  "eligible_for_hra",
   "column_break_gpiw",
   "eligible_for_sws",
   "eligible_for_overtime_and_payment",
@@ -385,12 +386,18 @@
    "fieldtype": "Link",
    "label": "Employment Type",
    "options": "Employment Type"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_hra",
+   "fieldtype": "Check",
+   "label": "Eligible for HRA"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2025-03-29 16:23:32.848436",
+ "modified": "2025-03-29 16:33:43.832228",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
