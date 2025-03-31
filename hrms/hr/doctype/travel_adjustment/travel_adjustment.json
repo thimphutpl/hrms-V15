@@ -140,7 +140,8 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Approver",
-   "options": "User"
+   "options": "User",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_tbcz",
@@ -167,7 +168,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-03-31 11:15:08.430065",
+ "modified": "2025-03-31 17:05:38.759465",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Adjustment",
