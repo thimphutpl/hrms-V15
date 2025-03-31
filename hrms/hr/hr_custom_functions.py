@@ -267,42 +267,93 @@ def post_casual_leaves():
 ##
 # Post earned leave on the first day of every month
 ##
-def post_earned_leaves():
-	
-	
+def post_earned_leaves():	
 	if not getdate(frappe.utils.nowdate()) == getdate(get_first_day(frappe.utils.nowdate())):
 		
 		return 0
 	
-
-	# print(f"hh")
 	date = add_days(frappe.utils.nowdate(), -20)
 	start = get_first_day(date);
 	end = get_last_day(date);
 	from datetime import datetime, timedelta
 	today = datetime.today()
 	first_day_of_year = datetime(today.year, 1, 1)
-	last_day_of_year = datetime(today.year, 12, 31)
-	# print("hh")
-	employees = frappe.db.sql("select name, employee_name, date_of_joining from `tabEmployee` where status = 'Active' ", as_dict=True)
-	# if not employees:
-		# print("hiii")
-	# else:
-	# 	print("fffff")
+	last_day_of_year = datetime(today.year, 12, 31)	
+	employees = frappe.db.sql("select name, employee_name, date_of_joining from `tabEmployee` where status = 'Active' and employment_type NOT IN('Armed Forces', 'GCE')", as_dict=True)
+	
 	for e in employees:
 		# print(e.name)
 		if cint(date_diff(end, getdate(e.date_of_joining))) > 14:
-			# print('hiiiii')
-			la = frappe.new_doc("Leave Allocation")
-			la.employee = e.name
-			la.employee_name = e.employee_name
-			la.leave_type = "Earned Leave"
-			la.from_date = first_day_of_year.strftime(f'%Y-%m-%d')
-			la.to_date = last_day_of_year.strftime(f'%Y-%m-%d')
-			la.carry_forward = cint(1)
-			la.new_leaves_allocated = flt(2.5)
-			la.submit()
-			print(f"Leave Allocation submitted successfully for {e.name}!")
+			employee_name = e.name
+			employee_full_name = e.employee_name
+			leave_type = "Earned Leave"
+			from_date = first_day_of_year.strftime(f'%Y-%m-%d')
+			to_date = last_day_of_year.strftime(f'%Y-%m-%d')
+			existing_allocation = frappe.db.exists("Leave Allocation", {
+    			"employee": employee_name,
+    			"leave_type": leave_type,
+    			"from_date": from_date,
+    			"to_date": to_date,
+    			"docstatus": 1  # Check for submitted documents only
+			})
+
+			max_leaves_allowed = flt(
+				frappe.db.get_value("Leave Type", leave_type, "max_leaves_allowed")
+			)
+
+			if existing_allocation:
+				
+				la = frappe.get_doc("Leave Allocation", existing_allocation)
+				leave_sum = frappe.get_all(
+											'Leave Ledger Entry',
+											filters={
+        											'leave_type': 'Earned Leave',
+        											'employee': employee_name,
+        											'docstatus': 1,
+        											'from_date': ['between', ['2025-01-01', '2025-12-31']],
+        											'to_date': ['between', ['2025-01-01', '2025-12-31']]
+    												},
+											fields=['SUM(leaves) as Leave_sum'],
+											as_list=True
+											)
+
+# Access the result
+				if leave_sum:
+					total_leaves = leave_sum[0][0]
+					#frappe.throw(str(total_leaves))
+					print(f"Total Leaves: {total_leaves}")
+				else:
+					print("No leaves found.")
+				if flt(total_leaves) + flt(2.5) <= max_leaves_allowed:
+					la.new_leaves_allocated = flt(la.new_leaves_allocated) + flt(2.5)
+					la.save()
+					frappe.db.commit()
+					print(f"Leave Allocation updated successfully for {employee_name}!")
+				# else:
+				# 	frappe.throw(str(la.new_leaves_allocated+2.5))
+			else:
+    
+				la = frappe.new_doc("Leave Allocation")
+				la.employee = employee_name
+				la.employee_name = employee_full_name
+				la.leave_type = leave_type
+				la.from_date = from_date
+				la.to_date = to_date
+				la.carry_forward = cint(1)
+				la.new_leaves_allocated = flt(2.5)
+				la.submit()
+				print(f"Leave Allocation submitted successfully for {employee_name}!")
+				
+			# la = frappe.new_doc("Leave Allocation")
+			# la.employee = e.name
+			# la.employee_name = e.employee_name
+			# la.leave_type = "Earned Leave"
+			# la.from_date = first_day_of_year.strftime(f'%Y-%m-%d')
+			# la.to_date = last_day_of_year.strftime(f'%Y-%m-%d')
+			# la.carry_forward = cint(1)
+			# la.new_leaves_allocated = flt(2.5)
+			# la.submit()
+			#print(f"Leave Allocation submitted successfully for {e.name}!")
 		else:
 			pass
 
