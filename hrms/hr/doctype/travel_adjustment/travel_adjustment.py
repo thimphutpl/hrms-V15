@@ -123,6 +123,13 @@ class TravelAdjustment(Document):
 				# frappe.throw(str(doc.end_date_auth))
 		# doc.save()
 
+	@frappe.whitelist()
+	def get_employee_approver(self):
+		if self.employee:
+			reports_to = frappe.db.get_value("Employee", self.employee, "reports_to")
+			approver, approver_name, approver_designation = frappe.db.get_value("Employee", reports_to, ["user_id", "employee_name", "designation"])
+			return approver, approver_name, approver_designation
+
 @frappe.whitelist()
 def get_approvers(doctype, txt, searchfield, start, page_len, filters):
     """

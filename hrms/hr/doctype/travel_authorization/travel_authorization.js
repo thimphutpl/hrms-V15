@@ -37,7 +37,8 @@ frappe.ui.form.on('Travel Authorization', {
     employee: function(frm) {
         // Clear approver when employee changes
         frm.set_value("approver", null);
-        
+        frm.set_value("approver_name", null);
+        frm.set_value("approver_designation", null);
         // Fetch new approver if employee is selected
 		frappe.call({
 			method: "get_employee_approver",
