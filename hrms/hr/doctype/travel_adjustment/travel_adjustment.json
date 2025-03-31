@@ -138,9 +138,9 @@
   {
    "fieldname": "approver",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Approver",
-   "options": "User",
-   "read_only": 1
+   "options": "User"
   },
   {
    "fieldname": "column_break_tbcz",
@@ -167,7 +167,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-06 14:12:08.960018",
+ "modified": "2025-03-31 11:15:08.430065",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Adjustment",

@@ -443,6 +443,34 @@ class TravelClaim(Document):
 		if str(self.ta_date) > str(self.posting_date):
 			frappe.throw("The Travel Claim Date cannot be earlier than Travel Authorization Date")
 
+
+@frappe.whitelist()
+def get_approvers(doctype, txt, searchfield, start, page_len, filters):
+    """
+    Returns the expense approver for the selected employee
+    """
+    if not filters.get("employee"):
+        frappe.throw(_("Please select an employee first"))
+
+    employee = filters.get("employee")
+    
+    # Get expense approver from Employee
+    expense_approver = frappe.db.get_value("Employee", employee, "expense_approver")
+    
+    if not expense_approver:
+        return []
+    
+    # Return user details if active
+    return frappe.get_all("User",
+        filters={
+            "name": expense_approver,
+            "enabled": 1
+        },
+        fields=["name as value", "full_name as description"],
+        as_list=1
+    )
+
+
 # Following code added by SHIV on 2020/09/21
 def get_permission_query_conditions(user):
 	if not user: user = frappe.session.user

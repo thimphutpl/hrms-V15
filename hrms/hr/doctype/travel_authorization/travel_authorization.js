@@ -10,6 +10,64 @@ cur_frm.add_fetch("employee", "branch", "branch")
 cur_frm.add_fetch("employee", "cost_center", "cost_center")
 
 frappe.ui.form.on('Travel Authorization', {
+
+	setup: function(frm) {
+        // Set query for employee field
+        frm.set_query("employee", function() {
+            return erpnext.queries.employee();
+        });
+        
+        // Set query for approver field
+        frm.set_query("approver", function() {
+            if (!frm.doc.employee) {
+                frappe.msgprint(__("Please select an employee first"));
+                return;
+            }
+            
+            return {
+                // Correct module path - point to current doctype's method
+                query: "hrms.hr.doctype.travel_authorization.travel_authorization.get_approvers",
+                filters: {
+                    employee: frm.doc.employee
+                }
+            };
+        });
+    },
+    
+    employee: function(frm) {
+        // Clear approver when employee changes
+        frm.set_value("approver", null);
+        
+        // Fetch new approver if employee is selected
+        if (frm.doc.employee) {
+            frappe.call({
+                method: "frappe.client.get_value",
+                args: {
+                    doctype: "Employee",
+                    fieldname: "expense_approver",
+                    filters: {name: frm.doc.employee}
+                },
+                callback: function(r) {
+                    if (r.message && r.message.expense_approver) {
+                        frm.set_value("approver", r.message.expense_approver);
+                    }
+                }
+            });
+        }
+        
+        // Your existing DSA calculation
+        frappe.call({
+            method: "set_dsa_per_day",
+            doc: frm.doc,
+            callback: function(r) {
+                if (r.message) {
+                    frm.set_value("dsa_per_day", r.message);
+                    frm.refresh_field("dsa_per_day");
+                }
+            }
+        });
+    },
+
 	refresh: function (frm) {
 		// frm.add_custom_button(__("Travel Claim"), function () {
 		// 	frm.trigger("create_travel_claim");
@@ -66,16 +124,16 @@ frappe.ui.form.on('Travel Authorization', {
 		frm.set_query("employee", erpnext.queries.employee);
 	},
 
-	employee: function (frm) {
-		frappe.call({
-			method: "set_dsa_per_day",
-			doc: frm.doc,
-			callback: function(r) {
-				frm.set_value("dsa_per_day", r.message)
-				frm.refresh_field("dsa_per_day");
-			}
-		});
-	},
+	// employee: function (frm) {
+	// 	frappe.call({
+	// 		method: "set_dsa_per_day",
+	// 		doc: frm.doc,
+	// 		callback: function(r) {
+	// 			frm.set_value("dsa_per_day", r.message)
+	// 			frm.refresh_field("dsa_per_day");
+	// 		}
+	// 	});
+	// },
 	
 	need_advance: function (frm) {
 		frm.toggle_reqd("estimated_amount", frm.doc.need_advance == 1);

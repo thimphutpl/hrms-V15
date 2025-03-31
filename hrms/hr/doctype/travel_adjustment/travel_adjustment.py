@@ -122,3 +122,29 @@ class TravelAdjustment(Document):
 				doc.db_set("travel_adjustment", self.name)
 				# frappe.throw(str(doc.end_date_auth))
 		# doc.save()
+
+@frappe.whitelist()
+def get_approvers(doctype, txt, searchfield, start, page_len, filters):
+    """
+    Returns the expense approver for the selected employee
+    """
+    if not filters.get("employee"):
+        frappe.throw(_("Please select an employee first"))
+
+    employee = filters.get("employee")
+    
+    # Get expense approver from Employee
+    expense_approver = frappe.db.get_value("Employee", employee, "expense_approver")
+    
+    if not expense_approver:
+        return []
+    
+    # Return user details if active
+    return frappe.get_all("User",
+        filters={
+            "name": expense_approver,
+            "enabled": 1
+        },
+        fields=["name as value", "full_name as description"],
+        as_list=1
+    )		

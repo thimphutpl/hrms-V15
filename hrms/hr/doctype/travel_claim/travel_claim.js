@@ -4,19 +4,50 @@
 
 cur_frm.add_fetch("employee", "branch", "branch");
 frappe.ui.form.on('Travel Claim', {
-	setup: function (frm) {
-		frm.set_query("approver", function () {
-			return {
-				query: "hrms.hr.doctype.department_approver.department_approver.get_approvers",
-				filters: {
-					employee: frm.doc.employee,
-					doctype: frm.doc.doctype,
-				},
-			};
-		});
-
-		frm.set_query("employee", erpnext.queries.employee);
-	},
+	setup: function(frm) {
+        // Set query for employee field
+        frm.set_query("employee", function() {
+            return erpnext.queries.employee();
+        });
+        
+        // Set query for approver field
+        frm.set_query("approver", function() {
+            if (!frm.doc.employee) {
+                frappe.msgprint(__("Please select an employee first"));
+                return;
+            }
+            
+            return {
+                // Correct module path - point to current doctype's method
+                query: "hrms.hr.doctype.travel_claim.travel_claim.get_approvers",
+                filters: {
+                    employee: frm.doc.employee
+                }
+            };
+        });
+    },
+    
+    employee: function(frm) {
+        // Clear approver when employee changes
+        frm.set_value("approver", null);
+        
+        // Fetch new approver if employee is selected
+        if (frm.doc.employee) {
+            frappe.call({
+                method: "frappe.client.get_value",
+                args: {
+                    doctype: "Employee",
+                    fieldname: "expense_approver",
+                    filters: {name: frm.doc.employee}
+                },
+                callback: function(r) {
+                    if (r.message && r.message.expense_approver) {
+                        frm.set_value("approver", r.message.expense_approver);
+                    }
+                }
+            });
+        }
+    },
 
 	onload: function (frm) {
 		frm.ignore_doctypes_on_cancel_all = ['Travel Authorization', 'GL Entry', 'Payment Ledger Entry']

@@ -373,10 +373,10 @@
   {
    "fieldname": "approver",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Approver",
    "no_copy": 1,
-   "options": "User",
-   "read_only": 1
+   "options": "User"
   },
   {
    "fieldname": "column_break_bdeb",
@@ -437,7 +437,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-03-25 23:28:09.935190",
+ "modified": "2025-03-31 10:03:25.446639",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",
