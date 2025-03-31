@@ -61,6 +61,14 @@ class TravelAuthorization(Document):
 			if self.place_type!='Out-Country':
 				self.exchange_rate = 1
 			self.base_advance_amount = self.advance_amount * self.exchange_rate
+
+	@frappe.whitelist()
+	def get_employee_approver(self):
+		if self.employee:
+			reports_to = frappe.db.get_value("Employee", self.employee, "reports_to")
+			approver, approver_name, approver_designation = frappe.db.get_value("Employee", reports_to, ["user_id", "employee_name", "designation"])
+			return approver, approver_name, approver_designation
+
 	def on_submit(self):
 		notify_workflow_states(self)
 		self.validate_travel_dates(update=True)
