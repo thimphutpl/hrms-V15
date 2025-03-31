@@ -82,6 +82,13 @@ class TravelClaim(Document):
 			current_date += timedelta(days=1)
 		return dates
 
+	@frappe.whitelist()
+	def get_employee_approver(self):
+		if self.employee:
+			reports_to = frappe.db.get_value("Employee", self.employee, "reports_to")
+			approver, approver_name, approver_designation = frappe.db.get_value("Employee", reports_to, ["user_id", "employee_name", "designation"])
+			return approver, approver_name, approver_designation
+
 	def update_training_event(self, cancel = False):
 		if not cancel:
 			if frappe.db.get_value("Training Event Employee", self.training_event_child_ref, "travel_claim_id") in (None, ''):
@@ -455,7 +462,7 @@ def get_approvers(doctype, txt, searchfield, start, page_len, filters):
     employee = filters.get("employee")
     
     # Get expense approver from Employee
-    expense_approver = frappe.db.get_value("Employee", employee, "expense_approver")
+    expense_approver = frappe.db.get_value("Employee", employee, "reports_to")
     
     if not expense_approver:
         return []

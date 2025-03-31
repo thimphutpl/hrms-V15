@@ -141,7 +141,7 @@ def get_approvers(doctype, txt, searchfield, start, page_len, filters):
     employee = filters.get("employee")
     
     # Get expense approver from Employee
-    expense_approver = frappe.db.get_value("Employee", employee, "expense_approver")
+    expense_approver = frappe.db.get_value("Employee", employee, "reports_to")
     
     if not expense_approver:
         return []

@@ -30,23 +30,21 @@ frappe.ui.form.on('Travel Claim', {
     employee: function(frm) {
         // Clear approver when employee changes
         frm.set_value("approver", null);
-        
+        frm.set_value("approver_name", null);
+        frm.set_value("approver_designation", null);
         // Fetch new approver if employee is selected
-        if (frm.doc.employee) {
-            frappe.call({
-                method: "frappe.client.get_value",
-                args: {
-                    doctype: "Employee",
-                    fieldname: "expense_approver",
-                    filters: {name: frm.doc.employee}
-                },
-                callback: function(r) {
-                    if (r.message && r.message.expense_approver) {
-                        frm.set_value("approver", r.message.expense_approver);
-                    }
-                }
-            });
-        }
+		frappe.call({
+			method: "get_employee_approver",
+			doc: frm.doc,
+			callback: function(r){
+				if(r.message){
+					frm.set_value("approver", r.message[0]);
+					frm.set_value("approver_name", r.message[1]);
+					frm.set_value("approver_designation", r.message[2]);
+					frm.refresh_fields();
+				}
+			}
+		})
     },
 
 	onload: function (frm) {
