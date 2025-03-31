@@ -39,21 +39,33 @@ frappe.ui.form.on('Travel Authorization', {
         frm.set_value("approver", null);
         
         // Fetch new approver if employee is selected
-        if (frm.doc.employee) {
-            frappe.call({
-                method: "frappe.client.get_value",
-                args: {
-                    doctype: "Employee",
-                    fieldname: "expense_approver",
-                    filters: {name: frm.doc.employee}
-                },
-                callback: function(r) {
-                    if (r.message && r.message.expense_approver) {
-                        frm.set_value("approver", r.message.expense_approver);
-                    }
-                }
-            });
-        }
+		frappe.call({
+			method: "get_employee_approver",
+			doc: frm.doc,
+			callback: function(r){
+				if(r.message){
+					frm.set_value("approver", r.message[0]);
+					frm.set_value("approver_name", r.message[1]);
+					frm.set_value("approver_designation", r.message[2]);
+					frm.refresh_fields();
+				}
+			}
+		})
+        // if (frm.doc.employee) {
+        //     frappe.call({
+        //         method: "frappe.client.get_value",
+        //         args: {
+        //             doctype: "Employee",
+        //             fieldname: ["reports_to", "reports_to_name"],
+        //             filters: {name: frm.doc.employee}
+        //         },
+        //         callback: function(r) {
+        //             if (r.message && r.message.reports_to) {
+        //                 frm.set_value("approver", r.message.reports_to);
+        //             }
+        //         }
+        //     });
+        // }
         
         // Your existing DSA calculation
         frappe.call({
