@@ -321,7 +321,7 @@
    "fieldtype": "Link",
    "label": "Approver",
    "options": "User",
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fieldname": "column_break_yrsk",
@@ -387,7 +387,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-03-31 17:11:51.975142",
+ "modified": "2025-04-01 12:27:23.032865",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim",
