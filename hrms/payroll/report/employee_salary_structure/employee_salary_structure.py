@@ -109,7 +109,6 @@ def get_salary_structures(filters):
 
     return salary_structures
 
-
 def get_conditions(filters):
     conditions = ""
     status = {
@@ -126,6 +125,9 @@ def get_conditions(filters):
         conditions += " and t1.branch = %(branch)s"
     if filters.get("grade"):
         conditions += " and t2.grade = %(grade)s"
+    # Add the employment type filter
+    if filters.get("employeement_type"):
+        conditions += " and t2.employment_type = %(employeement_type)s"
     if status:
         conditions += " and t1.is_active = '{0}'".format(status)
 

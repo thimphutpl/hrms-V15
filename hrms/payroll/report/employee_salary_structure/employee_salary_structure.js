@@ -20,6 +20,12 @@ frappe.query_reports["Employee Salary Structure"] = {
 			}
 		},
 		{
+			"fieldname": "employeement_type",
+			"label": __("Employment Type"),
+			"fieldtype": "Link",
+			"options": "Employment Type",
+		},
+		{
 			"fieldname": "branch",
 			"label": __("Branch"),
 			"fieldtype": "Link",
