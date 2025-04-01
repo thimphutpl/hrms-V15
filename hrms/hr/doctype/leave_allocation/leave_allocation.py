@@ -70,14 +70,21 @@ class LeaveAllocation(Document):
 					exclude_allocation=self.name,
 				)
 			leave_allocated += flt(self.new_leaves_allocated)
-
+			print(leave_allocated)
 			if leave_allocated > max_leaves_allowed and not self.ignore_max_leave_allocated:
-				frappe.throw(
+				
+				# pass
+				frappe.msgprint(
 					_(
-						"Total allocated leaves are more than maximum allocation allowed for {0} leave type for employee {1} in the period"
+						"Total allocated leaves1 are more than maximum allocation allowed for {0} leave type for employee {1} in the period"
 					).format(self.leave_type, self.employee),
 					OverAllocationError,
 				)
+				
+			else:
+				
+				pass
+				
 
 
 	def on_submit(self):
@@ -105,9 +112,12 @@ class LeaveAllocation(Document):
 			self.validate_leave_days_and_dates()
 
 			leaves_to_be_added = self.new_leaves_allocated - self.get_existing_leave_count()
+			from datetime import datetime, timedelta
+			today = datetime.today()
+			from_date=today.replace(day=1)
 			args = {
 				"leaves": leaves_to_be_added,
-				"from_date": self.from_date,
+				"from_date": from_date,
 				"to_date": self.to_date,
 				"is_carry_forward": 0,
 			}
@@ -259,6 +269,7 @@ class LeaveAllocation(Document):
 	def validate_total_leaves_allocated(self):
 		# Adding a day to include To Date in the difference
 		date_difference = date_diff(self.to_date, self.from_date) + 1
+		print(date_difference)
 		if date_difference < self.total_leaves_allocated:
 			if frappe.db.get_value("Leave Type", self.leave_type, "allow_over_allocation"):
 				frappe.msgprint(
@@ -379,27 +390,33 @@ def validate_carry_forward(leave_type):
 
 # Post earned leave on the first day of every month
 ##
-def post_earned_leaves():	
-	if not getdate(frappe.utils.nowdate()) == getdate(get_first_day(frappe.utils.nowdate())):		
-		return 0	
-	date = add_days(frappe.utils.nowdate(), -20)
-	start = get_first_day(date);
-	end = get_last_day(date);	
-	employees = frappe.db.sql("select name, employee_name, date_of_joining from `tabEmployee` where status = 'Active' limit 1", as_dict=True)	
-	for e in employees:		
-		if cint(date_diff(end, getdate(e.date_of_joining))) > 14:			
-			la = frappe.new_doc("Leave Allocation")
-			la.employee = e.name
-			la.employee_name = e.employee_name
-			la.leave_type = "Earned Leave"
-			la.from_date = str(start)
-			la.to_date = str(end)
-			la.carry_forward = cint(1)
-			la.new_leaves_allocated = flt(2.5)
-			la.submit()
-			print(f"Leave Allocation submitted successfully for {e.name}!")
-		else:
-			pass
+# def post_earned_leaves():	
+# 	# if not getdate(frappe.utils.nowdate()) == getdate(get_first_day(frappe.utils.nowdate())):		
+# 	# 	return 0	
+# 	date = add_days(frappe.utils.nowdate(), -20)
+# 	start = get_first_day(date);
+# 	end = get_last_day(date);
+# 	from datetime import datetime, timedelta
+# 	today = datetime.today()
+# 	first_day_of_year = datetime(today.year, 1, 1)
+# 	last_day_of_year = datetime(today.year, 12, 31)
+
+# 	employees = frappe.db.sql("select name, employee_name, date_of_joining from `tabEmployee` where employee='GYAL20268'and status = 'Active' limit 1", as_dict=True)	
+# 	for e in employees:		
+# 		if cint(date_diff(end, getdate(e.date_of_joining))) > 14:			
+# 			la = frappe.new_doc("Leave Allocation")
+# 			la.employee = e.name
+# 			la.employee_name = e.employee_name
+# 			la.leave_type = "Earned Leave"
+# 			la.from_date = first_day_of_year.strftime(f'%Y-%m-%d')
+# 			la.to_date = last_day_of_year.strftime(f'%Y-%m-%d')
+# 			la.carry_forward = cint(1)
+
+# 			la.new_leaves_allocated = flt(2.5)
+# 			la.submit()
+# 			print(f"Leave Allocation submitted successfully for {e.name}!")
+# 		else:
+# 			pass
 
 @frappe.whitelist()
 def get_date_diff(start_date, end_date):
