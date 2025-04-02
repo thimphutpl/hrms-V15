@@ -136,7 +136,19 @@ class TravelAuthorization(Document):
 
 	def validate_advance(self):
 		self.advance_amount = 0 if not self.need_advance else self.advance_amount
-		if flt(self.advance_amount) > flt(flt(self.estimated_amount) * 0.9):
+		
+		company_currency = frappe.get_cached_value("Company", self.company, "default_currency")
+		if self.currency == company_currency:
+			self.exchange_rate = 1.0
+			return
+		
+		advance_amt = 0
+		if self.currency != company_currency:
+			advance_amt = flt(self.base_advance_amount)
+		else:
+			advance_amt = flt(self.advance_amount)
+
+		if flt(advance_amt) > flt(flt(self.estimated_amount) * 0.9):
 			frappe.throw("Advance Amount cannot be greater than 90% of Total Estimated Amount")
 		self.advance_journal = None if self.docstatus == 0 else self.advance_journal
 
@@ -182,8 +194,15 @@ class TravelAuthorization(Document):
 			self.end_date_auth = self.items[len(self.items) - 1].from_date 
 
 	def post_journal_entry(self):
+		company_currency = frappe.get_cached_value("Company", self.company, "default_currency")
+		advance_amt = 0
+		if self.currency != company_currency:
+			advance_amt = flt(self.base_advance_amount)
+		else:
+			advance_amt = flt(self.advance_amount)
+
 		if self.need_advance:
-			if flt(self.advance_amount) > 0:
+			if flt(advance_amt) > 0:
 				cost_center = frappe.db.get_value("Employee", self.employee, "cost_center")
 				advance_account = frappe.db.get_single_value("HR Accounts Settings", "employee_advance_travel")
 				expense_bank_account = get_bank_account(self.branch, self.company)
@@ -214,16 +233,16 @@ class TravelAuthorization(Document):
 					"reference_type": self.doctype,
 					"reference_name": self.name,
 					"cost_center": cost_center,
-					"debit_in_account_currency": flt(self.advance_amount),
-					"debit": flt(self.advance_amount),
+					"debit_in_account_currency": flt(advance_amt),
+					"debit": flt(advance_amt),
 					"is_advance": "Yes"
 				})
 
 				je.append("accounts", {
 					"account": expense_bank_account,
 					"cost_center": cost_center,
-					"credit_in_account_currency": flt(self.advance_amount),
-					"credit": flt(self.advance_amount),
+					"credit_in_account_currency": flt(advance_amt),
+					"credit": flt(advance_amt),
 				})
 				
 				je.insert(ignore_permissions=True)
@@ -323,7 +342,15 @@ class TravelAuthorization(Document):
 @frappe.whitelist()
 def make_travel_claim(source_name, target_doc=None):
 	def update_date(obj, target, source_parent):
+		company_currency = frappe.get_cached_value("Company", obj.company, "default_currency")
+		advance_amount = 0
+		if obj.currency != company_currency:
+			advance_amount = flt(obj.base_advance_amount)
+		else:
+			advance_amount = flt(obj.advance_amount)
+		
 		target.posting_date = nowdate()
+		target.advance_amount = flt(advance_amount)
 		target.supervisor = None
 
 	def transfer_currency(obj, target, source_parent):
@@ -346,7 +373,7 @@ def make_travel_claim(source_name, target_doc=None):
 		dsa_percent = frappe.db.get_single_value("HR Settings", "return_day_dsa")
 		for d in target.items:
 			if d.is_last_day == 1:
-				d.dsa = flt(d.dsa) * flt(dsa_percent)/100
+				d.total_dsa = flt(d.total_dsa) * flt(dsa_percent)/100
 
 	doc = get_mapped_doc("Travel Authorization", source_name, {
 			"Travel Authorization": {
@@ -354,7 +381,6 @@ def make_travel_claim(source_name, target_doc=None):
 				"field_map": {
 					"name": "travel_authorization",
 					"posting_date": "ta_date",
-					"advance_amount": "advance_amount"
 				},
 				"postprocess": update_date,
 				"validation": {"docstatus": ["=", 1]}
