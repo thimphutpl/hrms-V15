@@ -112,8 +112,64 @@ frappe.ui.form.on('Travel Authorization', {
 	
 	need_advance: function (frm) {
 		// frm.toggle_reqd("estimated_amount", frm.doc.need_advance == 1);
-		// frm.toggle_reqd("advance_amount", frm.doc.need_advance == 1);
 		calculate_advance(frm);
+		frm.toggle_reqd("advance_amount", frm.doc.need_advance == 1);
+	},
+
+	currency: function (frm) {
+		// calculate_advance(frm);
+		let company_currency = erpnext.get_currency(frm.doc.company);
+		if (company_currency != frm.doc.company) {
+			frappe.call({
+				method: "erpnext.setup.utils.get_exchange_rate",
+				args: {
+					from_currency: company_currency,
+					to_currency: frm.doc.currency,
+				},
+				callback: function (r) {
+					if (r.message) {
+						frm.set_value("exchange_rate", flt(r.message));
+						frm.set_df_property(
+							"exchange_rate",
+							"description",
+							"1 " + frm.doc.currency + " = [?] " + company_currency
+						);
+					}
+				},
+			});
+		} else {
+			frm.set_value("exchange_rate", 1.0);
+			frm.set_df_property("exchange_rate", "hidden", 1);
+			frm.set_df_property("exchange_rate", "description", "");
+		}
+
+		frm.trigger("advance_amount");
+		frm.trigger("set_dynamic_field_label");
+	},
+
+	advance_amount: (frm) => {
+        frm.set_value("base_advance_amount", flt(frm.doc.advance_amount) * flt(frm.doc.exchange_rate));
+    },
+
+	exchange_rate: (frm) => {
+        frm.set_value("base_advance_amount", flt(frm.doc.advance_amount) * flt(frm.doc.exchange_rate));
+    },
+
+	set_dynamic_field_label: function (frm) {
+		frm.trigger("change_form_labels");
+	},
+
+	change_form_labels: function (frm) {
+		let company_currency = erpnext.get_currency(frm.doc.company);
+		frm.set_currency_labels(["estimated_amount"], company_currency);
+		frm.set_currency_labels(["base_advance_amount"], company_currency);
+		frm.set_currency_labels(["advance_amount"], frm.doc.currency);
+
+		// toggle fields
+		frm.toggle_display(
+			["exchange_rate", "base_advance_amount"],
+			frm.doc.currency != company_currency
+		);
 	},
 	
 	make_traveil_claim: function () {

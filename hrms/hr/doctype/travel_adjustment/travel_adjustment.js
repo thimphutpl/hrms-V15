@@ -58,7 +58,7 @@ const set_employee_dsa = (frm, cdt, cdn) => {
 				country: child.country,
 				grade: frm.doc.grade,
 			},
-			callback: function(r) {					
+			callback: function(r) {
 				if (r.message && r.message.length > 0) {
 					frappe.model.set_value(cdt, cdn, "dsa", r.message[0].dsa);
 					frappe.model.set_value(cdt, cdn, "currency", r.message[0].currency);

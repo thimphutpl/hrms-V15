@@ -9,8 +9,8 @@ from erpnext.custom_workflow import validate_workflow_states, notify_workflow_st
 
 class TravelAdjustment(Document):
 	def validate(self):
-		# validate_workflow_states(self)
-		self.validate_travel_dates(update=True)
+		validate_workflow_states(self)
+		self.validate_travel_dates()
 		self.validate_travel_last_day()
 
 	def on_submit(self):
@@ -26,7 +26,7 @@ class TravelAdjustment(Document):
 			self.items[-2].is_last_day = 0
 			self.items[-1].is_last_day = 1
 
-	def validate_travel_dates(self, update=False):
+	def validate_travel_dates(self):
 		for item in self.get("items"):
 			if cint(item.halt):
 				if not item.halt_at:
@@ -42,8 +42,7 @@ class TravelAdjustment(Document):
 			from_date = item.from_date
 			to_date   = item.from_date if not item.to_date else item.to_date
 			item.no_days   = date_diff(to_date, from_date) + 1
-			if update:
-				frappe.db.set_value("Travel Adjustment Item", item.name, "no_days", item.no_days)
+			
 		if self.items:
 			# check if the travel dates are already used in other travel authorization
 			tas = frappe.db.sql("""select t3.idx, t1.name, t2.from_date, t2.to_date

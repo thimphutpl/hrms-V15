@@ -33,32 +33,35 @@ class TravelClaim(Document):
 	def on_submit(self):
 		self.update_travel_authorization()
 		self.post_journal_entry()
+
 	def before_cancel(self):
 		self.unlink_travel_authorization()
-		for a in str(self.claim_journal).split(", "):
-			je_doc = frappe.get_doc("Journal Entry", a)
-			if je_doc.docstatus == 1:
-				je_doc.cancel()
-			elif je_doc.docstatus == 0:
-				je_doc.delete(ignore_permissions=True)
-		frappe.db.sql("update `tabGL Entry` set voucher_no = NULL where voucher_no = '{}'".format(self.name))
-		frappe.db.sql("update `tabGL Entry` set against_voucher = NULL where against_voucher = '{}'".format(self.name))
-		frappe.db.sql("update `tabPayment Ledger Entry` set voucher_no = NULL where voucher_no = '{}'".format(self.name))
-		frappe.db.sql("update `tabPayment Ledger Entry` set against_voucher_no = NULL where against_voucher_no = '{}'".format(self.name))
+	# 	for a in str(self.claim_journal).split(", "):
+	# 		je_doc = frappe.get_doc("Journal Entry", a)
+	# 		if je_doc.docstatus == 1:
+	# 			je_doc.cancel()
+	# 		elif je_doc.docstatus == 0:
+	# 			je_doc.delete(ignore_permissions=True)
+	# 	frappe.db.sql("update `tabGL Entry` set voucher_no = NULL where voucher_no = '{}'".format(self.name))
+	# 	frappe.db.sql("update `tabGL Entry` set against_voucher = NULL where against_voucher = '{}'".format(self.name))
+	# 	frappe.db.sql("update `tabPayment Ledger Entry` set voucher_no = NULL where voucher_no = '{}'".format(self.name))
+	# 	frappe.db.sql("update `tabPayment Ledger Entry` set against_voucher_no = NULL where against_voucher_no = '{}'".format(self.name))
 
 	def on_cancel(self):
-		# self.ignore_linked_doctypes = (
-		# 	"GL Entry"
-		# )
+		self.ignore_linked_doctypes = (
+			"GL Entry", "Payment Ledger Entry"
+		)
 		# super().on_cancel()
-		self.check_journal_entry()
+		# self.check_journal_entry()
 		if self.training_event:
 			self.update_training_event(cancel=True)
 		self.db_set("workflow_state", "Cancelled")
+
 	def unlink_travel_authorization(self):
 		if self.travel_authorization:
 			travel_a = frappe.get_doc("Travel Authorization", self.travel_authorization)
 			travel_a.db_set("travel_claim","")
+
 	def validate_duplicate(self):
 		existing = []
 		existing = frappe.db.sql("""
@@ -203,8 +206,7 @@ class TravelClaim(Document):
 	def update_amounts(self):
 		lastday_dsa_percent = flt(frappe.db.get_single_value("HR Settings", "return_day_dsa")) 
 		total_claim_amount = 0
-		company_currency = frappe.db.get_value("Company", self.company, "default_currency")
-		dsa_ceilings = {}
+		
 		total_claim_days = 0
 		for item in self.get("items"):
 			item.dsa = flt(item.total_dsa)
@@ -216,9 +218,14 @@ class TravelClaim(Document):
 			item.base_amount = flt(item.amount)
 			total_claim_amount += flt(item.base_amount)
 		
-		self.total_claim_amount = flt(total_claim_amount)
+		self.total_claim_amount = flt(total_claim_amount) + flt(self.extra_claim_amount)
 		self.total_claim_days = flt(total_claim_days)
-		self.balance_amount = (flt(self.total_claim_amount) + flt(self.extra_claim_amount) - flt(self.advance_amount))
+		diff = (flt(self.total_claim_amount) - flt(self.advance_amount))
+		if flt(diff) > 0:
+			self.balance_amount = flt(diff)
+		else:
+			self.refundable_amount = -1 * flt(diff)
+			
 		if flt(self.balance_amount) < 0:
 			frappe.throw(_("Balance Amount cannot be a negative value."), title="Invalid Amount")
 
@@ -280,8 +287,91 @@ class TravelClaim(Document):
 			for t in tas:
 				frappe.throw("Row#{}: The dates in your current Travel Claim have already been claimed in {} between {} and {}"\
 					.format(t.idx, frappe.get_desk_link("Travel Claim", t.name), t.from_date, t.to_date))
-
+				
 	def post_journal_entry(self):
+		self.post_payable_entry()
+		if self.balance_amount > 0:
+			self.post_payment_entry()
+		# if self.refundable_amount > 0:
+		# 	self.post_refund_entry()
+
+	def post_refund_entry(self):
+		bank_account = get_bank_account(self.branch, self.company)
+		if not bank_account:
+			frappe.throw("Setup Default Revenue Bank Account in {}".format(frappe.get_desk_link("Branch", self.branch)))
+
+		refundable_account = frappe.db.get_single_value("HR Accounts Settings",  "travel_refundable_account")
+		if not refundable_account:
+				frappe.throw("Setup Refundable Account to Employee (Travel) in HR Accounts Settings")
+
+		# To Bank
+		je = frappe.new_doc("Journal Entry")
+		je.flags.ignore_permissions = 1
+		je.title = "Refund Payment(" + self.employee_name + "  " + self.name + ")"
+		je.voucher_type = "Bank Entry"
+		je.naming_series = "Bank Receipt Voucher"
+		je.remark = 'Refund against : ' + self.name
+		je.posting_date = self.posting_date
+		je.branch = self.branch
+
+		je.append("accounts", {
+				"account": bank_account,
+				"reference_type": self.doctype,
+				"reference_name": self.name,
+				"cost_center": self.cost_center,
+				"debit_in_account_currency": flt(self.refundable_amount),
+				"debit": flt(self.refundable_amount),
+			})
+
+		je.append("accounts", {
+				"account": refundable_account,
+				"party_type": "Employee",
+				"party": self.employee,
+				"cost_center": self.cost_center,
+				"reference_type": self.doctype,
+				"reference_name": self.name,
+				"credit_in_account_currency": flt(self.refundable_amount),
+				"credit": flt(self.refundable_amount),
+			})
+		je.insert()
+
+	def post_payment_entry(self):
+		payable_account = frappe.db.get_single_value("HR Accounts Settings", 'travel_claim_payable')
+		expense_bank_account = get_bank_account(self.branch, self.company)
+		if not expense_bank_account:
+			frappe.throw("Setup Default Expense Bank Account in {}".format(frappe.get_desk_link("Branch", self.branch)))
+
+		if flt(self.balance_amount) > 0:
+			je = frappe.new_doc("Journal Entry")
+			je.flags.ignore_permissions = 1
+			je.title = "Travel Payment(" + self.employee_name + "  " + self.name + ")"
+			je.voucher_type = "Bank Entry"
+			je.naming_series = "Bank Payment Voucher"
+			je.remark = 'Claim payment against : ' + self.name
+			je.posting_date = self.posting_date
+			je.branch = self.branch
+			je.append("accounts", {
+					"account": payable_account,
+					"party_type": "Employee",
+					"party": self.employee,
+					"reference_type": self.doctype,
+					"reference_name": self.name,
+					"cost_center": self.cost_center,
+					"debit_in_account_currency": self.balance_amount,
+					"debit": self.balance_amount,
+				})
+
+			je.append("accounts", {
+					"account": expense_bank_account,
+					"cost_center": self.cost_center,
+					"reference_type": "Travel Claim",
+					"reference_name": self.name,
+					"credit_in_account_currency": flt(self.balance_amount),
+					"credit": flt(self.balance_amount),
+				})
+			je.insert()
+
+	def post_payable_entry(self):
 		if self.cost_center: 
 			cost_center = self.cost_center
 		else:
@@ -313,7 +403,12 @@ class TravelClaim(Document):
 		payable_account = frappe.db.get_single_value("HR Accounts Settings", 'travel_claim_payable')
 		if not expense_account:
 			frappe.throw("Setup Travel/Training Accounts in HR Accounts Settings")
-		advance_je = frappe.db.get_value("Travel Authorization", self.ta, "need_advance")
+
+		advance_account = frappe.db.get_single_value("HR Accounts Settings",  "employee_advance_travel")
+		if not advance_account:
+			frappe.throw("Setup Advance to Employee (Travel) in HR Accounts Settings")
+
+		# Payables
 		je = frappe.new_doc("Journal Entry")
 		je.flags.ignore_permissions = 1
 		je.title = "Travel Payable (" + self.employee_name + "  " + self.name + ")"
@@ -322,45 +417,40 @@ class TravelClaim(Document):
 		je.remark = 'Claim payment against : ' + self.name
 		je.posting_date = self.posting_date
 		je.branch = self.branch
-		# default_cc = frappe.db.get_value("Company", self.company, "company_cost_center")
-		total_amt = flt(self.total_claim_amount) + flt(self.extra_claim_amount)
-		references = {}
-		mileage_amount = 0
-		for a in self.items:
-			#Getting the mileage_rate and distance_covered
-			if a.mileage_rate and a.distance:
-				mileage_amount+=flt(a.mileage_rate)*flt(a.distance)
 
 		je.append("accounts", {
 				"account": expense_account,
 				"reference_type": "Travel Claim",
 				"reference_name": self.name,
 				"cost_center": self.cost_center,
-				"debit_in_account_currency": flt(total_amt,2),
-				"debit": (flt(total_amt,2)),
+				"debit_in_account_currency": flt(self.total_claim_amount),
+				"debit": flt(self.total_claim_amount),
 			})
 
-		je.append("accounts", {
-				"account": payable_account,
-				"reference_type": "Travel Claim",
-				"reference_name": self.name,
-				"cost_center": self.cost_center,
-				"credit_in_account_currency": flt(self.balance_amount,2),
-				"credit": flt(self.balance_amount,2),
-				"party_type": "Employee",
-				"party": self.employee, 
-			})
-		
-		advance_amt = flt(self.advance_amount)
-		bank_amt = flt(self.balance_amount)
+		if self.balance_amount > 0:
+			je.append("accounts", {
+					"account": payable_account,
+					"reference_type": self.doctype,
+					"reference_name": self.name,
+					"cost_center": self.cost_center,
+					"credit_in_account_currency": flt(self.balance_amount,2),
+					"credit": flt(self.balance_amount,2),
+					"party_type": "Employee",
+					"party": self.employee, 
+				})
+		else:
+			je.append("accounts", {
+					"account": advance_account,
+					"reference_type": self.doctype,
+					"reference_name": self.name,
+					"cost_center": self.cost_center,
+					"credit_in_account_currency": flt(self.total_claim_amount),
+					"credit": flt(self.total_claim_amount),
+					"party_type": "Employee",
+					"party": self.employee, 
+				})
 
-		if (self.advance_amount) > 0:
-			advance_account = frappe.db.get_single_value("HR Accounts Settings",  "employee_advance_travel")
-			if not advance_account:
-				frappe.throw("Setup Advance to Employee (Travel) in HR Accounts Settings")
-			if flt(self.balance_amount) <= 0:
-				advance_amt = total_amt
-
+		if flt(self.advance_amount) > 0 and self.balance_amount > 0:
 			je.append("accounts", {
 				"account": advance_account,
 				"party_type": "Employee",
@@ -368,45 +458,12 @@ class TravelClaim(Document):
 				"reference_type": "Travel Claim",
 				"reference_name": self.name,
 				"cost_center": cost_center,
-				"credit_in_account_currency": advance_amt,
-				"credit": advance_amt,
+				"credit_in_account_currency": flt(self.advance_amount),
+				"credit": flt(self.advance_amount),
 			})
 
 		je.insert()
 		je.submit()
-		je_references = je.name
-
-		if flt(self.balance_amount) > 0:
-			jeb = frappe.new_doc("Journal Entry")
-			jeb.flags.ignore_permissions = 1
-			jeb.title = "Travel Payment(" + self.employee_name + "  " + self.name + ")"
-			jeb.voucher_type = "Bank Entry"
-			jeb.naming_series = "Bank Payment Voucher"
-			jeb.remark = 'Claim payment against : ' + self.name
-			jeb.posting_date = self.posting_date
-			jeb.branch = self.branch
-			jeb.append("accounts", {
-					"account": payable_account,
-					"party_type": "Employee",
-					"party": self.employee,
-					"reference_type": "Journal Entry",
-					"reference_name": je.name,
-					"cost_center": cost_center,
-					"debit_in_account_currency": bank_amt,
-					"debit": bank_amt,
-				})
-
-			jeb.append("accounts", {
-					"account": expense_bank_account,
-					"cost_center": cost_center,
-					"reference_type": "Travel Claim",
-					"reference_name": self.name,
-					"credit_in_account_currency": bank_amt,
-					"credit": bank_amt,
-				})
-			jeb.insert()
-			je_references = je_references + ", "+ str(jeb.name)
-		self.db_set("claim_journal", je_references)
 
 	def update_travel_authorization(self):
 		ta = frappe.get_doc("Travel Authorization", self.travel_authorization)

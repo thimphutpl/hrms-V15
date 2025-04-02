@@ -16,7 +16,7 @@ from erpnext.accounts.doctype.accounts_settings.accounts_settings import get_ban
 
 class TravelAuthorization(Document):
 	def validate(self):
-		validate_workflow_states(self)
+		# validate_workflow_states(self)
 		self.set_employee_supervisor()
 		self.validate_travel_last_day()
 		self.assign_end_date()
@@ -286,7 +286,7 @@ class TravelAuthorization(Document):
 			""".format(travel_authorization = self.name, employee = self.employee), as_dict=True)
 			for t in tas:
 				frappe.throw("Row#{}: The dates in your current Travel Authorization have already been claimed in {} between {} and {}"\
-					.format(t.idx, frappe.get_desk_link("Travel Request", t.name), t.from_date, t.to_date))
+					.format(t.idx, frappe.get_desk_link("Travel Authorization", t.name), t.from_date, t.to_date))
 
 	def check_leave_applications(self):
 		las = frappe.db.sql("""select t1.name from `tabLeave Application` t1 
@@ -335,7 +335,7 @@ class TravelAuthorization(Document):
 		total_dsa = 0
 		for i in self.items:
 			if i.is_last_day == 0:
-				total_dsa += i.total_dsa
+				total_dsa += flt(i.total_dsa)
 		self.estimated_amount = total_dsa
 		return total_dsa if total_dsa else 0.0
 
