@@ -25,9 +25,10 @@
   "place_type",
   "col_break_mode",
   "mode_of_travel",
-  "column_break_btbv",
   "sponsorship",
   "if_sponsorship_is_others",
+  "column_break_btbv",
+  "purpose",
   "seminar_and_workshop_details_section",
   "topic",
   "column_break_rtdp",
@@ -58,7 +59,6 @@
   "section_break_18",
   "journal_entry",
   "end_date_auth",
-  "purpose",
   "column_break_30",
   "company",
   "branch",
@@ -181,6 +181,7 @@
    "default": "BTN",
    "fieldname": "currency",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Currency",
    "options": "Currency"
   },
@@ -200,7 +201,7 @@
    "description": "If the amount is in dollars, include the exchange rate above.",
    "fieldname": "advance_amount",
    "fieldtype": "Currency",
-   "label": "Advance Amount (Nu/Dollar)",
+   "label": "Advance Amount",
    "options": "currency"
   },
   {
@@ -353,6 +354,7 @@
    "depends_on": "eval:doc.need_advance ",
    "fieldname": "base_advance_amount",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Advance Amount",
    "options": "Company:company:default_currency",
    "read_only": 1
@@ -377,7 +379,7 @@
    "label": "Approver",
    "no_copy": 1,
    "options": "User",
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fieldname": "column_break_bdeb",
@@ -433,12 +435,13 @@
   {
    "fieldname": "exchange_rate",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Exchange Rate"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-03-31 17:05:54.178871",
+ "modified": "2025-04-01 17:19:13.973821",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",

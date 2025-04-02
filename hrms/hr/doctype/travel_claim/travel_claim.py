@@ -45,6 +45,7 @@ class TravelClaim(Document):
 		frappe.db.sql("update `tabGL Entry` set against_voucher = NULL where against_voucher = '{}'".format(self.name))
 		frappe.db.sql("update `tabPayment Ledger Entry` set voucher_no = NULL where voucher_no = '{}'".format(self.name))
 		frappe.db.sql("update `tabPayment Ledger Entry` set against_voucher_no = NULL where against_voucher_no = '{}'".format(self.name))
+
 	def on_cancel(self):
 		# self.ignore_linked_doctypes = (
 		# 	"GL Entry"
@@ -206,49 +207,18 @@ class TravelClaim(Document):
 		dsa_ceilings = {}
 		total_claim_days = 0
 		for item in self.get("items"):
-			# if str(item.date).split("-")[1]==str(item.till_date).split("-")[1]:
-			# 	if str(item.date).split("-")[1] not in dsa_ceilings:
-			# 		dsa_ceilings.update({str(item.date).split("-")[1]: {"days": date_diff(item.till_date, item.date)+1}})
-			# 	else:
-			# 		dsa_ceilings[str(item.date).split("-")[1]]['days'] += date_diff(item.till_date, item.date)+1
-			# else:
-			# 	for m in range(int(str(item.date).split("-")[1]), int(str(item.till_date).split("-")[1])+1):
-			# 		if m == int(str(item.date).split("-")[1]):
-			# 			if str(item.date).split("-")[1] not in dsa_ceilings:
-			# 				dsa_ceilings.update({str(item.date).split("-")[1]: {"days": date_diff(item, item.date)+1}})
-			# 			else:
-			# 				dsa_ceilings[str(item.date).split("-")[1]]['days'] += date_diff(item.till_date, item.date)+1
-			# 		elif m ==  int(str(item.till_date).split("-")[1]):
-			# 			if str(item.date).split("-")[1] not in dsa_ceilings:
-			# 				dsa_ceilings.update({str(item.date).split("-")[1]: {"days": date_diff(item.till_date, item.date)+1}})
-			# 			else:
-			# 				dsa_ceilings[str(item.date).split("-")[1]]['days'] += date_diff(item.till_date, item.date)+1
-			# 		else:
-			# 			if str(m) not in dsa_ceilings:
-			# 				dsa_ceilings.update({str(m): {"days": 15}})
-			# 			else:
-			# 				dsa_ceilings[str(item.date).split("-")[1]]['days'] += 15
-				# exchange_rate = 1 if self.currency == company_currency else get_exchange_rate(self.currency, company_currency)
 			item.dsa = flt(item.total_dsa)
 			if item.is_last_day:
 				item.dsa_percent = flt(lastday_dsa_percent)
 			
-			# if self.mode_of_travel == "Personal Car":
-			# item.amount = (flt(item.days_allocated) * (flt(item.dsa) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
 			item.amount = (flt(flt(item.dsa) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
-			# frappe.msgprint(str(item.amount))
 			total_claim_days += flt(item.days_allocated)
-			# total_claim_days += item.days_allocated
-			# else:
-			# 	item.amount = flt(item.days_allocated) * (flt(item.dsa) * flt(item.dsa_percent) / 100)
-			# item.base_amount = flt(item.amount) * flt(self.exchange_rate)
 			item.base_amount = flt(item.amount)
 			total_claim_amount += flt(item.base_amount)
 		
 		self.total_claim_amount = flt(total_claim_amount)
 		self.total_claim_days = flt(total_claim_days)
 		self.balance_amount = (flt(self.total_claim_amount) + flt(self.extra_claim_amount) - flt(self.advance_amount))
-		# frappe.throw(str(self.total_claim_amount))
 		if flt(self.balance_amount) < 0:
 			frappe.throw(_("Balance Amount cannot be a negative value."), title="Invalid Amount")
 

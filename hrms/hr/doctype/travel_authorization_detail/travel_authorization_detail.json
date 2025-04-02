@@ -15,7 +15,17 @@
   "halt_at",
   "column_break_9",
   "to_date",
-  "no_days"
+  "no_days",
+  "currency_section",
+  "currency",
+  "column_break_knva",
+  "exchange_rate",
+  "amount_details_section",
+  "dsa",
+  "column_break_wrim",
+  "dsa_nu_per_day",
+  "column_break_urnk",
+  "total_dsa"
  ],
  "fields": [
   {
@@ -38,7 +48,7 @@
    "fieldname": "no_days",
    "fieldtype": "Data",
    "hidden": 1,
-   "label": "Number of Halt Days",
+   "label": "Number of Days",
    "read_only": 1
   },
   {
@@ -80,11 +90,59 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Travel To"
+  },
+  {
+   "fieldname": "currency_section",
+   "fieldtype": "Section Break",
+   "label": "Currency"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "label": "Currency",
+   "options": "Currency"
+  },
+  {
+   "fieldname": "column_break_knva",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "exchange_rate",
+   "fieldtype": "Currency",
+   "label": "Exchange Rate"
+  },
+  {
+   "fieldname": "amount_details_section",
+   "fieldtype": "Section Break",
+   "label": "Amount Details"
+  },
+  {
+   "fieldname": "dsa",
+   "fieldtype": "Currency",
+   "label": "DSA"
+  },
+  {
+   "fieldname": "column_break_wrim",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "dsa_nu_per_day",
+   "fieldtype": "Currency",
+   "label": "DSA (Company Currency)"
+  },
+  {
+   "fieldname": "column_break_urnk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_dsa",
+   "fieldtype": "Currency",
+   "label": "Total DSA"
   }
  ],
  "istable": 1,
  "links": [],
- "modified": "2025-01-02 11:35:36.231183",
+ "modified": "2025-04-01 23:44:12.041306",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization Detail",

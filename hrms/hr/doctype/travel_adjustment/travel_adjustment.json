@@ -6,12 +6,11 @@
  "engine": "InnoDB",
  "field_order": [
   "travel_authorization",
+  "employee",
+  "employee_name",
   "column_break_mirj",
   "posting_date",
-  "section_break_mged",
-  "employee",
-  "column_break_yodx",
-  "employee_name",
+  "employee_grade",
   "section_break_soxe",
   "items",
   "section_break_nkbn",
@@ -63,18 +62,10 @@
    "label": "Posting Date"
   },
   {
-   "fieldname": "section_break_mged",
-   "fieldtype": "Section Break"
-  },
-  {
    "fieldname": "employee",
    "fieldtype": "Link",
    "label": "Employee",
    "options": "Employee"
-  },
-  {
-   "fieldname": "column_break_yodx",
-   "fieldtype": "Column Break"
   },
   {
    "fetch_from": "employee.employee_name",
@@ -141,7 +132,7 @@
    "in_list_view": 1,
    "label": "Approver",
    "options": "User",
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fieldname": "column_break_tbcz",
@@ -163,12 +154,18 @@
    "label": "Approver Designation",
    "options": "Designation",
    "read_only": 1
+  },
+  {
+   "fieldname": "employee_grade",
+   "fieldtype": "Link",
+   "label": "Employee Grade",
+   "options": "Employee Grade"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-03-31 17:05:38.759465",
+ "modified": "2025-04-01 23:51:28.571135",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Adjustment",

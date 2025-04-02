@@ -3,49 +3,90 @@
 
 frappe.ui.form.on("Travel Adjustment", {
 	setup: function(frm) {
-        // Set query for employee field
         frm.set_query("employee", function() {
             return erpnext.queries.employee();
         });
-        
-        // Set query for approver field
-        frm.set_query("approver", function() {
-            if (!frm.doc.employee) {
-                frappe.msgprint(__("Please select an employee first"));
-                return;
-            }
-            
-            return {
-                // Correct module path - point to current doctype's method
-                query: "hrms.hr.doctype.travel_adjustment.travel_adjustment.get_approvers",
-                filters: {
-                    employee: frm.doc.employee
-                }
-            };
-        });
-    },
-    
-    employee: function(frm) {
-        // Clear approver when employee changes
-        frm.set_value("approver", null);
-        frm.set_value("approver_name", null);
-        frm.set_value("approver_designation", null);
-        // Fetch new approver if employee is selected
-		frappe.call({
-			method: "get_employee_approver",
-			doc: frm.doc,
-			callback: function(r){
-				if(r.message){
-					frm.set_value("approver", r.message[0]);
-					frm.set_value("approver_name", r.message[1]);
-					frm.set_value("approver_designation", r.message[2]);
-					frm.refresh_fields();
-				}
-			}
-		})
     },
 	
 	refresh(frm) {
 
 	},
 });
+
+frappe.ui.form.on("Travel Adjustment Item", {
+    from_date: function(frm, cdt, cdn) {
+        frappe.model.set_value(cdt, cdn, "to_date", null);
+        set_form_data(frm, cdt, cdn);
+    },
+
+    halt: function (frm, cdt, cdn) {
+		var item = locals[cdt][cdn]
+		cur_frm.toggle_reqd("to_date", item.halt);
+	},
+
+    to_date: function(frm, cdt, cdn) {
+        set_form_data(frm, cdt, cdn);
+    },
+
+    country: function(frm, cdt, cdn) {
+        set_form_data(frm, cdt, cdn);
+    }, 
+
+    exchange_rate: function(frm, cdt, cdn) {
+        set_form_data(frm, cdt, cdn);
+    },
+
+});
+
+function set_form_data(frm, cdt, cdn) {
+    set_employee_dsa(frm, cdt, cdn);
+	calculate_total_dsa(frm, cdt, cdn);
+    refresh_fields(frm);
+}
+
+const set_employee_dsa = (frm, cdt, cdn) => {
+	if (frm.doc.employee) {
+		let child = locals[cdt][cdn];
+
+		if (!child.country || !frm.doc.grade) {
+			return;
+		}
+
+		frappe.call({
+			method: "hrms.hr.doctype.travel_authorization.travel_authorization.get_employee_dsa",
+			args: {
+				country: child.country,
+				grade: frm.doc.grade,
+			},
+			callback: function(r) {					
+				if (r.message && r.message.length > 0) {
+					frappe.model.set_value(cdt, cdn, "dsa", r.message[0].dsa);
+					frappe.model.set_value(cdt, cdn, "currency", r.message[0].currency);
+				} else {
+					frappe.model.set_value(cdt, cdn, "dsa", "");
+					frappe.model.set_value(cdt, cdn, "currency", "");
+				}
+			},
+		});
+	}
+};
+
+function calculate_total_dsa(frm, cdt, cdn) {
+    var item = locals[cdt][cdn];
+	if (!item.exchange_rate) {
+		item.exchange_rate = 1
+	}
+    if (item.dsa && item.no_days) {
+		if (item.to_date && item.from_date) {
+			frappe.model.set_value(cdt, cdn, "no_days", 1 + cint(frappe.datetime.get_day_diff(item.to_date, item.from_date)))
+		} else {
+			frappe.model.set_value(cdt, cdn, "no_days", 1)	
+		}
+		frappe.model.set_value(cdt, cdn, "dsa_nu_per_day", flt(item.dsa) * flt(item.exchange_rate))
+        frappe.model.set_value(cdt, cdn, "total_dsa", flt(item.dsa_nu_per_day) * flt(item.no_days));
+    }
+}
+
+function refresh_fields(frm) {
+	frm.refresh_field("items");
+}

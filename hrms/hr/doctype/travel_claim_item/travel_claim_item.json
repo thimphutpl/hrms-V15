@@ -197,7 +197,7 @@
    "fieldname": "base_dsa",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "DSA (Out Country)"
+   "label": "DSA"
   },
   {
    "default": "0",
@@ -218,7 +218,7 @@
    "fieldname": "total_dsa",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": " DSA (In Country)",
+   "label": " DSA (Company Currency)",
    "options": "currency",
    "reqd": 1
   }
@@ -226,7 +226,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-03-21 11:53:38.790936",
+ "modified": "2025-04-02 00:28:49.996304",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim Item",

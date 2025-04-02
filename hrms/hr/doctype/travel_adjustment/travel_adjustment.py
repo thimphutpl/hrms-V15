@@ -88,6 +88,12 @@ class TravelAdjustment(Document):
 					"travel_from": item.travel_from,
 					"travel_to": item.travel_to,
 					"is_last_day": item.is_last_day,
+
+					"currency": item.currency,
+					"exchange_rate": item.exchange_rate,
+					"dsa": item.dsa,
+					"dsa_nu_per_day": item.dsa_nu_per_day,
+					"total_dsa": item.total_dsa,
 				}).insert(ignore_permissions=True)
 		else:
 			for item in self.items:
@@ -105,6 +111,12 @@ class TravelAdjustment(Document):
 					"travel_from": item.travel_from,
 					"travel_to": item.travel_to,
 					"is_last_day": item.is_last_day,
+
+					"currency": item.currency,
+					"exchange_rate": item.exchange_rate,
+					"dsa": item.dsa,
+					"dsa_nu_per_day": item.dsa_nu_per_day,
+					"total_dsa": item.total_dsa,
 				}).insert(ignore_permissions=True)
 
 	def update_authorizaiton_end_date(self, cancel=False):

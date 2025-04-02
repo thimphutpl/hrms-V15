@@ -31,10 +31,6 @@
   "column_break_26",
   "extra_claim_amount",
   "extra_claim_reason",
-  "section_break_yrfb",
-  "currency",
-  "column_break_eldh",
-  "exchange_rate",
   "section_break_lhku4",
   "items",
   "section_break_ultc",
@@ -345,25 +341,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "section_break_yrfb",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "currency",
-   "fieldtype": "Link",
-   "label": "Currency",
-   "options": "Currency"
-  },
-  {
-   "fieldname": "column_break_eldh",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "exchange_rate",
-   "fieldtype": "Float",
-   "label": "Exchange Rate"
-  },
-  {
    "fieldname": "travel_authorization",
    "fieldtype": "Link",
    "label": "Travel Authorization",
@@ -387,7 +364,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-04-01 12:27:23.032865",
+ "modified": "2025-04-01 23:19:39.097963",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim",

@@ -17,65 +17,70 @@ from erpnext.accounts.doctype.accounts_settings.accounts_settings import get_ban
 class TravelAuthorization(Document):
 	def validate(self):
 		validate_workflow_states(self)
+		self.set_employee_supervisor()
 		self.validate_travel_last_day()
 		self.assign_end_date()
 		self.validate_advance()
 		self.set_travel_period()
-		self.check_advance()
 		self.check_total_dsa()
-		self.validate_travel_dates(update=True)
-		self.check_exchange_rate()
+		self.validate_travel_dates()
 		if self.training_event:
 			self.update_training_event()
 		if self.workflow_state != "Approved":
 			notify_workflow_states(self)
 
-	def check_exchange_rate(self):
-		if self.place_type == 'Out-Country' and self.need_advance:
-			if self.exchange_rate == 0.00:
-				frappe.throw("Please Enter Exchange rate")
-		if self.need_advance:
-			# dsa = 0
-			# for i in (len(self.items)-1):
-			# 	dsa = dsa + i.total_dsa
-			# self.estimated_amount = dsa
-			ninety_percent = self.estimated_amount * 0.90  # Fixing percentage calculation
-
-			if self.base_advance_amount > flt(ninety_percent):
-				frappe.throw("Advance amount exceeds the estimated amount")
-
-			
-				
 	def on_update(self):
-		self.validate_travel_dates()
 		self.check_date_overlap()
 		self.check_leave_applications()
-	def check_total_dsa(self):
-		for i in self.items:
-			if self.place_type == "In-Country":
-				i.total_dsa = flt(i.dsa) * flt(i.no_days)
-			if self.place_type == "Out-Country":
-				i.total_dsa = flt(i.dsa_nu_per_day) * flt(i.no_days)
-	def check_advance(self):
-		if self.need_advance:
-			if self.place_type!='Out-Country':
-				self.exchange_rate = 1
-			self.base_advance_amount = self.advance_amount * self.exchange_rate
-
-	@frappe.whitelist()
-	def get_employee_approver(self):
-		if self.employee:
-			reports_to = frappe.db.get_value("Employee", self.employee, "reports_to")
-			approver, approver_name, approver_designation = frappe.db.get_value("Employee", reports_to, ["user_id", "employee_name", "designation"])
-			return approver, approver_name, approver_designation
 
 	def on_submit(self):
 		notify_workflow_states(self)
-		self.validate_travel_dates(update=True)
 		self.create_attendance()
 		self.post_journal_entry()
 		if self.travel_type=="Training":
 			self.update_training_records()
+
+	def on_cancel(self):
+		self.ignore_linked_doctypes = (
+			"GL Entry",
+			"Payment Ledger Entry",
+			"Stock Ledger Entry",
+			"Repost Item Valuation",
+			"Serial and Batch Bundle",
+			"GL Entry",
+		)
+		self.cancel_attendance()	
+		if self.training_event:
+			self.update_training_event(cancel=True)
+		notify_workflow_states(self)
+
+	def on_update_after_submit(self):
+		if self.travel_claim:
+			frappe.throw("Cannot change once claim is created")
+		self.check_date_overlap()
+		self.check_leave_applications()
+		self.db_set("end_date_auth", self.items[len(self.items) - 1].date)
+		self.cancel_attendance()
+		self.create_attendance()
+
+	def check_total_dsa(self):
+		for item in self.items:
+			from_date = item.from_date
+			to_date   = item.from_date if not item.to_date else item.to_date
+			item.no_days   = date_diff(to_date, from_date) + 1
+
+			item.dsa_nu_per_day = flt(item.dsa) * flt(item.exchange_rate)
+			item.total_dsa = flt(item.dsa_nu_per_day) * flt(item.no_days)
+
+	@frappe.whitelist()
+	def set_employee_supervisor(self):
+		if self.employee:
+			reports_to = frappe.db.get_value("Employee", self.employee, "reports_to")
+			approver, approver_name, approver_designation = frappe.db.get_value("Employee", reports_to, ["user_id", "employee_name", "designation"])
+			self.approver = approver,
+			self.approver_name = approver_name,
+			self.approver_designation = approver_designation
+			return approver, approver_name, approver_designation
 
 	def validate_travel_last_day(self):
 		for i in self.items:
@@ -83,17 +88,17 @@ class TravelAuthorization(Document):
 		if len(self.get("items")) > 1:
 			self.items[-1].is_last_day = 1
 	
-	# def before_cancel(self):
-	# 	self.update_training_records(cancel=True)
-	# 	if self.advance_journal:
-	# 		for t in frappe.get_all("Journal Entry", ["name"], {"name": self.advance_journal, "docstatus": ("<",2)}):
-	# 			msg = '<b>Reference# : <a href="#Form/Journal Entry/{0}">{0}</a></b>'.format(t.name)
-	# 			frappe.throw(_("Advance payment for this transaction needs to be cancelled first.<br>{0}").format(msg),title='<div style="color: red;">Not permitted</div>')
-	# 	ta = frappe.db.sql("""
-	# 		select name from `tabTravel Claim` where ta = '{}' and docstatus != 2
-	# 	""".format(self.name))
-	# 	if ta:
-	# 		frappe.throw("""There is Travel Claim <a href="#Form/Travel%20Claim/{0}"><b>{0}</b></a> linked to this Travel Authorization""".format(ta[0][0]))
+	def before_cancel(self):
+		# self.update_training_records(cancel=True)
+		if self.advance_journal:
+			for t in frappe.get_all("Journal Entry", ["name"], {"name": self.advance_journal, "docstatus": ("<",2)}):
+				msg = '<b>Reference# : <a href="#Form/Journal Entry/{0}">{0}</a></b>'.format(t.name)
+				frappe.throw(_("Advance payment for this transaction needs to be cancelled first.<br>{0}").format(msg),title='<div style="color: red;">Not permitted</div>')
+		ta = frappe.db.sql("""
+			select name from `tabTravel Claim` where ta = '{}' and docstatus != 2
+		""".format(self.name))
+		if ta:
+			frappe.throw("""There is Travel Claim <a href="#Form/Travel%20Claim/{0}"><b>{0}</b></a> linked to this Travel Authorization""".format(ta[0][0]))
 		
 	def update_training_records(self, cancel=False):
 		emp_doc=frappe.get_doc("Employee", self.employee)
@@ -117,22 +122,6 @@ class TravelAuthorization(Document):
 			emp_doc.flags.ignore_permissions = 1
 			emp_doc.save()
 
-	def on_cancel(self):
-		self.cancel_attendance()	
-		if self.training_event:
-			self.update_training_event(cancel=True)
-		notify_workflow_states(self)
-
-	def on_update_after_submit(self):
-		if self.travel_claim:
-			frappe.throw("Cannot change once claim is created")
-		self.validate_travel_dates(update=True)
-		self.check_date_overlap()
-		self.check_leave_applications()
-		self.db_set("end_date_auth", self.items[len(self.items) - 1].date)
-		self.cancel_attendance()
-		self.create_attendance()
-
 	def update_training_event(self, cancel = False):
 		if not cancel:
 			if frappe.db.get_value("Training Event Employee", self.training_event_child_ref, "travel_authorization_id") in (None, ''):
@@ -146,11 +135,10 @@ class TravelAuthorization(Document):
 					""".format(self.training_event_child_ref))
 
 	def validate_advance(self):
-		self.advance_amount     = 0 if not self.need_advance else self.advance_amount
+		self.advance_amount = 0 if not self.need_advance else self.advance_amount
 		if flt(self.advance_amount) > flt(flt(self.estimated_amount) * 0.9):
 			frappe.throw("Advance Amount cannot be greater than 90% of Total Estimated Amount")
-		self.base_advance_amount  = 0 if not self.need_advance else self.base_advance_amount
-		self.advance_journal    = None if self.docstatus == 0 else self.advance_journal
+		self.advance_journal = None if self.docstatus == 0 else self.advance_journal
 
 	def set_travel_period(self):
 		period = frappe.db.sql("""select min(`from_date`) as min_date, max(to_date) as max_date
@@ -195,7 +183,7 @@ class TravelAuthorization(Document):
 
 	def post_journal_entry(self):
 		if self.need_advance:
-			if self.currency and flt(self.base_advance_amount) > 0:
+			if flt(self.advance_amount) > 0:
 				cost_center = frappe.db.get_value("Employee", self.employee, "cost_center")
 				advance_account = frappe.db.get_single_value("HR Accounts Settings", "employee_advance_travel")
 				expense_bank_account = get_bank_account(self.branch, self.company)
@@ -226,22 +214,22 @@ class TravelAuthorization(Document):
 					"reference_type": self.doctype,
 					"reference_name": self.name,
 					"cost_center": cost_center,
-					"debit_in_account_currency": flt(self.base_advance_amount),
-					"debit": flt(self.base_advance_amount),
+					"debit_in_account_currency": flt(self.advance_amount),
+					"debit": flt(self.advance_amount),
 					"is_advance": "Yes"
 				})
 
 				je.append("accounts", {
 					"account": expense_bank_account,
 					"cost_center": cost_center,
-					"credit_in_account_currency": flt(self.base_advance_amount),
-					"credit": flt(self.base_advance_amount),
+					"credit_in_account_currency": flt(self.advance_amount),
+					"credit": flt(self.advance_amount),
 				})
 				
 				je.insert(ignore_permissions=True)
 				self.db_set("journal_entry", je.name)
 
-	def validate_travel_dates(self, update=False):
+	def validate_travel_dates(self):
 		for item in self.get("items"):
 			if cint(item.halt):
 				if not item.halt_at:
@@ -257,8 +245,7 @@ class TravelAuthorization(Document):
 			from_date = item.from_date
 			to_date   = item.from_date if not item.to_date else item.to_date
 			item.no_days   = date_diff(to_date, from_date) + 1
-			if update:
-				frappe.db.set_value("Travel Authorization Item", item.name, "no_days", item.no_days)
+
 		if self.items:
 			# check if the travel dates are already used in other travel authorization
 			tas = frappe.db.sql("""select t3.idx, t1.name, t2.from_date, t2.to_date
@@ -326,23 +313,12 @@ class TravelAuthorization(Document):
 		if not self.need_advance:
 			return
 
-		# if self.place_type == 'Out-Country':
 		total_dsa = 0
 		for i in self.items:
 			if i.is_last_day == 0:
 				total_dsa += i.total_dsa
 		self.estimated_amount = total_dsa
-		return self.estimated_amount if total_dsa else 0.0
-		# else:
-			
-		# 	if len(self.items) > 1:
-		# 		first_day = self.items[0].from_date
-		# 		last_second_day = self.items[len(self.items) - 2].to_date
-		# 		total_days = date_diff(last_second_day, first_day) + 1
-		# 		self.estimated_amount = flt(total_days) * flt(self.dsa_per_day)
-		# 	else:
-		# 		self.estimated_amount = self.dsa_per_day
-		# 	return self.estimated_amount if self.currency == "BTN" else 0.0
+		return total_dsa if total_dsa else 0.0
 
 @frappe.whitelist()
 def make_travel_claim(source_name, target_doc=None):
@@ -378,7 +354,7 @@ def make_travel_claim(source_name, target_doc=None):
 				"field_map": {
 					"name": "travel_authorization",
 					"posting_date": "ta_date",
-					"base_advance_amount": "advance_amount"
+					"advance_amount": "advance_amount"
 				},
 				"postprocess": update_date,
 				"validation": {"docstatus": ["=", 1]}
@@ -408,6 +384,7 @@ def make_travel_adjustment(source_name, target_doc=None):
 				"doctype": "Travel Adjustment",
 				"field_map": {
 					"name": "travel_authorization",
+					"grade": "employee_grade",
 				},
 				"postprocess": update_date,
 				"validation": {"docstatus": ["=", 1]},
@@ -419,30 +396,7 @@ def make_travel_adjustment(source_name, target_doc=None):
 		target_doc
 	)
 	
-	return doc
-
-@frappe.whitelist()
-def get_exchange_rate(from_currency, to_currency, date=None):
-	# Following line is replaced by subsequent code by SHIV on 2020/09/22
-	#ex_rate = frappe.db.get_value("Currency Exchange", {"from_currency": from_currency, "to_currency": to_currency}, "exchange_rate")
-	if not date or date == "" or date == " ":
-		frappe.throw("Please select Currency Exchange Date.")
-	
-	ex_rate = frappe.db.sql("""select exchange_rate 
-					from `tabCurrency Exchange`
-					where from_currency = '{from_currency}'
-					and to_currency = '{to_currency}'
-					and `date` = '{data}'
-					order by `date` desc
-					limit 1
-	""".format(from_currency=from_currency, to_currency=to_currency, data=date), as_dict=False)
- 
-	
-	if not ex_rate:
-		frappe.throw("No Exchange Rate defined in Currency Exchange for the date {}! Kindly contact your accounts section".format(date))
-	else:
-		return ex_rate[0][0]
-	
+	return doc	
 
 @frappe.whitelist()
 def get_employee_dsa(country, grade):
