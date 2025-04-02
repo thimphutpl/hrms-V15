@@ -122,22 +122,48 @@ frappe.ui.form.on('Muster Roll Application Item', {
 			frm.refresh_field("rate_per_hour")
 		}
 	},
-	"existing_cid": function(frm, cdt, cdn){
-		var child  = locals[cdt][cdn];
-		frappe.call({
-			method: "frappe.client.get_value",
-			args: {doctype: "Muster Roll Employee", fieldname: ["person_name", "rate_per_day", "rate_per_hour_overtime","rate_per_hour_normal"],
-				filters: {
-					name: child.existing_cid
-				}},
-			callback: function(r){
-				frappe.model.set_value(cdt, cdn, "person_name", r.message.person_name);
-				frappe.model.set_value(cdt, cdn, "rate_per_day", r.message.rate_per_day);
-				frappe.model.set_value(cdt, cdn, "rate_per_hour", r.message.rate_per_hour_overtime);
-				frappe.model.set_value(cdt, cdn, "rate_per_hour_normal", r.message.rate_per_hour_normal);
-			}
+	// "existing_cid": function(frm, cdt, cdn){
+	// 	var child  = locals[cdt][cdn];
+	// 	frappe.call({
+	// 		method: "frappe.client.get_value",
+	// 		args: {doctype: "Muster Roll Employee", fieldname: ["person_name", "rate_per_day", "rate_per_hour_overtime","rate_per_hour_normal"],
+	// 			filters: {
+	// 				name: child.existing_cid
+	// 			}},
+	// 		callback: function(r){
+	// 			frappe.model.set_value(cdt, cdn, "person_name", r.message.person_name);
+	// 			frappe.model.set_value(cdt, cdn, "rate_per_day", r.message.rate_per_day);
+	// 			frappe.model.set_value(cdt, cdn, "rate_per_hour", r.message.rate_per_hour_overtime);
+	// 			frappe.model.set_value(cdt, cdn, "rate_per_hour_normal", r.message.rate_per_hour_normal);
+	// 		}
 
-		})
-	},
-	
+	// 	})
+	// },
+	"existing_cid": function(frm, cdt, cdn) {
+    var child = locals[cdt][cdn];
+    frappe.call({
+        method: "frappe.client.get_value",
+        args: {
+            doctype: "Muster Roll Employee", 
+            fieldname: ["person_name", "rate_per_day", "rate_per_hour_overtime", "rate_per_hour_normal", "status"],
+            filters: {
+                name: child.existing_cid
+            }
+        },
+        callback: function(r) {
+            if(r.message) {
+                if(r.message.status === "Terminated") {
+                    frappe.msgprint(__("Employee is Terminated"));
+                    // Optionally clear the field if employee is inactive
+                    frappe.model.set_value(cdt, cdn, "existing_cid", "");
+                } else {
+                    frappe.model.set_value(cdt, cdn, "person_name", r.message.person_name);
+                    frappe.model.set_value(cdt, cdn, "rate_per_day", r.message.rate_per_day);
+                    frappe.model.set_value(cdt, cdn, "rate_per_hour", r.message.rate_per_hour_overtime);
+                    frappe.model.set_value(cdt, cdn, "rate_per_hour_normal", r.message.rate_per_hour_normal);
+                }
+            }
+        }
+    });
+},
 })

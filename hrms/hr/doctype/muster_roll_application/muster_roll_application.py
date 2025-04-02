@@ -219,7 +219,7 @@ class MusterRollApplication(Document):
 				except Exception as e:
 					frappe.throw(
 						_(
-							f'<span style="color: red;">Muster Roll Application Row#{a.idx}: For Employee <b>{a.existing_cid}({a.person_name})</b></span>'
+							f'<span style="color: red;">Muster Roll Application Row#{a.idx}: For Employee <b>{a.citizenship_id}({a.person_name})</b> is Already Exist</span>'
 						),
 						title="Validation Error"
 					)
