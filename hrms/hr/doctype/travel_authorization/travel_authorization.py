@@ -16,7 +16,7 @@ from erpnext.accounts.doctype.accounts_settings.accounts_settings import get_ban
 
 class TravelAuthorization(Document):
 	def validate(self):
-		# validate_workflow_states(self)
+		validate_workflow_states(self)
 		self.set_employee_supervisor()
 		self.validate_travel_last_day()
 		self.assign_end_date()
