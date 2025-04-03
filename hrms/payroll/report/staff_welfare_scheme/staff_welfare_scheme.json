@@ -1,5 +1,5 @@
 {
- "add_total_row": 0,
+ "add_total_row": 1,
  "columns": [],
  "creation": "2024-12-02 15:46:43.281087",
  "disabled": 0,
@@ -8,9 +8,8 @@
  "filters": [],
  "idx": 0,
  "is_standard": "Yes",
- "letter_head": "cdcl_default",
  "letterhead": null,
- "modified": "2024-12-02 15:46:43.281087",
+ "modified": "2025-04-03 14:30:03.425188",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Staff Welfare Scheme",
@@ -27,7 +26,10 @@
    "role": "HR Manager"
   },
   {
-   "role": "Employee"
+   "role": "Accounts User"
+  },
+  {
+   "role": "Auditor"
   }
  ]
 }
