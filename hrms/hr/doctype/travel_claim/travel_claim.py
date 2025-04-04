@@ -205,7 +205,7 @@ class TravelClaim(Document):
 
 	def update_amounts(self):
 		lastday_dsa_percent = flt(frappe.db.get_single_value("HR Settings", "return_day_dsa")) 
-		total_claim_amount = 0
+		total_claim_amount, diff = 0, 0
 		
 		total_claim_days = 0
 		for item in self.get("items"):
@@ -221,13 +221,13 @@ class TravelClaim(Document):
 		self.total_claim_amount = flt(total_claim_amount) + flt(self.extra_claim_amount)
 		self.total_claim_days = flt(total_claim_days)
 		diff = (flt(self.total_claim_amount) - flt(self.advance_amount))
+
 		if flt(diff) > 0:
 			self.balance_amount = flt(diff)
+			self.refundable_amount = 0
 		else:
 			self.refundable_amount = -1 * flt(diff)
-			
-		if flt(self.balance_amount) < 0:
-			frappe.throw(_("Balance Amount cannot be a negative value."), title="Invalid Amount")
+			self.balance_amount = 0
 
 	def get_monthly_count(self, items):
 		counts = {}
