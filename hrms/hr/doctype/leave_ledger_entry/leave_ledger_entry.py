@@ -18,6 +18,7 @@ class LeaveLedgerEntry(Document):
 		if self.is_expired:
 			frappe.db.set_value("Leave Allocation", self.transaction_name, "expired", 0)
 		else:
+			return					
 			frappe.throw(_("Only expired allocation can be cancelled"))
 
 

@@ -37,7 +37,6 @@ class SalarySlip(TransactionBase):
 		if self.salary_slip_based_on_timesheet or not self.net_pay:
 		self.calculate_net_pay()
 		'''
-
 		self.calculate_net_pay()                #Added by SHIV on 2018/10/15
 		self.validate_amounts()                 #Added by SHIV on 2018/10/15
 		company_currency = get_company_currency(self.company)
@@ -47,7 +46,8 @@ class SalarySlip(TransactionBase):
 	def validate_dates(self):
 		if date_diff(self.end_date, self.start_date) < 0:
 			frappe.throw(_("To date cannot be before From date"))
-
+	
+	
 	@frappe.whitelist()
 	def get_emp_and_leave_details(self):
 		payment_days = 0                #Added by SHIV on 2018/09/28
@@ -560,9 +560,20 @@ def unlink_ref_doc_from_salary_slip(doc, method=None):
 def get_permission_query_conditions(user):
 	if not user: user = frappe.session.user
 	user_roles = frappe.get_roles(user)
+	if user == "Administrator":
+		return
 
 	if "HR User" in user_roles or "HR Manager" in user_roles:
 		return
+		
+	if "HR Support" in user_roles:
+		return """(
+			exists(select 1
+					from `tabEmployee`
+					where `tabEmployee`.branch = `tabSalary Slip`.branch
+					and `tabEmployee`.user_id = '{user}')
+		)""".format(user=user)
+
 	else:
 		return """(
 			exists(select 1
@@ -576,7 +587,7 @@ def has_record_permission(doc, user):
 	if not user: user = frappe.session.user
 	user_roles = frappe.get_roles(user)
 	
-	if "HR User" in user_roles or "HR Manager" in user_roles:
+	if "HR User" in user_roles or "HR Manager" in user_roles or "HR Support" in user_roles:
 		return True
 	else:
 		if frappe.db.exists("Employee", {"name":doc.employee, "user_id": user}):

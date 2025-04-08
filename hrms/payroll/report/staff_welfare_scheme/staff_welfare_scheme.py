@@ -6,8 +6,6 @@ from frappe.utils import flt, cstr
 from frappe import msgprint, _
 
 def execute(filters=None):
-	if not filters: filters = {}
-
 	data = get_data(filters)
 	columns = get_columns(data)
 
@@ -17,8 +15,8 @@ def get_columns(data):
 	columns = [
 		("Employee") + ":Link/Employee:100",
 		("Employee Name") + "::160",
-			("Designation") + ":Link/Designation:150",
-				("Branch") + ":Link/Branch:120",
+		("Designation") + ":Link/Designation:150",
+		("Branch") + ":Link/Branch:120",
 		("Amount") + ":Currency:100",
 	]
 

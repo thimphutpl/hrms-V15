@@ -21,7 +21,8 @@ from frappe.query_builder import DocType, Order
 class LeaveEncashment(Document):
 	def validate(self):			
 		set_employee_name(self)
-		validate_active_employee(self.employee)		
+		validate_active_employee(self.employee)
+		self.get_leave_details_for_encashment()		
 		#self.get_leave_balance()
 		self.validate_balances()
 		self.check_duplicate_entry()
@@ -73,6 +74,8 @@ class LeaveEncashment(Document):
 				"reference_type": "Leave Encashment",
 				"reference_name": self.name,
 				"cost_center": self.cost_center,
+				"party_type": "Employee",
+				"party": self.employee,
 		})
 
 		if flt(self.encashment_tax):
@@ -93,8 +96,7 @@ class LeaveEncashment(Document):
 					"cost_center": self.cost_center,
 					"credit_in_account_currency": flt(self.payable_amount,2),
 					"credit": flt(self.payable_amount,2),
-					"party_type": "Employee",
-					"party": self.employee,
+					
 				})
 		je.insert()
 		je_references = str(je.name)
@@ -310,7 +312,7 @@ class LeaveEncashment(Document):
 		# 			self.employee, self.leave_type
 		# 		)
 		# 	)
-		#frappe.throw(str(allocation.total_leaves_allocated))
+		frappe.throw("Leave Encashment is Under Repair....")
 		self.leave_balance = (
 			allocation.total_leaves_allocated
 			- allocation.carry_forwarded_leaves_count
@@ -318,7 +320,7 @@ class LeaveEncashment(Document):
 			+ get_leaves_for_period(
 				self.employee, self.leave_type, allocation.from_date, self.encashment_date
 			)
-		)		
+		)	
 		employee_group = frappe.db.get_value("Employee", self.employee, "employee_group")
 		encashment_min = frappe.db.get_value("Employee Group", employee_group, "encashment_min")
 		encashable_days = frappe.db.get_value("Employee Group", employee_group, "max_encashment_days")
@@ -329,7 +331,10 @@ class LeaveEncashment(Document):
 			self.balance_before=self.leave_balance+leave_bal_mr_cl.leaves
 		
 		self.balance_after=self.balance_before-encashable_days
-		if self.balance_before < flt(encashment_min):		
+		# need to chnage this 
+		# flt(encashment_min)
+		# frappe.throw(str(self.leave_balance))
+		if self.balance_before < encashment_min:		
 			frappe.throw(_("Minimum '{}' days is Mandatory for Encashment").format(cint(encashment_min)),title="Leave Balance")
 		
 		# self.encashable_days = encashable_days if encashable_days > 0 else 0

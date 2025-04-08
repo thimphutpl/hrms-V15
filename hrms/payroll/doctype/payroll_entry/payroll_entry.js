@@ -59,7 +59,6 @@ frappe.ui.form.on('Payroll Entry', {
 							frm.events.refresh(frm);
 						});
 					});
-
 					// Cancel salary slips
 					frm.page.add_action_item(__('Cancel Salary Slips'), function() {
 						frm.save('Cancel').then(()=>{

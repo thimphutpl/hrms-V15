@@ -552,28 +552,11 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 					### Ver.2.0.20191227 Begins, added by SHIV on 2019/12/27
 					# Temporary workout for adding 4% of oct-2019 and nov-2019 PF
 					# this needs to be commented after processing 201912 payslips
-					'''tmp_basic = 0
-					tmp_pf = 0
-					if target_doc.fiscal_year == '2019' and target_doc.month == '12':
-						tmp = frappe.db.sql("""
-							select sum(amount) total_amount
-							from `tabSalary Detail`
-							where salary_component = 'Basic Pay'
-							and exists(select 1
-									from `tabSalary Slip`
-									where `tabSalary Slip`.employee = '{employee}'
-									and `tabSalary Slip`.fiscal_year = '2019'
-									and `tabSalary Slip`.month in ('10','11')
-									and `tabSalary Slip`.docstatus = 1
-									and `tabSalary Detail`.parent = `tabSalary Slip`.name
-							)
-						""".format(employee=source.employee), as_dict=True)
-
-						if tmp:
-						       tmp_basic = flt(tmp[0].total_amount)
-						tmp_pf = tmp_basic*4*0.01
-					pf += flt(tmp_pf)'''
 					### Ver.2.0.20191227 Ends
+					employer_percent = flt(settings.get("employer_pf"))
+					employer_pf_amount = (flt(basic_amt)+flt(basic_pay_arrears_pf))*flt(employer_percent)*0.01
+					employer_pf_amount = roundoff(employer_pf_amount)
+					target.employer_pf = employer_pf_amount
 					d['amount'] = pf
 				if d['salary_component'] == 'Group Insurance Scheme':
 					gis = flt(settings.get("gis"))
@@ -597,8 +580,11 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 				d['amount'] = 0
 			else:
 				if d['salary_component'] == 'Salary Tax':
+					employee_grade = source.employee_grade
 					if not tax_included:
+						gis=frappe.db.get_value("Employee Grade",employee_grade,"gis")
 						tax_amt = get_salary_tax(flt(gross_amt) - flt(gis) - flt(pf) - (flt(comm_amt) * 0.5))
+						# frappe.throw("gross_amount "+str(gross_amt)+" GIS "+str(gis)+" pf "+str(pf)+ " And "+str(comm_amt))
 						if source.employment_type == 'Deputation':
 							gross_amt1 = gross_amt - deput_amt 
 							tax_amt1 = get_salary_tax(flt(gross_amt1) - flt(gis) - flt(pf) -(flt(comm_amt) * 0.5))  

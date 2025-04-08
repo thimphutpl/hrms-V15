@@ -8,7 +8,7 @@ from frappe.model.document import Document
 from frappe.utils import flt, getdate, cint,today, add_years, date_diff, nowdate
 from frappe.utils.data import get_first_day, get_last_day, add_days
 from frappe.model.naming import set_name_by_naming_series, make_autoname
-from hrms.hr.hr_custom_functions import post_earned_leaves
+# from hrms.hr.hr_custom_functions import post_earned_leaves
 class DFGANDGFG(Document):
 	# def autoname(self):
 	# 	if self.old_id:
@@ -36,9 +36,10 @@ class DFGANDGFG(Document):
 		self.name = name
 	
 	def validate(self):
-		post_earned_leaves()
+		# post_earned_leaves()
 		self.check_status()
 		self.calculate_rates()
+		self.validate_block_listed()
 		self.populate_work_history()
 
 	def calculate_rates(self):
@@ -51,7 +52,16 @@ class DFGANDGFG(Document):
 	def check_status(self):
 		if self.status == "Left" and self.date_of_separation:
 			self.docstatus = 1
-
+	def validate_block_listed(self):
+		block_listed_transaction = frappe.db.get_value("DFG AND GFG",{"id_card":self.id_card},"name")
+		if block_listed_transaction:
+			if frappe.db.get_value("DFG AND GFG",block_listed_transaction,"status")=="Active":
+				if block_listed_transaction != self.name:
+					frappe.throw("This CID is already registered with DFG AND GFG ID {id}".format(id=block_listed_transaction))
+			else:
+				black_listed = frappe.db.get_value("DFG AND GFG", block_listed_transaction, "black_listed")
+				if black_listed:
+					frappe.throw("This Desuup OR Gyalsup has been Black listed")
 	def populate_work_history(self):
 		if len(self.internal_work_history) == 0:
 			self.append("internal_work_history",{

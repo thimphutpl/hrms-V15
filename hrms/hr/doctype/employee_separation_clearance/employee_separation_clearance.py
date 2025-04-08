@@ -26,7 +26,7 @@ class EmployeeSeparationClearance(Document):
 		self.check_duplicates()
 		self.update_reference()
 		# self.notify_employee()
-		notify_workflow_states(self)
+		# notify_workflow_states(self)
 		self.update_seperation_clearence_reference()
 		self.update_update_employee()
 
@@ -34,7 +34,7 @@ class EmployeeSeparationClearance(Document):
 		self.check_employee_benefit()
 		self.update_reference()
 		# self.notify_employee()
-		notify_workflow_states(self)
+		# notify_workflow_states(self)
 		self.update_seperation_clearence_reference()
 		self.update_update_employee(cancel=True)
   

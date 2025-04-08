@@ -102,6 +102,41 @@ class TravelClaim(Document):
 			self.items[-1].is_last_day = 1
 		
 		
+	# def update_amounts(self):
+	# 	total_claim_amount = 0
+	# 	return_day_dsa = flt(frappe.db.get_single_value("HR Settings", "return_day_dsa"))
+	# 	company_currency = frappe.db.get_value("Company", self.company, "default_currency")
+	# 	row_count = len(self.get("items"))
+	# 	for idx, item in enumerate(self.get("items"), start=1):
+	# 		item.dsa = flt(item.dsa)
+	# 		is_last_row = idx == row_count  # Check if it's the last row
+	# 		item.mileage_amount = flt(item.mileage_rate) * flt(item.distance) if self.mode_of_travel == "Personal Car" else 0
+
+	# 		# Default amount calculation
+	# 		if self.mode_of_travel == "Personal Car":
+	# 			item.amount = flt(item.no_days) * item.dsa * (flt(item.dsa_percent) / 100)
+
+	# 		elif self.place_type in ["Out-Country", "In-Country"]:
+	# 			item.amount = (
+	# 				flt(item.no_days) * item.dsa * (flt(item.dsa_percent) / 100)
+	# 				if item.dsa_percent
+	# 				else flt(item.no_days) * item.dsa
+	# 			)						
+	# 		if is_last_row:
+	# 			item.amount = flt(item.dsa) * (flt(return_day_dsa) / 100)				
+	# 			item.base_amount = flt(item.amount) + item.mileage_amount
+	# 		else:
+	# 			# Multiply by exchange rate for all other rows
+	# 			item.base_amount = flt(item.amount) * flt(self.exchange_rate) + item.mileage_amount
+	# 		total_claim_amount += flt(item.base_amount)
+	# 	self.total_claim_amount = flt(total_claim_amount)
+	# 	self.balance_amount = (
+	# 		flt(self.total_claim_amount) + flt(self.extra_claim_amount) - flt(self.advance_amount)
+	# 	)
+
+	# 	if self.balance_amount < 0:
+	# 		frappe.throw(_("Balance Amount cannot be a negative value."), title="Invalid Amount")
+
 	def update_amounts(self):
 		total_claim_amount = 0
 		return_day_dsa = flt(frappe.db.get_single_value("HR Settings", "return_day_dsa"))
@@ -110,8 +145,12 @@ class TravelClaim(Document):
 		for idx, item in enumerate(self.get("items"), start=1):
 			item.dsa = flt(item.dsa)
 			is_last_row = idx == row_count  # Check if it's the last row
-			item.mileage_amount = flt(item.mileage_rate) * flt(item.distance) if self.mode_of_travel == "Personal Car" else 0
-
+			# item.mileage_amount = flt(item.mileage_rate) * flt(item.distance) if self.mode_of_travel == "Personal Car" || (self.mode_of_travel = 'Flight' && via_personal_car) else 0
+			item.mileage_amount = (
+				flt(item.mileage_rate) * flt(item.distance) 
+				if self.mode_of_travel == "Personal Car" or (self.mode_of_travel == "Flight" and cint(item.via_personal_car)) 
+				else 0
+			)
 			# Default amount calculation
 			if self.mode_of_travel == "Personal Car":
 				item.amount = flt(item.no_days) * item.dsa * (flt(item.dsa_percent) / 100)
@@ -121,14 +160,22 @@ class TravelClaim(Document):
 					flt(item.no_days) * item.dsa * (flt(item.dsa_percent) / 100)
 					if item.dsa_percent
 					else flt(item.no_days) * item.dsa
-				)						
+				)                        
 			if is_last_row:
-				item.amount = flt(item.dsa) * (flt(return_day_dsa) / 100)				
-				item.base_amount = flt(item.amount) + item.mileage_amount
+				item.amount = flt(item.dsa) * (flt(return_day_dsa) / 100)  # Correctly apply the percentage
+			
+			# Determine exchange rate based on currency and row
+			if item.currency == "BTN":
+				exchange_rate = 1.0
+			elif is_last_row:
+				exchange_rate = 1.0  # Last row uses exchange rate 1 as per original logic
 			else:
-				# Multiply by exchange rate for all other rows
-				item.base_amount = flt(item.amount) * flt(self.exchange_rate) + item.mileage_amount
+				exchange_rate = self.exchange_rate
+
+			# Calculate base amount with determined exchange rate
+			item.base_amount = flt(item.amount) * flt(exchange_rate) + flt(item.mileage_amount)
 			total_claim_amount += flt(item.base_amount)
+		
 		self.total_claim_amount = flt(total_claim_amount)
 		self.balance_amount = (
 			flt(self.total_claim_amount) + flt(self.extra_claim_amount) - flt(self.advance_amount)
@@ -145,7 +192,6 @@ class TravelClaim(Document):
 
 	def check_double_dates(self):
 		if self.items:
-			# check if the travel dates are already used in other travel authorization
 			tas = frappe.db.sql("""select t3.idx, t1.name, t2.from_date, t2.to_date
 					from 
 						`tabTravel Claim` t1, 
@@ -175,7 +221,7 @@ class TravelClaim(Document):
 		if not cost_center:
 			frappe.throw("Setup Cost Center for employee in Employee Master")
 
-		expense_bank_account = get_bank_account(self.branch, self.company)
+		expense_bank_account = frappe.db.get_value("Branch",self.branch,"expense_bank_account")
 		if not expense_bank_account:
 			frappe.throw("Setup Default Expense Bank Account in {}".format(frappe.get_desk_link("Branch", self.branch)))
 		
@@ -196,104 +242,66 @@ class TravelClaim(Document):
 			else:
 				gl_account = "meeting_and_seminars_out_account"
 		expense_account = frappe.db.get_single_value("HR Accounts Settings", gl_account)
-		payable_account = expense_account
 
 		if not expense_account:
 			frappe.throw("Setup Travel/Training Accounts in HR Accounts Settings")
 		advance_je = frappe.db.get_value("Travel Authorization", self.ta, "need_advance")
-		je = frappe.new_doc("Journal Entry")
-		je.flags.ignore_permissions = 1
-		je.title = "Travel Payable (" + self.employee_name + "  " + self.name + ")"
-		je.voucher_type = "Journal Entry"
-		je.naming_series = "Journal Voucher"
-		je.remark = 'Claim payment against : ' + self.name
-		je.posting_date = self.posting_date
-		je.branch = self.branch
-		# default_cc = frappe.db.get_value("Company", self.company, "company_cost_center")
+
 		total_amt = flt(self.total_claim_amount) + flt(self.extra_claim_amount)
 		references = {}
 		mileage_amount = 0
 		for a in self.items:
-			#Getting the mileage_rate and distance_covered
 			if a.mileage_rate and a.distance:
 				mileage_amount+=flt(a.mileage_rate)*flt(a.distance)
-
-		je.append("accounts", {
-				"account": expense_account,
-				"reference_type": "Travel Claim",
-				"reference_name": self.name,
-				"cost_center": self.cost_center,
-				"debit_in_account_currency": flt(total_amt,2),
-				"debit": (flt(total_amt,2)),
-			})
-
-		je.append("accounts", {
-				"account": payable_account,
-				"reference_type": "Travel Claim",
-				"reference_name": self.name,
-				"cost_center": self.cost_center,
-				"credit_in_account_currency": flt(self.balance_amount,2),
-				"credit": flt(self.balance_amount,2),
-				"party_type": "Employee",
-				"party": self.employee, 
-			})
 		
 		advance_amt = flt(self.advance_amount)
 		bank_amt = flt(self.balance_amount)
 
-		if (self.advance_amount) > 0:
-			advance_account = frappe.db.get_single_value("HR Accounts Settings",  "employee_advance_travel")
-			if not advance_account:
-				frappe.throw("Setup Advance to Employee (Travel) in HR Accounts Settings")
-			if flt(self.balance_amount) <= 0:
-				advance_amt = total_amt
-
-			je.append("accounts", {
-				"account": advance_account,
-				"party_type": "Employee",
-				"party": self.employee,
-				"reference_type": "Travel Claim",
-				"reference_name": self.name,
-				"cost_center": cost_center,
-				"credit_in_account_currency": advance_amt,
-				"credit": advance_amt,
-			})
-
-		je.insert()
-		je.submit()
-		je_references = je.name
-
-		if flt(self.balance_amount) > 0:
+		if flt(self.total_claim_amount) > 0:
 			jeb = frappe.new_doc("Journal Entry")
 			jeb.flags.ignore_permissions = 1
-			jeb.title = "Travel Payment(" + self.employee_name + "  " + self.name + ")"
+			jeb.title = "Travel Payment(" + self.employee_name+"("+str(self.employee)+")"+ "  " + self.name + ")"
 			jeb.voucher_type = "Bank Entry"
 			jeb.naming_series = "Bank Payment Voucher"
 			jeb.remark = 'Claim payment against : ' + self.name
 			jeb.posting_date = self.posting_date
 			jeb.branch = self.branch
 			jeb.append("accounts", {
-					"account": payable_account,
-					"party_type": "Employee",
-					"party": self.employee,
-					"reference_type": "Journal Entry",
-					"reference_name": je.name,
-					"cost_center": cost_center,
-					"debit_in_account_currency": bank_amt,
-					"debit": bank_amt,
-				})
-
-			jeb.append("accounts", {
-					"account": expense_bank_account,
-					"cost_center": cost_center,
+					"account": expense_account,
 					"reference_type": "Travel Claim",
 					"reference_name": self.name,
-					"credit_in_account_currency": bank_amt,
-					"credit": bank_amt,
+					"cost_center": cost_center,
+					"debit_in_account_currency": total_amt,
+					"debit": total_amt,
 				})
+			if (self.advance_amount) > 0:
+				advance_account = frappe.db.get_single_value("HR Accounts Settings",  "employee_advance_travel")
+				if not advance_account:
+					frappe.throw("Setup Advance to Employee (Travel) in HR Accounts Settings")
+				if flt(self.balance_amount) <= 0:
+					advance_amt = total_amt
+				
+				jeb.append("accounts", {
+						"account": advance_account,
+						"party_type": "Employee",
+						"party": self.employee,
+						"reference_type": "Travel Claim",
+						"reference_name": self.name,
+						"cost_center": cost_center,
+						"credit_in_account_currency": advance_amt,
+						"credit": advance_amt,
+					})
+			if self.balance_amount > 0:
+				jeb.append("accounts", {
+						"account": expense_bank_account,
+						"cost_center": cost_center,
+						"reference_type": "Travel Claim",
+						"reference_name": self.name,
+						"credit_in_account_currency": bank_amt,
+						"credit": bank_amt,
+					})
 			jeb.insert()
-			je_references = je_references + ", "+ str(jeb.name)
-		self.db_set("claim_journal", je_references)
+			self.db_set("claim_journal", jeb.name)
 
 	def update_travel_authorization(self):
 		ta = frappe.get_doc("Travel Authorization", self.travel_authorization)
@@ -316,7 +324,17 @@ def get_permission_query_conditions(user):
 
 	if user == "Administrator":
 		return
-
+	if "CEO" in user_roles:
+		return """(
+			`tabTravel Claim`.owner = '{user}'
+			or
+			exists(select 1
+				from `tabEmployee`
+				where `tabEmployee`.name = `tabTravel Claim`.employee
+				and `tabEmployee`.user_id = '{user}')
+			or
+			(`tabTravel Claim`.approver = '{user}' and `tabTravel Claim`.workflow_state not in ('Draft','Rejected','Rejected By Supervisor','Cancelled'))
+		)""".format(user=user)
 	if "HR User" in user_roles or "HR Manager" in user_roles or "Accounts User" in user_roles or "Accounts Master" in user_roles:
 		return
 	if "HR Support" in user_roles:
@@ -337,10 +355,10 @@ def get_permission_query_conditions(user):
 		`tabTravel Claim`.owner = '{user}'
 		or
 		exists(select 1
-				from `tabEmployee`
-				where `tabEmployee`.name = `tabTravel Claim`.employee
-				and `tabEmployee`.user_id = '{user}')
+			from `tabEmployee`
+			where `tabEmployee`.name = `tabTravel Claim`.employee
+			and `tabEmployee`.user_id = '{user}')
 		or
-		(`tabTravel Claim`.approver = '{user}' and `tabTravel Claim`.workflow_state not in ('Draft','Rejected','Rejected By Supervisor','Waiting for Supervisor','Waiting HR','Cancelled'))
+		(`tabTravel Claim`.approver = '{user}' and `tabTravel Claim`.workflow_state not in ('Draft','Rejected','Rejected By Supervisor','Cancelled'))
 	)""".format(user=user)
 

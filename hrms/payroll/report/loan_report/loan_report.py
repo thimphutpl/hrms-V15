@@ -19,6 +19,7 @@ def get_columns(data):
 	columns = [
 		_("Employee") + ":Link/Employee:80", 
 		_("Employee Name") + ":Data:140", 
+		_("Employment Type") + ":Data:140", 
 		_("CID") + ":Data:120", 
 		_("Designation") + ":Link/Designation:120",
 		_("Loan Type") + ":Data:140", 
@@ -42,7 +43,7 @@ def get_data(filters):
 	conditions, filters = get_conditions(filters)
 
 	data = frappe.db.sql("""
-		select t1.employee, t3.employee_name, t3.passport_number, t1.designation,
+		select t1.employee, t3.employee_name, t1.employment_type, t3.passport_number, t1.designation,
 			t2.reference_type, t2.institution_name, t2.reference_number, t2.amount, t2.total_deductible_amount, t2.total_outstanding_amount,
 			t1.company, t1.cost_center, t1.branch, t1.department, t1.division, t1.section,
 			t1.fiscal_year, t1.month
@@ -51,13 +52,12 @@ def get_data(filters):
 		and t3.employee = t1.employee
 		and t2.parent = t1.name
 		and t2.parentfield = 'deductions'
-		and case when t2.institution_name = 'RICBL' then t2.reference_type like '%loan%' else 1 = 1 end
 		and exists
 			(select 1
 				from `tabSalary Component` sc
 				where sc.name = t2.salary_component
 			)
-		and t2.reference_type != 'NULL'
+		and t2.salary_component= 'Financial Institution Loan'
 	""".format(conditions))
 	return data
 

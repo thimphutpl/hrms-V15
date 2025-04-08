@@ -3,20 +3,19 @@
 
 frappe.query_reports["Staff Welfare Scheme"] = {
 	"filters": [
-	{
+		{
 			"fieldname":"month",
 			"label": __("Month"),
 			"fieldtype": "Select",
 			"options": "Jan\nFeb\nMar\nApr\nMay\nJun\nJul\nAug\nSep\nOct\nNov\nDec",
 			"default": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov",
-				"Dec"][frappe.datetime.str_to_obj(frappe.datetime.get_today()).getMonth()],
+			"Dec"][frappe.datetime.str_to_obj(frappe.datetime.get_today()).getMonth()],
 		},
 		{
 			"fieldname":"fiscal_year",
 			"label": __("Fiscal Year"),
 			"fieldtype": "Link",
-			"options": "Fiscal Year",
-			"default": sys_defaults.fiscal_year,
+			"options": "Fiscal Year"
 		},
 		{
 			"fieldname":"employee",
@@ -25,11 +24,11 @@ frappe.query_reports["Staff Welfare Scheme"] = {
 			"options": "Employee"
 		},
 		{
-                        "fieldname":"branch",
-                        "label": __("Branch"),
-                        "fieldtype": "Link",
-                        "options": "Branch"
-                },
+			"fieldname":"branch",
+			"label": __("Branch"),
+			"fieldtype": "Link",
+			"options": "Branch"
+        },
 
 		{
 			"fieldname":"company",
@@ -40,4 +39,4 @@ frappe.query_reports["Staff Welfare Scheme"] = {
 		}
 
 	]
-}
+};

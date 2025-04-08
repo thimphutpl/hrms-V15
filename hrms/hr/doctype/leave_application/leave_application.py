@@ -73,7 +73,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		self.notify_approver()
 
 	def validate(self):
-		#validate_workflow_states(self)
+		validate_workflow_states(self)
 		validate_active_employee(self.employee)
 		set_employee_name(self)
 		self.validate_dates()
@@ -94,8 +94,6 @@ class LeaveApplication(Document, PWANotificationsMixin):
 			# notify leave approver about creation
 			if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
 				self.notify_leave_approver()
-
-		share_doc_with_approver(self, self.leave_approver)
 		self.publish_update()
 		self.notify_approval_status()
 
@@ -361,7 +359,9 @@ class LeaveApplication(Document, PWANotificationsMixin):
 			frappe.throw(_("You are not authorized to approve leaves on Block Dates"), LeaveDayBlockedError)
 
 	def validate_balance_leaves(self):
-		if self.leave_type == 'Casual Leave' and (getdate(self.to_date) - getdate(self.from_date)).days > 5:
+		# if self.leave_type == 'Casual Leave' and (getdate(self.to_date) - getdate(self.from_date)).days > 5:
+		# 	frappe.throw(_("Casual Leave cannot exceed 5 days."))
+		if self.leave_type == 'Casual Leave' and self.total_leave_days > 5:
 			frappe.throw(_("Casual Leave cannot exceed 5 days."))
 		if self.from_date and self.to_date:
 			self.total_leave_days = get_number_of_leave_days(
@@ -390,7 +390,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
 					self.employee,
 					self.leave_type,
 					str(getdate(self.from_date)),  # Convert to string
-    				str(getdate(self.to_date)),    # Convert to string					
+					str(getdate(self.to_date)),    # Convert to string					
 					consider_all_leaves_in_the_allocation_period=True,
 					for_consumption=True,
 				)
@@ -833,39 +833,39 @@ def get_allocation_expiry_for_cf_leaves(
 
 @frappe.whitelist()
 def get_number_of_leave_days(
-    employee: str,
-    leave_type: str,
-    from_date: datetime.date,
-    to_date: datetime.date,
-    half_day: int | str | None = None,
-    half_day_date: datetime.date | str | None = None,
-    holiday_list: str | None = None,
+	employee: str,
+	leave_type: str,
+	from_date: datetime.date,
+	to_date: datetime.date,
+	half_day: int | str | None = None,
+	half_day_date: datetime.date | str | None = None,
+	holiday_list: str | None = None,
 ) -> float:
-    """Returns number of leave days between 2 dates after considering half day and holidays.
-    Holidays are included only for specific leave types: Casual Leave, Earn Leave, and Bereavement Leave.
-    For all other leave types, holidays are excluded."""
+	"""Returns number of leave days between 2 dates after considering half day and holidays.
+	Holidays are included only for specific leave types: Casual Leave, Earn Leave, and Bereavement Leave.
+	For all other leave types, holidays are excluded."""
 	   
-    if from_date > to_date:
-        frappe.throw("From Date cannot be greater than To Date") 
-    half_day = cint(half_day)
+	if from_date > to_date:
+		frappe.throw("From Date cannot be greater than To Date") 
+	half_day = cint(half_day)
 
-    # Calculate total days
-    if half_day == 1:
-        if getdate(from_date) == getdate(to_date):
-            number_of_days = 0.5
-        elif half_day_date and getdate(from_date) <= getdate(half_day_date) <= getdate(to_date):
-            number_of_days = date_diff(to_date, from_date) + 0.5
-        else:
-            number_of_days = date_diff(to_date, from_date) + 1
-    else:
-        number_of_days = date_diff(to_date, from_date) + 1    
-    leave_types_with_holidays = ["Casual Leave", "Earned Leave", "Bereavement Leave"]    
-    if leave_type in leave_types_with_holidays:        
-        holidays = get_holidays(employee, from_date, to_date, holiday_list=holiday_list)
-        number_of_days = flt(number_of_days) - flt(holidays)
-    else:       
-        pass
-    return number_of_days
+	# Calculate total days
+	if half_day == 1:
+		if getdate(from_date) == getdate(to_date):
+			number_of_days = 0.5
+		elif half_day_date and getdate(from_date) <= getdate(half_day_date) <= getdate(to_date):
+			number_of_days = date_diff(to_date, from_date) + 0.5
+		else:
+			number_of_days = date_diff(to_date, from_date) + 1
+	else:
+		number_of_days = date_diff(to_date, from_date) + 1    
+	leave_types_with_holidays = ["Casual Leave", "Earned Leave", "Bereavement Leave", "GCE Casual Leave"]    
+	if leave_type in leave_types_with_holidays:        
+		holidays = get_holidays(employee, from_date, to_date, holiday_list=holiday_list)
+		number_of_days = flt(number_of_days) - flt(holidays)
+	else:       
+		pass
+	return number_of_days
 
 
 @frappe.whitelist()
@@ -921,10 +921,10 @@ def get_leave_balance_on(
 	:param to_date: future date to check for allocation expiry
 	:param consider_all_leaves_in_the_allocation_period: consider all leaves taken till the allocation end date
 	:param for_consumption: flag to check if leave balance is required for consumption or display
-	        eg: employee has leave balance = 10 but allocation is expiring in 1 day so employee can only consume 1 leave
-	        in this case leave_balance = 10 but leave_balance_for_consumption = 1
-	        if True, returns a dict eg: {'leave_balance': 10, 'leave_balance_for_consumption': 1}
-	        else, returns leave_balance (in this case 10)
+			eg: employee has leave balance = 10 but allocation is expiring in 1 day so employee can only consume 1 leave
+			in this case leave_balance = 10 but leave_balance_for_consumption = 1
+			if True, returns a dict eg: {'leave_balance': 10, 'leave_balance_for_consumption': 1}
+			else, returns leave_balance (in this case 10)
 	"""
 	
 	if not to_date:

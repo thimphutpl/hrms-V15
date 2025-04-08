@@ -72,11 +72,13 @@ class PromotionEntry(Document):
 
 		if not self.fiscal_year or not self.month_name:
 			frappe.throw("Please select Fiscal Year and Month.")
-
-		if self.month_name == "January":
-			pe_date = self.fiscal_year+"-01-01"
-		elif self.month_name == "July":
-			pe_date = self.fiscal_year+"-07-01"
+		month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November",
+			"December"].index(self.month_name) + 1
+		if month < 10:
+			month = "0"+str(month)
+		else:
+			month = str(month)
+		pe_date = self.fiscal_year+"-"+month+"-01"
 		# query =	"""
 		# 	select t1.name as employee, t1.employee_name, t1.department, t1.designation, t1.grade as employee_grade
 		# 	from `tabEmployee` t1

@@ -204,6 +204,7 @@ class PayrollEntry(Document):
 			if not self.get(fieldname):
 				frappe.throw(_("Please set {0}").format(self.meta.get_label(fieldname)))
 
+		
 	@frappe.whitelist()
 	def create_salary_slips(self):
 		"""
@@ -552,7 +553,7 @@ class PayrollEntry(Document):
 					else ifnull(sc.is_remittable,0)
 				end)                       as is_remittable,
 				sc.gl_head                 as gl_head,
-				sum(ifnull(sd.amount,0))   as amount,
+				sum(ifnull(t1.employer_pf,0))   as amount,
 				(case
 					when ifnull(sc.make_party_entry,0) = 1 then 'Payable'
 					else 'Other'
@@ -679,7 +680,10 @@ class PayrollEntry(Document):
 						where ped.parent = t1.payroll_entry
 						and ped.employee = t1.employee)
 			group by 
-				t1.cost_center,
+				(case
+					when sc.type = 'Deduction' and ifnull(sc.make_party_entry,0) = 0 then c.cost_center
+					else t1.cost_center
+				end),
 				(case when sc.type = 'Earning' then sc.type else ifnull(sc.clubbed_component,sc.name) end),
 				sc.type,
 				(case when sc.type = 'Earning' then 0 else ifnull(sc.is_remittable,0) end),
@@ -694,7 +698,6 @@ class PayrollEntry(Document):
 		posting = frappe._dict()
 		cc_wise_totals = frappe._dict()
 		tot_payable_amt= 0
-		
 		for rec in cc:
 			# frappe.throw('hi')
 			# frappe.msgprint(str(rec.gl_head)+" "+str(rec.salary_component)+" "+str(default_payable_account))
@@ -713,16 +716,15 @@ class PayrollEntry(Document):
 				"reference_name": self.name,
 				"salary_component": rec.salary_component
 			}) 
-				
 			# Remittance
 			if rec.is_remittable and rec.component_type == 'Deduction':
 				remit_amount    = 0
 				remit_gl_list   = [rec.gl_head,default_gpf_account] if rec.salary_component == salary_component_pf else [rec.gl_head]
-
 				for r in remit_gl_list:
-					remit_amount += flt(rec.amount)
+					# remit_amount += flt(rec.amount)
 					if r == default_gpf_account:
 						for i in self.get_cc_wise_entries(salary_component_pf):
+							remit_amount += flt(i.amount)
 							posting.setdefault(rec.salary_component,[]).append({
 								"account"       : r,
 								"debit_in_account_currency" : flt(i.amount),
@@ -736,9 +738,8 @@ class PayrollEntry(Document):
 								"salary_component": rec.salary_component
 							})
 					else:
+						remit_amount += flt(rec.amount)
 						# if "GIS" in rec.salary_component:
-						# 	frappe.throw(r)
-						
 						posting.setdefault(rec.salary_component,[]).append({
 							"account"       : r,
 							"debit_in_account_currency" : flt(rec.amount),
@@ -751,7 +752,6 @@ class PayrollEntry(Document):
 							"reference_name": self.name,
 							"salary_component": rec.salary_component
 						})
-					
 				posting.setdefault(rec.salary_component,[]).append({
 					"account"       : default_bank_account,
 					"credit_in_account_currency" : flt(remit_amount),
@@ -761,7 +761,7 @@ class PayrollEntry(Document):
 					"reference_name": self.name,
 					"salary_component": rec.salary_component
 				})
-
+				# frappe.throw(str(posting))
 		# To Bank
 		if posting.get("to_payables") and len(posting.get("to_payables")):
 			posting.setdefault("to_bank",[]).append({
@@ -828,7 +828,6 @@ class PayrollEntry(Document):
 					})
 				doc.flags.ignore_permissions = 1 
 				doc.insert()
-
 				if i == "to_payables":
 					doc.submit() #Added by Thukten to submit Payable from HR
 					jv_name = doc.name
