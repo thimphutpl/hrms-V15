@@ -10,8 +10,11 @@ class DispatchRegister(Document):
 	def validate(self):
 		self.generate_dispatch_no()
 	
-	# def on_submit(self):
-	# 	self.generate_dispatch_no()
+	def on_submit(self):
+		# self.generate_dispatch_no()
+		if not self.attach:
+			frappe.throw("Please attach the document to submit")
+	
   
 	def generate_dispatch_no(self):
 		if self.manual_dispatch and self.dispatch_series_type:
