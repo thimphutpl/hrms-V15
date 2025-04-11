@@ -225,6 +225,14 @@ class PBVA(Document):
 		start = getdate(start)
 		end = getdate(end)
 
+		if self.pbva_percent > 0:
+			for d in entries:
+				row = self.append('items', {})
+				d.total_basic_pay = 0 if not d.total_basic_pay else d.total_basic_pay
+				d.amount = flt(d.total_basic_pay)/100 * flt(self.pbva_percent)
+				row.update(d)
+			return
+
 		for d in entries:
 			# d.amount = 0
 			row = self.append('items', {})
