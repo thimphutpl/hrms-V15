@@ -847,8 +847,8 @@ def get_number_of_leave_days(
 	   
 	if from_date > to_date:
 		frappe.throw("From Date cannot be greater than To Date") 
-	half_day = cint(half_day)
 
+	half_day = cint(half_day)
 	# Calculate total days
 	if half_day == 1:
 		if getdate(from_date) == getdate(to_date):
@@ -858,15 +858,15 @@ def get_number_of_leave_days(
 		else:
 			number_of_days = date_diff(to_date, from_date) + 1
 	else:
-		number_of_days = date_diff(to_date, from_date) + 1    
-	leave_types_with_holidays = ["Casual Leave", "Earned Leave", "Bereavement Leave", "GCE Casual Leave"]    
-	if leave_type in leave_types_with_holidays:        
+		number_of_days = date_diff(to_date, from_date) + 1
+	# Leave types that include holidays
+	leave_types_with_holidays = ["Casual Leave", "Earned Leave", "Bereavement Leave", "GCE Casual Leave"]
+	if leave_type in leave_types_with_holidays:		
+		if leave_type == "Bereavement Leave":
+			holiday_list = frappe.db.get_value("Branch", "GI - Head Office", "holiday_list")
 		holidays = get_holidays(employee, from_date, to_date, holiday_list=holiday_list)
 		number_of_days = flt(number_of_days) - flt(holidays)
-	else:       
-		pass
 	return number_of_days
-
 
 @frappe.whitelist()
 def get_leave_details(employee, date):
