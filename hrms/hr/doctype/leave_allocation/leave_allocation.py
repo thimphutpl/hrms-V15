@@ -224,20 +224,42 @@ class LeaveAllocation(Document):
 				).format(formatdate(future_allocation[0].from_date), future_allocation[0].name),
 				BackDatedAllocationError,
 			)
-
+		
 	@frappe.whitelist()
 	def set_total_leaves_allocated(self):
-		self.unused_leaves = get_carry_forwarded_leaves(
-			self.employee, self.leave_type, self.from_date, self.carry_forward
-		)
-
-		self.total_leaves_allocated = flt(self.unused_leaves) + flt(self.new_leaves_allocated)
-
+		if (
+			self.leave_type == "Bereavement Leave"
+			and self.from_date and self.to_date
+		):				
+			holiday_dates = []
+			holiday_list_name = frappe.db.get_value("Branch", "GI - Head Office", "holiday_list")
+			if holiday_list_name:
+				holiday_dates = [
+					getdate(d["holiday_date"]) for d in frappe.get_all(
+						"Holiday",
+						filters={"parent": holiday_list_name},
+						fields=["holiday_date"]
+					)
+				]
+			# Count only weekdays that are not holidays
+			current = getdate(self.from_date)
+			end = getdate(self.to_date)
+			days = 0
+			while current <= end:
+				if current.weekday() not in (5, 6) and current not in holiday_dates:
+					days += 1
+				current = add_days(current, 1)
+			self.new_leaves_allocated = days
+			self.total_leaves_allocated = days
+		else:			
+			self.unused_leaves = get_carry_forwarded_leaves(
+				self.employee, self.leave_type, self.from_date, self.carry_forward
+			)
+			self.total_leaves_allocated = flt(self.unused_leaves) + flt(self.new_leaves_allocated)
+			if self.carry_forward:
+				self.set_carry_forwarded_leaves_in_previous_allocation()
+				
 		self.limit_carry_forward_based_on_max_allowed_leaves()
-
-		if self.carry_forward:
-			self.set_carry_forwarded_leaves_in_previous_allocation()
-
 		if (
 			not self.total_leaves_allocated
 			and not frappe.db.get_value("Leave Type", self.leave_type, "is_earned_leave")
@@ -246,6 +268,7 @@ class LeaveAllocation(Document):
 			frappe.throw(
 				_("Total leaves allocated is mandatory for Leave Type {0}").format(self.leave_type)
 			)
+
 
 	def limit_carry_forward_based_on_max_allowed_leaves(self):
 		max_leaves_allowed = frappe.db.get_value("Leave Type", self.leave_type, "max_leaves_allowed")

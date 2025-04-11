@@ -25,8 +25,7 @@ frappe.ui.form.on('Travel Claim', {
             });
         });        
         frm.trigger("calculate_total");
-    },    
-    
+    },        
     refresh: function (frm) {
         if (frm.doc.docstatus == 1) {
             if (frappe.model.can_read("Journal Entry")) {
@@ -99,25 +98,7 @@ frappe.ui.form.on('Travel Claim', {
         });
         frm.refresh_fields();
     },    
-
-    // calculate_total: function (frm) {
-    //     let total = 0,
-    //         base_total = 0;
         
-    //     frm.doc.items.forEach((item) => {
-    //         total += item.amount + item.mileage_amount;
-    //         base_total += item.base_amount;
-    //     });
-    
-    //     let total_claim_amount = base_total; 
-    
-    //     frm.set_value({
-    //         total_amount: flt(total),
-    //         base_total_amount: flt(base_total),
-    //         total_claim_amount: flt(total_claim_amount)
-    //     });
-    // },    
-
     calculate_total: function (frm) {
         let total = 0,
             base_total = 0;
@@ -171,11 +152,9 @@ frappe.ui.form.on("Travel Claim Item", {
         }    
         // Calculate the values
         frappe.model.set_value(cdt, cdn, "amount", flt(row.dsa) * flt(row.no_days) * flt(row.dsa_percent) / 100);
-        frappe.model.set_value(cdt, cdn, "mileage_amount", flt(row.mileage_rate) * flt(row.distance));    
-        // Use updated exchange rate if manually set or from row
+        frappe.model.set_value(cdt, cdn, "mileage_amount", flt(row.mileage_rate) * flt(row.distance));        
         let exchange_rate = row.currency === "BTN" ? 1 : flt(frm.doc.exchange_rate);
-        frappe.model.set_value(cdt, cdn, "base_amount", exchange_rate * flt(row.amount) + flt(row.mileage_amount));    
-        // Trigger related updates
+        frappe.model.set_value(cdt, cdn, "base_amount", exchange_rate * flt(row.amount) + flt(row.mileage_amount));        
         frm.trigger("calculate_total");
         frm.trigger("set_dynamic_field_label");
     },    

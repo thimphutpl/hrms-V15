@@ -100,7 +100,7 @@ class TravelClaim(Document):
 	def validate_travel_last_day(self):
 		if len(self.get("items")) > 1:
 			self.items[-1].is_last_day = 1
-		
+	# updated method	
 	def update_amounts(self):
 		total_claim_amount = 0
 		return_day_dsa = flt(frappe.db.get_single_value("HR Settings", "return_day_dsa"))
