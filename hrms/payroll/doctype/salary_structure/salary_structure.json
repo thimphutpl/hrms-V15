@@ -19,6 +19,7 @@
   "cost_center",
   "department",
   "letter_head",
+  "parent_organization",
   "cb_6",
   "is_active",
   "is_default",
@@ -1376,12 +1377,17 @@
    "fieldname": "value_cdcl",
    "fieldtype": "Int",
    "label": "Value"
+  },
+  {
+   "fieldname": "parent_organization",
+   "fieldtype": "Data",
+   "label": "Parent Organization"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2025-02-20 17:00:18.398252",
+ "modified": "2025-04-15 09:50:09.159447",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
