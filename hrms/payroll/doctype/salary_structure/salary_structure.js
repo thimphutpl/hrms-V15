@@ -185,7 +185,12 @@ frappe.ui.form.on('Salary Structure', {
 	eligible_for_contract_allowance_cdcl: function(frm){
 		calculate_others(frm);
 	},
-
+	payment_methpod_cdcl: function(frm){
+		calculate_others(frm);
+	},
+	value_cdcl: function(frm){
+		calculate_others(frm);
+	},
 	eligible_for_house_rent_deduction: function(frm){
 		calculate_others(frm);
 	},
