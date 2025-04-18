@@ -10,12 +10,12 @@ class DispatchRegister(Document):
 	def validate(self):
 		self.generate_dispatch_no()
 	
-	def on_submit(self):
-		# self.generate_dispatch_no()
-		if not self.attach:
-			frappe.throw("Please attach the document to submit")
+	# def on_submit(self):
+	# 	# self.generate_dispatch_no()
+	# 	if not self.attach:
+	# 		frappe.throw("Please attach the document to submit")
 	
-  
+
 	def generate_dispatch_no(self):
 		if self.manual_dispatch and self.dispatch_series_type:
 			id = frappe.db.sql('''
@@ -24,7 +24,6 @@ class DispatchRegister(Document):
 			if not id or not id[0][0]:
 			    self.dispatch_serial = 1
 			else:
-				
 				self.dispatch_serial = int(id[0][0]) + 1
 		if not self.transaction_dispatch_number:
 			self.transaction_dispatch_number = f'{self.dispatch_series_type}/{self.dispatch_serial}'
