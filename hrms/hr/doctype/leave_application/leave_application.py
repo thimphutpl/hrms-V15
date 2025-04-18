@@ -85,6 +85,8 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		self.validate_salary_processed_days()
 		self.validate_attendance()
 		self.set_half_day_date()
+		if self.workflow_state != "Approved":
+			notify_workflow_states(self)
 		if frappe.db.get_value("Leave Type", self.leave_type, "is_optional_leave"):
 			self.validate_optional_leave()
 		self.validate_applicable_after()
@@ -93,12 +95,11 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		if self.status == "Open" and self.docstatus < 1:
 			# notify leave approver about creation
 			if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-				self.notify_leave_approver()
+				notify_workflow_states(self)
 		self.publish_update()
 		self.notify_approval_status()
 
 	def on_submit(self):
-		
 		if self.workflow_state == "Approved":
 			self.db_set("status", "Approved")
 		elif self.workflow_state == "Rejected":
@@ -112,7 +113,6 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		# notify leave applier about approval
 		if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
 			self.notify_employee()
-
 		self.create_leave_ledger_entry()
 		self.reload()
 
@@ -629,30 +629,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
 			}
 		)
 
-	def notify_leave_approver(self):
-		if self.leave_approver:
-			parent_doc = frappe.get_doc("Leave Application", self.name)
-			args = parent_doc.as_dict()
-
-			template = frappe.db.get_single_value("HR Settings", "leave_approval_notification_template")
-			if not template:
-				frappe.msgprint(
-					_("Please set default template for Leave Approval Notification in HR Settings.")
-				)
-				return
-			email_template = frappe.get_doc("Email Template", template)
-			message = frappe.render_template(email_template.response_, args)
-
-			self.notify(
-				{
-					# for post in messages
-					"message": message,
-					"message_to": self.leave_approver,
-					# for email
-					"subject": email_template.subject,
-				}
-			)
-
+	
 	def notify(self, args):
 		args = frappe._dict(args)
 		# args -> message, message_to, subject
