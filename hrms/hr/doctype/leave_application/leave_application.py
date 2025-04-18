@@ -955,7 +955,7 @@ def get_leave_allocation_records(employee, date, leave_type=None):
 			& (
 				# newly allocated leave's end date is same as the leave allocation's to date
 				((Ledger.is_carry_forward == 0) & (Ledger.to_date >= date))
-				# carry forwarded leave's end date won't be same as the leave allocation's to date
+				# carry forwarded leave's end date won't be same as the leave allocation's to dates
 				# it's between the leave allocation's from and to date
 				| (
 					(Ledger.is_carry_forward == 1)
