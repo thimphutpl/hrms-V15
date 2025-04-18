@@ -85,15 +85,31 @@ erpnext.attendance_tool_others = {
 							} else if (status === "Half Day") {
 								half_day_list.push(`<span style="color: orange;">${display_text}</span>`);
 							}
-						});
-					
+						});					
+
+						function chunkAndFormat(list, color) {
+							if (list.length === 0) return `<div class="text-muted">None</div>`;
+							let html = "";
+							for (let i = 0; i < list.length; i += 4) {
+								let row = list.slice(i, i + 4).map(item => {
+									return `<div class="col-sm-3" style="color: ${color}; padding: 5px 0;">${item.replace(/<[^>]*>/g, '')}</div>`;
+								}).join("");
+								html += `<div class="row">${row}</div>`;
+							}
+							return html;
+						}
+						
 						let html_content = `
-							<div><strong>Present:</strong> ${present_list.join(", ") || "None"}</div>
-							<div><strong>Absent:</strong> ${absent_list.join(", ") || "None"}</div>
-							<div><strong>Half Day:</strong> ${half_day_list.join(", ") || "None"}</div>
+							<div style="margin-bottom: 10px;"><strong>Present:</strong></div>
+							${chunkAndFormat(present_list, 'green')}
+							<div style="margin: 20px 0 10px;"><strong>Absent:</strong></div>
+							${chunkAndFormat(absent_list, 'red')}
+							<div style="margin: 20px 0 10px;"><strong>Half Day:</strong></div>
+							${chunkAndFormat(half_day_list, 'orange')}
 						`;
-					
+						
 						frm.marked_employee_area.html(html_content);
+						
 					}
 					
 
