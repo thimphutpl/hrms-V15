@@ -632,7 +632,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
 	
 	def notify(self, args):
 		args = frappe._dict(args)
-		# args -> message, message_to, subject
+		# args -> message, message_to, subjects
 		if cint(self.follow_via_email):
 			contact = args.message_to
 			if not isinstance(contact, list):
