@@ -94,7 +94,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
 
 	def on_update(self):
 		if self.status == "Open" and self.docstatus < 1:
-			# notify leave approver about creation
+			# notify leave approver about creations
 			if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
 				notify_workflow_states(self)
 		self.publish_update()
