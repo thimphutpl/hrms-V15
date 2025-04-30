@@ -13,6 +13,7 @@ from erpnext.setup.doctype.employee.employee import get_holiday_list_for_employe
 from erpnext.accounts.doctype.business_activity.business_activity import get_default_ba
 import calendar
 import datetime
+from datetime import datetime
 
 class IncrementEntry(Document):
 	def onload(self):
@@ -181,8 +182,13 @@ class IncrementEntry(Document):
 		return str(month_id).rjust(2,"0")
 
 	# Following method created by SHIV on 2018/10/10
+
 	def get_employee_payscale(self, employee):
-		effective_date = "-".join([self.fiscal_year, self.get_month_id(), "01"])
+		
+
+		current_year = datetime.now().year
+		# frappe.throw(str(current_year))
+		effective_date = "-".join([str(current_year), self.get_month_id(), "01"])
 		old_basic = 0
 		new_basic = 0
 		increment = 0
@@ -245,6 +251,7 @@ class IncrementEntry(Document):
 		self.number_of_employees = len(employees)
 
 def get_salary_structure(employee, effective_date):
+	
 	sst = frappe.db.sql("""
 			select name from `tabSalary Structure`
 			where employee = '{0}'

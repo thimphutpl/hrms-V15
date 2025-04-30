@@ -11,6 +11,7 @@ from frappe import _
 from frappe import msgprint
 import datetime
 import calendar
+from datetime import datetime
 
 class SalaryIncrement(Document):
 	def autoname(self):
@@ -40,11 +41,11 @@ class SalaryIncrement(Document):
 		cur_year = getdate(nowdate()).year
 		cur_month= getdate(nowdate()).month
 
-		if int(self.fiscal_year) > int(cur_year):
-			frappe.throw(_("Salary Increment not allowed for future years"), title="Invalid Data")
+		# if int(self.fiscal_year) > int(cur_year):
+		# 	frappe.throw(_("Salary Increment not allowed for future years"), title="Invalid Data")
 
-		if int(self.fiscal_year) < int(cur_year):
-			frappe.throw(_("Salary Increment not allowed for past years"), title="Invalid Data")
+		# if int(self.fiscal_year) < int(cur_year):
+		# 	frappe.throw(_("Salary Increment not allowed for past years"), title="Invalid Data")
 	
 	def validate_increment(self):
 		if self.employee and not frappe.db.exists("Employee", {"name": self.employee, "increment_cycle": self.month}):
@@ -96,7 +97,9 @@ class SalaryIncrement(Document):
 	# Following method created by SHIV on 2018/10/10
 	def get_employee_payscale(self):
 		self.reset_amounts()
-		effective_date = "-".join([self.fiscal_year, self.get_month_id(), "01"])
+		current_year = datetime.now().year
+		# frappe.throw(str(current_year))
+		effective_date = "-".join([str(current_year), self.get_month_id(), "01"])
 
 		if self.employee:
 			self.update_employee_details()
@@ -125,7 +128,7 @@ class SalaryIncrement(Document):
 				grade= frappe.get_doc("Employee Grade", self.grade)
 				self.payscale_minimum   = grade.lower_limit
 				self.payscale_increment_method = grade.increment_method
-				self.payscale_increment = grade.increment
+				self.payscale_increment = grade.increment_value
 				self.payscale_maximum   = grade.upper_limit 
 
 				# Calculating increment
