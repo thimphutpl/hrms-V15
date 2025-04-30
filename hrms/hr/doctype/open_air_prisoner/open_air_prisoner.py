@@ -38,6 +38,15 @@ class OpenAirPrisoner(Document):
 		# Disabling Open Air Prisoner record after status change to "Left"
 		if self.status == "Left" and self.date_of_separation:
 			self.docstatus = 1
+	@frappe.whitelist()
+	def unfreeze_oap(self):
+		if self.status=="Left":
+			frappe.db.sql("""
+				update `tabOpen Air Prisoner` set docstatus=0, status='Active' where name='{name_oap}'
+			""".format(name_oap=self.name))
+			self.status="Active"
+		return self.status
+
 
 	def populate_work_history(self):
 		if self.is_new() or len(self.internal_work_history) == 0:
