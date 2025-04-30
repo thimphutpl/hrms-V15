@@ -37,8 +37,7 @@ class OpenAirPrisoner(Document):
 	def check_status(self):
 		# Disabling Open Air Prisoner record after status change to "Left"
 		if self.status == "Left" and self.date_of_separation:
-			pass
-			# self.docstatus = 1
+			self.docstatus = 1
 	@frappe.whitelist()
 	def unfreeze_oap(self):
 		if self.status=="Left":

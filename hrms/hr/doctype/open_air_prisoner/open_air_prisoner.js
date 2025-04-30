@@ -7,13 +7,13 @@ frappe.ui.form.on('Open Air Prisoner', {
 			cur_frm.set_value("date_of_joining", get_today())
 		}	
 	},
-	refresh: function (frm) {		
-		if (frm.doc.status === "Left") {
+	refresh: function (frm) {
+		if (frm.doc.docstatus == 1 && frm.doc.status=="Left") {
 			frm.add_custom_button(__("Unfreeze OAP"), function () {
 				frm.trigger("unfreeze_oap");
-			}, __("Unfreeze"));
+				}, __("Unfreeze")
+			);
 		}
-		
 	},
 	unfreeze_oap: function (frm) {
 		unfreeze_open_air_prisoner(frm);
