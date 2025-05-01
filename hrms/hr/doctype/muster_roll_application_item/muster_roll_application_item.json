@@ -189,7 +189,8 @@
    "fieldname": "bank_account_type",
    "fieldtype": "Link",
    "label": "Bank Account Type",
-   "options": "Bank Account Type"
+   "options": "Bank Account Type",
+   "reqd": 1
   },
   {
    "fieldname": "rate_per_hour_normal",
@@ -212,7 +213,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-03-13 10:20:03.180044",
+ "modified": "2025-05-01 12:15:06.843781",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Muster Roll Application Item",
