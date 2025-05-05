@@ -115,8 +115,8 @@
   {
    "fieldname": "dsa_per_day",
    "fieldtype": "Currency",
-   "hidden": 1,
-   "label": "DSA Per Day"
+   "label": "DSA Per Day",
+   "read_only": 1
   },
   {
    "fieldname": "travel_detail_information",
@@ -362,7 +362,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-04-02 17:18:51.773093",
+ "modified": "2025-05-03 14:05:09.966164",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim",

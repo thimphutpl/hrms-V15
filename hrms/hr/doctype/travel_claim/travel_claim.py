@@ -16,7 +16,7 @@ from datetime import datetime, timedelta
 
 class TravelClaim(Document):
 	def validate(self):
-		validate_workflow_states(self)
+		# validate_workflow_states(self)
 		self.validate_travel_last_day()
 		self.validate_dsa_ceiling()
 		self.update_amounts()
@@ -212,7 +212,7 @@ class TravelClaim(Document):
 			item.dsa = flt(item.total_dsa)
 			if item.is_last_day:
 				item.dsa_percent = flt(lastday_dsa_percent)
-			
+			item.mileage_amount=flt(item.mileage_rate) * flt(item.distance)
 			item.amount = (flt(flt(item.dsa) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
 			total_claim_days += flt(item.days_allocated)
 			item.base_amount = flt(item.amount)
