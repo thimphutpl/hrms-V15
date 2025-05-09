@@ -12,6 +12,8 @@
   "column_break_dush",
   "company",
   "employee",
+  "employee_name",
+  "employee_designation",
   "department",
   "section_break_eibt",
   "manual_dispatch",
@@ -180,12 +182,26 @@
    "fieldname": "attach",
    "fieldtype": "Attach",
    "label": "Attach"
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Link",
+   "label": "Employee Name",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "employee.designation",
+   "fieldname": "employee_designation",
+   "fieldtype": "Link",
+   "label": "Employee Designation",
+   "options": "Employee"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-05-09 09:59:52.689980",
+ "modified": "2025-05-09 16:00:45.522295",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Dispatch Register",
