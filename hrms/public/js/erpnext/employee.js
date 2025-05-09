@@ -12,6 +12,15 @@ frappe.ui.form.on("Employee", {
 			};
 		});
 	},
+	dzongkhag: function (frm) {
+        frm.set_query('gewog', function () {
+            return {
+                filters: {
+                    parent_dzongkhag: frm.doc.dzongkhag
+                }
+            };
+        });
+    },
 
 	date_of_birth(frm) {
 		frm.call({
