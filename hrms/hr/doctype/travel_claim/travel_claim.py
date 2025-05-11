@@ -16,7 +16,7 @@ from datetime import datetime, timedelta
 
 class TravelClaim(Document):
 	def validate(self):
-		# validate_workflow_states(self)
+		validate_workflow_states(self)
 		self.validate_travel_last_day()
 		self.validate_dsa_ceiling()
 		self.update_amounts()
