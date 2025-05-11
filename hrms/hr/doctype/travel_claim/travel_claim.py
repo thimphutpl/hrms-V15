@@ -199,21 +199,31 @@ class TravelClaim(Document):
 							frappe.msgprint(_("Row#{0}: You have crossed the DSA({4} days) limit by {1} days for the month {2}-{3}").format(i.idx, int(lapsed), months[int(str(k)[4:])-1], str(k)[:4],max_days_per_month))
 							i.remarks = str(i.remarks)+"{3}) {0} Day(s) lapsed for the month {1}-{2}\n".format(int(lapsed), months[int(str(k)[4:])-1], str(k)[:4], counter)
 		else:
+			
 			for i in self.get("items"):
 				i.remarks = ""
-				i.days_allocated = 0 if i.is_last_day and not lastday_dsa_percent else i.no_days 
+				i.days_allocated = 0 if i.is_last_day and not lastday_dsa_percent else i.no_days
+				#frappe.msgprint(str(i.days_allocated)) 
+
+			
 
 	def update_amounts(self):
+		if self.grade:
+			dsa_per_day=frappe.db.get_value("Employee Grade", self.grade, "dsa_per_day")
+			#frappe.throw(dsa_per_day)
 		lastday_dsa_percent = flt(frappe.db.get_single_value("HR Settings", "return_day_dsa")) 
 		total_claim_amount, diff = 0, 0
 		
 		total_claim_days = 0
 		for item in self.get("items"):
+			#item.total_dsa=dsa_per_day
+			#frappe.msgprint(str(flt(item.days_allocated)))
 			item.dsa = flt(item.total_dsa)
-			if item.is_last_day:
+			if item.is_last_day or flt(item.days_allocated)==0.0:
 				item.dsa_percent = flt(lastday_dsa_percent)
 			item.mileage_amount=flt(item.mileage_rate) * flt(item.distance)
-			item.amount = (flt(flt(item.dsa) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
+			#item.amount = (flt(flt(item.dsa) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
+			item.amount = (flt((flt(item.days_allocated)*flt(dsa_per_day)) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
 			total_claim_days += flt(item.days_allocated)
 			item.base_amount = flt(item.amount)
 			total_claim_amount += flt(item.base_amount)
