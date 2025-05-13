@@ -63,7 +63,7 @@ class TravelAuthorization(Document):
 				"bond_period_to_date": self.bond_period_to_date
 
 			})
-			emp_doc.save(ignore_permissions=1)
+			emp_doc.save(ignore_permissions=1)	
 	
 	def on_cancel(self):
 		claims = frappe.get_all("Travel Claim", filters={
@@ -73,9 +73,13 @@ class TravelAuthorization(Document):
 		for claim in claims:
 			claim_doc = frappe.get_doc("Travel Claim", claim.name)
 			state = claim_doc.workflow_state or "Unknown"
-			if claim_doc.workflow_state == "Approved":
+			if state == "Approved":
 				frappe.throw(f"Cannot cancel this Travel Authorization because Travel Claim {claim.name} is already approved.")
-			frappe.throw(f"Travel Claim {claim.name} is in <b>{state}</b> state.Please ask the supervisor to reject the Travel Claim {claim.name} before cancelling this Travel Authorization.")
+			elif state != "Rejected":
+				frappe.throw(
+					f"Travel Claim <b>{claim.name}</b> is in <b>{state}</b> state.<br>"
+					f"Please ask the supervisor to reject it before cancelling this Travel Authorization."
+				)
 		adjustments = frappe.get_all("Travel Adjustment", filters={
 			"travel_authorization": self.name,
 			"docstatus": 1
