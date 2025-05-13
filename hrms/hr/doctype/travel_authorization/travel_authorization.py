@@ -42,20 +42,8 @@ class TravelAuthorization(Document):
 
 	def validate_travel_last_day(self):
 		if len(self.get("items")) > 1:
-			self.items[-1].is_last_day = 1
+			self.items[-1].is_last_day = 1	
 	
-	# def before_cancel(self):
-	# 	self.update_training_records(cancel=True)
-	# 	if self.advance_journal:
-	# 		for t in frappe.get_all("Journal Entry", ["name"], {"name": self.advance_journal, "docstatus": ("<",2)}):
-	# 			msg = '<b>Reference# : <a href="#Form/Journal Entry/{0}">{0}</a></b>'.format(t.name)
-	# 			frappe.throw(_("Advance payment for this transaction needs to be cancelled first.<br>{0}").format(msg),title='<div style="color: red;">Not permitted</div>')
-	# 	ta = frappe.db.sql("""
-	# 		select name from `tabTravel Claim` where ta = '{}' and docstatus != 2
-	# 	""".format(self.name))
-	# 	if ta:
-	# 		frappe.throw("""There is Travel Claim <a href="#Form/Travel%20Claim/{0}"><b>{0}</b></a> linked to this Travel Authorization""".format(ta[0][0]))
-		
 	def update_training_records(self, cancel=False):
 		emp_doc=frappe.get_doc("Employee", self.employee)
 		if cancel:
@@ -76,9 +64,27 @@ class TravelAuthorization(Document):
 
 			})
 			emp_doc.save(ignore_permissions=1)
-
+	
 	def on_cancel(self):
-		self.cancel_attendance()	
+		claims = frappe.get_all("Travel Claim", filters={
+			"travel_authorization": self.name,
+			"docstatus": ["!=", 2]
+		})
+		for claim in claims:
+			claim_doc = frappe.get_doc("Travel Claim", claim.name)
+			state = claim_doc.workflow_state or "Unknown"
+			if claim_doc.workflow_state == "Approved":
+				frappe.throw(f"Cannot cancel this Travel Authorization because Travel Claim {claim.name} is already approved.")
+			frappe.throw(f"Travel Claim {claim.name} is in <b>{state}</b> state.Please ask the supervisor to reject the Travel Claim {claim.name} before cancelling this Travel Authorization.")
+		adjustments = frappe.get_all("Travel Adjustment", filters={
+			"travel_authorization": self.name,
+			"docstatus": 1
+		})
+		for adj in adjustments:
+			adj_doc = frappe.get_doc("Travel Adjustment", adj.name)
+			adj_doc.cancel()
+			frappe.msgprint(f"Linked Travel Adjustment {adj.name} has been cancelled.")
+		self.cancel_attendance()
 		if self.training_event:
 			self.update_training_event(cancel=True)
 		notify_workflow_states(self)
