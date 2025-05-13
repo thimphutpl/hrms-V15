@@ -18,6 +18,9 @@ class TravelAdjustment(Document):
 		self.update_authorizaiton_end_date()
 
 	def on_cancel(self):
+		travel_auth = frappe.get_doc("Travel Authorization", self.travel_authorization)
+		if travel_auth.docstatus == 1:
+			frappe.throw("Cannot cancel Travel Adjustment before cancelling its linked Travel Authorization.")
 		self.update_travel_authorization(cancel=True)
 		self.update_authorizaiton_end_date(cancel=True)
 
