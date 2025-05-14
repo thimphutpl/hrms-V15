@@ -43,7 +43,8 @@
   "user_id",
   "column_break_eoja",
   "company",
-  "date_of_transfer"
+  "date_of_transfer",
+  "amended_from"
  ],
  "fields": [
   {
@@ -227,10 +228,11 @@
    "options": "Company"
   },
   {
-   "depends_on": "eval:doc.status=='Left'",
    "fieldname": "date_of_transfer",
    "fieldtype": "Date",
-   "label": "Date of Transfer"
+   "hidden": 1,
+   "label": "Date of Transfer",
+   "read_only": 1
   },
   {
    "fieldname": "person_name",
@@ -262,11 +264,21 @@
    "fieldname": "old_id",
    "fieldtype": "Data",
    "label": "Old ID"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Open Air Prisoner",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-04-30 08:47:33.662660",
+ "modified": "2025-04-30 17:17:59.697251",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Open Air Prisoner",
