@@ -28,7 +28,7 @@ class LeaveEncashment(Document):
 		self.check_duplicate_entry()
 		if not self.encashment_date:
 		 	self.encashment_date = getdate(nowdate())
-		if self.workflow_state != "Approved":
+		if 	self.workflow_state != "Approved":
 			notify_workflow_states(self)
 
 	def before_submit(self):
@@ -120,11 +120,6 @@ class LeaveEncashment(Document):
 	def check_journal_entry(self):
 		if self.journal_entry:
 			status_je = frappe.db.get_value("Journal Entry", self.journal_entry, "docstatus")		
-			# if status_je !=2:
-			# 	frappe.throw("Please cancel/Delete Journal Entry {} first".format(self.journal_entry))
-			# else:
-			# 	frappe.db.sql("""Delete from `tabGL Entry` where voucher_no='{} '""".format(self.name))
-			# 	self.db_set("journal_entry","")
 	def post_expense_claim(self):
 		cost_center = frappe.get_value("Employee", self.employee, "cost_center")
 		branch = frappe.get_value("Employee", self.employee, "branch")
@@ -212,9 +207,7 @@ class LeaveEncashment(Document):
 		return from_date, to_date                            
 
 	def validate_balances(self):		
-		msg = ''
-		#frappe.throw(str(self.balance_after))
-		#le = get_le_settings()                                                                         # Line commented by SHIV on 2018/10/15
+		msg = ''                                                                        # Line commented by SHIV on 2018/10/15
 		le = frappe.get_doc("Employee Group",frappe.db.get_value("Employee",self.employee,"employee_group")) # Line added by SHIV on 2018/10/15
 		if flt(self.balance_before) <= flt(le.min_encashment_days):
 			msg = "Minimum leave balance {0} required to encash.".format(le.encashment_min)
@@ -240,8 +233,6 @@ class LeaveEncashment(Document):
 				self.balance_after  = flt(self.balance_before) - flt(self.encashment_days)			
 	
 	def check_duplicate_entry(self):
-		# Check if there's already a draft entry
-		#frappe.throw(self.workflow_state)
 		draft_count = frappe.db.count(self.doctype, {
 			"employee": self.employee,
 			"leave_period": self.leave_period,
@@ -293,10 +284,7 @@ class LeaveEncashment(Document):
 
 		if not frappe.db.get_value("Leave Type", self.leave_type, "allow_encashment"):
 			frappe.throw(_("Leave Type {0} is not encashable").format(self.leave_type))
-		allocation = self.get_leave_allocation()
-		# frappe.msgprint(f"Allocation: {allocation}")
-		# for al in allocation:
-		# 	 frappe.msgprint(f"Total Leaves Allocated: {al.total_leaves_allocated}")		
+		allocation = self.get_leave_allocation()		
 		leave_bal_mr_cl=self.get_laave_bal_mr()		
 		
 		if not allocation:
@@ -306,13 +294,6 @@ class LeaveEncashment(Document):
 				)
 			)
 
-		# if not leave_bal_mr_cl:
-		# 	frappe.throw(
-		# 		_("No Leaves Allocated to Employee: {0} for Leave Type: {1}").format(
-		# 			self.employee, self.leave_type
-		# 		)
-		# 	)
-		frappe.throw("Leave Encashment is Under Repair....")
 		self.leave_balance = (
 			allocation.total_leaves_allocated
 			- allocation.carry_forwarded_leaves_count
@@ -334,7 +315,7 @@ class LeaveEncashment(Document):
 		# need to chnage this 
 		# flt(encashment_min)
 		# frappe.throw(str(self.leave_balance))
-		if self.balance_before < encashment_min:		
+		if self.balance_before < flt(encashment_min):		
 			frappe.throw(_("Minimum '{}' days is Mandatory for Encashment").format(cint(encashment_min)),title="Leave Balance")
 		
 		# self.encashable_days = encashable_days if encashable_days > 0 else 0
@@ -378,19 +359,6 @@ class LeaveEncashment(Document):
 		LeaveAllocation = frappe.qb.DocType("Leave Allocation")
 		leave_allocation = (
 			frappe.qb.from_(LeaveAllocation)
-			# .select(
-			# 	LeaveAllocation.name,
-			# 	LeaveAllocation.from_date,
-			# 	LeaveAllocation.to_date,
-			# 	LeaveAllocation.total_leaves_allocated,
-			# 	LeaveAllocation.carry_forwarded_leaves_count,
-			# )
-			# .where(
-			# 	((LeaveAllocation.from_date <= date) & (date <= LeaveAllocation.to_date))
-			# 	& (LeaveAllocation.docstatus == 1)
-			# 	& (LeaveAllocation.leave_type == self.leave_type)
-			# 	& (LeaveAllocation.employee == self.employee)
-			# ).orderby(LeaveAllocation.name, order=Order.desc)
 			.select(
 				LeaveAllocation.name,
 				LeaveAllocation.from_date,
