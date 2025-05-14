@@ -155,21 +155,30 @@ class SalaryStructure(Document):
 
 				ed_item.amount = roundoff(ed_item.amount)
 				amount = ed_item.amount
-
+				#frappe.throw(str(amount))
+			
 				if ed_item.salary_component not in ed_map:
 					if ed == 'earnings':
-						if ed_item.salary_component == 'Basic Pay':
+						
+						if ed_item.salary_component == 'Basic Salary':
+							
 							if flt(new_basic_pay) > 0 and flt(new_basic_pay) != flt(amount):
 								amount = flt(new_basic_pay)
 							basic_pay = amount
 							ed_item.amount = basic_pay
+							
 						elif frappe.db.exists("Salary Component", {"name": ed_item.salary_component, "is_pf_deductible": 1}):
 							basic_pay_arrears += flt(ed_item.amount)
 						total_earning += round(amount)
+						
 					else:
+						
 						if flt(ed_item.total_deductible_amount) == 0:
+							
 							total_deduction += amount
+							
 						else:
+							
 							if flt(ed_item.total_deductible_amount) != flt(ed_item.total_deducted_amount):
 								total_deduction += round(amount)
 				else:
@@ -177,12 +186,13 @@ class SalaryStructure(Document):
 						if m['name'] == ed_item.salary_component and not self.get(m['field_name']):
 							del_list.append(ed_item)
 							del_list_all.append(ed_item)
-
+			
 			if remove_flag:
 				[self.remove(d) for d in del_list]
 
 			# Calculating Earnings and Deductions based on preferences and values set
 			# frappe.throw(frappe.as_json(sst_map[ed]))
+			
 			for m in sst_map[ed]:
 				#basic,hra,eligible
 				
@@ -206,13 +216,14 @@ class SalaryStructure(Document):
 							calc_amt = flt(self.get(m['field_value']))
 				
 						if m["field_name"] == "eligible_for_fixed_allowance":
+							#frappe.throw("kk")
 							calc_amt = frappe.db.get_value("Employee Grade", self.employee_grade, "fixed_allowance")
 						if m["field_name"] == "eligible_for_hra":
 							payment_method = frappe.db.get_value("Salary Component", "HRA", "payment_method")
 							cal_based = frappe.db.get_value("Salary Component", "HRA", "based_on")
 							amount = frappe.db.get_value("Salary Component", "HRA", "amount")
-							if not payment_method or not cal_based or not amount:
-								frappe.throw('Add Payment Method, Calculation Based, Amount in salary component in HRA')
+							# if not payment_method or not cal_based or not amount:
+							# 	frappe.throw('Add Payment Method, Calculation Based, Amount in salary component in HRA')
 							if payment_method == 'Percent' and cal_based == 'Basic Pay' and amount:
 								calc_amt = (flt(basic_pay) * flt(amount) / 100)
 							if payment_method == 'Lumpsum' and amount:
@@ -239,6 +250,7 @@ class SalaryStructure(Document):
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
 
 					elif self.get(m['field_name']) and m['name'] == 'PF':
+						#frappe.throw(str(flt(basic_pay)))
 						pf_amt = (flt(basic_pay)+flt(basic_pay_arrears))*flt(settings.get("employee_pf"))*0.01
 						calc_amt = roundoff(pf_amt)
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
@@ -369,6 +381,24 @@ def get_employee_currency(employee):
 			)
 		)
 	return employee_currency
+
+def get_basic_and_gross_pay(employee, effective_date=today()):
+	struc = frappe.db.sql(""" select sst.name,
+			sum(case when sd.salary_component = "Basic Pay" then coalesce(sd.amount,0) else 0 end) basic_pay,
+			sum(case when (sc.type = 'Earning' and (sd.salary_component = "Basic Pay" or coalesce(sc.field_name,'') != '')) then ifnull(sd.amount,0) else 0 end) gross_pay
+		from `tabSalary Structure` sst, `tabSalary Detail` sd, `tabSalary Component` sc
+		where sst.employee = '{employee}'
+		and '{effective_date}' between sst.from_date and coalesce(sst.to_date,now())
+		and sd.parent = sst.name
+		and sc.name = sd.salary_component
+		order by coalesce(sst.to_date,now()), sst.from_date
+		limit 1
+	""".format(employee=employee, effective_date=effective_date), as_dict=True)
+
+	if not struc:
+		frappe.throw(_("Salary Structure not found"))
+
+	return struc[0]
 
 	'''
 	def before_validate(self):

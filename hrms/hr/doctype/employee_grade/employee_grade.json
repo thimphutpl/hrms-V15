@@ -8,12 +8,16 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "employee_group",
   "default_salary_structure",
-  "currency",
   "default_base_pay",
   "dsa",
+  "default_leave_policy",
+  "government_grade",
   "column_break_ytuy",
+  "sub_level",
   "fixed_allowance",
+  "currency",
   "gis",
   "sws",
   "eligible_for_overtime",
@@ -144,11 +148,32 @@
    "fieldtype": "Link",
    "label": "Next Promotion Grade",
    "options": "Employee Grade"
+  },
+  {
+   "fieldname": "employee_group",
+   "fieldtype": "Link",
+   "label": "Employee Group",
+   "options": "Employee Group"
+  },
+  {
+   "fieldname": "default_leave_policy",
+   "fieldtype": "Data",
+   "label": "Default Leave Policy"
+  },
+  {
+   "fieldname": "government_grade",
+   "fieldtype": "Data",
+   "label": "Government Grade"
+  },
+  {
+   "fieldname": "sub_level",
+   "fieldtype": "Data",
+   "label": "Sub Level"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-17 12:45:05.847365",
+ "modified": "2025-04-09 11:01:37.432232",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Grade",

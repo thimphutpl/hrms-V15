@@ -5,6 +5,7 @@ import frappe
 from frappe import _
 from frappe.model.naming import set_name_by_naming_series, make_autoname
 from frappe.utils import add_years, cint, get_link_to_form, getdate
+from datetime import datetime
 
 from erpnext.setup.doctype.employee.employee import Employee
 
@@ -18,12 +19,24 @@ class EmployeeMaster(Employee):
 			if not self.date_of_joining:
 				frappe.throw(_("Date of Joining is required to generate a new Employee ID."))
 			try:
-				year_month_day = self.date_of_joining[:4] + self.date_of_joining[5:7]
+				#year_month_day = self.date_of_joining[:4] + self.date_of_joining[5:7]
+				date_val = self.date_of_joining
+
+				if isinstance(date_val, str):
+					date_val = datetime.strptime(date_val, "%Y-%m-%d")
+				
+				year_month_day = date_val.strftime("%Y%m")
+				
+				#frappe.throw(str(year_month_day))
 			except IndexError:
 				frappe.throw(_("Date of Joining must be in YYYY-MM-DD format."))
 			
-			unique_suffix = make_autoname('EMP.##')[3:]
-			new_name = f"{year_month_day}{unique_suffix}"
+			#unique_suffix = make_autoname('EMP.##')[3:]
+			naming_series=self.naming_series
+			#x = 
+			#frappe.throw(str(naming_series))
+			new_name = make_autoname(str(naming_series) +year_month_day+ '.###')
+			#frappe.throw(str(new_name))
 			self.employee = self.name = new_name
 
 		# naming_method = frappe.db.get_value("HR Settings", None, "emp_created_by")
@@ -43,7 +56,9 @@ class EmployeeMaster(Employee):
 
 def validate_onboarding_process(doc, method=None):
 	"""Validates Employee Creation for linked Employee Onboarding"""
+	
 	if not doc.job_applicant:
+		
 		return
 
 	employee_onboarding = frappe.get_all(

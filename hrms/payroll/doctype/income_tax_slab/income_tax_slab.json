@@ -26,8 +26,7 @@
    "fieldname": "effective_from",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "label": "Effective From",
-   "reqd": 1
+   "label": "Effective From"
   },
   {
    "default": "0",
@@ -97,7 +96,6 @@
    "fetch_from": "company.default_currency",
    "fieldname": "currency",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "Currency",
    "options": "Currency",
    "print_hide": 1
@@ -113,13 +111,12 @@
   {
    "fieldname": "effective_till",
    "fieldtype": "Date",
-   "label": "Effective Till",
-   "reqd": 1
+   "label": "Effective Till"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-02-03 15:41:11.175223",
+ "modified": "2025-04-09 12:56:21.254608",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Income Tax Slab",

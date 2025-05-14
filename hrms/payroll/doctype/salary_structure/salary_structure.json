@@ -23,26 +23,25 @@
   "eligible_for_contract_allowance",
   "contract_allowance_method",
   "contract_allowance",
-  "eligible_for_conveyance_allowance",
   "conveyance_allowance_method",
   "conveyance_allowance",
+  "eligible_for_hra",
+  "payment_method_house_rent_allowance",
+  "value_house_rent_allowance",
   "column_break_yjrq",
-  "eligible_for_corporate_allowance",
-  "corporate_allowance_method",
-  "corporate_allowance",
   "eligible_for_fixed_allowance",
+  "fixed_allowance_method",
+  "fixed_allowance",
   "column_break_mehf",
   "eligible_for_communication_allowance",
   "communication_allowance_method",
   "communication_allowance",
-  "eligible_for_monthly_variable_compensation",
   "mvc_method",
   "mvc",
   "benefits_deductions_section",
   "eligible_for_gis",
   "eligible_for_pf",
   "eligible_for_health_contribution",
-  "eligible_for_hra",
   "column_break_gpiw",
   "eligible_for_sws",
   "eligible_for_overtime_and_payment",
@@ -192,12 +191,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "0",
-   "fieldname": "eligible_for_corporate_allowance",
-   "fieldtype": "Check",
-   "label": "Eligible for Corporate Allowance"
-  },
-  {
    "fieldname": "column_break_mehf",
    "fieldtype": "Column Break"
   },
@@ -220,20 +213,6 @@
    "fieldname": "contract_allowance",
    "fieldtype": "Float",
    "label": "Value (Contract Allowance)"
-  },
-  {
-   "default": "Percent",
-   "depends_on": "eval:doc.eligible_for_corporate_allowance",
-   "fieldname": "corporate_allowance_method",
-   "fieldtype": "Select",
-   "label": "Payment Method (Corporate Allowance)",
-   "options": "Percent\nLumpsum"
-  },
-  {
-   "depends_on": "eval:doc.eligible_for_corporate_allowance",
-   "fieldname": "corporate_allowance",
-   "fieldtype": "Float",
-   "label": "Value (Corporate Allowance)"
   },
   {
    "depends_on": "eval:doc.eligible_for_communication_allowance",
@@ -320,12 +299,6 @@
    "reqd": 1
   },
   {
-   "default": "0",
-   "fieldname": "eligible_for_conveyance_allowance",
-   "fieldtype": "Check",
-   "label": "Eligible for Conveyance Allowance"
-  },
-  {
    "default": "Lumpsum",
    "depends_on": "eval:doc.eligible_for_conveyance_allowance",
    "fieldname": "conveyance_allowance_method",
@@ -343,20 +316,13 @@
    "default": "0",
    "fieldname": "eligible_for_fixed_allowance",
    "fieldtype": "Check",
-   "label": " Eligible for Fixed Allowance (Increment)"
+   "label": " Eligible for Fixed Allowance"
   },
   {
    "depends_on": "eval:doc.eligible_for_monthly_variable_compensation",
    "fieldname": "mvc",
    "fieldtype": "Float",
    "label": "Value (MVC)"
-  },
-  {
-   "default": "0",
-   "description": "(Monthly Variable Compensation)",
-   "fieldname": "eligible_for_monthly_variable_compensation",
-   "fieldtype": "Check",
-   "label": "Eligible for MVC"
   },
   {
    "default": "Lumpsum",
@@ -391,13 +357,40 @@
    "default": "0",
    "fieldname": "eligible_for_hra",
    "fieldtype": "Check",
-   "label": "Eligible for HRA"
+   "label": "Eligible for House Rent Allowance"
+  },
+  {
+   "depends_on": "eval:doc.eligible_for_hra",
+   "fieldname": "payment_method_house_rent_allowance",
+   "fieldtype": "Select",
+   "label": " Payment Method (House Rent Allowance)",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eval:doc.eligible_for_hra",
+   "fieldname": "value_house_rent_allowance",
+   "fieldtype": "Float",
+   "label": "Value (House Rent Allowance)"
+  },
+  {
+   "default": "Percent",
+   "depends_on": "eval:doc.eligible_for_fixed_allowance",
+   "fieldname": "fixed_allowance_method",
+   "fieldtype": "Select",
+   "label": "Payment Method (Fixed Allowance)",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eval:doc.eligible_for_fixed_allowance",
+   "fieldname": "fixed_allowance",
+   "fieldtype": "Float",
+   "label": "Value (Fixed Allowance)"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2025-03-29 16:33:43.832228",
+ "modified": "2025-05-12 12:11:04.990156",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
