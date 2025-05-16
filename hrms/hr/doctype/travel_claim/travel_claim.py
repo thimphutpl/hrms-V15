@@ -271,6 +271,8 @@ class TravelClaim(Document):
 					"cost_center": cost_center,
 					"debit_in_account_currency": total_amt,
 					"debit": total_amt,
+					"party_type": "Employee",
+					"party": self.employee,
 				})
 			if (self.advance_amount) > 0:
 				advance_account = frappe.db.get_single_value("HR Accounts Settings",  "employee_advance_travel")
