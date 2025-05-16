@@ -186,22 +186,21 @@
   {
    "fetch_from": "employee.employee_name",
    "fieldname": "employee_name",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "Employee Name",
    "options": "Employee"
   },
   {
    "fetch_from": "employee.designation",
    "fieldname": "employee_designation",
-   "fieldtype": "Link",
-   "label": "Employee Designation",
-   "options": "Employee"
+   "fieldtype": "Data",
+   "label": "Employee Designation"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-05-09 16:00:45.522295",
+ "modified": "2025-05-16 11:42:34.411978",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Dispatch Register",
