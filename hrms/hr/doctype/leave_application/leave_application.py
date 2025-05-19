@@ -69,8 +69,8 @@ class LeaveApplication(Document, PWANotificationsMixin):
 	def get_feed(self):
 		return _("{0}: From {0} of type {1}").format(self.employee_name, self.leave_type)
 
-	def after_insert(self):
-		self.notify_approver()
+	# def after_insert(self):
+	# 	self.notify_approver()
 
 	def validate(self):
 		validate_workflow_states(self)
@@ -93,12 +93,11 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		self.validate_applicable_after()
 
 	def on_update(self):
-		if self.status == "Open" and self.docstatus < 1:
-			# notify leave approver about creations
-			if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-				notify_workflow_states(self)
+		# if self.status == "Open" and self.docstatus < 1:
+		# 	if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
+		# 		notify_workflow_states(self)
 		self.publish_update()
-		self.notify_approval_status()
+		# self.notify_approval_status()
 
 	def on_submit(self):
 		if self.workflow_state == "Approved":
