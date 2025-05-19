@@ -96,7 +96,7 @@ frappe.query_reports["Employee TDS Certificate"] = {
 			"label":"Seal and Signature",
 			"fieldtype": "Data",
 			"read_only": 1,
-			"hidden": 1
+			"hidden": 0
 		}
 	]
 }
