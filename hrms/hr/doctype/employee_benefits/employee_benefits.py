@@ -24,6 +24,7 @@ class EmployeeBenefits(Document):
 		self.validate_gratuity()
 		self.check_duplicates()
 		self.validate_benefits()
+		self.check_leave_encashment_tax()
 		notify_workflow_states(self)
 		self.set_total()
 
@@ -59,7 +60,13 @@ class EmployeeBenefits(Document):
 		# 	frappe.throw(_("<b>Total Deduction Amount</b> cannot be more than Total Benefits"))
 
 		self.net_amount = flt(self.total_amount) - flt(self.total_deducted_amount)
-
+	def check_leave_encashment_tax(self):
+		for d in self.items:
+			if d.benefit_type == "Leave Encashment":
+				if d.amount > 0:
+					d.tax_amount= get_salary_tax(d.amount)
+					d.net_amount= d.amount - d.tax_amount
+					
 	def check_duplicates(self):
 		if self.employee_separation_id:
 			for t in frappe.db.get_all("Employee Benefits", {"name": ("!=", self.name), \
