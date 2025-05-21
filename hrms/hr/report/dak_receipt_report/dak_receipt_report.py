@@ -5,19 +5,41 @@ import frappe
 from frappe import _
 
 def execute(filters=None):
+	if not filters:
+		filters = {}
 	columns, data = get_columns(filters), get_data(filters)
 	return columns, data
 
+def get_conditions(filters=None):
+	condition=""
+	if filters.get("to_date"):
+		condition+=" and date_of_receipt<='{}'".format(filters.get("to_date"))
+	if filters.get("from_date"):
+		condition+=" and date_of_receipt>='{}'".format(filters.get("from_date"))
+	condition+=" order by date_of_receipt desc"
+	return condition
+
 def get_data(filters=None):
-    data=frappe.db.sql("select date_of_receipt, letter_no, postage, from_whom_received, purpose, employee, employee_name from `tabDAK Receipt Register` where 1=1", as_dict=True)
-    # frappe.throw(str(data))
-    return data
+	if filters.get("to_date") or filters.get("from_date"):
+		condition=get_conditions(filters)
+		data=frappe.db.sql("select date_of_receipt, letter_no, from_whom_received, purpose, employee, employee_name,name from `tabDAK Receipt Register` where 1=1"+condition, as_dict=True)
+	else:
+		data=frappe.db.sql("select date_of_receipt, letter_no, from_whom_received, purpose, employee, employee_name,name from `tabDAK Receipt Register` where 1=1 order by date_of_receipt desc", as_dict=True)
+	# frappe.throw(str(data))
+	return data
 
 # def get_conditions(filters=None):
-    
+	
 
 def get_columns(filters=None):
-    return [
+	return [
+		{
+			"label": _("DAK Receipt ID"),
+			"fieldname": "name",
+			"fieldtype": "Link",
+			"options": "DAK Receipt Register",
+			"width": 140,
+		},
 		{
 			"label": _("Date of Receipt"),
 			"fieldname": "date_of_receipt",
@@ -29,12 +51,6 @@ def get_columns(filters=None):
 			"fieldname": "letter_no",
 			"fieldtype": "Data",
 			"width": 140,
-		},
-		{
-			"label": _("Postage"),
-			"fieldname": "postage",
-			"fieldtype": "Data",
-			"width": 240,
 		},
 		{
 			"label": _("From Whom Received"),
