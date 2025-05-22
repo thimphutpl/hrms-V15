@@ -76,7 +76,6 @@ frappe.ui.form.on('Travel Authorization', {
 		frm.toggle_reqd("advance_amount", frm.doc.need_advance == 1);
 		calculate_advance(frm);
 	},
-
 	currency: function (frm) {
 		calculate_advance(frm);
 		let company_currency = erpnext.get_currency(frm.doc.company);
@@ -251,8 +250,13 @@ function calculate_advance(frm) {
 		method: "set_estimate_amount",
 		doc: frm.doc,
 		callback: function(r) {
-			frm.set_value("estimated_amount", r.message)
-			frm.refresh_field("estimated_amount");
+			if (r.message) {
+				const estimated = flt(r.message);
+				frm.set_value("estimated_amount", estimated);
+				frm.set_value("advance_amount", Math.round(estimated * 0.9 * 100) / 100);
+				frm.refresh_field("estimated_amount");
+				frm.refresh_field("advance_amount");
+			}
 		}
 	});
 }
