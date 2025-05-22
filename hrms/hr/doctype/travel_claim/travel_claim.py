@@ -223,7 +223,7 @@ class TravelClaim(Document):
 				item.dsa_percent = flt(lastday_dsa_percent)
 			item.mileage_amount=flt(item.mileage_rate) * flt(item.distance)
 			#item.amount = (flt(flt(item.dsa) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
-			item.amount = (flt((flt(item.days_allocated)*flt(dsa_per_day)) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
+			item.amount = (flt((flt(item.days_allocated)*flt(item.dsa)) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
 			total_claim_days += flt(item.days_allocated)
 			item.base_amount = flt(item.amount)
 			total_claim_amount += flt(item.base_amount)
