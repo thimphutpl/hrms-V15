@@ -76,6 +76,12 @@ frappe.ui.form.on('Travel Authorization', {
 		frm.toggle_reqd("advance_amount", frm.doc.need_advance == 1);
 		calculate_advance(frm);
 	},
+	estimated_amount: function(frm) {
+		if (frm.doc.estimated_amount) {
+			frm.set_value('advance_amount', frm.doc.estimated_amount * 0.9);
+		}
+	},
+
 	currency: function (frm) {
 		calculate_advance(frm);
 		let company_currency = erpnext.get_currency(frm.doc.company);
