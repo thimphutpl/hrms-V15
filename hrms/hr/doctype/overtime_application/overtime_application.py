@@ -125,8 +125,6 @@ class OvertimeApplication(Document):
 			})
 
 		je.insert()
-
-		self.db_set("payment_jv", je.name)
 		frappe.msgprint("Bill processed to accounts through journal voucher " + je.name)
 		
 	##
