@@ -26,8 +26,10 @@
   "mileage_amount",
   "section_break_18",
   "dsa_percent",
+  "dsa_nu_per_day",
   "column_break_21",
   "total_dsa",
+  "dsa",
   "column_break_16",
   "amount",
   "sb_remarks",
@@ -204,13 +206,27 @@
    "in_list_view": 1,
    "label": " DSA",
    "options": "currency",
+   "read_only": 1,
    "reqd": 1
+  },
+  {
+   "depends_on": "eval:parent.place_type=='In-Country'",
+   "fieldname": "dsa",
+   "fieldtype": "Currency",
+   "label": "DSA Per Day",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:parent.place_type=='Out-Country'",
+   "fieldname": "dsa_nu_per_day",
+   "fieldtype": "Currency",
+   "label": "DSA Per Day In Nu"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-04-02 14:29:44.062165",
+ "modified": "2025-05-23 13:50:25.750215",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim Item",

@@ -208,8 +208,10 @@ class TravelClaim(Document):
 			
 
 	def update_amounts(self):
-		if self.grade:
-			dsa_per_day=frappe.db.get_value("Employee Grade", self.grade, "dsa_per_day")
+		exchange_rate=1
+		if self.place_type=='Out-Country':
+			#dsa_per_day=frappe.db.get_value("Employee Grade", self.grade, "dsa_per_day")
+			exchange_rate=85
 			#frappe.throw(dsa_per_day)
 		lastday_dsa_percent = flt(frappe.db.get_single_value("HR Settings", "return_day_dsa")) 
 		total_claim_amount, diff = 0, 0
@@ -217,13 +219,18 @@ class TravelClaim(Document):
 		total_claim_days = 0
 		for item in self.get("items"):
 			#item.total_dsa=dsa_per_day
-			#frappe.msgprint(str(flt(item.days_allocated)))
-			item.dsa = flt(item.total_dsa)
+			item.dsa_cal=item.dsa
+			#frappe.msgprint(str(self.place_type))
+			if self.place_type=="Out-Country":
+				item.dsa_cal=item.dsa_nu_per_day
+			#item.dsa = flt(item.dsa) * flt(exchange_rate)
+			#frappe.msgprint(str(flt(item.dsa1)))
 			if item.is_last_day or flt(item.days_allocated)==0.0:
 				item.dsa_percent = flt(lastday_dsa_percent)
+				item.dsa=0.0
 			item.mileage_amount=flt(item.mileage_rate) * flt(item.distance)
 			#item.amount = (flt(flt(item.dsa) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
-			item.amount = (flt((flt(item.days_allocated)*flt(item.dsa)) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
+			item.amount = (flt((flt(item.days_allocated)*flt(item.dsa_cal)) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
 			total_claim_days += flt(item.days_allocated)
 			item.base_amount = flt(item.amount)
 			total_claim_amount += flt(item.base_amount)
