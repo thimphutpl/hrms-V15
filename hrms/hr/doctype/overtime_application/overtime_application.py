@@ -21,7 +21,7 @@ class OvertimeApplication(Document):
 		#self.check_status()
 		self.validate_submitter()
 		 	#self.check_budget()
-		self.post_journal_entry()
+		# self.post_journal_entry()
 		notify_workflow_states(self)
 
 	def on_cancel(self):
