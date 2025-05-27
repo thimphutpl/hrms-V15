@@ -218,6 +218,7 @@
   {
    "fieldname": "date_of_transfer",
    "fieldtype": "Date",
+   "hidden": 1,
    "label": "Date of Transfer"
   },
   {
@@ -269,7 +270,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-04 10:09:29.413400",
+ "modified": "2025-05-27 16:14:20.537834",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Operator",
