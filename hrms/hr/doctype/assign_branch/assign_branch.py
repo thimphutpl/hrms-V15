@@ -27,7 +27,10 @@ class AssignBranch(Document):
 			self.user = emp.user_id
 			self.company = emp.company
 			self.current_branch = emp.branch
-			self.employee_name = emp.employee_name
+			if self.employee_type == "Muster Roll Employee":
+				self.employee_name = emp.person_name
+			else:
+				self.employee_name = emp.employee_name
 		else:
 			frappe.throw("Employee ID is Mandatory")
 
