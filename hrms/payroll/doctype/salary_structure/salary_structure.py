@@ -429,7 +429,8 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 				outstanding_amt = 0.0
 				if d.salary_component == 'Basic Pay':
 					full_basic = amount
-
+				if d.salary_component == 'Salary Arrears':
+					payment_days = days_in_month
 				if d.from_date:
 					if (start_date <= d.from_date <= end_date) or ((d.from_date <= end_date) and (nvl(d.to_date,end_date) >= start_date)):                
 						if key == 'deductions':
