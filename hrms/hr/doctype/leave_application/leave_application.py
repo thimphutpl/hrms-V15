@@ -92,6 +92,12 @@ class LeaveApplication(Document, PWANotificationsMixin):
 			self.validate_optional_leave()
 		self.validate_applicable_after()
 
+		# Restrict 'GCE Casual Leave' for non-GCE employees
+		if self.leave_type == "GCE Casual Leave":
+			employment_type = frappe.db.get_value("Employee", self.employee, "employment_type")
+			if employment_type != "GCE":
+				frappe.throw(_("You are not allowed to apply for GCE Casual Leave as a {0} employee.").format(employment_type))
+
 	def on_update(self):
 		# if self.status == "Open" and self.docstatus < 1:
 		# 	if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
@@ -871,6 +877,11 @@ def get_leave_details(employee, date):
 			"leaves_pending_approval": flt(leaves_pending, precision),
 			"remaining_leaves": flt(remaining_leaves, precision),
 		}
+
+	# Remove 'GCE Casual Leave' from dashboard if employee is not GCE
+	employment_type = frappe.db.get_value("Employee", employee, "employment_type")
+	if employment_type != "GCE" and "GCE Casual Leave" in leave_allocation:
+		leave_allocation.pop("GCE Casual Leave")
 
 	# is used in set query
 	lwp = frappe.get_list("Leave Type", filters={"is_lwp": 1}, pluck="name")
