@@ -79,12 +79,12 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		self.validate_dates()		
 		if self.workflow_state != "Rejected":
 			self.validate_balance_leaves()
+			self.validate_attendance()
 		self.validate_leave_overlap()
 		self.validate_max_days()
 		self.show_block_day_warning()
 		self.validate_block_days()
 		self.validate_salary_processed_days()
-		self.validate_attendance()
 		self.set_half_day_date()
 		if self.workflow_state != "Approved":
 			notify_workflow_states(self)
