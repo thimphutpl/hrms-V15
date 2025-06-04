@@ -51,6 +51,10 @@ class EmployeeSeparationClearance(Document):
 			frappe.throw('Need to cancel employee benefit')
 	
 	def update_update_employee(self, cancel=False):
+		employee_user = frappe.db.get_value('Employee', self.employee,'user_id')
+		if not employee_user:
+			frappe.throw("User ID is not set for Employee Please Set User ID in Employee Master.")
+			
 		if not cancel:
 			# relieving_date = frappe.db.get_value("Employee Separation",self.employee_separation_id, "separation_date")
 			# reason_for_resignation =frappe.db.get_value("Employee Separation",self.employee_separation_id, "reason_for_resignation")
@@ -63,13 +67,17 @@ class EmployeeSeparationClearance(Document):
 				id.relieving_date = self.separation_date
 				id.reason_for_resignation = self.reason_for_resignation
 				id.save()
+
+			frappe.db.set_value('User', employee_user, 'enabled', 0)
+
 		else:
 			id = frappe.get_doc("Employee",self.employee)
 			id.status = 'Active'
 			id.relieving_date = ''
 			id.reason_for_resignation = ''
 			id.save()
-
+			frappe.db.set_value('User', employee_user, 'enabled', 1)
+			
 	def check_signatures(self):			
 		if self.supervisor_clearance == 0:
 			frappe.throw("Supervisor {} has not granted clearance.".format(self.supervisor))
