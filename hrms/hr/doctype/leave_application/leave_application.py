@@ -812,69 +812,35 @@ def get_allocation_expiry_for_cf_leaves(
 	return expiry[0][0] if expiry else ""
 
 
-# @frappe.whitelist()
-# def get_number_of_leave_days(
-# 	employee: str,
-# 	leave_type: str,
-# 	from_date: datetime.date,
-# 	to_date: datetime.date,
-# 	half_day: int | str | None = None,
-# 	half_day_date: datetime.date | str | None = None,
-# 	holiday_list: str | None = None,
-# ) -> float:
-# 	"""Returns number of leave days between 2 dates after considering half day and holidays
-# 	(Based on the include_holiday setting in Leave Type)"""
-# 	number_of_days = 0
-# 	if cint(half_day) == 1:
-# 		if getdate(from_date) == getdate(to_date):
-# 			number_of_days = 0.5
-# 		elif half_day_date and getdate(from_date) <= getdate(half_day_date) <= getdate(to_date):
-# 			number_of_days = date_diff(to_date, from_date) + 0.5
-# 		else:
-# 			number_of_days = date_diff(to_date, from_date) + 1
-# 	else:
-# 		number_of_days = date_diff(to_date, from_date) + 1
-
-# 	if not frappe.db.get_value("Leave Type", leave_type, "include_holiday"):
-# 		number_of_days = flt(number_of_days) - flt(
-# 			get_holidays(employee, from_date, to_date, holiday_list=holiday_list)
-# 		)
-# 	return number_of_days
-
 @frappe.whitelist()
 def get_number_of_leave_days(
-    employee: str,
-    leave_type: str,
-    from_date: datetime.date,
-    to_date: datetime.date,
-    half_day: int | str | None = None,
-    half_day_date: datetime.date | str | None = None,
-    holiday_list: str | None = None,
+	employee: str,
+	leave_type: str,
+	from_date: datetime.date,
+	to_date: datetime.date,
+	half_day: int | str | None = None,
+	half_day_date: datetime.date | str | None = None,
+	holiday_list: str | None = None,
 ) -> float:
-    """Returns number of leave days between 2 dates after considering half day and holidays
-    (Based on the include_holiday setting in Leave Type)"""
-    number_of_days = 0
-    total_days = date_diff(to_date, from_date) + 1
-    weekend_days = 0
-    current_date = getdate(from_date)
-    while current_date <= getdate(to_date):
-        if current_date.weekday() >= 5:
-            weekend_days += 1
-        current_date = add_days(current_date, 1)
-    
-    number_of_days = total_days - weekend_days
-    
-    if cint(half_day) == 1:
-        if getdate(from_date) == getdate(to_date):
-            number_of_days = 0.5
-        elif half_day_date and getdate(from_date) <= getdate(half_day_date) <= getdate(to_date):
-            number_of_days -= 0.5
+	"""Returns number of leave days between 2 dates after considering half day and holidays
+	(Based on the include_holiday setting in Leave Type)"""
+	number_of_days = 0
+	if cint(half_day) == 1:
+		if getdate(from_date) == getdate(to_date):
+			number_of_days = 0.5
+		elif half_day_date and getdate(from_date) <= getdate(half_day_date) <= getdate(to_date):
+			number_of_days = date_diff(to_date, from_date) + 0.5
+		else:
+			number_of_days = date_diff(to_date, from_date) + 1
+	else:
+		number_of_days = date_diff(to_date, from_date) + 1
 
-    if not frappe.db.get_value("Leave Type", leave_type, "include_holiday"):
-        number_of_days = flt(number_of_days) - flt(
-            get_holidays(employee, from_date, to_date, holiday_list=holiday_list)
-        )
-    return number_of_days
+	if not frappe.db.get_value("Leave Type", leave_type, "include_holiday"):
+		number_of_days = flt(number_of_days) - flt(
+			get_holidays(employee, from_date, to_date, holiday_list=holiday_list)
+		)
+	return number_of_days
+
 
 
 @frappe.whitelist()
