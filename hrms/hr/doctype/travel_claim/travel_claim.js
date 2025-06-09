@@ -5,25 +5,27 @@ cur_frm.add_fetch("employee", "branch", "branch");
 frappe.ui.form.on('Travel Claim', {    
     onload: function (frm) {
         let grid = frm.fields_dict['items'].grid;
-        grid.cannot_add_rows = true;    
-        let lastRowIndex = frm.doc.items.length - 1;  
-        frm.doc.items.forEach((row, index) => {
-            if (frm.doc.items.length === 1 || index === lastRowIndex) {                
-                let valid_dsa_values = ["100.0", "50.0", "20.0"];                
-                if (valid_dsa_values.includes("50.0")) {
-                    frappe.model.set_value(row.doctype, row.name, "dsa_percent", "50.0");
+        grid.cannot_add_rows = true;
+        // Only run the default-setting logic for new docs
+        if (frm.is_new()) {
+            let lastRowIndex = frm.doc.items.length - 1;
+            frm.doc.items.forEach((row, index) => {
+                if (frm.doc.items.length === 1 || index === lastRowIndex) {
+                    let valid_dsa_values = ["100.0", "50.0", "20.0"];
+                    if (valid_dsa_values.includes("50.0")) {
+                        frappe.model.set_value(row.doctype, row.name, "dsa_percent", "50.0");
+                    }
                 }
-            }            
-            frappe.after_ajax(() => {
-                if (row.dsa && row.no_days && row.dsa_percent) {
-                    let amount = flt(row.dsa) * flt(row.no_days) * flt(row.dsa_percent) / 100;
-                    let base_amount = flt(frm.doc.exchange_rate) * flt(amount);
-    
-                    frappe.model.set_value(row.doctype, row.name, "amount", amount);
-                    frappe.model.set_value(row.doctype, row.name, "base_amount", base_amount);
-                }
+                frappe.after_ajax(() => {
+                    if (row.dsa && row.no_days && row.dsa_percent) {
+                        let amount = flt(row.dsa) * flt(row.no_days) * flt(row.dsa_percent) / 100;
+                        let base_amount = flt(frm.doc.exchange_rate) * flt(amount);
+                        frappe.model.set_value(row.doctype, row.name, "amount", amount);
+                        frappe.model.set_value(row.doctype, row.name, "base_amount", base_amount);
+                    }
+                });
             });
-        });        
+        }
         frm.trigger("calculate_total");
     },        
     refresh: function (frm) {
