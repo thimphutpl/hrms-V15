@@ -51,7 +51,7 @@ class TravelClaim(Document):
 		existing = []
 		existing = frappe.db.sql("""
 			select name from `tabTravel Claim` where name != '{}' and docstatus != 2 and workflow_state != 'Rejected'
-			and ta = '{}'
+			and travel_authorization = '{}'
 		""".format(self.name, self.travel_authorization), as_dict=True)
 
 		for a in existing:
@@ -243,7 +243,7 @@ class TravelClaim(Document):
 
 		if not expense_account:
 			frappe.throw("Setup Travel/Training Accounts in HR Accounts Settings")
-		advance_je = frappe.db.get_value("Travel Authorization", self.ta, "need_advance")
+		advance_je = frappe.db.get_value("Travel Authorization", self.travel_authorization, "need_advance")
 
 		total_amt = flt(self.total_claim_amount) + flt(self.extra_claim_amount)
 		references = {}

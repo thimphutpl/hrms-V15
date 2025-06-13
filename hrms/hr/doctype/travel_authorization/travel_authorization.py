@@ -120,7 +120,7 @@ class TravelAuthorization(Document):
 		if flt(self.advance_amount) > flt(flt(self.estimated_amount) * 0.9):
 			frappe.throw("Advance Amount cannot be greater than 90% of Total Estimated Amount")
 		self.base_advance_amount  = 0 if not self.need_advance else self.base_advance_amount
-		self.advance_journal    = None if self.docstatus == 0 else self.advance_journal
+		self.journal_entry    = None if self.docstatus == 0 else self.journal_entry
 
 	def set_travel_period(self):
 		period = frappe.db.sql("""select min(`from_date`) as min_date, max(to_date) as max_date

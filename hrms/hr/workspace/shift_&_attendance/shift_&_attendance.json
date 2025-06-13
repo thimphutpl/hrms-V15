@@ -261,8 +261,8 @@
    "type": "Link"
   }
  ],
- "modified": "2025-01-27 09:32:59.119583",
- "modified_by": "sangay.choden@thimphutechpark.bt",
+ "modified": "2025-05-28 11:01:10.542579",
+ "modified_by": "kalden.dorji@thimphutechpark.bt",
  "module": "HR",
  "name": "Shift & Attendance",
  "number_cards": [],
@@ -271,7 +271,7 @@
  "public": 1,
  "quick_lists": [],
  "roles": [],
- "sequence_id": 5.0,
+ "sequence_id": 4.0,
  "shortcuts": [
   {
    "color": "Grey",

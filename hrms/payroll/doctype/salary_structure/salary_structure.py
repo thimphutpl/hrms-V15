@@ -530,84 +530,86 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 
 		# Calculating PF, Group Insurance Scheme, Health Contribution
 		sws = pf = gis = health = 0.00
-		for d in calc_map['deductions']:
-			if not flt(gross_amt):
-				d['amount'] = 0
-			else:
-				
-				if d['salary_component'] == 'SWS':
-					sws = flt(settings.get("sws_contribution"));
-					#sws = 0.0
-					#sws = frappe.get_doc("Employee Grade", self.employee_grade).sws_contribution
-					d['amount'] = flt(sws)
-				
-				if d['salary_component'] == 'PF':
-					percent = flt(settings.get("employee_pf"))
-					if source.employment_type == 'GEP':
-						pf = round(full_basic*flt(percent)*0.01);
-					else:
-						pf = round(basic_amt*flt(percent)*0.01);
+		if 'deductions' in calc_map:
+			for d in calc_map['deductions']:
+				if not flt(gross_amt):
+					d['amount'] = 0
+				else:
+					
+					if d['salary_component'] == 'SWS':
+						sws = flt(settings.get("sws_contribution"));
+						#sws = 0.0
+						#sws = frappe.get_doc("Employee Grade", self.employee_grade).sws_contribution
+						d['amount'] = flt(sws)
+					
+					if d['salary_component'] == 'PF':
+						percent = flt(settings.get("employee_pf"))
+						if source.employment_type == 'GEP':
+							pf = round(full_basic*flt(percent)*0.01);
+						else:
+							pf = round(basic_amt*flt(percent)*0.01);
 
-					pf += basic_pay_arrears_pf
-					### Ver.2.0.20191227 Begins, added by SHIV on 2019/12/27
-					# Temporary workout for adding 4% of oct-2019 and nov-2019 PF
-					# this needs to be commented after processing 201912 payslips
-					### Ver.2.0.20191227 Ends
-					employer_percent = flt(settings.get("employer_pf"))
-					employer_pf_amount = (flt(basic_amt)+flt(basic_pay_arrears_pf))*flt(employer_percent)*0.01
-					employer_pf_amount = roundoff(employer_pf_amount)
-					target.employer_pf = employer_pf_amount
-					d['amount'] = pf
-				if d['salary_component'] == 'Group Insurance Scheme':
-					gis = flt(settings.get("gis"))
-					d['amount'] = gis
+						pf += basic_pay_arrears_pf
+						### Ver.2.0.20191227 Begins, added by SHIV on 2019/12/27
+						# Temporary workout for adding 4% of oct-2019 and nov-2019 PF
+						# this needs to be commented after processing 201912 payslips
+						### Ver.2.0.20191227 Ends
+						employer_percent = flt(settings.get("employer_pf"))
+						employer_pf_amount = (flt(basic_amt)+flt(basic_pay_arrears_pf))*flt(employer_percent)*0.01
+						employer_pf_amount = roundoff(employer_pf_amount)
+						target.employer_pf = employer_pf_amount
+						d['amount'] = pf
+					if d['salary_component'] == 'Group Insurance Scheme':
+						gis = flt(settings.get("gis"))
+						d['amount'] = gis
 
-				if d['salary_component'] == 'Health Contribution':
-					percent = flt(settings.get("health_contribution"))
-					health = round(gross_amt*flt(percent)*0.01);
+					if d['salary_component'] == 'Health Contribution':
+						percent = flt(settings.get("health_contribution"))
+						health = round(gross_amt*flt(percent)*0.01);
 
-					if source.employment_type == 'Deputation':	
-						#gross_amt  =  gross_amt - deput_amt
-						health = round(deput_amt*flt(percent)*0.01);
+						if source.employment_type == 'Deputation':	
+							#gross_amt  =  gross_amt - deput_amt
+							health = round(deput_amt*flt(percent)*0.01);
 
-					d['amount'] = health
+						d['amount'] = health
 
-				
-		# Calculating Salary Tax
-		tax_included = 0
-		for d in calc_map['deductions']:
-			if not flt(gross_amt):
-				d['amount'] = 0
-			else:
-				if d['salary_component'] == 'Salary Tax':
-					employee_grade = source.employee_grade
-					if not tax_included:
-						gis=frappe.db.get_value("Employee Grade",employee_grade,"gis")
-						tax_amt = get_salary_tax(flt(gross_amt) - flt(gis) - flt(pf) - (flt(comm_amt) * 0.5))
-						# frappe.throw("gross_amount "+str(gross_amt)+" GIS "+str(gis)+" pf "+str(pf)+ " And "+str(comm_amt))
-						if source.employment_type == 'Deputation':
-							gross_amt1 = gross_amt - deput_amt 
-							tax_amt1 = get_salary_tax(flt(gross_amt1) - flt(gis) - flt(pf) -(flt(comm_amt) * 0.5))  
-							tax_amt = tax_amt - tax_amt1	
-							
+					
+			# Calculating Salary Tax
+			tax_included = 0
+			for d in calc_map['deductions']:
+				if not flt(gross_amt):
+					d['amount'] = 0
+				else:
+					if d['salary_component'] == 'Salary Tax':
+						employee_grade = source.employee_grade
+						if not tax_included:
+							gis=frappe.db.get_value("Employee Grade",employee_grade,"gis")
+							tax_amt = get_salary_tax(flt(gross_amt) - flt(gis) - flt(pf) - (flt(comm_amt) * 0.5))
+							# frappe.throw("gross_amount "+str(gross_amt)+" GIS "+str(gis)+" pf "+str(pf)+ " And "+str(comm_amt))
+							if source.employment_type == 'Deputation':
+								gross_amt1 = gross_amt - deput_amt 
+								tax_amt1 = get_salary_tax(flt(gross_amt1) - flt(gis) - flt(pf) -(flt(comm_amt) * 0.5))  
+								tax_amt = tax_amt - tax_amt1	
+								
 
-						d['amount'] = flt(tax_amt)
-						tax_included = 1
+							d['amount'] = flt(tax_amt)
+							tax_included = 1
 
-		# Appending calculated components to salary slip                                                
-		#[target.append('earnings',m) for m in calc_map['earnings']]
-		#[target.append('deductions',m) for m in calc_map['deductions']]
+			# Appending calculated components to salary slip                                                
+			#[target.append('earnings',m) for m in calc_map['earnings']]
+			#[target.append('deductions',m) for m in calc_map['deductions']]
 		for m in calc_map['earnings']:
 			#frappe.msgprint("hhh {0} {1}".format(m['salary_component'], source.employment_type))
 			if source.employment_type == 'Deputation' and m['salary_component'] not in ['Deputation Allowance','Communication Allowance', 'Salary Arrears', 'Contract Allowance (CDCL)', 'PSA']:
 				continue 
 			else:
 				target.append('earnings', m)
-		for m in calc_map['deductions']:
-			if source.employment_type == 'Deputation' and m['salary_component'] not in ['SWS', 'Salary Tax','Health Contribution', 'Other deduction','Other Recoveries']:
-				continue
-			else:
-				target.append('deductions', m)
+		if 'deductions' in calc_map:
+			for m in calc_map['deductions']:
+				if source.employment_type == 'Deputation' and m['salary_component'] not in ['SWS', 'Salary Tax','Health Contribution', 'Other deduction','Other Recoveries']:
+					continue
+				else:
+					target.append('deductions', m)
   
 		target.run_method("pull_emp_details")
 		target.run_method("calculate_net_pay")

@@ -23,7 +23,7 @@ class EmployeeMaster(Employee):
 			month = str(date_of_joining.month).zfill(2)  # Ensure month is two digits
 
 			# Generate Employee ID
-			name = make_autoname(f'GYAL.{year}.{month}.###')
+			name = make_autoname(f'{self.naming_series}.{year}.{month}.###')
 			self.employee = self.name = name
 
 

@@ -423,8 +423,8 @@
    "type": "Link"
   }
  ],
- "modified": "2024-12-02 16:20:19.794104",
- "modified_by": "Administrator",
+ "modified": "2025-05-28 11:01:10.739798",
+ "modified_by": "kalden.dorji@thimphutechpark.bt",
  "module": "Payroll",
  "name": "Salary Payout",
  "number_cards": [],
@@ -433,7 +433,7 @@
  "public": 1,
  "quick_lists": [],
  "roles": [],
- "sequence_id": 9.0,
+ "sequence_id": 8.0,
  "shortcuts": [],
  "title": "Salary Payout"
 }
