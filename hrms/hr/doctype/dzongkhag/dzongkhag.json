@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
  "autoname": "field:dzongkhag_name",
  "creation": "2022-11-15 11:48:00.706785",
@@ -120,7 +121,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-24 10:27:38.038834",
+ "modified": "2025-06-16 11:50:38.356008",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Dzongkhag",

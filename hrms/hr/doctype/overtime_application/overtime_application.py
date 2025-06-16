@@ -11,22 +11,22 @@ from erpnext.custom_workflow import verify_workflow
 
 class OvertimeApplication(Document):	
 	def validate(self):
-		validate_workflow_states(self)
+		# validate_workflow_states(self)
 		self.validate_dates()
 		self.calculate_totals()
 		self.validate_employee_grade()
-		verify_workflow(self)
+		# verify_workflow(self)
 
 	def on_submit(self):
 		#self.check_status()
-		self.validate_submitter()
+		# self.validate_submitter()
 		 	#self.check_budget()
 		self.post_journal_entry()
-		notify_workflow_states(self)
+		# notify_workflow_states(self)
 
 	def on_cancel(self):
 		self.check_journal()
-		notify_workflow_states(self)
+		# notify_workflow_states(self)
 	
 	def check_budget(self):
 		cc = get_branch_cc(self.branch)
@@ -74,13 +74,15 @@ class OvertimeApplication(Document):
 	# Allow only the approver to submit the document
 	##
 	def validate_employee_grade(self):		
-		allowed_grades = ['O1', 'O2', 'O3', 'O4', 'O5', 'O6', 'O7', 'GCE-1', 'GCE-2', 'GCE-3', 'GCE-4', 'GCE-5']
+		allowed_grades = []
+		for eg in frappe.db.get_list("Employee Grade", {"eligible_for_overtime":1}):
+			allowed_grades.append(eg.name)
 		# Fetch the employee's grade
 		employee = frappe.get_doc('Employee', self.employee)		
 		if not employee.grade:
 			frappe.throw(_("The selected employee does not have a grade assigned."))
 		if employee.grade not in allowed_grades:
-			frappe.throw(_("Overtime Application can only be processed for employees with grades O level and GCE level. Your Current grade is: {0}").format(employee.grade))
+			frappe.throw(_("Overtime Application can only be processed for employees with grades {1}. Your Current grade is: {0}").format(employee.grade, allowed_grades))
 
 	def validate_submitter(self):
 		if self.ot_approver != frappe.session.user:			

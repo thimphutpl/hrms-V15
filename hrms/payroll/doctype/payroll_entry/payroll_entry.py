@@ -333,20 +333,16 @@ class PayrollEntry(Document):
 
 		company = frappe.db.get("Company", self.company)
 		default_bank_account    = frappe.db.get_value("Branch", self.processing_branch,"expense_bank_account")
-		# default_bank_account = get_bank_account(self.processing_branch)
 		default_payable_account = frappe.db.get_single_value("HR Accounts Settings","salary_payable_account")
-		# company.get("salary_payable_account")
 		company_cc              = company.get("cost_center")
 		default_gpf_account     = frappe.db.get_single_value("HR Accounts Settings","employee_contribution_pf")
 		# company.get("employer_contribution_to_pf")
 		salary_component_pf     = "PF"
 
 		if not default_bank_account:
-			# pass
 			frappe.throw(_("Please set default <b>Expense Bank Account</b> for processing branch {}")\
 				.format(frappe.get_desk_link("Branch", self.processing_branch)))
 		elif not default_payable_account:
-			# pass
 			frappe.throw(_("Please set default <b>Salary Payable Account</b> for the Company"))
 		elif not default_gpf_account:
 			frappe.throw(_("Please set account for <b>Employer Contribution to PF</b> for the Company"))
@@ -354,7 +350,6 @@ class PayrollEntry(Document):
 		# Filters
 		#cond = self.get_filter_condition()
 		
-				
 		cc = frappe.db.sql("""
 			select t1.cost_center as cost_center,
 				(case
@@ -413,7 +408,6 @@ class PayrollEntry(Document):
 			order by t1.cost_center, sc.type, sc.name
 		""".format(self.fiscal_year, self.month, self.name),as_dict=1)
 		# frappe.throw(str(cc))
-		
 		posting = frappe._dict()
 		cc_wise_totals = frappe._dict()
 		tot_payable_amt= 0

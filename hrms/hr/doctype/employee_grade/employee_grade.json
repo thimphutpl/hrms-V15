@@ -20,6 +20,7 @@
   "gis",
   "dsa_per_day",
   "sws_contribution",
+  "eligible_for_overtime",
   "pay_scale_section",
   "lower_limit",
   "column_break_tgfh",
@@ -183,11 +184,17 @@
    "fieldtype": "Data",
    "label": "Employee Grade",
    "unique": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_overtime",
+   "fieldtype": "Check",
+   "label": "Eligible for Overtime"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-10 10:28:29.096483",
+ "modified": "2025-06-13 16:23:08.897614",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Grade",

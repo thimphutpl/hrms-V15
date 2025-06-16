@@ -198,8 +198,6 @@ frappe.ui.form.on("Expense Claim", {
 		frm.set_query("payable_account", function() {
 			return {
 				filters: {
-					"report_type": "Balance Sheet",
-					"account_type": "Payable",
 					"company": frm.doc.company,
 					"is_group": 0
 				}

@@ -220,7 +220,8 @@ frappe.ui.form.on('Employee Advance', {
 
 		}
 		frappe.call({
-			method: "hrms.hr.doctype.employee_advance.employee_advance.select_account",
+			method: "select_account",
+			doc: frm.doc,
 			args: {
 				"advance_type": frm.doc.advance_type,
 				"company": frm.doc.company

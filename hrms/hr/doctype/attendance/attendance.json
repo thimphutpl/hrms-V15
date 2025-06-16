@@ -183,6 +183,7 @@
   {
    "fieldname": "details_section",
    "fieldtype": "Section Break",
+   "hidden": 1,
    "label": "Details"
   },
   {
@@ -215,7 +216,7 @@
  "idx": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-02-06 16:26:49.764065",
+ "modified": "2025-06-16 09:59:22.090226",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Attendance",
@@ -271,7 +272,8 @@
    "report": 1,
    "role": "Employee",
    "select": 1,
-   "share": 1
+   "share": 1,
+   "write": 1
   },
   {
    "create": 1,

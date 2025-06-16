@@ -253,7 +253,8 @@ class SalaryStructure(Document):
 				if ed_item.from_date and ed_item.to_date and str(ed_item.to_date) < str(ed_item.from_date):
 					frappe.throw(_("<b>Row#{}:</b> Invalid <b>From Date</b> for <b>{}</b> under <b>{}s</b>").format(ed_item.idx, ed_item.salary_component, tbl_list[ed]))
 				
-				ed_item.amount = roundoff(ed_item.amount)
+				# ed_item.amount = roundoff(ed_item.amount)
+				ed_item.amount = flt(ed_item.amount,2)
 				
 				amount = ed_item.amount
 
@@ -267,7 +268,8 @@ class SalaryStructure(Document):
 						# Following condition added by SHIV on 2019/04/29
 						elif frappe.db.exists("Salary Component", {"name": ed_item.salary_component, "is_pf_deductible": 1}):
 							basic_pay_arrears += flt(ed_item.amount)
-						total_earning += round(amount)
+						# total_earning += round(amount)
+						total_earning += flt(amount,2)
 
 						if ed_item.salary_component == 'Basic Pay Arrear':
 							basic_pay_arrears += flt(ed_item.amount)
@@ -280,7 +282,8 @@ class SalaryStructure(Document):
 							total_deduction += amount
 						else:
 							if flt(ed_item.total_deductible_amount) != flt(ed_item.total_deducted_amount):
-								total_deduction += round(amount)
+								# total_deduction += round(amount)
+								total_deduction += flt(amount,2)
 						''' Ver3.0.191212 Ends '''
 				else:
 					for m in sst_map[ed]:
@@ -314,27 +317,32 @@ class SalaryStructure(Document):
 							if m["field_name"] == "eligible_for_fixed_allowance":
 								calc_amt = frappe.db.get_value("Employee Grade", self.employee_grade, "fixed_allowance")
 								self.fixed_allowance = frappe.db.get_value("Employee Grade",self.employee_grade, "fixed_allowance")
-						calc_amt = roundoff(calc_amt)
+						# calc_amt = roundoff(calc_amt)
+						calc_amt = flt(calc_amt,2)
 						comm_allowance += flt(calc_amt) if m['name'] == 'Communication Allowance' else 0
 						total_earning += calc_amt
 						calc_map.append({'salary_component': m['name'], 'amount': calc_amt})
 				else:
 					if self.get(m['field_name']) and m['name'] == 'SWS':
 						sws_amt = flt(settings.get('sws_contribution'))
-						calc_amt = roundoff(sws_amt)
+						# calc_amt = roundoff(sws_amt)
+						calc_amt = flt(sws_amt,2)
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
 					elif self.get(m['field_name']) and m['name'] == 'GIS':
 						gis_amt = flt(settings.get("gis"))
-						calc_amt = roundoff(gis_amt)
+						# calc_amt = roundoff(gis_amt)
+						calc_amt = flt(gis_amt,2)
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
 					elif self.get(m['field_name']) and m['name'] == 'PF':
 						# frappe.throw(str(basic_pay_arrears))
 						pf_amt = (flt(basic_pay)+flt(basic_pay_arrears))*flt(settings.get("employee_pf"))*0.01
-						calc_amt = roundoff(pf_amt)
+						# calc_amt = roundoff(pf_amt)
+						calc_amt = flt(pf_amt,2)
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
 					elif self.get(m['field_name']) and m['name'] == 'Health Contribution':
 						health_cont_amt = flt(total_earning)*flt(settings.get("health_contribution"))*0.01
-						calc_amt = roundoff(health_cont_amt)
+						# calc_amt = roundoff(health_cont_amt)
+						calc_amt = flt(health_cont_amt,2)
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
 					else:
 						calc_amt = 0
@@ -344,7 +352,8 @@ class SalaryStructure(Document):
 			# Calculating Salary Tax
 			if ed == 'deductions':
 				calc_amt = get_salary_tax(math.floor(flt(total_earning)-flt(pf_amt)-flt(gis_amt)-(comm_allowance*0.5)))
-				calc_amt = roundoff(calc_amt)
+				# calc_amt = roundoff(calc_amt)
+				calc_amt = flt(calc_amt)
 				total_deduction += calc_amt
 				calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(calc_amt)})
 
@@ -472,9 +481,11 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 				calc_amount = flt(amount)
 				if key == "earnings":
 					if d.depends_on_lwp or source.depend_salary_on_attendance:
-						calc_amount = round(flt(amount)*flt(payment_days)/flt(days_in_month))
+						# calc_amount = round(flt(amount)*flt(payment_days)/flt(days_in_month))
+						calc_amount = flt(flt(amount)*flt(payment_days)/flt(days_in_month),2)
 					else:
-						calc_amount = round(flt(amount)*(flt(working_days)/flt(days_in_month)))
+						# calc_amount = round(flt(amount)*(flt(working_days)/flt(days_in_month)))
+						calc_amount = flt(flt(amount)*(flt(working_days)/flt(days_in_month)),2)
 
 				
 				# following condition added by SHIV on 2021/05/28
@@ -513,7 +524,8 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 					if flt(off_cycle_pf) > 0:
 						basic_pay_arrears_pf += flt(e["amount"])*flt(off_cycle_pf)*0.01
 					elif not flt(off_cycle_pf):
-						basic_pay_arrears_pf += round(flt(e["amount"])*flt(settings.get("employee_pf"))*0.01)
+						# basic_pay_arrears_pf += round(flt(e["amount"])*flt(settings.get("employee_pf"))*0.01)
+						basic_pay_arrears_pf += flt(flt(e["amount"])*flt(settings.get("employee_pf"))*0.01,2)
 			### Ver.2.0.20191227 Ends
 			if e['salary_component'] == 'Communication Allowance':
 				comm_amt = (flt(e['amount']))
@@ -545,9 +557,11 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 					if d['salary_component'] == 'PF':
 						percent = flt(settings.get("employee_pf"))
 						if source.employment_type == 'GEP':
-							pf = round(full_basic*flt(percent)*0.01);
+							# pf = round(full_basic*flt(percent)*0.01)
+							pf = flt(full_basic*flt(percent)*0.01,2)
 						else:
-							pf = round(basic_amt*flt(percent)*0.01);
+							# pf = round(basic_amt*flt(percent)*0.01)
+							pf = flt(basic_amt*flt(percent)*0.01,2)
 
 						pf += basic_pay_arrears_pf
 						### Ver.2.0.20191227 Begins, added by SHIV on 2019/12/27
@@ -556,7 +570,8 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 						### Ver.2.0.20191227 Ends
 						employer_percent = flt(settings.get("employer_pf"))
 						employer_pf_amount = (flt(basic_amt)+flt(basic_pay_arrears_pf))*flt(employer_percent)*0.01
-						employer_pf_amount = roundoff(employer_pf_amount)
+						# employer_pf_amount = roundoff(employer_pf_amount)
+						employer_pf_amount = flt(employer_pf_amount,2)
 						target.employer_pf = employer_pf_amount
 						d['amount'] = pf
 					if d['salary_component'] == 'Group Insurance Scheme':
@@ -565,11 +580,13 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 
 					if d['salary_component'] == 'Health Contribution':
 						percent = flt(settings.get("health_contribution"))
-						health = round(gross_amt*flt(percent)*0.01);
+						# health = round(gross_amt*flt(percent)*0.01)
+						health = flt(gross_amt*flt(percent)*0.01,2)
 
 						if source.employment_type == 'Deputation':	
 							#gross_amt  =  gross_amt - deput_amt
-							health = round(deput_amt*flt(percent)*0.01);
+							# health = round(deput_amt*flt(percent)*0.01)
+							health = flt(deput_amt*flt(percent)*0.01,2)
 
 						d['amount'] = health
 

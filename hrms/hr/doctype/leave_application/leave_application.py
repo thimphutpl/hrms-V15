@@ -73,12 +73,12 @@ class LeaveApplication(Document, PWANotificationsMixin):
 	# 	self.notify_approver()
 
 	def validate(self):
-		validate_workflow_states(self)
+		# validate_workflow_states(self)
 		validate_active_employee(self.employee)
 		set_employee_name(self)
 		self.validate_dates()		
-		if self.workflow_state != "Rejected":
-			self.validate_balance_leaves()
+		# if self.workflow_state != "Rejected":
+		# 	self.validate_balance_leaves()
 		self.validate_leave_overlap()
 		self.validate_max_days()
 		self.show_block_day_warning()
@@ -86,8 +86,8 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		self.validate_salary_processed_days()
 		self.validate_attendance()
 		self.set_half_day_date()
-		if self.workflow_state != "Approved":
-			notify_workflow_states(self)
+		# if self.workflow_state != "Approved":
+		# 	notify_workflow_states(self)
 		if frappe.db.get_value("Leave Type", self.leave_type, "is_optional_leave"):
 			self.validate_optional_leave()
 		self.validate_applicable_after()

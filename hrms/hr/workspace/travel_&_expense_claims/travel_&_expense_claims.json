@@ -21,34 +21,6 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Travel",
-   "link_count": 2,
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Travel Request",
-   "link_count": 0,
-   "link_to": "Travel Request",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Purpose of Travel",
-   "link_count": 0,
-   "link_to": "Purpose of Travel",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
    "label": "Reports",
    "link_count": 3,
    "onboard": 0,
@@ -257,10 +229,59 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Travel",
+   "link_count": 4,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Travel Authorization",
+   "link_count": 0,
+   "link_to": "Travel Authorization",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Travel Claim",
+   "link_count": 0,
+   "link_to": "Travel Claim",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Travel Adjustment",
+   "link_count": 0,
+   "link_to": "Travel Adjustment",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Purpose of Travel",
+   "link_count": 0,
+   "link_to": "Purpose of Travel",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2025-05-28 11:01:10.596416",
- "modified_by": "kalden.dorji@thimphutechpark.bt",
+ "modified": "2025-06-16 15:19:05.968365",
+ "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel & Expense Claims",
  "number_cards": [],

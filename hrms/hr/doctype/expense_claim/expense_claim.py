@@ -113,7 +113,7 @@ class ExpenseClaim(AccountsController):
 		self.check_for_total_sanctioned_amount()
 		self.update_task_and_project()
 		self.make_gl_entries()
-		self.post_accounts_entry()
+		# self.post_accounts_entry()
 		if self.is_paid:
 			update_reimbursed_amount(self, self.grand_total)
 
@@ -340,7 +340,7 @@ class ExpenseClaim(AccountsController):
 					item=self,
 				)
 			)
-
+		# frappe.throw(str(gl_entry))
 		return gl_entry
 
 	def add_tax_gl_entries(self, gl_entries):

@@ -6,10 +6,10 @@
  "docstatus": 0,
  "doctype": "Report",
  "filters": [],
- "idx": 59,
+ "idx": 63,
  "is_standard": "Yes",
  "letterhead": null,
- "modified": "2025-03-08 09:53:31.233554",
+ "modified": "2025-06-16 09:25:12.236758",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Monthly Attendance Sheet",
@@ -29,10 +29,7 @@
    "role": "HR Manager"
   },
   {
-   "role": "HR Support"
-  },
-  {
-   "role": "DFG User"
+   "role": "Employee"
   }
  ]
 }

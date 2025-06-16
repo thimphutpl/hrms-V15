@@ -16,7 +16,7 @@ from datetime import datetime, timedelta
 
 class TravelClaim(Document):
 	def validate(self):			
-		validate_workflow_states(self)
+		# validate_workflow_states(self)
 		self.validate_travel_last_day()
 		self.update_amounts()
 		self.validate_dates()
@@ -31,7 +31,7 @@ class TravelClaim(Document):
 	def on_submit(self):
 		self.update_travel_authorization()
 		self.post_journal_entry()
-		notify_workflow_states(self)
+		# notify_workflow_states(self)
 
 	def before_cancel(self):
 		cl_status = frappe.db.get_value("Journal Entry", self.claim_journal, "docstatus")
@@ -45,7 +45,7 @@ class TravelClaim(Document):
 		self.check_journal_entry()				
 		if self.training_event:
 			self.update_training_event(cancel=True)
-		notify_workflow_states(self)
+		# notify_workflow_states(self)
 
 	def validate_duplicate(self):
 		existing = []
