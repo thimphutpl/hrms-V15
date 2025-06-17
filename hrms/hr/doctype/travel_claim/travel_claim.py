@@ -113,7 +113,15 @@ class TravelClaim(Document):
 		for idx, item in enumerate(self.get("items"), start=1):
 			item.dsa = flt(item.dsa)
 			is_last_row = idx == row_count
-			item.mileage_amount = flt(item.mileage_rate) * flt(item.distance) if self.mode_of_travel == "Personal Car" else 0
+
+			# Calculate mileage_amount for Personal Car or for Flight with via_personal_car checked
+			if (
+				(self.mode_of_travel == "Personal Car") or
+				(self.mode_of_travel == "Flight" and getattr(item, "via_personal_car", 0))
+			):
+				item.mileage_amount = flt(item.mileage_rate) * flt(item.distance)
+			else:
+				item.mileage_amount = 0
 
 			# Calculate amount using dsa_percent
 			if self.mode_of_travel == "Personal Car":
@@ -129,7 +137,11 @@ class TravelClaim(Document):
 				item.amount = flt(item.dsa) * (flt(return_day_dsa) / 100)
 				item.base_amount = flt(item.amount) + item.mileage_amount
 			else:
-				item.base_amount = flt(item.amount) * flt(self.exchange_rate) + item.mileage_amount
+				# If country is Bhutan or India and currency is BTN, do not multiply by exchange rate
+				if getattr(item, 'country', None) in ["Bhutan", "India"] and getattr(item, 'currency', None) == "BTN":
+					item.base_amount = flt(item.amount) + item.mileage_amount
+				else:
+					item.base_amount = flt(item.amount) * flt(self.exchange_rate) + item.mileage_amount
 
 			total_claim_amount += flt(item.base_amount)
 
