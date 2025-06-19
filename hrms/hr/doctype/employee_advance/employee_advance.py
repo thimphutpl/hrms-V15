@@ -93,24 +93,10 @@ class EmployeeAdvance(Document):
 			working_days =date_diff(self.posting_date,joining_date)
 			if employment_type == "Probation":
 				frappe.throw("Employee who is in Probation Period is not eligible for Salary Advance.")
-			if working_days < 360 :
-				frappe.throw("Employee who did not serve 1 year is not eligible for Salary Advance")
 			if not frappe.db.get_value("Employee Group", self.employee_group, "salary_advance_limit"):
 				frappe.throw("Please set Maximum Advance Amount in Employee Group {}".format(self.employee_group))
 			self.max_advance_limit = frappe.db.get_value("Employee Group", self.employee_group, "salary_advance_limit")
 			
-			# from_date = frappe.defaults.get_user_default("year_start_date")
-			# advance_status = frappe.db.sql("""
-			# 	select name 
-			# 	from `tabEmployee Advance`
-			# 	where name != '{0}'
-			# 	and advance_type = "Salary Advance"
-			# 	and employee = "{1}"
-			# 	and posting_date between "{2}" and "{3}"
-			# """.format(self.name,self.employee,from_date, today()))
-			# if advance_status:
-			# 	frappe.throw("Employee Advance for employee {} has been already claimed ".format(self.employee_name))
-
 			advance_comp=frappe.db.sql("select sum(sd.amount) as sum from `tabSalary Structure`as ss join `tabEmployee` as te on ss.employee=te.name join `tabSalary Detail` as sd on sd.parent=ss.name where sd.salary_component='Salary Advance Deductions' and te.name='{}'".format(self.employee), as_dict=True)
 			limit = frappe.get_value("Employee Group", self.employee_group, "salary_advance_max_months")
 			# self.total_eligible_amount=flt(self.total_eligible_amount)-flt(advance_comp[0].sum)*flt(limit)
