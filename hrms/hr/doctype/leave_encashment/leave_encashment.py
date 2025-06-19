@@ -11,7 +11,7 @@ from frappe.utils import date_diff, flt, cint, money_in_words
 from hrms.hr.doctype.leave_application.leave_application import get_leaves_for_period
 from hrms.hr.doctype.leave_ledger_entry.leave_ledger_entry import create_leave_ledger_entry
 from hrms.hr.utils import set_employee_name, validate_active_employee
-from hrms.payroll.doctype.salary_structure.salary_structure import get_basic_and_gross_pay, get_salary_tax
+from hrms.payroll.doctype.salary_structure.salary_structure import get_basic_and_gross_pay
 from hrms.hr.hr_custom_functions import get_salary_tax
 from erpnext.custom_workflow import notify_workflow_states
 from erpnext.accounts.doctype.hr_accounts_settings.hr_accounts_settings import get_bank_account
@@ -344,7 +344,7 @@ class LeaveEncashment(Document):
 
 		self.leave_encashment_type = leave_encashment_type
 		# self.salary_structure = salary_structure
-		self.encashment_tax = get_salary_tax(self.encashment_amount)
+		self.encashment_tax = get_salary_tax(round(self.encashment_amount))
 		# frappe.throw(str(self.encashment_tax))
 		self.payable_amount = flt(self.encashment_amount) - flt(self.encashment_tax)
 
