@@ -9,6 +9,6 @@ frappe.ui.form.on('Income Tax Slab', {
 		if (frm.doc.docstatus === 1){
 			$(".grid-footer").attr('style','');
 		}
-		$(".grid-upload").addClass('hidden');
+		// $(".grid-upload").addClass('hidden');
 	},
 });
