@@ -843,7 +843,7 @@ def get_number_of_leave_days(
 	else:
 		number_of_days = date_diff(to_date, from_date) + 1
 	# Leave types that include holidays
-	leave_types_with_holidays = ["Casual Leave", "Earned Leave", "Bereavement Leave", "GCE Casual Leave"]
+	leave_types_with_holidays = ["Casual Leave", "Earned Leave", "Bereavement Leave", "GCE Casual Leave", "Paternity Leave"]
 	if leave_type in leave_types_with_holidays:		
 		if leave_type == "Bereavement Leave":
 			holiday_list = frappe.db.get_value("Branch", "GI - Head Office", "holiday_list")
