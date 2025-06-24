@@ -673,11 +673,13 @@ def get_previous_claimed_amount(employee, payroll_period, non_pro_rata=False, co
 
 
 def share_doc_with_approver(doc, user):
+	
 	if not user:
 		return
 
 	# if approver does not have permissions, share
 	if not frappe.has_permission(doc=doc, ptype="submit", user=user):
+		
 		frappe.share.add_docshare(
 			doc.doctype, doc.name, user, submit=1, flags={"ignore_share_permission": True}
 		)
@@ -687,6 +689,7 @@ def share_doc_with_approver(doc, user):
 	# remove shared doc if approver changes
 	doc_before_save = doc.get_doc_before_save()
 	if doc_before_save:
+		#frappe.throw("ppp1")
 		approvers = {
 			"Leave Application": "leave_approver",
 			"Expense Claim": "expense_approver",

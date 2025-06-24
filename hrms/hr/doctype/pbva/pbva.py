@@ -6,7 +6,7 @@ import frappe
 from frappe.model.document import Document
 from frappe.utils import flt, getdate, date_diff, cint, add_months
 from hrms.payroll.doctype.salary_structure.salary_structure import get_salary_tax
-from erpnext.accounts.doctype.hr_accounts_settings.hr_accounts_settings import get_bank_account
+#from erpnext.accounts.doctype.hr_accounts_settings.hr_accounts_settings import get_bank_account
 from datetime import datetime
 
 class PBVA(Document):

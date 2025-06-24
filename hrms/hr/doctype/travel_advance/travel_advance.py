@@ -109,14 +109,26 @@ def make_travel_advance(dt, dn):
 	Creates a Travel Advance document linked to the given Travel Authorization.
 	"""
 	doc = frappe.get_doc(dt, dn)
+	no_of_days=0
+	for d in doc.items:
+		if d.is_last_day==1:
+			no_of_day=0
+		else:
+			no_of_day=date_diff(d.to_date, d.from_date) + 1
+		no_of_days+=no_of_day
+
+
+	
 	if doc.items:
 		from_date = doc.items[0].from_date
 		to_date = doc.items[-1].from_date if len(doc.items) > 1 else from_date
 
 	employee_grade = frappe.db.get_value("Employee", doc.employee, "grade")
+	return_day_dsa = frappe.db.get_single_value("HR Settings", "return_day_dsa")
 	dsa = frappe.db.get_value("Employee Grade", employee_grade, "dsa")
-
-	no_of_days = date_diff(to_date, from_date) + 1
+	
+	# no_of_days = date_diff(to_date, from_date) + 1
+	# frappe.throw(str(no_of_days))
 
 	adv = frappe.new_doc("Travel Advance")
 	adv.employee = doc.employee
@@ -128,7 +140,7 @@ def make_travel_advance(dt, dn):
 	adv.from_date = from_date
 	adv.to_date = to_date
 
-	adv.estimated_amount = flt(dsa) * flt(no_of_days)
+	adv.estimated_amount = flt(dsa) * flt(no_of_days) + (flt(return_day_dsa) /100 * flt(dsa))
 
 	adv.travel_authorization = doc.name
 

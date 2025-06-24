@@ -77,7 +77,7 @@ frappe.ui.form.on("Overtime Application Item", {
 		}
 		if (frm.doc.employee) {
 			frappe.call({
-				method: "erpnext.setup.doctype.employee.employee.get_overtime_rate",
+				method: "hrms.hr.doctype.overtime_application.overtime_application.get_overtime_rate",
 				args: {
 					employee: frm.doc.employee,
 					posting_date:child.from_date

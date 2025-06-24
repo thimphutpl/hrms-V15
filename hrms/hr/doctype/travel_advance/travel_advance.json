@@ -238,6 +238,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "fetch_from": "approver.full_name",
    "fieldname": "approver_name",
    "fieldtype": "Data",
    "label": "Approver Name",
@@ -251,6 +252,7 @@
   {
    "fieldname": "approver_designation",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Approver Designation",
    "no_copy": 1,
    "options": "Designation"
@@ -259,7 +261,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-03-27 16:42:54.415154",
+ "modified": "2025-05-31 12:35:49.807056",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Advance",

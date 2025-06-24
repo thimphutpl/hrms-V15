@@ -12,7 +12,7 @@ from hrms.hr.doctype.leave_application.leave_application import get_leave_balanc
 from hrms.payroll.doctype.salary_structure.salary_structure import get_basic_and_gross_pay
 from hrms.hr.hr_custom_functions import get_salary_tax
 # from erpnext.custom_workflow import validate_workflow_states, notify_workflow_states
-from erpnext.accounts.doctype.hr_accounts_settings.hr_accounts_settings import get_bank_account
+#from erpnext.accounts.doctype.hr_accounts_settings.hr_accounts_settings import get_bank_account
 from datetime import *
 
 class BulkLeaveEncashment(Document):

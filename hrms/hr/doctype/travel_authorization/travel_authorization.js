@@ -96,7 +96,14 @@ frappe.ui.form.on("Travel Authorization", {
 	},
 
 	employee: function (frm) {
-		if (frm.doc.employee) frm.trigger("get_employee_currency");
+		if (frm.doc.employee) 
+		{
+			frm.trigger("get_employee_currency");
+			frm.trigger("set_reports_to");
+			frm.trigger("set_approver")
+
+		}
+		
 	},
 
 	get_employee_currency: function (frm) {
@@ -149,6 +156,38 @@ frappe.ui.form.on("Travel Authorization", {
 				);
 			},
 		});
+	},
+	set_reports_to: function (frm) {
+		if (frm.doc.employee) {
+			console.log("hi")
+			return frappe.call({
+				method: "hrms.hr.hr_custom_function.get_reports_to",
+				args: {
+					employee: frm.doc.employee,
+				},
+				callback: function (r) {
+					if (r && r.message) {
+						frm.set_value("reports_to", r.message);
+					}
+				},
+			});
+		}
+	},
+	set_approver: function (frm) {
+		if (frm.doc.employee) {
+			console.log("hi")
+			return frappe.call({
+				method: "hrms.hr.hr_custom_function.get_approver",
+				args: {
+					employee: frm.doc.employee,
+				},
+				callback: function (r) {
+					if (r && r.message) {
+						frm.set_value("approver", r.message);
+					}
+				},
+			});
+		}
 	},
 });
 

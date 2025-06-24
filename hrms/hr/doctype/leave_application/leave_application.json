@@ -28,6 +28,8 @@
   "leave_approver",
   "leave_approver_name",
   "follow_via_email",
+  "reports_to",
+  "reports_name",
   "column_break_18",
   "posting_date",
   "status",
@@ -157,9 +159,11 @@
    "fieldname": "leave_approver",
    "fieldtype": "Link",
    "label": "Leave Approver",
-   "options": "User"
+   "options": "User",
+   "reqd": 1
   },
   {
+   "fetch_from": "leave_approver.full_name",
    "fieldname": "leave_approver_name",
    "fieldtype": "Data",
    "label": "Leave Approver Name",
@@ -248,6 +252,19 @@
    "fieldname": "sb_other_details",
    "fieldtype": "Section Break",
    "label": "Other Details"
+  },
+  {
+   "fieldname": "reports_to",
+   "fieldtype": "Link",
+   "label": "Reports to",
+   "options": "User"
+  },
+  {
+   "fetch_from": "reports_to.full_name",
+   "fieldname": "reports_name",
+   "fieldtype": "Data",
+   "label": "Reports Name",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-calendar",
@@ -255,7 +272,7 @@
  "is_submittable": 1,
  "links": [],
  "max_attachments": 3,
- "modified": "2024-04-08 13:56:03.818019",
+ "modified": "2025-05-26 12:10:55.781045",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Application",
@@ -283,7 +300,6 @@
    "read": 1,
    "report": 1,
    "role": "HR Manager",
-   "set_user_permissions": 1,
    "share": 1,
    "submit": 1,
    "write": 1
@@ -303,7 +319,6 @@
    "read": 1,
    "report": 1,
    "role": "HR User",
-   "set_user_permissions": 1,
    "share": 1,
    "submit": 1,
    "write": 1

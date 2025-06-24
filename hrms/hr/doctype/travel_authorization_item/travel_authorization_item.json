@@ -15,7 +15,9 @@
   "column_break_qqwh",
   "travel_to",
   "to_date",
-  "is_last_day"
+  "is_last_day",
+  "section_break_zwhn",
+  "country"
  ],
  "fields": [
   {
@@ -93,12 +95,22 @@
    "fieldtype": "Check",
    "label": "Is Last Day",
    "read_only": 1
+  },
+  {
+   "fieldname": "section_break_zwhn",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "country",
+   "fieldtype": "Link",
+   "label": "Country",
+   "options": "Country"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-02-06 17:07:26.405044",
+ "modified": "2025-06-20 09:57:32.955057",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization Item",

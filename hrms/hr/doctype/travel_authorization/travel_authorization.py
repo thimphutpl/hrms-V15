@@ -27,12 +27,13 @@ from erpnext.custom_workflow import validate_workflow_states, notify_workflow_st
 
 class TravelAuthorization(Document):
 	def validate(self):
+
 		validate_active_employee(self.employee)
 		self.validate_travel_dates()
 		self.validate_travel_last_day()
 		self.validate_exchange_rate()
 		self.set_status()
-		# validate_workflow_states(self)
+		validate_workflow_states(self)
 
 	def on_update(self):
 		self.check_date_overlap()
@@ -164,3 +165,4 @@ class TravelAuthorization(Document):
 		return {
 			"has_travel_claim": bool(travel_claim)
 		}
+

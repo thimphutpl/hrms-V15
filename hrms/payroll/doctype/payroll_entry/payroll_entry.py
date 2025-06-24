@@ -195,6 +195,7 @@ class PayrollEntry(Document):
 
 	@frappe.whitelist()
 	def create_salary_slips(self):
+		#frappe.throw("hi")
 		"""
 		Creates salary slip for selected employees if already not created
 		"""
@@ -202,6 +203,7 @@ class PayrollEntry(Document):
 		employees = [emp.employee for emp in self.employees]
 
 		if employees:
+			
 			args = frappe._dict(
 				{
 					"company": self.company,
@@ -229,6 +231,7 @@ class PayrollEntry(Document):
 					indicator="blue",
 				)
 			else:
+				
 				create_salary_slips_for_employees(employees, args, publish_progress=False)
 				# since this method is called via frm.call this doc needs to be updated manually
 				self.reload()

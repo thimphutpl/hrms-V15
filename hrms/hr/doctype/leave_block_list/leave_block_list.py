@@ -45,6 +45,7 @@ class LeaveBlockList(Document):
 def get_applicable_block_dates(
 	from_date, to_date, employee=None, company=None, all_lists=False, leave_type=None
 ):
+	#frappe.throw("hi")
 	return frappe.db.get_all(
 		"Leave Block List Date",
 		filters={
@@ -57,7 +58,7 @@ def get_applicable_block_dates(
 
 def get_applicable_block_lists(employee=None, company=None, all_lists=False, leave_type=None):
 	block_lists = []
-
+	#frappe.throw(employee)
 	def add_block_list(block_list):
 		for d in block_list:
 			if all_lists or not is_user_in_allow_list(d):

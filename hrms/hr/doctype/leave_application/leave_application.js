@@ -3,7 +3,7 @@
 
 frappe.ui.form.on("Leave Application", {
 	setup: function (frm) {
-		frm.set_query("leave_approver", function () {
+		frm.set_query("reports_to", function () {
 			return {
 				query: "hrms.hr.doctype.department_approver.department_approver.get_approvers",
 				filters: {
@@ -30,7 +30,7 @@ frappe.ui.form.on("Leave Application", {
 				},
 				callback: function (r) {
 					if (!r.exc && r.message) {
-						frm.toggle_reqd("leave_approver", true);
+						frm.toggle_reqd("reports_to", true);
 					}
 				},
 			});
@@ -118,7 +118,11 @@ frappe.ui.form.on("Leave Application", {
 	async set_employee(frm) {
 		if (frm.doc.employee) return;
 
+		
 		const employee = await hrms.get_current_employee(frm);
+		//const employee = await "BTF201412002"
+		
+		console.log(employee)
 		if (employee) {
 			frm.set_value("employee", employee);
 		}
@@ -127,14 +131,15 @@ frappe.ui.form.on("Leave Application", {
 	employee: function (frm) {
 		frm.trigger("make_dashboard");
 		frm.trigger("get_leave_balance");
-		frm.trigger("set_leave_approver");
+		frm.trigger("set_reports_to");
+		frm.trigger("set_leave_approver")
 	},
 
-	leave_approver: function (frm) {
-		if (frm.doc.leave_approver) {
-			frm.set_value("leave_approver_name", frappe.user.full_name(frm.doc.leave_approver));
-		}
-	},
+	// leave_approver: function (frm) {
+	// 	if (frm.doc.leave_approver) {
+	// 		frm.set_value("leave_approver_name", frappe.user.full_name(frm.doc.leave_approver));
+	// 	}
+	// },
 
 	leave_type: function (frm) {
 		frm.trigger("get_leave_balance");
@@ -239,10 +244,27 @@ frappe.ui.form.on("Leave Application", {
 		}
 	},
 
+	set_reports_to: function (frm) {
+		if (frm.doc.employee) {
+			console.log("hi")
+			return frappe.call({
+				method: "hrms.hr.hr_custom_function.get_reports_to",
+				args: {
+					employee: frm.doc.employee,
+				},
+				callback: function (r) {
+					if (r && r.message) {
+						frm.set_value("reports_to", r.message);
+					}
+				},
+			});
+		}
+	},
 	set_leave_approver: function (frm) {
 		if (frm.doc.employee) {
+			console.log("hi")
 			return frappe.call({
-				method: "hrms.hr.doctype.leave_application.leave_application.get_leave_approver",
+				method: "hrms.hr.hr_custom_function.get_approver",
 				args: {
 					employee: frm.doc.employee,
 				},

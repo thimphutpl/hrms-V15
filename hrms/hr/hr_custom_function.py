@@ -95,7 +95,7 @@ def get_basic_and_gross_pay(employee, effective_date):
 		.where(
 			(SalaryStructure.is_active == "Yes")
 			& (SalaryStructure.employee == employee)
-			& (SalaryDetail.salary_component == "Basic Pay")
+			& (SalaryDetail.salary_component == "Basic Salary")
 		)
 	)
 	
@@ -132,3 +132,28 @@ def get_officiating_employee(employee):
 			else:
 				flag = False
 	return officiate
+
+@frappe.whitelist()
+def get_approver(employee):
+	# leave_approver, department = frappe.db.get_value("Employee", employee, ["leave_approver", "department"])
+
+	# if not leave_approver and department:
+	# 	leave_approver = frappe.db.get_value(
+	# 		"Department Approver",
+	# 		{"parent": department, "parentfield": "leave_approvers", "idx": 1},
+	# 		"approver",
+	# 	)
+	department = frappe.db.get_value("Employee", employee, "department")
+	empid=frappe.db.get_value("Department", department, "approver")
+	approver = frappe.db.get_value("Employee", empid, "user_id")
+
+
+	return approver
+
+
+@frappe.whitelist()
+def get_reports_to(employee):
+	empid = frappe.db.get_value("Employee", employee, "reports_to")
+	reports_to = frappe.db.get_value("Employee", empid, "user_id")
+	
+	return reports_to

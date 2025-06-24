@@ -75,6 +75,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
 	def validate(self):
 		validate_active_employee(self.employee)
 		set_employee_name(self)
+		
 		self.validate_dates()
 		self.validate_balance_leaves()
 		self.validate_leave_overlap()
@@ -89,9 +90,19 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		self.validate_applicable_after()
 
 	def on_update(self):
+		
 		if self.status == "Open" and self.docstatus < 1:
+			user_id=frappe.session.user
+			
+			#frappe.throw(empid)
+			if self.workflow_state=="Waiting Approval" and self.reports_to!=user_id:
+				frappe.throw("Only {} can verify".format(self.reports_to))	
+			
+			
+			
 			# notify leave approver about creation
 			if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
+				
 				self.notify_leave_approver()
 
 		share_doc_with_approver(self, self.leave_approver)
@@ -99,13 +110,14 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		self.notify_approval_status()
 
 	def on_submit(self):
-		if self.status in ["Open", "Cancelled"]:
-			frappe.throw(_("Only Leave Applications with status 'Approved' and 'Rejected' can be submitted"))
-
+		
+		
 		self.validate_back_dated_application()
-		self.update_attendance()
+		
 		self.validate_for_self_approval()
-
+		self.db_set("status", "Approved")
+		frappe.db.commit()
+		self.update_attendance()
 		# notify leave applier about approval
 		if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
 			self.notify_employee()
@@ -133,6 +145,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		hrms.refetch_resource("hrms:my_leaves", employee_user)
 
 	def validate_applicable_after(self):
+		#frappe.throw("hh")
 		if self.leave_type:
 			leave_type = frappe.get_doc("Leave Type", self.leave_type)
 			if leave_type.applicable_after > 0:
@@ -617,12 +630,15 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		)
 
 	def notify_leave_approver(self):
+		
 		if self.leave_approver:
+			
 			parent_doc = frappe.get_doc("Leave Application", self.name)
 			args = parent_doc.as_dict()
 
 			template = frappe.db.get_single_value("HR Settings", "leave_approval_notification_template")
 			if not template:
+				
 				frappe.msgprint(
 					_("Please set default template for Leave Approval Notification in HR Settings.")
 				)
@@ -667,6 +683,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
 
 	def create_leave_ledger_entry(self, submit=True):
 		if self.status != "Approved" and submit:
+			#frappe.throw(self.status)
 			return
 
 		expiry_date = get_allocation_expiry_for_cf_leaves(
@@ -797,6 +814,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
 				create_leave_ledger_entry(self, args, submit)
 
 	def validate_for_self_approval(self):
+		
 		self_leave_approval_not_allowed = frappe.db.get_single_value(
 			"HR Settings", "prevent_self_leave_approval"
 		)
@@ -1375,17 +1393,25 @@ def get_approved_leaves_for_period(employee, leave_type, from_date, to_date):
 
 @frappe.whitelist()
 def get_leave_approver(employee):
-	leave_approver, department = frappe.db.get_value("Employee", employee, ["leave_approver", "department"])
+	# leave_approver, department = frappe.db.get_value("Employee", employee, ["leave_approver", "department"])
 
-	if not leave_approver and department:
-		leave_approver = frappe.db.get_value(
-			"Department Approver",
-			{"parent": department, "parentfield": "leave_approvers", "idx": 1},
-			"approver",
-		)
+	# if not leave_approver and department:
+	# 	leave_approver = frappe.db.get_value(
+	# 		"Department Approver",
+	# 		{"parent": department, "parentfield": "leave_approvers", "idx": 1},
+	# 		"approver",
+	# 	)
+	department = frappe.db.get_value("Employee", employee, "department")
+	empid=frappe.db.get_value("Department", department, "approver")
+	leave_approver = frappe.db.get_value("Employee", empid, "user_id")
+
 
 	return leave_approver
 
 
+
+
 def on_doctype_update():
 	frappe.db.add_index("Leave Application", ["employee", "from_date", "to_date"])
+
+

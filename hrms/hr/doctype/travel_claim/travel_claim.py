@@ -208,14 +208,31 @@ def get_travel_claim(dt, dn):
 	tc.branch = doc.branch
 	tc.cost_center = doc.cost_center
 
+	
+
 	for d in doc.get("items"):
+		#frappe.msgprint(str(d.country))
 		item = d.as_dict()
 		if d.is_last_day == 1:
 			item["dsa_percent"] = return_day_dsa if return_day_dsa else 100
 			item["dsa"] = flt(dsa) * flt(item["dsa_percent"])/100
 		else:
 			item["dsa_percent"] = 100
-			item["dsa"] = dsa
+			if doc.travel_type=="International":
+				dsa_international=frappe.get_doc("DSA Out Country",d.country)
+				if not dsa_international:
+					frappe.throw("set Dsa Out Contry")
+
+				for dsa_int in dsa_international.country_dsa_detail:
+					if dsa_int.grade==employee_grade:
+						item["dsa"] = flt(dsa_int.dsa) * doc.exchange_rate
+					else:
+						frappe.throw("set grade in dsa out country")
+
+					#frappe.msgprint(str(employee_grade))
+				
+			else:			
+				item["dsa"] = dsa
 		item["no_of_days"] = date_diff(d.to_date, d.from_date) + 1
 		item["amount"] = flt(item["no_of_days"]) * flt(item["dsa"])
 		tc.append("items", item)

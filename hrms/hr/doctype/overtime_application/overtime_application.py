@@ -132,6 +132,26 @@ class OvertimeApplication(Document):
 					#frappe.throw("{}, {}, {} and {},{},{}".format(start2,start1,end2,start2,end1,end2))
 					if start2 <= start1 <= end2 or start2 <= end1 <= end2:
 						frappe.throw("Duplicate Dates in row " + str(a.idx) + " and " + str(b.idx))
+@frappe.whitelist()
+def get_overtime_rate(employee, posting_date ):
+	
+	basic = frappe.db.sql("select b.eligible_for_overtime_and_payment, a.amount as basic_pay from `tabSalary Detail` a, `tabSalary Structure` b where a.parent = b.name and a.salary_component = 'Basic Salary' and b.is_active = 'Yes' and b.employee = \'" + str(employee) + "\'", as_dict=True)
+	
+	if basic:
+		
+		# frappe.throw(str(basic))
+		if not cint(basic[0].eligible_for_overtime_and_payment):
+			salary_struc=frappe.db.sql("select name from `tabSalary Structure` where employee='{}' and is_active='Yes'".format(employee), as_dict=True)[0].name
+			if not salary_struc:
+				frappe.throw("There is no salary strcuture for the employee ")
+			if cint(frappe.db.get_value('Salary Structure',salary_struc,'eligible_for_overtime_and_payment')) == 0:
+				frappe.throw(_("Employee is not eligible for Overtime"))
+		# if is_holiday(employee=employee, date= posting_date):
+		# 	return ((flt(basic[0].basic_pay) * 1.5) / (30 * 8))
+		# else:
+		return (flt(flt(basic[0].basic_pay) / (30 * 8),0))
+	else:
+		frappe.throw("No Salary Structure found for the employee")
 
 def get_permission_query_conditions(user):
 	if not user: user = frappe.session.user

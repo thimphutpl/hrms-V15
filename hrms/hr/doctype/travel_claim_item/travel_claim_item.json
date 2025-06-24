@@ -27,7 +27,9 @@
   "column_break_mwyx",
   "dsa",
   "column_break_djke",
-  "amount"
+  "amount",
+  "section_break_ppaq",
+  "country"
  ],
  "fields": [
   {
@@ -162,12 +164,23 @@
    "fieldtype": "Currency",
    "label": "Mileage Amount",
    "read_only": 1
+  },
+  {
+   "fieldname": "section_break_ppaq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "country",
+   "fieldtype": "Link",
+   "label": "Country",
+   "options": "Country",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-03-04 16:24:44.768528",
+ "modified": "2025-06-20 11:06:33.686078",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim Item",

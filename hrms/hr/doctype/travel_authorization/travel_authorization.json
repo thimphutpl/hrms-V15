@@ -26,8 +26,10 @@
   "items",
   "approver_detial_section",
   "approver",
+  "reports_to",
   "column_break_aysp",
   "approver_name",
+  "reports_to_name",
   "column_break_esiv",
   "approver_designation",
   "additional_information_section",
@@ -205,6 +207,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "fetch_from": "approver.full_name",
    "fieldname": "approver_name",
    "fieldtype": "Data",
    "label": "Approver Name",
@@ -222,12 +225,24 @@
    "no_copy": 1,
    "options": "Designation",
    "read_only": 1
+  },
+  {
+   "fieldname": "reports_to",
+   "fieldtype": "Link",
+   "label": "Reports to",
+   "options": "User"
+  },
+  {
+   "fetch_from": "reports_to.full_name",
+   "fieldname": "reports_to_name",
+   "fieldtype": "Data",
+   "label": "Reports to Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-03-04 12:00:47.591600",
+ "modified": "2025-05-28 15:30:03.949206",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",

@@ -29,6 +29,7 @@ class LeaveControlPanel(Document):
 
 	@frappe.whitelist()
 	def allocate_leave(self, employees: list):
+		
 		self.validate_fields(employees)
 		if self.allocate_based_on_leave_policy:
 			return self.create_leave_policy_assignments(employees)
@@ -71,6 +72,7 @@ class LeaveControlPanel(Document):
 		)
 
 	def create_leave_policy_assignments(self, employees: list) -> dict:
+		# frappe.throw("hii")
 		from_date, to_date = self.get_from_to_date()
 		assignment_based_on = None if self.dates_based_on == "Custom Range" else self.dates_based_on
 		failure = []
@@ -114,6 +116,7 @@ class LeaveControlPanel(Document):
 	def get_from_to_date(self):
 		if self.dates_based_on == "Joining Date":
 			return None, self.to_date
+			
 		elif self.dates_based_on == "Leave Period" and self.leave_period:
 			return frappe.db.get_value("Leave Period", self.leave_period, ["from_date", "to_date"])
 		else:

@@ -4,10 +4,17 @@
 frappe.ui.form.on("Travel Advance", {
 	refresh(frm) {
 		refresh_html(frm);
+		frm.trigger("set_approver");
 	},
 
     employee: function (frm) {
-		if (frm.doc.employee) frm.trigger("get_employee_currency");
+		if (frm.doc.employee) 
+		{
+			frm.trigger("get_employee_currency");
+			frm.trigger("set_approver");
+
+		}
+			
 	},
 
 	get_employee_currency: function (frm) {
@@ -22,7 +29,22 @@ frappe.ui.form.on("Travel Advance", {
 			},
 		);
 	},
-
+	set_approver: function (frm) {
+		if (frm.doc.employee) {
+			console.log("hi")
+			return frappe.call({
+				method: "hrms.hr.hr_custom_function.get_approver",
+				args: {
+					employee: frm.doc.employee,
+				},
+				callback: function (r) {
+					if (r && r.message) {
+						frm.set_value("approver", r.message);
+					}
+				},
+			});
+		}
+	},
     currency: function (frm) {
 		if (frm.doc.currency) {
 			var from_currency = frm.doc.currency;
