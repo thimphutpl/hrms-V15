@@ -1,8 +1,8 @@
 # Copyright (c) 2018, Frappe Technologies Pvt. Ltd. and Contributors
 # See license.txt
 
-from frappe.tests.utils import FrappeTestCase
+import unittest
 
 
-class TestPayrollPeriod(FrappeTestCase):
+class TestPayrollPeriod(unittest.TestCase):
 	pass

@@ -22,12 +22,7 @@ def execute(filters=None):
 			"hidden": 1,
 			"width": 200,
 		},
-		{
-			"label": _("Payment Date"),
-			"fieldtype": "Data",
-			"fieldname": "payment_date",
-			"width": 100,
-		},
+		{"label": _("Payment Date"), "fieldtype": "Data", "fieldname": "payment_date", "width": 100},
 		{
 			"label": _("Employee Name"),
 			"fieldtype": "Link",
@@ -45,7 +40,9 @@ def execute(filters=None):
 	]
 
 	if frappe.db.has_column("Employee", "ifsc_code"):
-		columns.append({"label": _("IFSC Code"), "fieldtype": "Data", "fieldname": "bank_code", "width": 100})
+		columns.append(
+			{"label": _("IFSC Code"), "fieldtype": "Data", "fieldname": "bank_code", "width": 100}
+		)
 
 	columns += [
 		{"label": _("Currency"), "fieldtype": "Data", "fieldname": "currency", "width": 50},
@@ -149,10 +146,12 @@ def get_emp_bank_ifsc_code(salary_slips):
 	emp_names = [d.employee for d in salary_slips]
 	ifsc_codes = get_all("Employee", [("name", "IN", emp_names)], ["ifsc_code", "name"])
 
-	ifsc_codes_map = {code.name: code.ifsc_code for code in ifsc_codes}
+	ifsc_codes_map = {}
+	for code in ifsc_codes:
+		ifsc_codes_map[code.name] = code
 
 	for slip in salary_slips:
-		slip["ifsc_code"] = ifsc_codes_map[slip.employee]
+		slip["ifsc_code"] = ifsc_codes_map[code.name]["ifsc_code"]
 
 	return salary_slips
 

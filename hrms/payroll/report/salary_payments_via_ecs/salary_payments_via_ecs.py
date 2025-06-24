@@ -79,6 +79,7 @@ def get_conditions(filters):
 
 
 def get_data(filters):
+
 	data = []
 
 	fields = ["employee", "branch", "bank_name", "bank_ac_no", "salary_mode"]
@@ -112,6 +113,7 @@ def get_data(filters):
 	)
 
 	for d in entry:
+
 		employee = {
 			"branch": employee_data_dict.get(d.employee).get("branch"),
 			"employee_name": d.employee_name,

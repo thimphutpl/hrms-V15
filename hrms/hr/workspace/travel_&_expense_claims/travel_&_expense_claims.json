@@ -5,7 +5,7 @@
    "label": "Expense Claims"
   }
  ],
- "content": "[{\"id\":\"L2zVuWBp7u\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Expense Claims\",\"col\":12}},{\"id\":\"xrNOam-5qD\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"WeY2C9ArOK\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"iDZGDH96Bx\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Expense Claim\",\"col\":3}},{\"id\":\"BrkYRKnEbD\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Employee Advance\",\"col\":3}},{\"id\":\"zFC6AYv26B\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dashboard\",\"col\":3}},{\"id\":\"ALah8wGQ6F\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"sQTzb1f7Y_\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Masters &amp; Reports</b></span>\",\"col\":12}},{\"id\":\"DuIKEI2BM-\",\"type\":\"card\",\"data\":{\"card_name\":\"Claims\",\"col\":4}},{\"id\":\"YLUHzAMPPI\",\"type\":\"card\",\"data\":{\"card_name\":\"Advances\",\"col\":4}},{\"id\":\"gRpeo_qpkn\",\"type\":\"card\",\"data\":{\"card_name\":\"Fleet Management\",\"col\":4}},{\"id\":\"ZSjP2Kct-c\",\"type\":\"card\",\"data\":{\"card_name\":\"Travel\",\"col\":4}},{\"id\":\"xcW_x4wuLQ\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":4}},{\"id\":\"KgfEHHa8pF\",\"type\":\"card\",\"data\":{\"card_name\":\"Accounting Reports\",\"col\":4}}]",
+ "content": "[{\"id\":\"L2zVuWBp7u\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Expense Claims\",\"col\":12}},{\"id\":\"xrNOam-5qD\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"WeY2C9ArOK\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"iDZGDH96Bx\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Expense Claim\",\"col\":3}},{\"id\":\"BrkYRKnEbD\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Employee Advance\",\"col\":3}},{\"id\":\"zFC6AYv26B\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dashboard\",\"col\":3}},{\"id\":\"ALah8wGQ6F\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"sQTzb1f7Y_\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Masters &amp; Reports</b></span>\",\"col\":12}},{\"id\":\"ZSjP2Kct-c\",\"type\":\"card\",\"data\":{\"card_name\":\"Travel\",\"col\":4}},{\"id\":\"DuIKEI2BM-\",\"type\":\"card\",\"data\":{\"card_name\":\"Claims\",\"col\":4}},{\"id\":\"YLUHzAMPPI\",\"type\":\"card\",\"data\":{\"card_name\":\"Advances\",\"col\":4}},{\"id\":\"gRpeo_qpkn\",\"type\":\"card\",\"data\":{\"card_name\":\"Fleet Management\",\"col\":4}},{\"id\":\"xcW_x4wuLQ\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":4}},{\"id\":\"KgfEHHa8pF\",\"type\":\"card\",\"data\":{\"card_name\":\"Accounting Reports\",\"col\":4}}]",
  "creation": "2022-08-20 16:28:40.701015",
  "custom_blocks": [],
  "docstatus": 0,
@@ -14,8 +14,9 @@
  "hide_custom": 1,
  "icon": "expenses",
  "idx": 0,
+ "indicator_color": "",
  "is_hidden": 0,
- "label": "Expense Claims",
+ "label": "Travel & Expense Claims",
  "links": [
   {
    "hidden": 0,
@@ -41,34 +42,6 @@
    "label": "Expense Claim Type",
    "link_count": 0,
    "link_to": "Expense Claim Type",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Travel",
-   "link_count": 2,
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Travel Request",
-   "link_count": 0,
-   "link_to": "Travel Request",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Purpose of Travel",
-   "link_count": 0,
-   "link_to": "Purpose of Travel",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -254,12 +227,71 @@
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Travel",
+   "link_count": 5,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Travel Authorization",
+   "link_count": 0,
+   "link_to": "Travel Authorization",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Travel Claim",
+   "link_count": 0,
+   "link_to": "Travel Claim",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Travel Adjustment",
+   "link_count": 0,
+   "link_to": "Travel Adjustment",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Travel Request",
+   "link_count": 0,
+   "link_to": "Travel Request",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Purpose of Travel",
+   "link_count": 0,
+   "link_to": "Purpose of Travel",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2024-02-05 09:10:45.636550",
+ "modified": "2025-06-13 12:11:09.023795",
  "modified_by": "Administrator",
  "module": "HR",
- "name": "Expense Claims",
+ "name": "Travel & Expense Claims",
  "number_cards": [],
  "owner": "Administrator",
  "parent_page": "HR",
@@ -294,5 +326,5 @@
    "type": "DocType"
   }
  ],
- "title": "Expense Claims"
+ "title": "Travel & Expense Claims"
 }

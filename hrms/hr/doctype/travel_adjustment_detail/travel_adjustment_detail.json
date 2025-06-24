@@ -1,0 +1,165 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-05-22 12:16:29.256782",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+    "from_date",
+    "halt",
+    "travel_from",
+    "column_break_2",
+    "travel_to",
+    "halt_at",
+    "column_break_4",
+    "to_date",
+    "no_days",
+    "country",
+    "is_last_day",
+    "currency_section",
+    "currency",
+    "column_break_skxa",
+    "exchange_rate",
+    "section_break_vtmt",
+    "dsa",
+    "column_break_pufp",
+    "dsa_nu_per_day",
+    "column_break_axty",
+    "total_dsa"
+   ],
+   "fields": [
+    {
+     "fieldname": "from_date",
+     "fieldtype": "Date",
+     "in_list_view": 1,
+     "label": "From Date",
+     "read_only": 1,
+     "reqd": 1
+    },
+    {
+     "depends_on": "eval:doc.halt==0 && doc.from_date",
+     "fieldname": "travel_from",
+     "fieldtype": "Data",
+     "in_list_view": 1,
+     "label": "Travel From"
+    },
+    {
+     "fieldname": "column_break_2",
+     "fieldtype": "Column Break"
+    },
+    {
+     "columns": 1,
+     "default": "0",
+     "depends_on": "eval:doc.from_date",
+     "fieldname": "halt",
+     "fieldtype": "Check",
+     "in_list_view": 1,
+     "label": "Halt?"
+    },
+    {
+     "fieldname": "column_break_4",
+     "fieldtype": "Column Break"
+    },
+    {
+     "fieldname": "to_date",
+     "fieldtype": "Date",
+     "in_list_view": 1,
+     "label": "To Date"
+    },
+    {
+     "depends_on": "eval:doc.halt==0 && doc.from_date",
+     "fieldname": "travel_to",
+     "fieldtype": "Data",
+     "in_list_view": 1,
+     "label": "Travel To"
+    },
+    {
+     "columns": 1,
+     "depends_on": "eval:doc.halt",
+     "fieldname": "halt_at",
+     "fieldtype": "Data",
+     "in_list_view": 1,
+     "label": "Halt At"
+    },
+    {
+     "default": "1",
+     "fieldname": "no_days",
+     "fieldtype": "Data",
+     "label": "Number of Days",
+     "read_only": 1
+    },
+    {
+     "fieldname": "country",
+     "fieldtype": "Link",
+     "label": "Country",
+     "options": "Country"
+    },
+    {
+     "default": "0",
+     "fieldname": "is_last_day",
+     "fieldtype": "Check",
+     "label": "Is Last Day?",
+     "read_only": 1
+    },
+    {
+     "fieldname": "currency_section",
+     "fieldtype": "Section Break",
+     "label": "Currency"
+    },
+    {
+     "fieldname": "currency",
+     "fieldtype": "Link",
+     "label": "Currency",
+     "options": "Currency"
+    },
+    {
+     "fieldname": "column_break_skxa",
+     "fieldtype": "Column Break"
+    },
+    {
+     "fieldname": "exchange_rate",
+     "fieldtype": "Currency",
+     "label": "Exchange Rate"
+    },
+    {
+     "fieldname": "section_break_vtmt",
+     "fieldtype": "Section Break"
+    },
+    {
+     "fieldname": "dsa",
+     "fieldtype": "Currency",
+     "label": "DSA"
+    },
+    {
+     "fieldname": "column_break_pufp",
+     "fieldtype": "Column Break"
+    },
+    {
+     "fieldname": "dsa_nu_per_day",
+     "fieldtype": "Currency",
+     "label": "DSA (Company Currency)"
+    },
+    {
+     "fieldname": "column_break_axty",
+     "fieldtype": "Column Break"
+    },
+    {
+     "fieldname": "total_dsa",
+     "fieldtype": "Currency",
+     "label": "Total DSA"
+    }
+   ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-05-22 12:16:29.256782",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Travel Adjustment Detail",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -20,22 +20,22 @@
   },
   {
    "chart": "Designation Wise Salary(Last Month)",
-   "width": "Half"
+   "width": "Full"
   },
   {
    "chart": "Department Wise Salary(Last Month)",
-   "width": "Half"
+   "width": "Full"
   }
  ],
  "creation": "2020-07-22 11:56:34.727185",
  "dashboard_name": "Payroll",
  "docstatus": 0,
  "doctype": "Dashboard",
- "idx": 0,
- "is_default": 1,
+ "idx": 2,
+ "is_default": 0,
  "is_standard": 1,
- "modified": "2022-08-22 14:21:33.653983",
- "modified_by": "Administrator",
+ "modified": "2024-12-04 11:20:42.985180",
+ "modified_by": "kinzang.namgyal@cdcl.bt",
  "module": "Payroll",
  "name": "Payroll",
  "owner": "Administrator"

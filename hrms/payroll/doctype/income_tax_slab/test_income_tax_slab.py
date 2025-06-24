@@ -2,8 +2,8 @@
 # See license.txt
 
 # import frappe
-from frappe.tests.utils import FrappeTestCase
+import unittest
 
 
-class TestIncomeTaxSlab(FrappeTestCase):
+class TestIncomeTaxSlab(unittest.TestCase):
 	pass

@@ -1,0 +1,466 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "TA-.YY.-.MM.-.####",
+ "creation": "2025-05-22 11:58:35.264499",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "employee_information",
+  "employee",
+  "employee_name",
+  "grade",
+  "cost_center",
+  "column_break_6",
+  "division",
+  "designation",
+  "column_break_kkkk",
+  "posting_date",
+  "dsa_per_day",
+  "dsa_per_out_country",
+  "travel_purpose_information",
+  "travel_type",
+  "training_event",
+  "training_event_child_ref",
+  "place_type",
+  "col_break_mode",
+  "mode_of_travel",
+  "sponsorship",
+  "if_sponsorship_is_others",
+  "column_break_btbv",
+  "purpose",
+  "seminar_and_workshop_details_section",
+  "topic",
+  "column_break_rtdp",
+  "venue",
+  "training_information_section",
+  "course_name",
+  "training_venue",
+  "column_break_dzlm",
+  "type_of_training",
+  "bond_period_from_date",
+  "bond_period_to_date",
+  "section_break_s22dq",
+  "items",
+  "section_break_20",
+  "need_advance",
+  "currency",
+  "exchange_rate",
+  "column_break_16",
+  "estimated_amount",
+  "advance_amount",
+  "base_advance_amount",
+  "approver_details_section",
+  "approver",
+  "column_break_bdeb",
+  "approver_name",
+  "column_break_lxei",
+  "approver_designation",
+  "section_break_18",
+  "journal_entry",
+  "end_date_auth",
+  "column_break_30",
+  "company",
+  "branch",
+  "travel_claim",
+  "travel_adjustment",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fetch_from": "employee.branch",
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch",
+   "read_only": 1
+  },
+  {
+   "fieldname": "employee_information",
+   "fieldtype": "Section Break",
+   "label": "Employee Information"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "designation",
+   "fieldtype": "Link",
+   "label": "Designation",
+   "options": "Designation",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.division",
+   "fieldname": "division",
+   "fieldtype": "Link",
+   "label": "Division",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Cost Center",
+   "options": "Cost Center"
+  },
+  {
+   "fieldname": "travel_purpose_information",
+   "fieldtype": "Section Break",
+   "label": "Travel Details"
+  },
+  {
+   "fieldname": "travel_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Purpose",
+   "options": "\nTravel\nTraining\nWorkshop and Seminars",
+   "reqd": 1
+  },
+  {
+   "fieldname": "place_type",
+   "fieldtype": "Select",
+   "label": "Place",
+   "options": "\nIn-Country\nOut-Country",
+   "reqd": 1
+  },
+  {
+   "fieldname": "col_break_mode",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "mode_of_travel",
+   "fieldtype": "Select",
+   "label": "Mode of Travel",
+   "options": "\nOffice Car\nPersonal Car\nPublic Transport(Bus)\nTaxi",
+   "reqd": 1
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "ignore_user_permissions": 1,
+   "label": "Travel Itinerary",
+   "options": "Travel Authorization Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Posting Date",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "need_advance",
+   "fieldtype": "Check",
+   "label": "Need Advance?"
+  },
+  {
+   "fieldname": "section_break_20",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "BTN",
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "label": "Currency",
+   "options": "Currency"
+  },
+  {
+   "fieldname": "column_break_16",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.need_advance",
+   "fieldname": "estimated_amount",
+   "fieldtype": "Currency",
+   "label": "Estimated Amount (Company Currency)",
+   "options": "Company:company:default_currency"
+  },
+  {
+   "depends_on": "eval:doc.need_advance",
+   "description": "If the amount is in dollars, include the exchange rate above.",
+   "fieldname": "advance_amount",
+   "fieldtype": "Currency",
+   "label": "Advance Amount",
+   "options": "currency"
+  },
+  {
+   "fieldname": "section_break_18",
+   "fieldtype": "Section Break",
+   "label": "Additional Information"
+  },
+  {
+   "fieldname": "purpose",
+   "fieldtype": "Long Text",
+   "label": "Purpose",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_30",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "travel_claim",
+   "fieldtype": "Data",
+   "label": "Travel Claim",
+   "no_copy": 1,
+   "options": "Travel Claim",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Travel Authorization",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "training_event",
+   "fieldtype": "Data",
+   "label": "Training Event",
+   "read_only": 1
+  },
+  {
+   "fieldname": "training_event_child_ref",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Training Event Child Ref"
+  },
+  {
+   "fieldname": "section_break_s22dq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "sponsorship",
+   "fieldtype": "Select",
+   "label": "Sponsorship",
+   "options": "RBA\nOthers"
+  },
+  {
+   "depends_on": "eval:doc.sponsorship!=\"CDCL\"",
+   "fieldname": "if_sponsorship_is_others",
+   "fieldtype": "Data",
+   "label": "If sponsorship is others"
+  },
+  {
+   "depends_on": "eval:doc.travel_type==\"Training\"",
+   "fieldname": "training_information_section",
+   "fieldtype": "Section Break",
+   "label": "Training Information"
+  },
+  {
+   "fieldname": "course_name",
+   "fieldtype": "Data",
+   "label": "Course Name",
+   "mandatory_depends_on": "eval:doc.travel_type==\"Training\""
+  },
+  {
+   "fieldname": "training_venue",
+   "fieldtype": "Data",
+   "label": "Training Venue",
+   "mandatory_depends_on": "eval:doc.travel_type==\"Training\""
+  },
+  {
+   "fieldname": "column_break_dzlm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "type_of_training",
+   "fieldtype": "Select",
+   "label": "Type of Training",
+   "mandatory_depends_on": "eval:doc.travel_type==\"Training\"",
+   "options": "\nShort Term\nLong Term\nWorkshop\nSeminar"
+  },
+  {
+   "fieldname": "bond_period_from_date",
+   "fieldtype": "Date",
+   "label": "Bond Period From Date",
+   "mandatory_depends_on": "eval:doc.travel_type==\"Training\""
+  },
+  {
+   "fieldname": "bond_period_to_date",
+   "fieldtype": "Date",
+   "label": "Bond Period To Date",
+   "mandatory_depends_on": "eval:doc.travel_type==\"Training\""
+  },
+  {
+   "depends_on": "eval:doc.travel_type==\"Meeting and Seminars\"",
+   "fieldname": "seminar_and_workshop_details_section",
+   "fieldtype": "Section Break",
+   "label": "Meeting and Seminar Details"
+  },
+  {
+   "fieldname": "topic",
+   "fieldtype": "Data",
+   "label": "Topic",
+   "mandatory_depends_on": "eval:doc.travel_type==\"Meeting and Seminars\""
+  },
+  {
+   "fieldname": "column_break_rtdp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "venue",
+   "fieldtype": "Data",
+   "label": "Venue",
+   "mandatory_depends_on": "eval:doc.travel_type==\"Meeting and Seminars\""
+  },
+  {
+   "fieldname": "column_break_btbv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "dsa_per_day",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "DSA Per Day (In Country)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_kkkk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.need_advance ",
+   "fieldname": "base_advance_amount",
+   "fieldtype": "Currency",
+   "label": "Advance Amount (Company Currency)",
+   "options": "Company:company:default_currency",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "end_date_auth",
+   "fieldtype": "Date",
+   "hidden": 1,
+   "label": "End Date Auth",
+   "read_only": 1
+  },
+  {
+   "fieldname": "approver_details_section",
+   "fieldtype": "Section Break",
+   "label": "Approver Details"
+  },
+  {
+   "fieldname": "approver",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Approver",
+   "no_copy": 1,
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_bdeb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approver_name",
+   "fieldtype": "Data",
+   "label": "Approver Name",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_lxei",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approver_designation",
+   "fieldtype": "Link",
+   "label": "Approver Designation",
+   "no_copy": 1,
+   "options": "Designation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "journal_entry",
+   "fieldtype": "Data",
+   "label": "Journal Entry",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "travel_adjustment",
+   "fieldtype": "Data",
+   "label": "Travel Adjustment",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "dsa_per_out_country",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "DSA Per Day (Out Country)"
+  },
+  {
+   "fetch_from": "employee.grade",
+   "fieldname": "grade",
+   "fieldtype": "Link",
+   "label": "Grade",
+   "options": "Employee Grade",
+   "read_only": 1
+  },
+  {
+   "fieldname": "exchange_rate",
+   "fieldtype": "Currency",
+   "label": "Exchange Rate"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-05-29 10:47:55.726154",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Travel Authorization",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

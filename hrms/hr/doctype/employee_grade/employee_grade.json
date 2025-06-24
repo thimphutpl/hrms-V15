@@ -9,8 +9,38 @@
  "engine": "InnoDB",
  "field_order": [
   "default_salary_structure",
+  "default_leave_policy",
   "currency",
-  "default_base_pay"
+  "default_base_pay",
+  "government_grade",
+  "maximum_grade",
+  "column_break_vaoa",
+  "sub_level",
+  "gis",
+  "dsa_per_day",
+  "sws_contribution",
+  "retirement_age",
+  "pay_scale_section",
+  "lower_limit",
+  "column_break_tgfh",
+  "increment_method",
+  "column_break_hxuk",
+  "increment_value",
+  "column_break_qjhy",
+  "upper_limit",
+  "promotion_settings_section",
+  "noof_years_for_next_promotion",
+  "column_break_adwe",
+  "promotion_grade",
+  "allowances_section",
+  "fixed_allowance",
+  "vegetable_allowance",
+  "afsa",
+  "column_break_zzpy",
+  "ltc",
+  "hra",
+  "orderly_allowance",
+  "lumpsum_revision"
  ],
  "fields": [
   {
@@ -34,11 +64,162 @@
    "label": "Currency",
    "options": "Currency",
    "read_only": 1
+  },
+  {
+   "fieldname": "column_break_vaoa",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sub_level",
+   "fieldtype": "Data",
+   "label": "Sub Level"
+  },
+  {
+   "fieldname": "gis",
+   "fieldtype": "Data",
+   "label": "GIS"
+  },
+  {
+   "fieldname": "dsa_per_day",
+   "fieldtype": "Data",
+   "label": "DSA Per Day"
+  },
+  {
+   "fieldname": "pay_scale_section",
+   "fieldtype": "Section Break",
+   "label": "PAY SCALE"
+  },
+  {
+   "fieldname": "lower_limit",
+   "fieldtype": "Currency",
+   "label": "Lower Limit"
+  },
+  {
+   "fieldname": "column_break_tgfh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "increment_method",
+   "fieldtype": "Select",
+   "label": "Increment Method",
+   "options": "\nLumpsum\nPercent"
+  },
+  {
+   "fieldname": "column_break_hxuk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "increment_value",
+   "fieldtype": "Currency",
+   "label": "Increment Value"
+  },
+  {
+   "fieldname": "column_break_qjhy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "upper_limit",
+   "fieldtype": "Currency",
+   "label": "Upper Limit"
+  },
+  {
+   "fieldname": "promotion_settings_section",
+   "fieldtype": "Section Break",
+   "label": "PROMOTION SETTINGS"
+  },
+  {
+   "fieldname": "noof_years_for_next_promotion",
+   "fieldtype": "Int",
+   "label": "No. of Years For Next Promotion"
+  },
+  {
+   "fieldname": "column_break_adwe",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "allowances_section",
+   "fieldtype": "Section Break",
+   "label": "Allowances"
+  },
+  {
+   "fieldname": "fixed_allowance",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Fixed Allowance"
+  },
+  {
+   "fieldname": "sws_contribution",
+   "fieldtype": "Data",
+   "label": "SWS Contribution"
+  },
+  {
+   "fieldname": "default_leave_policy",
+   "fieldtype": "Link",
+   "label": "Default Leave Policy",
+   "options": "Leave Policy"
+  },
+  {
+   "fieldname": "government_grade",
+   "fieldtype": "Data",
+   "label": "Government Grade"
+  },
+  {
+   "fieldname": "column_break_zzpy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ltc",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "LTC"
+  },
+  {
+   "fieldname": "promotion_grade",
+   "fieldtype": "Link",
+   "label": "Promote To Grade",
+   "options": "Employee Grade"
+  },
+  {
+   "fieldname": "retirement_age",
+   "fieldtype": "Int",
+   "label": "Retirement Age"
+  },
+  {
+   "fieldname": "maximum_grade",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Maximum Grade",
+   "options": "Employee Grade"
+  },
+  {
+   "fieldname": "vegetable_allowance",
+   "fieldtype": "Currency",
+   "label": "Vegetable Allowance"
+  },
+  {
+   "fieldname": "afsa",
+   "fieldtype": "Currency",
+   "label": "AFSA"
+  },
+  {
+   "fieldname": "hra",
+   "fieldtype": "Currency",
+   "label": "HRA"
+  },
+  {
+   "fieldname": "orderly_allowance",
+   "fieldtype": "Currency",
+   "label": "Orderly Allowance"
+  },
+  {
+   "fieldname": "lumpsum_revision",
+   "fieldtype": "Currency",
+   "label": "Lumpsum Revision"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-03-27 13:09:38.976321",
+ "modified": "2025-06-05 11:57:03.688961",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Grade",

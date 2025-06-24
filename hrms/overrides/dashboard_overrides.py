@@ -31,13 +31,8 @@ def get_dashboard_for_employee(data):
 			{
 				"label": _("Payroll"),
 				"items": [
-					"Salary Structure Assignment",
+					"Salary Structure",
 					"Salary Slip",
-					"Additional Salary",
-					"Timesheet",
-					"Employee Incentive",
-					"Retention Bonus",
-					"Bank Account",
 				],
 			},
 			{

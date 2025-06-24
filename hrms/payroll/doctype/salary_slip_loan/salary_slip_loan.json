@@ -6,7 +6,7 @@
  "engine": "InnoDB",
  "field_order": [
   "loan",
-  "loan_product",
+  "loan_type",
   "loan_account",
   "interest_income_account",
   "column_break_4",
@@ -76,11 +76,11 @@
    "read_only": 1
   },
   {
-   "fetch_from": "loan.loan_product",
-   "fieldname": "loan_product",
+   "fetch_from": "loan.loan_type",
+   "fieldname": "loan_type",
    "fieldtype": "Link",
-   "label": "Loan Product",
-   "options": "Loan Product",
+   "label": "Loan Type",
+   "options": "Loan Type",
    "read_only": 1
   }
  ],
