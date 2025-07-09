@@ -125,34 +125,34 @@
    "reqd": 1
   },
   {
+   "fetch_from": "employee.employee_name",
    "fieldname": "employee_name",
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Employee Name",
    "oldfieldname": "employee_name",
-   "oldfieldtype": "Data",
-   "read_only": 1
+   "oldfieldtype": "Data"
   },
   {
+   "fetch_from": "employee.employment_type",
    "fieldname": "employment_type",
    "fieldtype": "Link",
    "label": "Employment Type",
-   "options": "Employment Type",
-   "read_only": 1
+   "options": "Employment Type"
   },
   {
+   "fetch_from": "employee.employee_group",
    "fieldname": "employee_group",
    "fieldtype": "Link",
    "label": "Employee Group",
-   "options": "Employee Group",
-   "read_only": 1
+   "options": "Employee Group"
   },
   {
+   "fetch_from": "employee.grade",
    "fieldname": "employee_grade",
    "fieldtype": "Link",
    "label": "Employee Grade",
-   "options": "Employee Grade",
-   "read_only": 1
+   "options": "Employee Grade"
   },
   {
    "fieldname": "designation",
@@ -161,10 +161,10 @@
    "label": "Designation",
    "oldfieldname": "designation",
    "oldfieldtype": "Select",
-   "options": "Designation",
-   "read_only": 1
+   "options": "Designation"
   },
   {
+   "fetch_from": "employee.company",
    "fieldname": "company",
    "fieldtype": "Link",
    "hidden": 1,
@@ -173,6 +173,7 @@
    "options": "Company"
   },
   {
+   "fetch_from": "employee.branch",
    "fieldname": "branch",
    "fieldtype": "Link",
    "in_filter": 1,
@@ -180,18 +181,17 @@
    "label": "Branch",
    "oldfieldname": "branch",
    "oldfieldtype": "Select",
-   "options": "Branch",
-   "read_only": 1
+   "options": "Branch"
   },
   {
+   "fetch_from": "employee.department",
    "fieldname": "department",
    "fieldtype": "Link",
    "in_filter": 1,
    "label": "Department",
    "oldfieldname": "department",
    "oldfieldtype": "Select",
-   "options": "Department",
-   "read_only": 1
+   "options": "Department"
   },
   {
    "fieldname": "business_activity",
@@ -824,8 +824,7 @@
    "fieldname": "cost_center",
    "fieldtype": "Link",
    "label": "Cost Center",
-   "options": "Cost Center",
-   "read_only": 1
+   "options": "Cost Center"
   },
   {
    "default": "0",
@@ -869,7 +868,7 @@
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2024-08-02 12:07:17.609868",
+ "modified": "2025-07-09 18:00:12.162765",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
