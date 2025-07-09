@@ -14,6 +14,8 @@ from erpnext.setup.doctype.employee.employee import get_holiday_list_for_employe
 from erpnext.utilities.transaction_base import TransactionBase
 from frappe.model.mapper import get_mapped_doc
 from erpnext import get_company_currency
+from datetime import datetime
+
 
 class SalarySlip(TransactionBase):
 	def autoname(self):
@@ -58,7 +60,10 @@ class SalarySlip(TransactionBase):
 			self.set("items", [])   #Added by SHIV on 2018/09/28
 			self.set_month_dates()
 			self.validate_dates()
-			self.yearmonth = str(self.fiscal_year)+str(self.month)
+			
+
+			current_year = datetime.now().year
+			self.yearmonth = str(current_year)+str(self.month)
 			joining_date, relieving_date = frappe.db.get_value("Employee", self.employee, ["date_of_joining", "relieving_date"])
 			struct = self.check_sal_struct(joining_date, relieving_date)
 

@@ -178,6 +178,7 @@ class PayrollEntry(Document):
 				"fiscal_year": self.fiscal_year,
 				"month": self.month
 			})
+			# frappe.throw(str(args))
 			if len(emp_list) > 300:
 				frappe.enqueue(create_salary_slips_for_employees, timeout=600, employees=emp_list, args=args)
 			else:
@@ -780,7 +781,7 @@ class PayrollEntry(Document):
 					v_naming_series = "Journal Voucher"
 				else:
 					v_title         = "To Bank" if i == "to_bank" else i
-					v_voucher_type  = "Bank Entry"
+					v_voucher_type  = "Journal Entry"
 					v_naming_series = "Bank Payment Voucher"
 
 				if v_title:
