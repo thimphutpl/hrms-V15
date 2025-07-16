@@ -22,8 +22,14 @@
   "purpose_of_travel",
   "column_break_xlsv",
   "mode_of_travel",
+  "vehicle_number",
   "section_break_tvvk",
   "items",
+  "section_break_xebq",
+  "need_advance",
+  "column_break_fnha",
+  "estimated_amount",
+  "advance_amount",
   "approver_detial_section",
   "approver",
   "reports_to",
@@ -237,12 +243,45 @@
    "fieldname": "reports_to_name",
    "fieldtype": "Data",
    "label": "Reports to Name"
+  },
+  {
+   "depends_on": "eval:doc.mode_of_travel==\"Office Car\"",
+   "fieldname": "vehicle_number",
+   "fieldtype": "Data",
+   "label": "Vehicle Number",
+   "mandatory_depends_on": "eval:doc.mode_of_travel==\"Office Car\""
+  },
+  {
+   "fieldname": "section_break_xebq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "need_advance",
+   "fieldtype": "Check",
+   "label": "Need Advance"
+  },
+  {
+   "fieldname": "column_break_fnha",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.need_advance",
+   "fieldname": "estimated_amount",
+   "fieldtype": "Currency",
+   "label": "Estimated Amount"
+  },
+  {
+   "depends_on": "eval:doc.need_advance",
+   "fieldname": "advance_amount",
+   "fieldtype": "Currency",
+   "label": "Advance Amount"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-05-28 15:30:03.949206",
+ "modified": "2025-07-15 20:26:29.855357",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",

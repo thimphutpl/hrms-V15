@@ -933,6 +933,7 @@ def get_leave_balance_on(
 	consider_all_leaves_in_the_allocation_period: bool = False,
 	for_consumption: bool = False,
 ):
+#frappe.throw("hi")
 	"""
 	Returns leave balance till date
 	:param employee: employee name
@@ -967,6 +968,7 @@ def get_leave_balance_on(
 
 
 def get_leave_allocation_records(employee, date, leave_type=None):
+	#frappe.throw(leave_type)
 	"""Returns the total allocated leaves and carry forwarded leaves based on ledger entries"""
 	Ledger = frappe.qb.DocType("Leave Ledger Entry")
 	LeaveAllocation = frappe.qb.DocType("Leave Allocation")

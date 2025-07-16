@@ -836,6 +836,7 @@ class PayrollEntry(Document):
 
 	@frappe.whitelist()
 	def make_bank_entry(self):
+		#frappe.throw("hi")
 		"""
 			---------------------------------------------------------------------------------
 			type            Dr            Cr               voucher_type

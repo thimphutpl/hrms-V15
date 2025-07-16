@@ -106,6 +106,7 @@ def make_travel_adjustment(source_name, target_doc=None):
     """
     Create a Travel Adjustment document from a Travel Authorization.
     """
+    #frappe.throw(str(source_name))
     def set_missing_values(source, target):
         """Copy itinerary items from the source Travel Authorization to the target Travel Adjustment."""
         for item in source.get("items"):
@@ -118,7 +119,9 @@ def make_travel_adjustment(source_name, target_doc=None):
             "Travel Authorization": {
                 "doctype": "Travel Adjustment",
                 "field_map": {
-                    "name": "travel_authorization"
+                    "name": "travel_authorization",
+                    "employee":"employee"
+
                 },
                 "validation": {
                     "docstatus": ["=", 1],

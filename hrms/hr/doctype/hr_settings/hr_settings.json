@@ -62,7 +62,7 @@
   "afd",
   "ama",
   "icthr",
-  "internal_audit",
+  "iad",
   "ada",
   "pc",
   "sws",
@@ -70,7 +70,14 @@
   "overtime_settings_tab",
   "overtime_limit_type",
   "column_break_cqkd",
-  "overtime_limit"
+  "overtime_limit",
+  "tb_notifications",
+  "enote_email_templates_section",
+  "enote_approval_notification",
+  "enote_copyto_notification",
+  "column_break_bbgs",
+  "enote_status_notification",
+  "enote_reviewer_notification"
  ],
  "fields": [
   {
@@ -411,12 +418,6 @@
    "options": "Employee"
   },
   {
-   "fieldname": "internal_audit",
-   "fieldtype": "Link",
-   "label": "Internal Audit",
-   "options": "Employee"
-  },
-  {
    "fieldname": "ada",
    "fieldtype": "Link",
    "label": "Asset Declaration Administrator",
@@ -453,13 +454,57 @@
    "fieldname": "overtime_limit",
    "fieldtype": "Int",
    "label": "Overtime Limit In Hrs(Per Day)"
+  },
+  {
+   "fieldname": "tb_notifications",
+   "fieldtype": "Tab Break",
+   "label": "Notification Templates"
+  },
+  {
+   "fieldname": "enote_email_templates_section",
+   "fieldtype": "Section Break",
+   "label": "eNote Email Templates"
+  },
+  {
+   "fieldname": "enote_approval_notification",
+   "fieldtype": "Link",
+   "label": "eNote Approval Notification",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "enote_copyto_notification",
+   "fieldtype": "Link",
+   "label": "eNote CopyTo Notification",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "column_break_bbgs",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "enote_status_notification",
+   "fieldtype": "Link",
+   "label": "eNote Status Notification",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "enote_reviewer_notification",
+   "fieldtype": "Link",
+   "label": "eNote Reviewer Notification",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "iad",
+   "fieldtype": "Link",
+   "label": "Internal Audit",
+   "options": "Employee"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-06-11 13:57:49.785057",
+ "modified": "2025-07-08 15:55:57.270617",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",

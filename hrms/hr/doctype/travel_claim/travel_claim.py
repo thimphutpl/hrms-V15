@@ -63,9 +63,9 @@ class TravelClaim(Document):
 		if self.miscellaneous_amount:
 			self.total_amount += flt(self.miscellaneous_amount)
 
-		for adv in self.get("advances"):
-			advance_amount += flt(adv.advance_amount)
-		self.advance_amount = flt(advance_amount)
+		# for adv in self.get("advances"):
+		# 	advance_amount += flt(adv.advance_amount)
+		# self.advance_amount = flt(advance_amount)
 		self.net_amount = flt(self.total_amount) - flt(self.advance_amount)
 			
 	def get_advance(self):
@@ -204,6 +204,7 @@ def get_travel_claim(dt, dn):
 	tc.employee_name = doc.employee_name
 	tc.travel_type = doc.travel_type
 	tc.purpose_of_travel = doc.purpose_of_travel
+	tc.advance_amount=doc.advance_amount
 	tc.mode_of_travel = doc.mode_of_travel
 	tc.branch = doc.branch
 	tc.cost_center = doc.cost_center
@@ -222,12 +223,18 @@ def get_travel_claim(dt, dn):
 				dsa_international=frappe.get_doc("DSA Out Country",d.country)
 				if not dsa_international:
 					frappe.throw("set Dsa Out Contry")
-
+				grade=False
 				for dsa_int in dsa_international.country_dsa_detail:
+					#frappe.msgprint(str(dsa_int.grade))
 					if dsa_int.grade==employee_grade:
 						item["dsa"] = flt(dsa_int.dsa) * doc.exchange_rate
-					else:
-						frappe.throw("set grade in dsa out country")
+						grade=True
+						break
+					# else:
+					# 	frappe.throw("set grade in dsa out country1")
+
+				if grade==False:
+					frappe.throw("set grade in dsa out country1")
 
 					#frappe.msgprint(str(employee_grade))
 				

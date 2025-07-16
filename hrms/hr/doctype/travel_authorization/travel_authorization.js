@@ -57,6 +57,11 @@ frappe.ui.form.on("Travel Authorization", {
 			}
 		});
 	},
+	// need_advance: function (frm) {
+		
+	// 	frm.toggle_reqd("estimated_amount", frm.doc.need_advance == 1);
+	// 	calculate_advance(frm);
+	// },
 
 	make_travel_claim: function (frm) {
 		let method = "hrms.hr.doctype.travel_claim.travel_claim.get_travel_claim";
@@ -211,3 +216,18 @@ frappe.ui.form.on("Travel Authorization Item", {
 		}
 	},
 });
+// function calculate_advance(frm) {
+// 	frappe.call({
+// 		method: "make_travel_advance",
+// 		doc: frm.doc,
+// 		callback: function(r) {
+// 			if (r.message) {
+// 				const estimated = flt(r.message);
+// 				frm.set_value("estimated_amount", estimated);
+// 			//	frm.set_value("advance_amount", Math.round(estimated * 0.9 * 100) / 100);
+// 				frm.refresh_field("estimated_amount");
+// 				//frm.refresh_field("advance_amount");
+// 			}
+// 		}
+// 	});
+// }

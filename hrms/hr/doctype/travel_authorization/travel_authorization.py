@@ -29,10 +29,13 @@ class TravelAuthorization(Document):
 	def validate(self):
 
 		validate_active_employee(self.employee)
+		
 		self.validate_travel_dates()
 		self.validate_travel_last_day()
 		self.validate_exchange_rate()
 		self.set_status()
+		self.make_travel_advance()
+		self.validate_estimated_amount()
 		validate_workflow_states(self)
 
 	def on_update(self):
@@ -50,6 +53,10 @@ class TravelAuthorization(Document):
 			self.db_set("status", status)
 		else:
 			self.status = status
+
+	def validate_estimated_amount(self):
+		if flt(self.advance_amount) > flt(self.estimated_amount):
+			frappe.throw("your estimate amount is less than advance amount ")
 
 	def validate_travel_dates(self):
 		for item in self.get("items", []):
@@ -166,3 +173,57 @@ class TravelAuthorization(Document):
 			"has_travel_claim": bool(travel_claim)
 		}
 
+
+	#@frappe.whitelist()
+	def make_travel_advance(self):
+		"""
+		Creates a Travel Advance document linked to the given Travel Authorization.
+		"""
+		#frappe.throw(self.employee)
+		
+		#doc = frappe.get_doc(dt, dn)
+		no_of_days=0
+		# #frappe.throw(str(doc.items[0].country))
+		for d in self.items:
+			#frappe.msgprint("hi")
+			if d.is_last_day==1:
+				no_of_day=0
+			else:
+				
+				no_of_day=date_diff(d.to_date, d.from_date) + 1
+			no_of_days+=no_of_day
+
+
+		
+		if self.items:
+			from_date = self.items[0].from_date
+			to_date = self.items[-1].from_date if len(self.items) > 1 else from_date
+
+		employee_grade = frappe.db.get_value("Employee", self.employee, "grade")
+		return_day_dsa = frappe.db.get_single_value("HR Settings", "return_day_dsa")
+		dsa = frappe.db.get_value("Employee Grade", employee_grade, "dsa")
+		#frappe.throw(str(no_of_day))
+
+		if self.travel_type=="International":
+			country=frappe.get_doc("DSA Out Country", self.items[0].country)
+			if not country:
+				frappe.throw("country in not set in DSA OUT Countery")
+			grade=False
+			for dsa_int in country.country_dsa_detail:
+			
+				if dsa_int.grade==employee_grade:
+							
+					dsa = flt(dsa_int.dsa) * self.exchange_rate
+					grade=True
+					break
+
+			if grade==False:
+				frappe.throw("DSa is not net grade")
+		
+		
+		
+		self.estimated_amount = flt(dsa) * flt(no_of_days) + (flt(return_day_dsa) /100 * flt(dsa))
+		#frappe.throw(str(self.estimated_amount))
+		#adv.travel_authorization = doc.name
+
+		#return estimated_amount

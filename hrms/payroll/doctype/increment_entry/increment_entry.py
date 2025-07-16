@@ -326,13 +326,16 @@ def get_existing_salary_increments(employees, args):
 		[args.company, args.fiscal_year, args.month] + employees)
 
 def submit_salary_increments_for_employees(increment_entry, salary_increments, publish_progress=True):
+	#frappe.throw("hi")
 	submitted_si = []
 	not_submitted_si = []
 	frappe.flags.via_increment_entry = True
 
 	count = 0
 	for si in salary_increments:
+		
 		si_obj = frappe.get_doc("Salary Increment",si[0])
+		frappe.throw(str(si_obj))
 		if si_obj.increment<0:
 			not_submitted_si.append(si[0])
 		else:
