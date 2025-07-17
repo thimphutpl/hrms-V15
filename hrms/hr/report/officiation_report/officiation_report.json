@@ -1,0 +1,33 @@
+{
+ "add_total_row": 1,
+ "columns": [],
+ "creation": "2025-07-02 10:40:40.925612",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": "cdcl_default",
+ "letterhead": null,
+ "modified": "2025-07-02 10:40:40.925612",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Officiation Report",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Officiating Employee",
+ "report_name": "Officiation Report",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "GM"
+  },
+  {
+   "role": "HR Manager"
+  }
+ ]
+}

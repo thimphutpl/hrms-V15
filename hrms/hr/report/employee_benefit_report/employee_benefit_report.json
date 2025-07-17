@@ -1,0 +1,45 @@
+{
+ "add_total_row": 1,
+ "columns": [],
+ "creation": "2025-06-30 16:44:13.760187",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": "cdcl_default",
+ "letterhead": null,
+ "modified": "2025-06-30 16:44:13.760187",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Employee Benefit Report",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Employee Benefits",
+ "report_name": "Employee Benefit Report",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "Regional Manager"
+  },
+  {
+   "role": "HR User"
+  },
+  {
+   "role": "Administrator"
+  },
+  {
+   "role": "Approver"
+  },
+  {
+   "role": "HR Manager"
+  },
+  {
+   "role": "Employee"
+  },
+  {
+   "role": "ADM User"
+  }
+ ]
+}
