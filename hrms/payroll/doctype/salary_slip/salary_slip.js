@@ -130,15 +130,15 @@ cur_frm.fields_dict.employee.get_query = function(doc,cdt,cdn) {
 	}
 }
 
-// Added by SHIV on 2018/09/18
-var calculate_others = function(doc){
-	if (doc.employee){
-		cur_frm.call({
-			method: "get_emp_and_leave_details",
-			doc: doc
-		});
-	}
-}
+// // Added by SHIV on 2018/09/18
+// var calculate_others = function(doc){
+// 	if (doc.employee){
+// 		cur_frm.call({
+// 			method: "get_emp_and_leave_details",
+// 			doc: doc
+// 		});
+// 	}
+// }
 
 
 

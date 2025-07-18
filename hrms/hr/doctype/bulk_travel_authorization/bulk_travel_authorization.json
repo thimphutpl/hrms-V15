@@ -18,18 +18,16 @@
   "dsa_per_out_country",
   "travel_purpose_information",
   "travel_type",
-  "training_event",
-  "training_event_child_ref",
-  "place_type",
+  "branch",
   "cost_center",
   "col_break_mode",
   "mode_of_travel",
   "sponsorship",
-  "if_sponsorship_is_others",
-  "branch",
+  "training_event",
   "column_break_btbv",
   "posting_date",
-  "purpose",
+  "if_sponsorship_is_others",
+  "training_event_child_ref",
   "seminar_and_workshop_details_section",
   "topic",
   "column_break_rtdp",
@@ -43,6 +41,7 @@
   "bond_period_to_date",
   "section_break_s22dq",
   "items",
+  "total_claim_days",
   "section_break_20",
   "need_advance",
   "currency",
@@ -51,8 +50,11 @@
   "estimated_amount",
   "advance_amount",
   "base_advance_amount",
-  "section_break_uoui",
+  "section_break_cppo",
+  "companys",
+  "column_break_frdo",
   "branch_name",
+  "section_break_uoui",
   "get_employee",
   "employee_table",
   "amount_detail_section",
@@ -66,11 +68,13 @@
   "section_break_18",
   "journal_entry",
   "end_date_auth",
+  "purpose",
   "column_break_30",
   "company",
   "travel_claim",
   "travel_adjustment",
-  "amended_from"
+  "amended_from",
+  "place_type"
  ],
  "fields": [
   {
@@ -119,6 +123,7 @@
    "read_only": 1
   },
   {
+   "fetch_from": "branch.cost_center",
    "fieldname": "cost_center",
    "fieldtype": "Link",
    "label": "Cost Center",
@@ -174,6 +179,7 @@
    "default": "0",
    "fieldname": "need_advance",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Need Advance?"
   },
   {
@@ -184,6 +190,7 @@
    "default": "BTN",
    "fieldname": "currency",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Currency",
    "options": "Currency"
   },
@@ -243,8 +250,7 @@
    "fieldtype": "Link",
    "label": "Company",
    "options": "Company",
-   "read_only": 1,
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fieldname": "training_event",
@@ -275,22 +281,20 @@
    "label": "If sponsorship is others"
   },
   {
-   "depends_on": "eval:doc.travel_type==\"Training\"",
    "fieldname": "training_information_section",
    "fieldtype": "Section Break",
+   "hidden": 1,
    "label": "Training Information"
   },
   {
    "fieldname": "course_name",
    "fieldtype": "Data",
-   "label": "Course Name",
-   "mandatory_depends_on": "eval:doc.travel_type==\"Training\""
+   "label": "Course Name"
   },
   {
    "fieldname": "training_venue",
    "fieldtype": "Data",
-   "label": "Training Venue",
-   "mandatory_depends_on": "eval:doc.travel_type==\"Training\""
+   "label": "Training Venue"
   },
   {
    "fieldname": "column_break_dzlm",
@@ -300,20 +304,17 @@
    "fieldname": "type_of_training",
    "fieldtype": "Select",
    "label": "Type of Training",
-   "mandatory_depends_on": "eval:doc.travel_type==\"Training\"",
    "options": "\nShort Term\nLong Term\nWorkshop\nSeminar"
   },
   {
    "fieldname": "bond_period_from_date",
    "fieldtype": "Date",
-   "label": "Bond Period From Date",
-   "mandatory_depends_on": "eval:doc.travel_type==\"Training\""
+   "label": "Bond Period From Date"
   },
   {
    "fieldname": "bond_period_to_date",
    "fieldtype": "Date",
-   "label": "Bond Period To Date",
-   "mandatory_depends_on": "eval:doc.travel_type==\"Training\""
+   "label": "Bond Period To Date"
   },
   {
    "depends_on": "eval:doc.travel_type==\"Meeting and Seminars\"",
@@ -436,11 +437,13 @@
   {
    "fieldname": "exchange_rate",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Exchange Rate"
   },
   {
    "fieldname": "section_break_uoui",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "DSA Details"
   },
   {
    "default": "0",
@@ -449,6 +452,7 @@
    "label": "Get employee"
   },
   {
+   "allow_bulk_edit": 1,
    "fieldname": "employee_table",
    "fieldtype": "Table",
    "options": "Bulk Travel Authorization Item"
@@ -468,15 +472,36 @@
    "fetch_from": "employee.branch",
    "fieldname": "branch_name",
    "fieldtype": "Link",
-   "in_list_view": 1,
+   "hidden": 1,
    "label": "Branch",
    "options": "Branch"
+  },
+  {
+   "fieldname": "section_break_cppo",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_frdo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "companys",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "total_claim_days",
+   "fieldtype": "Float",
+   "label": "Total Claim Days",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-24 11:12:37.925804",
+ "modified": "2025-07-16 14:06:20.970983",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Bulk Travel Authorization",

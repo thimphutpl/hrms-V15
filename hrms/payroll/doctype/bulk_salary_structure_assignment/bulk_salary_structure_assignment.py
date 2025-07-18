@@ -96,10 +96,10 @@ class BulkSalaryStructureAssignment(Document):
 				)
 			except Exception:
 				frappe.db.rollback(save_point=savepoint)
-				frappe.log_error(
-					f"Bulk Assignment - Salary Structure Assignment failed for employee {d['employee']}.",
-					reference_doctype="Salary Structure Assignment",
-				)
+				# frappe.log_error(
+				# 	f"Bulk Assignment - Salary Structure Assignment failed for employee {d['employee']}.",
+				# 	reference_doctype="Salary Structure Assignment",
+				# )
 				failure.append(d["employee"])
 			else:
 				success.append(

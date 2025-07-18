@@ -86,6 +86,7 @@
    "search_index": 1
   },
   {
+   "fetch_from": "employee.employee_name",
    "fieldname": "employee_name",
    "fieldtype": "Read Only",
    "in_filter": 1,
@@ -142,19 +143,19 @@
    "fieldname": "branch",
    "fieldtype": "Link",
    "in_filter": 1,
+   "in_list_view": 1,
    "label": "Branch",
    "oldfieldname": "branch",
    "oldfieldtype": "Link",
-   "options": "Branch",
-   "read_only": 1
+   "options": "Branch"
   },
   {
+   "fetch_from": "branch.cost_center",
    "fieldname": "cost_center",
    "fieldtype": "Link",
    "label": "Cost Center",
    "options": "Cost Center",
-   "read_only": 1,
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fieldname": "department",
@@ -561,7 +562,7 @@
  "idx": 9,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-08-02 11:33:55.383647",
+ "modified": "2025-07-02 19:31:45.129591",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Slip",

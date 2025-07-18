@@ -224,34 +224,25 @@ frappe.ui.form.on("Bulk Travel Authorization", {
 	},
 });
 
+// client‑side
 function calculate_amounts(frm) {
-    // Get all items and employees
-    let items = frm.doc.items || [];
-    let employees = frm.doc.employee_table || [];
-    
-    if (!items.length || !employees.length) {
-        frappe.msgprint(__("Please add both Travel Items and Employees first"));
-        return;
-    }
-    
-    // Create a map of number_of_days by travel item
-    let days_map = {};
-    items.forEach(item => {
-        days_map[item.name] = item.no_days || 0;
-    });
-    
-    // Calculate amounts for each employee
-    employees.forEach(emp => {
-        let total_amount = 0;
-        items.forEach(item => {
-            total_amount += (days_map[item.name] || 0) * (emp.dsa_per_day || 0);
-        });
-        frappe.model.set_value(emp.doctype, emp.name, 'amount', total_amount);
-    });
-    
-    frm.refresh_field('employee_table');
-    frappe.show_alert(__("Amounts calculated successfully"));
+	const items      = frm.doc.items || [];
+	const employees  = frm.doc.employee_table || [];
+	if (!items.length || !employees.length) return;
+
+	const total_days = items.reduce((n, i) => n + flt(i.no_days || 0), 0);
+
+	employees.forEach(emp => {
+		const days   = flt(emp.number_of_days || total_days);
+		const amount = flt(emp.dsa_per_day || 0) * days;
+		frappe.model.set_value(emp.doctype, emp.name, "amount", amount);
+	});
+
+	frm.refresh_field("employee_table");
+	update_total_amount(frm);
 }
+
+
 
 function update_total_amount(frm) {
     let total = 0;

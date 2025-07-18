@@ -13,7 +13,8 @@
   "division",
   "column_break_ngpk",
   "dsa_per_day",
-  "amount"
+  "amount",
+  "number_of_days"
  ],
  "fields": [
   {
@@ -65,12 +66,18 @@
    "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "Amount"
+  },
+  {
+   "fieldname": "number_of_days",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Number of Days"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-06-19 14:32:59.244737",
+ "modified": "2025-07-15 12:27:39.779662",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Bulk Travel Authorization Item",

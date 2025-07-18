@@ -30,6 +30,7 @@ class BulkTravelAuthorization(Document):
 			self.update_training_event()
 		# if self.workflow_state != "Approved":
 		# 	notify_workflow_states(self)
+		self.update_amounts()
 
 	def on_update(self):
 		self.check_date_overlap()
@@ -39,8 +40,8 @@ class BulkTravelAuthorization(Document):
 		# notify_workflow_states(self)
 		# self.create_attendance()
 		self.post_journal_entry()
-		if self.travel_type=="Training":
-			self.update_training_records()
+		# if self.travel_type=="Training":
+		# 	self.update_training_records()
 
 	def on_cancel(self):
 		self.ignore_linked_doctypes = (
@@ -72,21 +73,40 @@ class BulkTravelAuthorization(Document):
 			item.no_days   = date_diff(to_date, from_date) + 1
 
 			item.dsa_nu_per_day = flt(item.dsa) * flt(item.exchange_rate)
-			item.total_dsa = flt(item.dsa_nu_per_day) * flt(item.no_days)
-
+			item.total_dsa = flt(item.dsa_nu_per_day) * flt(item.no_days)	
+	
+	# def calculate_amounts(self):
+	# 	"""Calculate amounts for all employees based on travel items.
+	# 	If employee has number_of_days, use that, otherwise use item's no_days."""
+	# 	if not self.items or not self.employee_table:
+	# 		return
+			
+	# 	for employee in self.employee_table:
+	# 		total_amount = 0.0  
+	# 		for item in self.items:
+	# 			days = float(employee.number_of_days) if (
+	# 				hasattr(employee, 'number_of_days') and 
+	# 				employee.number_of_days not in [None, ""]
+	# 			) else float(item.no_days)
+	# 			frappe.throw(str(days))
+	# 			dsa = float(employee.dsa_per_day or 0)
+				
+	# 			total_amount += days * dsa
+		
+	# 		employee.amount = round(total_amount)
+	
+	# server‑side
 	def calculate_amounts(self):
-		"""Calculate amounts for all employees based on travel items"""
 		if not self.items or not self.employee_table:
 			return
-			
-		# Create a dictionary of number_of_days by travel item
-		days_by_item = {item.name: (item.no_days or 0) for item in self.items}
-		
+
+		total_days_all_items = sum(flt(i.no_days) for i in self.items)
+
 		for employee in self.employee_table:
-			total_amount = 0
-			for item in self.items:
-				total_amount += days_by_item[item.name] * (employee.dsa_per_day or 0)
-			employee.amount = total_amount	
+			dsa  = flt(employee.dsa_per_day or 0)
+			days = flt(employee.number_of_days) if employee.number_of_days not in (None, "", 0) else total_days_all_items
+			employee.amount = round(days * dsa, 2)
+
 
 	def calculate_total_travel_amount(self):
 		"""Sum all employee amounts to update total_travel_amount"""
@@ -174,11 +194,43 @@ class BulkTravelAuthorization(Document):
 	# 	if ta:
 	# 		frappe.throw("""There is Travel Claim <a href="#Form/Travel%20Claim/{0}"><b>{0}</b></a> linked to this Travel Authorization""".format(ta[0][0]))
 
+	# def update_amounts(self):
+	# 	if self.grade:
+	# 		dsa_per_day=frappe.db.get_value("Employee Grade", self.grade, "dsa_per_day")
+	# 		#frappe.throw(dsa_per_day)
+	# 	# lastday_dsa_percent = flt(frappe.db.get_single_value("HR Settings", "return_day_dsa")) 
+	# 	total_travel_amount, diff = 0, 0
+		
+	# 	total_claim_days = 0
+	# 	for item in self.get("items"):
+	# 		#item.total_dsa=dsa_per_day
+	# 		#frappe.msgprint(str(flt(item.days_allocated)))
+	# 		item.dsa = flt(item.total_dsa)
+	# 		if item.is_last_day or flt(item.days_allocated)==0.0:
+	# 			item.dsa_percent = flt(lastday_dsa_percent)
+	# 		item.mileage_amount=flt(item.mileage_rate) * flt(item.distance)
+	# 		#item.amount = (flt(flt(item.dsa) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
+	# 		item.amount = (flt((flt(item.days_allocated)*flt(dsa_per_day)) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
+	# 		total_claim_days += flt(item.days_allocated)
+	# 		item.base_amount = flt(item.amount)
+	# 		total_travel_amount += flt(item.base_amount)
+		
+	# 	self.total_travel_amount = flt(total_travel_amount) + flt(self.extra_claim_amount)
+	# 	self.total_claim_days = flt(total_claim_days)
+	# 	diff = (flt(self.total_travel_amount) - flt(self.advance_amount))
+
+	# 	if flt(diff) > 0:
+	# 		self.total_travel_amount = flt(diff)
+	# 		self.refundable_amount = 0
+	# 	else:
+	# 		self.refundable_amount = -1 * flt(diff)
+	# 		self.total_travel_amount = 0
+
 	def update_amounts(self):
 		if self.grade:
 			dsa_per_day=frappe.db.get_value("Employee Grade", self.grade, "dsa_per_day")
 			#frappe.throw(dsa_per_day)
-		lastday_dsa_percent = flt(frappe.db.get_single_value("HR Settings", "return_day_dsa")) 
+		# lastday_dsa_percent = flt(frappe.db.get_single_value("HR Settings", "return_day_dsa")) 
 		total_travel_amount, diff = 0, 0
 		
 		total_claim_days = 0
@@ -186,16 +238,16 @@ class BulkTravelAuthorization(Document):
 			#item.total_dsa=dsa_per_day
 			#frappe.msgprint(str(flt(item.days_allocated)))
 			item.dsa = flt(item.total_dsa)
-			if item.is_last_day or flt(item.days_allocated)==0.0:
-				item.dsa_percent = flt(lastday_dsa_percent)
-			item.mileage_amount=flt(item.mileage_rate) * flt(item.distance)
-			#item.amount = (flt(flt(item.dsa) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
-			item.amount = (flt((flt(item.days_allocated)*flt(dsa_per_day)) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
-			total_claim_days += flt(item.days_allocated)
-			item.base_amount = flt(item.amount)
-			total_travel_amount += flt(item.base_amount)
+			# if flt(item.no_days)==0.0:
+				# item.dsa_percent = flt(lastday_dsa_percent)
+			# item.mileage_amount=flt(item.mileage_rate) * flt(item.distance)
+			##item.amount = (flt(flt(item.dsa) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
+			# item.amount = (flt((flt(item.no_days)*flt(dsa_per_day)) * flt(item.dsa_percent) / 100) + flt(item.mileage_rate) * flt(item.distance))
+			total_claim_days += flt(item.no_days)
+			# item.base_amount = flt(item.amount)
+		# 	total_travel_amount += flt(item.base_amount)
 		
-		self.total_travel_amount = flt(total_travel_amount) + flt(self.extra_claim_amount)
+		# self.total_travel_amount = flt(total_travel_amount) + flt(self.extra_claim_amount)
 		self.total_claim_days = flt(total_claim_days)
 		diff = (flt(self.total_travel_amount) - flt(self.advance_amount))
 
@@ -204,7 +256,7 @@ class BulkTravelAuthorization(Document):
 			self.refundable_amount = 0
 		else:
 			self.refundable_amount = -1 * flt(diff)
-			self.total_travel_amount = 0
+			self.total_travel_amount = 0		
 
 	def get_monthly_count(self, items):
 		counts = {}
@@ -364,7 +416,6 @@ class BulkTravelAuthorization(Document):
 				"credit_in_account_currency": flt(self.advance_amount),
 				"credit": flt(self.advance_amount),
 			})
-
 		je.insert()
 		je.submit()
 
@@ -405,27 +456,27 @@ class BulkTravelAuthorization(Document):
 				})
 			je.insert()		
 		
-	def update_training_records(self, cancel=False):
-		emp_doc=frappe.get_doc("Employee", self.employee)
-		if cancel:
-			for child_d in emp_doc.get_all_children():
-				if child_d.doctype=='Training Records':
-					if child_d.from_date==self.from_date and child_d.to_date==self.to_date:
-						frappe.db.sql("delete from `tabTraining Records` where name = '{}'".format(child_d.name))
+	# def update_training_records(self, cancel=False):
+	# 	emp_doc=frappe.get_doc("Employee", self.employee)
+	# 	if cancel:
+	# 		for child_d in emp_doc.get_all_children():
+	# 			if child_d.doctype=='Training Records':
+	# 				if child_d.from_date==self.from_date and child_d.to_date==self.to_date:
+	# 					frappe.db.sql("delete from `tabTraining Records` where name = '{}'".format(child_d.name))
 	
-		else:
-			emp_doc.append("train_record",{
-				"from_date": self.from_date,
-				"to_date": self.to_date,
-				"training_name": self.course_name,
-				"training_venue": self.training_venue,
-				"type_of_training": self.type_of_training,
-				"bond_period_from_date": self.bond_period_from_date,
-				"bond_period_to_date": self.bond_period_to_date
+	# 	else:
+	# 		emp_doc.append("train_record",{
+	# 			"from_date": self.from_date,
+	# 			"to_date": self.to_date,
+	# 			"training_name": self.course_name,
+	# 			"training_venue": self.training_venue,
+	# 			"type_of_training": self.type_of_training,
+	# 			"bond_period_from_date": self.bond_period_from_date,
+	# 			"bond_period_to_date": self.bond_period_to_date
 
-			})
-			emp_doc.flags.ignore_permissions = 1
-			emp_doc.save()
+	# 		})
+	# 		emp_doc.flags.ignore_permissions = 1
+	# 		emp_doc.save()
 
 	def update_training_event(self, cancel = False):
 		if not cancel:
