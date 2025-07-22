@@ -214,8 +214,7 @@
    "fieldname": "business_activity",
    "fieldtype": "Link",
    "label": "Business Activity",
-   "options": "Business Activity",
-   "reqd": 1
+   "options": "Business Activity"
   },
   {
    "fieldname": "travel_details",
@@ -322,7 +321,7 @@
   {
    "fieldname": "purpose",
    "fieldtype": "Long Text",
-   "label": "Purpose",
+   "label": "Travel Purpose",
    "reqd": 1
   },
   {
@@ -509,7 +508,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-10-07 16:45:16.761660",
+ "modified": "2025-07-22 15:12:23.946121",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",
