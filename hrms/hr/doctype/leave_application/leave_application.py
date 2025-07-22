@@ -814,42 +814,99 @@ def get_allocation_expiry_for_cf_leaves(
 	).run()
 	return expiry[0][0] if expiry else ""
 
+
 @frappe.whitelist()
 def get_number_of_leave_days(
-	employee: str,
-	leave_type: str,
-	from_date: datetime.date,
-	to_date: datetime.date,
-	half_day: int | str | None = None,
-	half_day_date: datetime.date | str | None = None,
-	holiday_list: str | None = None,
+    employee: str,
+    leave_type: str,
+    from_date: datetime.date,
+    to_date: datetime.date,
+    half_day: int | str | None = None,
+    half_day_date: datetime.date | str | None = None,
+    holiday_list: str | None = None,
 ) -> float:
-	"""Returns number of leave days between 2 dates after considering half day and holidays.
-	Holidays are included only for specific leave types: Casual Leave, Earn Leave, and Bereavement Leave.
-	For all other leave types, holidays are excluded."""
-	   
-	if from_date > to_date:
-		frappe.throw("From Date cannot be greater than To Date") 
+    """Returns number of leave days between 2 dates after considering half day and holidays.
+    For Paternity Leave, excludes all Saturdays, Sundays, and holidays (no double counting)."""
 
-	half_day = cint(half_day)
-	# Calculate total days
-	if half_day == 1:
-		if getdate(from_date) == getdate(to_date):
-			number_of_days = 0.5
-		elif half_day_date and getdate(from_date) <= getdate(half_day_date) <= getdate(to_date):
-			number_of_days = date_diff(to_date, from_date) + 0.5
-		else:
-			number_of_days = date_diff(to_date, from_date) + 1
-	else:
-		number_of_days = date_diff(to_date, from_date) + 1
-	# Leave types that include holidays
-	leave_types_with_holidays = ["Casual Leave", "Earned Leave", "Bereavement Leave", "GCE Casual Leave", "Paternity Leave"]
-	if leave_type in leave_types_with_holidays:		
-		if leave_type == "Bereavement Leave":
-			holiday_list = frappe.db.get_value("Branch", "GI - Head Office", "holiday_list")
-		holidays = get_holidays(employee, from_date, to_date, holiday_list=holiday_list)
-		number_of_days = flt(number_of_days) - flt(holidays)
-	return number_of_days
+    from datetime import timedelta
+
+    if from_date > to_date:
+        frappe.throw("From Date cannot be greater than To Date") 
+
+    half_day = cint(half_day)
+    if half_day == 1:
+        if getdate(from_date) == getdate(to_date):
+            number_of_days = 0.5
+        elif half_day_date and getdate(from_date) <= getdate(half_day_date) <= getdate(to_date):
+            number_of_days = date_diff(to_date, from_date) + 0.5
+        else:
+            number_of_days = date_diff(to_date, from_date) + 1
+    else:
+        number_of_days = date_diff(to_date, from_date) + 1
+
+    leave_types_with_holidays = [
+        "Casual Leave", "Earned Leave", "Bereavement Leave",
+        "GCE Casual Leave", "Paternity Leave"
+    ]
+
+    def get_holiday_dates(from_date, to_date, holiday_list):
+        holiday_dates = set()
+        if not holiday_list:
+            return holiday_dates
+        filters = {
+            "parent": holiday_list,
+            "holiday_date": ["between", [from_date, to_date]]
+        }
+        for h in frappe.get_all("Holiday", filters=filters, fields=["holiday_date"]):
+            holiday_dates.add(getdate(h.holiday_date))
+        return holiday_dates
+
+    if leave_type in leave_types_with_holidays:
+        if leave_type == "Bereavement Leave":
+            holiday_list = frappe.db.get_value("Branch", "GI - Head Office", "holiday_list")
+
+        if leave_type == "Paternity Leave":
+            # Auto-detect holiday_list if not provided
+            if not holiday_list:
+                holiday_list = frappe.db.get_value("Employee", employee, "holiday_list")
+                if not holiday_list:
+                    branch = frappe.db.get_value("Employee", employee, "branch")
+                    holiday_list = frappe.db.get_value("Branch", branch, "holiday_list")
+
+            start = getdate(from_date)
+            end = getdate(to_date)
+            weekends = set()
+            current = start
+            while current <= end:
+                if current.weekday() in [5, 6]:
+                    weekends.add(current)
+                current += timedelta(days=1)
+            holiday_dates = get_holiday_dates(from_date, to_date, holiday_list)
+            exclude_dates = weekends.union(holiday_dates)
+            leave_days = 0
+            current = start
+            while current <= end:
+                if current not in exclude_dates:
+                    leave_days += 1
+                current += timedelta(days=1)
+            # Handle half day for paternity leave
+            if half_day == 1:
+                if getdate(from_date) == getdate(to_date):
+                    if getdate(from_date) not in exclude_dates:
+                        leave_days = 0.5
+                    else:
+                        leave_days = 0
+                elif half_day_date and getdate(from_date) <= getdate(half_day_date) <= getdate(to_date):
+                    if getdate(half_day_date) not in exclude_dates:
+                        leave_days -= 0.5
+            number_of_days = leave_days
+
+        else:
+            holidays = get_holidays(employee, from_date, to_date, holiday_list=holiday_list)
+            number_of_days = flt(number_of_days) - flt(holidays)
+
+    return number_of_days
+
 
 @frappe.whitelist()
 def get_leave_details(employee, date):
