@@ -87,6 +87,7 @@
   {
    "fieldname": "employee",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Employee",
    "mandatory_depends_on": "eval: doc.workflow_state != \"Draft\"",
    "options": "Employee"
@@ -152,7 +153,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-05-09 10:20:06.021262",
+ "modified": "2025-07-23 11:39:34.182403",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "DAK Receipt Register",
