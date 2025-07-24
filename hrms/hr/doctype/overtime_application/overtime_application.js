@@ -75,24 +75,25 @@ frappe.ui.form.on("Overtime Application Item", {
 		if(child.to_date && child.from_date) {
 			frappe.model.set_value(cdt, cdn, "number_of_hours", hours);
 		}
-		if (frm.doc.employee) {
-			frappe.call({
-				method: "erpnext.setup.doctype.employee.employee.get_overtime_rate",
-				args: {
-					employee: frm.doc.employee,
-					posting_date:child.from_date,
-					is_late_night_ot: child.is_late_night_ot || 0,
-					is_holiday: child.is_holiday || 0
-				},
-				callback: function(r) {
-					if(r.message) {
-						frm.set_value("rate", r.message)
-						frappe.model.set_value(cdt, cdn, "rate", r.message);
+		update_overtime_rate(frm, cdt, cdn);
+		// if (frm.doc.employee) {
+		// 	frappe.call({
+		// 		method: "erpnext.setup.doctype.employee.employee.get_overtime_rate",
+		// 		args: {
+		// 			employee: frm.doc.employee,
+		// 			posting_date:child.from_date,
+		// 			is_late_night_ot: child.is_late_night_ot ? 1 : 0,
+		// 			is_holiday: child.is_holiday ? 1 : 0
+		// 		},
+		// 		callback: function(r) {
+		// 			if(r.message) {
+		// 				frm.set_value("rate", r.message)
+		// 				frappe.model.set_value(cdt, cdn, "rate", r.message);
 						
-					}
-				}
-			})
-		}
+		// 			}
+		// 		}
+		// 	})
+		// }
 	},
 	
 	"to_date": function(frm, cdt, cdn) {
@@ -107,8 +108,37 @@ frappe.ui.form.on("Overtime Application Item", {
 	items_remove: function(frm, cdt, cdn) {
 		calculate_time(frm, cdt, cdn);
 	},
+	"is_late_night_ot": function(frm, cdt, cdn) {
+		update_overtime_rate(frm, cdt, cdn);
+	},
+
+	"is_holiday": function(frm, cdt, cdn) {
+		update_overtime_rate(frm, cdt, cdn);
+	},
 	
 })
+
+function update_overtime_rate(frm, cdt, cdn) {
+	const child = locals[cdt][cdn];
+	if (frm.doc.employee && child.from_date) {
+		frappe.call({
+			method: "erpnext.setup.doctype.employee.employee.get_overtime_rate",
+			args: {
+				employee: frm.doc.employee,
+				posting_date: child.from_date,
+				is_late_night_ot: child.is_late_night_ot ? 1 : 0,
+				is_holiday: child.is_holiday ? 1 : 0
+			},
+			callback: function(r) {
+				if (r.message) {
+						frm.set_value("rate", r.message)
+						frappe.model.set_value(cdt, cdn, "rate", r.message);
+					
+				}
+			}
+		});
+	}
+}
 function calculate_amount(frm, cdt, cdn){
 	let row = locals[cdt][cdn]
 	if (row.number_of_hours && row.rate){
