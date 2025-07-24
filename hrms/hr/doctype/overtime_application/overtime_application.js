@@ -80,12 +80,15 @@ frappe.ui.form.on("Overtime Application Item", {
 				method: "erpnext.setup.doctype.employee.employee.get_overtime_rate",
 				args: {
 					employee: frm.doc.employee,
-					posting_date:child.from_date
+					posting_date:child.from_date,
+					is_late_night_ot: child.is_late_night_ot || 0,
+					is_holiday: child.is_holiday || 0
 				},
 				callback: function(r) {
 					if(r.message) {
 						frm.set_value("rate", r.message)
 						frappe.model.set_value(cdt, cdn, "rate", r.message);
+						
 					}
 				}
 			})

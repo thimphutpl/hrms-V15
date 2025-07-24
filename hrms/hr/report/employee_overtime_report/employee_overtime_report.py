@@ -57,20 +57,21 @@ def get_columns(filters):
 			"width": 150,
 		},
 		{
-			"fieldname": "hrs",
-			"fieldtype": "Dataq",
-			"label": ("No of hours"),
+			"fieldname": "hours",
+			"fieldtype": "Data",
+			"label": ("No of Hours"),
+			"width": 150,
+		},
+	
+		{
+			"fieldname": "normal_rate",
+			"fieldtype": "Data",
+			"label": ("Hourly rate"),
 			"width": 150,
 		},
 		{
-			"fieldname": "normal_ot_type",
-			"label": "Normal Hours",
-			"fieldtype": "Data", 
-			"width": 120
-		},
-		{
-			"fieldname": "special_ot_type",
-			"label": "Special Hours",
+			"fieldname": "type_of_ot",
+			"label": "Type of OT",
 			"fieldtype": "Data", 
 			"width": 120
 		},
@@ -81,12 +82,6 @@ def get_columns(filters):
 			"label": ("Amount"),
 			"width": 150,
 		},
-		{
-			"fieldname": "total_amount",
-			"fieldtype": "Currency",
-			"label": ("Total Amount"),
-			"width": 150
-		}
 		
 	]
 
@@ -94,18 +89,21 @@ def get_columns(filters):
 def get_data(filters):
 	query ="""
 		select ota.employee,ota.employee_name,ota.name,e.cost_center,otad.date,otad.from_date,otad.to_date,
-		TIMESTAMPDIFF(MINUTE, otad.from_date, otad.to_date)/60 AS hrs,
-	
+		CASE
+			WHEN otad.is_late_night_ot = 1 OR otad.is_holiday = 1 THEN otad.number_of_hours
+			WHEN otad.is_late_night_ot = 0 AND otad.is_holiday = 0 THEN otad.number_of_hours
+			ELSE 0
+		END AS hours,
+		CASE
+			WHEN otad.is_late_night_ot = 1 OR otad.is_holiday = 1 THEN otad.rate
+			WHEN otad.is_late_night_ot = 0 AND otad.is_holiday = 0 THEN otad.rate
+			ELSE 0
+		END AS number_rate,
 		CASE 
-			WHEN otad.is_late_night_ot = 0 THEN 'Normal'
-			ELSE NULL
-		END AS normal_ot_type,
-		CASE 
-			WHEN otad.is_late_night_ot = 1 THEN 'Special'
-			ELSE NULL
-		END AS special_ot_type,
-		ota.total_amount,
-		otad.amount
+			WHEN otad.is_late_night_ot = 1 OR otad.is_holiday = 1 THEN 'Special'
+    		ELSE 'Normal'
+		END AS type_of_ot,
+        otad.amount
 		from `tabOvertime Application Item` otad 
 		Join `tabOvertime Application` ota On otad.parent=ota.name 
 		Join `tabEmployee` e On ota.employee=e.name 

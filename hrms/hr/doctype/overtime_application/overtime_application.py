@@ -9,12 +9,12 @@ from erpnext.custom_workflow import validate_workflow_states, notify_workflow_st
 from datetime import datetime
 class OvertimeApplication(Document):
 	def validate(self):
-		# validate_workflow_states(self)
+		validate_workflow_states(self)
 		self.validate_dates()
 		self.calculate_totals()
 		self.validate_eligible_creteria()
-		# if self.workflow_state != "Approved":
-		# 	notify_workflow_states(self)
+		if self.workflow_state != "Approved":
+			notify_workflow_states(self)
 		self.processed = 0
 		self.validate_total_claim_amount()
 	
@@ -38,13 +38,17 @@ class OvertimeApplication(Document):
 		overtime_limit_type, overtime_limit = settings.overtime_limit_type, flt(settings.overtime_limit)
 		total_amount = 0
 		total_hours = 0
+		base_hourly_rate = None
+		
 		for i in self.get("items"):
 			if i.is_holiday:
 				i.is_late_night_ot = 0
-			i.rate = self.rate
+			if not i.is_late_night_ot and not i.is_holiday and not base_hourly_rate:
+				base_hourly_rate = flt(i.rate)	
+			# i.rate = self.rate
 			if i.is_late_night_ot or i.is_holiday:
 				i.number_of_hours    = flt(time_diff_in_hours(i.to_date, i.from_date),2)
-				i.amount             = flt(i.number_of_hours) * flt(flt(i.rate) * 1.5)
+				i.amount             = flt(i.number_of_hours) * flt(flt(i.rate))
 			else:
 				i.number_of_hours    = flt(time_diff_in_hours(i.to_date, i.from_date),2)
 				i.amount             = flt(i.number_of_hours) * flt(i.rate)
@@ -61,6 +65,8 @@ class OvertimeApplication(Document):
 			# 	month_start_date = add_to_date(i.to_date, years=-1)
 			# i.amount = flt(i.rate) * flt(i.number_of_hours)
 			total_amount += i.amount
+			
+			
 		self.actual_hours = flt(total_hours)
 		# if flt(total_hours) > flt(overtime_limit):
 		# 	frappe.throw(_("Only {} hours accepted for payment").format(overtime_limit))
@@ -70,6 +76,9 @@ class OvertimeApplication(Document):
 		self.total_hours = flt(self.actual_hours)
 		self.total_amount = round(total_amount,0)
 		self.actual_amount = round(total_amount,0)
+		if base_hourly_rate:
+			self.rate = round(base_hourly_rate, 0)
+		# self.rate = round(total_rate, 0)
 
 	def on_cancel(self):
 		# notify_workflow_states(self)
@@ -125,13 +134,18 @@ class OvertimeApplication(Document):
 			for b in self.items:
 				if a.date == b.date and a.idx != b.idx:
 					time_format = "%H:%M:%S"
-					start1 = datetime.strptime(a.from_time, time_format)
-					end1 = datetime.strptime(a.to_time, time_format)
-					start2 = datetime.strptime(b.from_time, time_format)
-					end2 = datetime.strptime(b.to_time, time_format)
+					# start1 = datetime.strptime(a.from_date, time_format)
+					# end1 = datetime.strptime(a.to_date, time_format)
+					# start2 = datetime.strptime(b.from_date, time_format)
+					# end2 = datetime.strptime(b.to_date, time_format)
+					start1 = datetime.strptime(str(a.from_date), time_format)
+					end1 = datetime.strptime(str(a.to_date), time_format)
+					start2 = datetime.strptime(str(b.from_date), time_format)
+					end2 = datetime.strptime(str(b.to_date), time_format)
+
 					#frappe.throw("{}, {}, {} and {},{},{}".format(start2,start1,end2,start2,end1,end2))
-					if start2 <= start1 <= end2 or start2 <= end1 <= end2:
-						frappe.throw("Duplicate Dates in row " + str(a.idx) + " and " + str(b.idx))
+					# if start2 <= start1 <= end2 or start2 <= end1 <= end2:
+					# 	frappe.throw("Duplicate Dates in row " + str(a.idx) + " and " + str(b.idx))
 
 def get_permission_query_conditions(user):
 	if not user: user = frappe.session.user
