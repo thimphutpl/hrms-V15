@@ -103,66 +103,68 @@ class TravelAdvance(Document):
 			frappe.msgprint(_('{} posted to accounts').format(frappe.get_desk_link(je.doctype,je.name)))
 
 
-@frappe.whitelist()
-def make_travel_advance(dt, dn):
-	"""
-	Creates a Travel Advance document linked to the given Travel Authorization.
-	"""
-	# frappe.throw("hi")
-	doc = frappe.get_doc(dt, dn)
-	no_of_days=0
-	#frappe.throw(str(doc.items[0].country))
-	for d in doc.items:
-		if d.is_last_day==1:
-			no_of_day=0
-		else:
+#@frappe.whitelist()
+#def make_travel_advance(dt, dn):
+def make_travel_advance():
+	print("hi pem")
+	# """
+	# Creates a Travel Advance document linked to the given Travel Authorization.
+	# """
+	# # frappe.throw("hi")
+	# doc = frappe.get_doc(dt, dn)
+	# no_of_days=0
+	# #frappe.throw(str(doc.items[0].country))
+	# for d in doc.items:
+	# 	if d.is_last_day==1:
+	# 		no_of_day=0
+	# 	else:
 			
-			no_of_day=date_diff(d.to_date, d.from_date) + 1
-		no_of_days+=no_of_day
+	# 		no_of_day=date_diff(d.to_date, d.from_date) + 1
+	# 	no_of_days+=no_of_day
 
 
 	
-	if doc.items:
-		from_date = doc.items[0].from_date
-		to_date = doc.items[-1].from_date if len(doc.items) > 1 else from_date
+	# if doc.items:
+	# 	from_date = doc.items[0].from_date
+	# 	to_date = doc.items[-1].from_date if len(doc.items) > 1 else from_date
 
-	employee_grade = frappe.db.get_value("Employee", doc.employee, "grade")
-	return_day_dsa = frappe.db.get_single_value("HR Settings", "return_day_dsa")
-	dsa = frappe.db.get_value("Employee Grade", employee_grade, "dsa")
+	# employee_grade = frappe.db.get_value("Employee", doc.employee, "grade")
+	# return_day_dsa = frappe.db.get_single_value("HR Settings", "return_day_dsa")
+	# dsa = frappe.db.get_value("Employee Grade", employee_grade, "dsa")
 
 
-	if doc.travel_type=="International":
-		country=frappe.get_doc("DSA Out Country", doc.items[0].country)
-		if not country:
-			frappe.throw("country in not set in DSA OUT Countery")
-		grade=False
-		for dsa_int in country.country_dsa_detail:
+	# if doc.travel_type=="International":
+	# 	country=frappe.get_doc("DSA Out Country", doc.items[0].country)
+	# 	if not country:
+	# 		frappe.throw("country in not set in DSA OUT Countery")
+	# 	grade=False
+	# 	for dsa_int in country.country_dsa_detail:
 		
-			if dsa_int.grade==employee_grade:
+	# 		if dsa_int.grade==employee_grade:
 						
-				dsa = flt(dsa_int.dsa) * doc.exchange_rate
-				grade=True
-				break
+	# 			dsa = flt(dsa_int.dsa) * doc.exchange_rate
+	# 			grade=True
+	# 			break
 
-		if grade==False:
-			frappe.throw("DSa is not net grade")
+	# 	if grade==False:
+	# 		frappe.throw("DSa is not net grade")
 	
 	
 	# no_of_days = date_diff(to_date, from_date) + 1
 	# frappe.throw(str(no_of_days))
 
-	adv = frappe.new_doc("Travel Advance")
-	adv.employee = doc.employee
-	adv.employee_name = doc.employee_name
-	adv.branch = doc.branch
-	adv.cost_center = doc.cost_center
-	adv.currency = doc.currency
-	adv.exchange_rate = doc.exchange_rate
-	adv.from_date = from_date
-	adv.to_date = to_date
+	# adv = frappe.new_doc("Travel Advance")
+	# adv.employee = doc.employee
+	# adv.employee_name = doc.employee_name
+	# adv.branch = doc.branch
+	# adv.cost_center = doc.cost_center
+	# adv.currency = doc.currency
+	# adv.exchange_rate = doc.exchange_rate
+	# adv.from_date = from_date
+	# adv.to_date = to_date
 
-	adv.estimated_amount = flt(dsa) * flt(no_of_days) + (flt(return_day_dsa) /100 * flt(dsa))
+	# adv.estimated_amount = flt(dsa) * flt(no_of_days) + (flt(return_day_dsa) /100 * flt(dsa))
 
-	adv.travel_authorization = doc.name
+	# adv.travel_authorization = doc.name
 
-	return adv.as_dict()
+	# return adv.as_dict()

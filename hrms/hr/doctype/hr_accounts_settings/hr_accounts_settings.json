@@ -1,0 +1,268 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-11-08 16:16:28.709331",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_1",
+  "salary_payable_account",
+  "salary_tax_account",
+  "overtime_account",
+  "employee_contribution_pf",
+  "muster_roll_payable_account",
+  "column_break_4",
+  "leave_encashment_account",
+  "pbva_account",
+  "bonus_account",
+  "ltc_account",
+  "section_break_8",
+  "travel_incountry_account",
+  "travel_outcountry_account",
+  "travel_refundable_account",
+  "column_break_12",
+  "meeting_and_seminars_in_account",
+  "meeting_and_seminars_out_account",
+  "column_break_11",
+  "training_incountry_account",
+  "training_outcountry_account",
+  "section_break_14",
+  "employee_advance_travel",
+  "column_break_16",
+  "employee_advance_salary",
+  "sws_accounts_settings_section",
+  "sws_credit_account",
+  "column_break_qnkc",
+  "sws_debit_account",
+  "payable_account_section",
+  "leave_encashment_payable",
+  "column_break_jgtd",
+  "travel_claim_payable"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_1",
+   "fieldtype": "Section Break",
+   "label": "Expense Accounts Settings"
+  },
+  {
+   "fieldname": "salary_payable_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Salary Payable Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "salary_tax_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Salary Tax Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "overtime_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Overtime Allowance Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "employee_contribution_pf",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Employer Contribution To PF",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "leave_encashment_account",
+   "fieldtype": "Link",
+   "label": "Leave Encashment Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "pbva_account",
+   "fieldtype": "Link",
+   "label": "PBVA Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "bonus_account",
+   "fieldtype": "Link",
+   "label": "Bonus Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "ltc_account",
+   "fieldtype": "Link",
+   "label": "LTC Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_8",
+   "fieldtype": "Section Break",
+   "label": "Travel/Training Accounts Settings"
+  },
+  {
+   "fieldname": "travel_incountry_account",
+   "fieldtype": "Link",
+   "label": "Tavel In-Country Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "travel_outcountry_account",
+   "fieldtype": "Link",
+   "label": "Tavel Out-Country Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_12",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "meeting_and_seminars_in_account",
+   "fieldtype": "Link",
+   "label": "Meeting & Seminars Account (In-Country)",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "meeting_and_seminars_out_account",
+   "fieldtype": "Link",
+   "label": "Meeting & Seminars Account (Out-Country)",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_11",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "training_incountry_account",
+   "fieldtype": "Link",
+   "label": "Training In-Country Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "training_outcountry_account",
+   "fieldtype": "Link",
+   "label": "Training Out-Country Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_14",
+   "fieldtype": "Section Break",
+   "label": "Advance Accounts Settings"
+  },
+  {
+   "fieldname": "employee_advance_travel",
+   "fieldtype": "Link",
+   "label": "Advance To Employee (Travel) Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_16",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "employee_advance_salary",
+   "fieldtype": "Link",
+   "label": "Advance To Employee (Salary) Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "sws_accounts_settings_section",
+   "fieldtype": "Section Break",
+   "label": "SWS Accounts Settings"
+  },
+  {
+   "fieldname": "sws_credit_account",
+   "fieldtype": "Link",
+   "label": "SWS Credit Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "column_break_qnkc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sws_debit_account",
+   "fieldtype": "Link",
+   "label": "SWS Debit Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "payable_account_section",
+   "fieldtype": "Section Break",
+   "label": "Payable Accounts Settings"
+  },
+  {
+   "fieldname": "leave_encashment_payable",
+   "fieldtype": "Link",
+   "label": "Leave Encashment Payable",
+   "options": "Account"
+  },
+  {
+   "fieldname": "column_break_jgtd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "travel_claim_payable",
+   "fieldtype": "Link",
+   "label": "Travel Claim Payable",
+   "options": "Account"
+  },
+  {
+   "fieldname": "muster_roll_payable_account",
+   "fieldtype": "Link",
+   "label": "Muster Roll Payable Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "travel_refundable_account",
+   "fieldtype": "Link",
+   "label": "Travel Refundable Account",
+   "options": "Account"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2025-04-02 16:32:32.707099",
+ "modified_by": "Administrator",
+ "module": "Accounts",
+ "name": "HR Accounts Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

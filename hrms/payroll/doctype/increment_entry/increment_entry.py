@@ -39,14 +39,20 @@ class IncrementEntry(Document):
 
 	def get_emp_list(self, process_type=None):
 		self.set_month_dates()
-
+		#frappe.throw(str(self.fiscal_year))
+		from datetime import datetime
+		month_num = datetime.strptime(self.month_name, "%B").strftime("%m")
+		date_string = f"{self.fiscal_year}-{month_num}-01"
+		
 		cond = self.get_filter_condition()
 		cond += self.get_joining_relieving_condition()
 		data = []
 		emp_list = frappe.db.sql("""
 			select t1.name as employee, t1.employee_name, t1.grade, t1.department, t1.designation
 			from `tabEmployee` t1
+			Join `tabEmployee Group` eg on t1.employee_group=eg.name
 			where t1.status = 'Active'
+			and TIMESTAMPDIFF(MONTH, date_of_joining, '{}') > eg.minimum_months
 			and t1.increment_cycle = '{}' 
 			and not exists(select 1
 					from `tabSalary Increment` as t3
@@ -60,7 +66,7 @@ class IncrementEntry(Document):
 					and sst.is_active = 'Yes')
 			{}
 			order by t1.branch, t1.name
-		""".format(self.month_name, self.fiscal_year, self.month_name, cond), as_dict=True)
+		""".format(date_string,self.month_name, self.fiscal_year, self.month_name, cond), as_dict=True)
 		if emp_list:
 			for a in emp_list:
 				new_basic, increment, old_basic = self.get_employee_payscale(a.employee)
@@ -190,7 +196,7 @@ class IncrementEntry(Document):
 				sst_doc = frappe.get_doc("Salary Structure", salary_structure)
 				date_of_reference = sst_doc.from_date if getdate(sst_doc.from_date) < getdate(frappe.db.get_value("Employee",employee,"date_of_joining")) else frappe.db.get_value("Employee", employee, "date_of_joining")
 				for d in sst_doc.earnings:
-					if d.salary_component == 'Basic Pay':
+					if d.salary_component == 'Basic Salary':
 						old_basic = flt(d.amount)
 						
 				# Fetching employee group settings
@@ -335,7 +341,7 @@ def submit_salary_increments_for_employees(increment_entry, salary_increments, p
 	for si in salary_increments:
 		
 		si_obj = frappe.get_doc("Salary Increment",si[0])
-		frappe.throw(str(si_obj))
+		# frappe.throw(str(si_obj))
 		if si_obj.increment<0:
 			not_submitted_si.append(si[0])
 		else:

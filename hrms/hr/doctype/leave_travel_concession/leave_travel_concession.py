@@ -7,6 +7,8 @@ from frappe.utils import flt, getdate, cint, date_diff
 from datetime import datetime
 import calendar
 from dateutil.relativedelta import relativedelta
+from hrms.hr.hr_custom_function import (get_salary_tax)
+
 
 class LeaveTravelConcession(Document):
 	def validate(self):
@@ -51,12 +53,11 @@ class LeaveTravelConcession(Document):
 						and b.employee in ({})""".format(emp_list))		
 		if doc:
 			frappe.throw("Cannot create multiple LTC for the same year. One or more employees LTC already processed.")
-
 	def calculate_values(self):
 		if self.items:
 			total = 0
 			for a in self.items:
-				total += flt(a.amount)
+				total += flt(a.basic_pay) - flt(a.amount)
 			self.total_amount = total
 		else:
 			frappe.throw("Cannot save without any employee records")
@@ -116,7 +117,11 @@ class LeaveTravelConcession(Document):
 	@frappe.whitelist()
 	def get_ltc_details(self):
 		start, end = frappe.db.get_value("Fiscal Year", self.fiscal_year, ["year_start_date", "year_end_date"])
-		entries = frappe.db.sql("""select 
+		employee_filter = ""
+		if self.employee:
+			employee_filter = " and b.employee = '{}' ".format(self.employee)
+		entries = frappe.db.sql("""
+					select 
 						e.date_of_joining, 
 						b.employee, 
 						b.employee_name, 
@@ -131,9 +136,10 @@ class LeaveTravelConcession(Document):
 					where 
 						a.parent = b.name 
 						and b.employee = e.name 
-						and a.salary_component = 'Basic Pay' 
-						and (b.is_active = 'Yes' or e.relieving_date between \'"+str(start)+"\' and \'"+str(end)+"\') 
-						and b.eligible_for_ltc = 1 
+						and a.salary_component = 'Basic Salary' 
+						and (b.is_active = 'Yes' or e.relieving_date between \'"+str(start)+"\' and \'"+str(end)+"\')
+						and b.eligible_for_ltc = 1
+						""" + employee_filter + """
 					order by b.branch """, as_dict=True)
 		self.set('items', [])
 		for d in entries:
@@ -143,15 +149,16 @@ class LeaveTravelConcession(Document):
 			working_days =date_diff(self.posting_date,d.date_of_joining)
 			# if working_days >= 360 :
 			# 2024-09-10
+			amount = d.amount
 			if getdate(str(self.fiscal_year) + "-01-01") < getdate(d.date_of_joining) <  getdate(str(self.fiscal_year) + "-12-31"):
 				if cint(str(d.date_of_joining)[8:10]) <= 15:
 					months = 12 - cint(str(d.date_of_joining)[5:7]) + 1
 				else:
 					months = 12 - cint(str(d.date_of_joining)[5:7])
 				
-				amount = d.amount
-				if flt(d.amount) > 15000:
-					amount = 15000
+			
+				if flt(d.amount) > 25000:
+					amount = get_salary_tax(d.amount)
 
 				if months >= 3:
 					d.amount = round(flt((flt(months)/12.0) * amount), 2)
@@ -162,8 +169,9 @@ class LeaveTravelConcession(Document):
 				# 	d.amount += round(flt((flt(days)/12.0/30.0) * amount), 2)
 
 			else:
-				if flt(d.amount) > 15000:
-					d.amount = 15000
+				if flt(d.amount) > 25000:
+					d.amount = get_salary_tax(d.amount)
+				# d.amount = amount
 			row = self.append('items', {})
 			
 			row.update(d)

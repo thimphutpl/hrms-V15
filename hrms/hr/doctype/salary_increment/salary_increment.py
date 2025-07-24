@@ -105,7 +105,7 @@ class SalaryIncrement(Document):
 				sst_doc = frappe.get_doc("Salary Structure", self.salary_structure)
 				self.date_of_reference = sst_doc.from_date if getdate(sst_doc.from_date) < getdate(self.date_of_reference) else self.date_of_reference
 				for d in sst_doc.earnings:
-					if d.salary_component == 'Basic Pay':
+					if d.salary_component == 'Basic Salary':
 						self.old_basic = flt(d.amount)
 
 				# Fetching employee group settings

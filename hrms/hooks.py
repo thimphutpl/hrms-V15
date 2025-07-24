@@ -214,22 +214,27 @@ doc_events = {
 # ---------------
 
 scheduler_events = {
+	
 	"all": [
 		"hrms.hr.doctype.interview.interview.send_interview_reminder",
 	],
 	"hourly": [
+		
 		"hrms.hr.doctype.daily_work_summary_group.daily_work_summary_group.trigger_emails",
+		
 	],
 	"hourly_long": [
+		
 		"hrms.hr.doctype.shift_type.shift_type.process_auto_attendance_for_all_shifts",
-		"hrms.hr.doctype.shift_assignment_schedule.shift_assignment_schedule.process_auto_shift_creation",
+		#"hrms.hr.doctype.shift_assignment_schedule.shift_assignment_schedule.process_auto_shift_creation",
 	],
 	"daily": [
-		"hrms.controllers.employee_reminders.send_birthday_reminders",
-		"hrms.controllers.employee_reminders.send_work_anniversary_reminders",
-		"hrms.hr.doctype.daily_work_summary_group.daily_work_summary_group.send_summary",
-		"hrms.hr.doctype.interview.interview.send_daily_feedback_reminder",
-		"hrms.hr.doctype.job_opening.job_opening.close_expired_job_openings",
+		# "hrms.controllers.employee_reminders.send_birthday_reminders",
+		# "hrms.controllers.employee_reminders.send_work_anniversary_reminders",
+		# "hrms.hr.doctype.daily_work_summary_group.daily_work_summary_group.send_summary",
+		# "hrms.hr.doctype.interview.interview.send_daily_feedback_reminder",
+		 "hrms.hr.doctype.job_opening.job_opening.close_expired_job_openings",
+		
 	],
 	"daily_long": [
 		"hrms.hr.doctype.leave_ledger_entry.leave_ledger_entry.process_expired_allocation",
@@ -237,7 +242,9 @@ scheduler_events = {
 		"hrms.hr.utils.allocate_earned_leaves",
 	],
 	"weekly": ["hrms.controllers.employee_reminders.send_reminders_in_advance_weekly"],
-	"monthly": ["hrms.controllers.employee_reminders.send_reminders_in_advance_monthly"],
+	"monthly": ["hrms.controllers.employee_reminders.send_reminders_in_advance_monthly",
+				"hrms.hr.hr_custom_function.post_earned_leaves",
+				],
 }
 
 advance_payment_doctypes = ["Gratuity", "Employee Advance"]

@@ -1,14 +1,6 @@
 // Copyright (c) 2024, Frappe Technologies Pvt. Ltd. and contributors
 // For license information, please see license.txt
 
-// frappe.ui.form.on("Leave Travel Concession", {
-// 	refresh(frm) {
-
-// 	},
-// });
-// Copyright (c) 2022, Frappe Technologies Pvt. Ltd. and contributors
-// For license information, please see license.txt
-
 frappe.ui.form.on('Leave Travel Concession', {
 	setup: function(frm) {
 		frm.get_docfield("items").allow_bulk_edit = 1;

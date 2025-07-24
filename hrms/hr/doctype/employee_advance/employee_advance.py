@@ -77,6 +77,41 @@ class EmployeeAdvance(Document):
 		if not self.exchange_rate:
 			frappe.throw(_("Exchange Rate cannot be zero."))
 
+	# def get_max_month_adv(self):
+	# 	Employee = frappe.qb.DocType("Employee")
+	# 	EmployeeGroup = frappe.qb.DocType("Employee Group")
+
+	# 	salary_advance_max_months = (
+	# 		frappe.qb.from_(Employee)
+	# 		.join(EmployeeGroup)
+	# 		.on(Employee.employee_group == EmployeeGroup.name)
+	# 		.select(EmployeeGroup.salary_advance_max_months)
+	# 		.where(Employee.name == self.employee) 
+	# 	).run(as_dict=True)
+
+	# 	return salary_advance_max_months[0] if salary_advance_max_months else None
+	def get_max_month_adv(self):
+		Employee = frappe.qb.DocType("Employee")
+		EmployeeGroup = frappe.qb.DocType("Employee Group")
+
+		result = (
+			frappe.qb.from_(Employee)
+			.join(EmployeeGroup)
+			.on(Employee.employee_group == EmployeeGroup.name)
+			.select(EmployeeGroup.salary_advance_max_months)
+			.where(Employee.name == self.employee)
+		).run(as_dict=True)
+
+		if not result:
+			frappe.throw(_("Employee Group not found for employee {0}").format(self.employee))
+
+		# Explicitly convert to integer
+		max_months = cint(result[0].get("salary_advance_max_months"))
+		
+		if not max_months:
+			frappe.throw(_("Salary Advance Max Months is not set for Employee Group of {0}").format(self.employee))
+
+		return max_months
 	def update_salary_structure(self, cancel=False):
 		if cancel:
 			rem_list = []
@@ -232,24 +267,28 @@ class EmployeeAdvance(Document):
 			self.recovery_end_date = last_day
 		
 
-	@frappe.whitelist()
-	def calculate_amount(self):
-		deduction = 0.0
-		max_amount = flt(self.basic_pay) * 3
-		if flt(self.advance_amount) > flt(max_amount):
-			frappe.throw(
-				_(
-					"The advance amount cannot exceed 3 times your basic pay. "
-					"You are attempting to set an advance of {} while the maximum allowable amount is {}. "
-					"Please adjust the advance amount accordingly.".format(
-						frappe.bold(frappe.format_value(self.advance_amount, {"fieldtype":"Currency"})),
-						frappe.bold(frappe.format_value(max_amount, {"fieldtype":"Currency"}))
-					)
-				),
-				title=_("Exceeded Maximum Limit")
-			)
-		deduction = flt(self.advance_amount) / flt(self.no_of_installments)
-		return deduction
+	
+
+	# def calculate_amount(self):
+	# 	deduction = 0.0
+	# 	max=self.get_max_month_adv()
+	# 	#frappe.throw(str(max.salary_advance_max_months))
+	# 	max_amount = flt(self.basic_pay) * flt(max.salary_advance_max_months)
+	# 	#frappe.throw(str(max_amount))
+	# 	if flt(self.advance_amount) > flt(max_amount):
+	# 		frappe.throw(
+	# 			_(
+	# 				"The advance amount cannot exceed 3 times your basic pay. "
+	# 				"You are attempting to set an advance of {} while the maximum allowable amount is {}. "
+	# 				"Please adjust the advance amount accordingly.".format(
+	# 					frappe.bold(frappe.format_value(self.advance_amount, {"fieldtype":"Currency"})),
+	# 					frappe.bold(frappe.format_value(max_amount, {"fieldtype":"Currency"}))
+	# 				)
+	# 			),
+	# 			title=_("Exceeded Maximum Limit")
+	# 		)
+	# 	deduction = flt(self.advance_amount) / flt(self.no_of_installments)
+	# 	return deduction
 
 	@frappe.whitelist()
 	def validate_employment_status(self):
@@ -290,6 +329,7 @@ class EmployeeAdvance(Document):
 		self.advance_amount = self.basic_pay
 
 	
+
 	@frappe.whitelist()
 	def set_default_no_of_installments(self, update=False):
 		if update:
@@ -454,6 +494,33 @@ class EmployeeAdvance(Document):
 			)
 		).run()[0][0] or 0.0
 
+
+	@frappe.whitelist()
+	def calculate_amount(self):
+		try:
+			max_months = self.get_max_month_adv()
+			max_amount = flt(self.basic_pay) * max_months  # Use the already converted integer
+			
+			#frappe.msgprint(f"Debug: basic_pay={self.basic_pay}, max_months={max_months}, max_amount={max_amount}")  # Debug line
+			
+			if flt(self.advance_amount) > max_amount:
+				frappe.throw(
+					_("The advance amount cannot exceed {0} times your basic pay. "
+					"Maximum allowed: {1}, Attempted: {2}").format(
+						max_months,
+						frappe.bold(frappe.format_value(max_amount, {"fieldtype": "Currency"})),
+						frappe.bold(frappe.format_value(self.advance_amount, {"fieldtype": "Currency"}))
+					),
+					title=_("Exceeded Maximum Limit")
+				)
+				
+			deduction = flt(self.advance_amount) / flt(self.no_of_installments)
+			return deduction
+			
+		except Exception as e:
+			frappe.log_error(f"Error in calculate_amount: {str(e)}")
+			frappe.throw(_("Error calculating advance amount. Please check logs for details."))
+
 	def check_linked_payment_entry(self):
 		from erpnext.accounts.utils import (
 			remove_ref_doc_link_from_pe,
@@ -473,6 +540,8 @@ def get_pending_amount(employee, posting_date):
 		fields=["advance_amount", "paid_amount"],
 	)
 	return sum([(emp.advance_amount - emp.paid_amount) for emp in employee_due_amount])
+
+
 
 
 @frappe.whitelist()

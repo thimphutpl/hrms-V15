@@ -87,34 +87,39 @@ class LeaveEncashment(Document):
 		)
 
 	def set_actual_encashable_days(self):
+		#frappe.throw("hi")
 		encashment_settings = self.get_encashment_settings()
 		if not encashment_settings.allow_encashment:
 			frappe.throw(_("Leave Type {0} is not encashable").format(self.leave_type))
 
-		self.actual_encashable_days = self.leave_balance
+		self.actual_encashable_days = encashment_settings.max_encashable_leaves
 		leave_form_link = get_link_to_form("Leave Type", self.leave_type)
 
 		# TODO: Remove this weird setting if possible. Retained for backward compatibility
-		if encashment_settings.non_encashable_leaves:
-			actual_encashable_days = self.leave_balance - encashment_settings.non_encashable_leaves
-			self.actual_encashable_days = actual_encashable_days if actual_encashable_days > 0 else 0
-			frappe.msgprint(
-				_("Excluded {0} Non-Encashable Leaves for {1}").format(
-					bold(encashment_settings.non_encashable_leaves),
-					leave_form_link,
-				),
-			)
+		# if encashment_settings.non_encashable_leaves:
+		# 	actual_encashable_days = self.leave_balance - encashment_settings.non_encashable_leaves
+		# 	self.actual_encashable_days = actual_encashable_days if actual_encashable_days > 0 else 0
+		# 	frappe.throw(
+		# 		_("Excluded {0} Non-Encashable Leaves for {1}").format(
+		# 			bold(encashment_settings.non_encashable_leaves),
+		# 			leave_form_link,
+		# 		),
+		# 	)
 
-		if encashment_settings.max_encashable_leaves:
-			self.actual_encashable_days = min(
-				self.actual_encashable_days, encashment_settings.max_encashable_leaves
-			)
-			frappe.msgprint(
-				_("Maximum encashable leaves for {0} are {1}").format(
-					leave_form_link, bold(encashment_settings.max_encashable_leaves)
-				),
-				title=_("Encashment Limit Applied"),
-			)
+		# total_leav=self.get_leave_allocation()
+		# frappe.throw(str(total_leav.get('total_leaves_allocated', 0)))
+		# if encashment_settings.max_encashable_leaves:
+		# 	frappe.throw(str(encashment_settings.max_encashable_leaves))
+		# 	# self.actual_encashable_days = min(
+		# 	# 	encashment_settings.max_encashable_leaves
+		# 	# )
+			
+		# 	frappe.throw(
+		# 		_("Maximum encashable leaves for {0} are {1}").format(
+		# 			leave_form_link, bold(encashment_settings.max_encashable_leaves)
+		# 		),
+		# 		title=_("Encashment Limit Applied"),
+		# 	)
 
 	def set_encashment_days(self):
 		# allow overwriting encashment days
@@ -146,6 +151,11 @@ class LeaveEncashment(Document):
 				self.employee, self.leave_type, allocation.from_date, self.encashment_date
 			)
 		)
+		# frappe.throw(str(self.leave_balance))
+		encashment_settings = self.get_encashment_settings()
+		#frappe.throw(str(encashment_settings.max_encashable_leaves))
+		if self.leave_balance < encashment_settings.max_encashable_leaves:
+			frappe.throw(f"You have have {self.leave_balance} and is not able encash")
 		self.leave_allocation = allocation.name
 
 	def set_encashment_amount(self):

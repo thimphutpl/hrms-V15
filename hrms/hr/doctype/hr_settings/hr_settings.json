@@ -77,7 +77,9 @@
   "enote_copyto_notification",
   "column_break_bbgs",
   "enote_status_notification",
-  "enote_reviewer_notification"
+  "enote_reviewer_notification",
+  "attendance_tab",
+  "office_gobal_ip"
  ],
  "fields": [
   {
@@ -498,13 +500,23 @@
    "fieldtype": "Link",
    "label": "Internal Audit",
    "options": "Employee"
+  },
+  {
+   "fieldname": "attendance_tab",
+   "fieldtype": "Tab Break",
+   "label": "Attendance"
+  },
+  {
+   "fieldname": "office_gobal_ip",
+   "fieldtype": "Data",
+   "label": "Office Gobal Ip"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-07-08 15:55:57.270617",
+ "modified": "2025-07-19 21:07:02.984778",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",
