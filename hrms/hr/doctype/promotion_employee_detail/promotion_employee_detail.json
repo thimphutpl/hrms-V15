@@ -12,13 +12,15 @@
   "department",
   "employee_grade",
   "current_basic_pay",
+  "maximum_grade",
   "column_break_3",
   "new_increment",
   "new_basic_pay",
   "new_designation",
   "new_employee_grade",
   "employee_promotion",
-  "next_promotion_date"
+  "next_promotion_date",
+  "exception_grade"
  ],
  "fields": [
   {
@@ -108,12 +110,26 @@
    "in_list_view": 1,
    "label": "New Increment",
    "read_only": 1
+  },
+  {
+   "fieldname": "maximum_grade",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Maximum Grade",
+   "options": "Employee Grade"
+  },
+  {
+   "fieldname": "exception_grade",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Exception Grade",
+   "options": "Employee Grade"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-12-28 15:48:56.519275",
+ "modified": "2025-03-18 16:13:04.329324",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Promotion Employee Detail",
