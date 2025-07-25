@@ -67,7 +67,7 @@ def get_columns(filters=None):
 		{
 			"label": _("Forward to Employee ID"),
 			"fieldname": "employee",
-			"fieldtype": "Link",
+			"fieldtype": "Data",
 			"options": "Employee",
 			"width": 220,
 		},
