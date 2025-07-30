@@ -815,7 +815,7 @@ class PayrollEntry(Document):
 				self.update_salary_slip_status(jv_name = jv_name)		
 			frappe.msgprint(_("Salary posting to accounts is successful."),title="Posting Successful")
 		else:
-			frappe.throw(_("No data found"),title="Posting failed")
+			frappe.throw(_("No Account has been mapped to the Salary Component"),title="Posting failed")
 	##### Ver3.0.190304 Ends
 
 
