@@ -57,7 +57,7 @@ class LeaveTravelConcession(Document):
 		if self.items:
 			total = 0
 			for a in self.items:
-				total += flt(a.basic_pay) - flt(a.amount)
+				total += flt(a.basic_pay) - flt(a.tax)
 			self.total_amount = total
 		else:
 			frappe.throw("Cannot save without any employee records")
@@ -86,6 +86,8 @@ class LeaveTravelConcession(Document):
 					"account": ltc_account,
 					"reference_type": self.doctype,
 					"reference_name": self.name,
+					"party_type": "Employee",
+			        "party"	: self.employee,
 					"cost_center": values[0],
 					"debit_in_account_currency": flt(cc_amount[key],2),
 					"debit": flt(cc_amount[key],2),
@@ -151,26 +153,37 @@ class LeaveTravelConcession(Document):
 			# 2024-09-10
 			amount = d.amount
 			if getdate(str(self.fiscal_year) + "-01-01") < getdate(d.date_of_joining) <  getdate(str(self.fiscal_year) + "-12-31"):
-				if cint(str(d.date_of_joining)[8:10]) <= 15:
-					months = 12 - cint(str(d.date_of_joining)[5:7]) + 1
-				else:
-					months = 12 - cint(str(d.date_of_joining)[5:7])
+				pass
+				# if cint(str(d.date_of_joining)[8:10]) <= 15:
+				# 	months = 12 - cint(str(d.date_of_joining)[5:7]) + 1
+				# else:
+				# 	months = 12 - cint(str(d.date_of_joining)[5:7])
 				
 			
-				if flt(d.amount) > 25000:
-					amount = get_salary_tax(d.amount)
+				# if flt(d.amount) > 25000:
+					
+				# 	tax = get_salary_tax(d.amount)
 
-				if months >= 3:
-					d.amount = round(flt((flt(months)/12.0) * amount), 2)
-				else:
-					d.amount = 0.0
-				# days = relativedelta(datetime.strptime(str(d.date_of_joining).split("-")[0]+"-"+str(d.date_of_joining).split("-")[1]+"-"+str(dates),"%Y-%m-%d"),datetime.strptime(str(d.date_of_joining),"%Y-%m-%d")).days
-				# if int(days) < int(dates):
-				# 	d.amount += round(flt((flt(days)/12.0/30.0) * amount), 2)
+				# if months >= 3:
+					
+				# 	d.amount = round(flt((flt(months)/12.0) * amount), 2)
+				# else:
+					
+				# 	d.amount = 0.0
+				# # days = relativedelta(datetime.strptime(str(d.date_of_joining).split("-")[0]+"-"+str(d.date_of_joining).split("-")[1]+"-"+str(dates),"%Y-%m-%d"),datetime.strptime(str(d.date_of_joining),"%Y-%m-%d")).days
+				# # if int(days) < int(dates):
+				# # 	d.amount += round(flt((flt(days)/12.0/30.0) * amount), 2)
 
 			else:
-				if flt(d.amount) > 25000:
-					d.amount = get_salary_tax(d.amount)
+				#if flt(d.amount) > 25000:
+					# frappe.throw("hi4")
+				d.tax = get_salary_tax(d.amount)
+				d.amount=d.amount-d.tax
+				# else:
+					
+				# 	d.tax = get_salary_tax(d.amount)
+				# 	d.amount=d.amount-d.tax
+
 				# d.amount = amount
 			row = self.append('items', {})
 			
