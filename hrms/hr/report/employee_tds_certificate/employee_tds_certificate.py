@@ -9,13 +9,14 @@ def execute(filters=None):
 	validate_filters(filters)
 	columns = get_columns()
 	data = get_data(filters)
-	frappe.errprint(str(data))
+	# frappe.errprint(str(data))
 	return columns, data, filters
 
 def get_data( filters=None):
 	data = []
 	# salary 
 	data += get_salary_data(filters)
+	# frappe.msgprint(str(data))
 	#Leave Encashment 
 	data += get_leave_encashment(filters)
 	#Bonus
