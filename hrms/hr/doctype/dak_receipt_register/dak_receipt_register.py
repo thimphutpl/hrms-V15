@@ -47,34 +47,67 @@ class DAKReceiptRegister(Document):
 		if action != "save":
 			self.send_notification()
    
+	# def update_dak_remark(self):
+	# 	user=""
+	# 	emp=""
+	# 	emp_name=""
+	# 	design=""
+	# 	action = frappe.request.form.get('action')
+	# 	user=frappe.session.user
+	# 	if not user:
+	# 		frappe.throw("You are using without session")
+	# 	emp=frappe.db.sql("select name from `tabEmployee` where user_id='{}'".format(user))
+	# 	if not emp:
+	# 		frappe.throw("You Cannot Apply If you are not an Employee")
+   
+	# 	if action in ("Apply","Forward", "Receive", "Reject"):
+	# 		emp_name=frappe.db.get_value('Employee', emp, 'employee_name')
+	# 		design=frappe.db.get_value('Employee', emp, 'designation')
+	# 		self.append("items",{
+	# 			'user': user,
+	# 			'employee': emp,
+	# 			'employee_name':emp_name,
+	# 			'designation': design,
+	# 			'action': action,
+	# 			'remark_date': getdate(nowdate()),
+	# 			'remark': self.remark,
+	# 			'forwarded_to': self.employee if action in ("Forward") else ''
+	# 		})
+   
+	# 		self.remark=""
+ 
 	def update_dak_remark(self):
-		user=""
-		emp=""
-		emp_name=""
-		design=""
-		action = frappe.request.form.get('action')
-		user=frappe.session.user
+		user = frappe.session.user
 		if not user:
 			frappe.throw("You are using without session")
-		emp=frappe.db.sql("select name from `tabEmployee` where user_id='{}'".format(user))
+		
+		# Get employee - improved query handling
+		emp = frappe.db.get_value("Employee", {"user_id": user}, "name")
 		if not emp:
 			frappe.throw("You Cannot Apply If you are not an Employee")
-   
+
+		action = frappe.request.form.get('action')
 		if action in ("Apply","Forward", "Receive", "Reject"):
-			emp_name=frappe.db.get_value('Employee', emp, 'employee_name')
-			design=frappe.db.get_value('Employee', emp, 'designation')
-			self.append("items",{
+			# Get all employee details in one query
+			emp_details = frappe.db.get_value("Employee", emp, 
+											["employee_name", "designation"], as_dict=1)
+			
+			if not emp_details:
+				frappe.throw("Employee details not found")
+				
+			
+			self.append("items", {
 				'user': user,
 				'employee': emp,
-				'employee_name':emp_name,
-				'designation': design,
+				'employee_name': emp_details.employee_name,
+				'designation': emp_details.designation,
 				'action': action,
 				'remark_date': getdate(nowdate()),
 				'remark': self.remark,
 				'forwarded_to': self.employee if action in ("Forward") else ''
 			})
-   
-			self.remark=""
+			
+			self.remark = ""
    
 	def send_notification(self):
 		action = frappe.request.form.get('action')  
