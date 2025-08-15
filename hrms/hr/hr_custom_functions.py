@@ -268,8 +268,8 @@ def post_casual_leaves():
 # Post earned leave on the first day of every month
 ##
 def post_earned_leaves():	
-	if not getdate(frappe.utils.nowdate()) == getdate(get_first_day(frappe.utils.nowdate())):
-		return 0
+	# if not getdate(frappe.utils.nowdate()) == getdate(get_first_day(frappe.utils.nowdate())):
+	# 	return 0
 	
 	date = add_days(frappe.utils.nowdate(), -20)
 	start = get_first_day(date);
@@ -277,18 +277,32 @@ def post_earned_leaves():
 	employees = frappe.db.sql("select name, employee_name, date_of_joining from `tabEmployee` where status = 'Active' and employment_type NOT IN('Armed Forces', 'GCE')", as_dict=True)
 	
 	for e in employees:
-		if cint(date_diff(end, getdate(e.date_of_joining))) > 14:
-			la = frappe.new_doc("Leave Allocation")
-			la.employee = e.name
-			la.employee_name = e.employee_name
-			la.leave_type = "Earned Leave"
-			la.from_date = str(start)
-			la.to_date = str(end)
-			la.carry_forward = cint(1)
-			la.new_leaves_allocated = flt(2.5)
-			la.submit()
+		if e.name== "GYAL201310":
+			if cint(date_diff(end, getdate(e.date_of_joining))) > 14:
+				la = frappe.new_doc("Leave Allocation")
+				la.employee = e.name
+				la.employee_name = e.employee_name
+				la.leave_type = "Earned Leave"
+				la.from_date = str(start)
+				la.to_date = str(end)
+				la.carry_forward = cint(1)
+				la.new_leaves_allocated = flt(1.75)
+				la.submit()
+			else:
+				pass
 		else:
-			pass
+			if cint(date_diff(end, getdate(e.date_of_joining))) > 14:
+				la = frappe.new_doc("Leave Allocation")
+				la.employee = e.name
+				la.employee_name = e.employee_name
+				la.leave_type = "Earned Leave"
+				la.from_date = str(start)
+				la.to_date = str(end)
+				la.carry_forward = cint(1)
+				la.new_leaves_allocated = flt(2.5)
+				la.submit()
+			else:
+				pass
 
 #function to get the difference between two dates
 @frappe.whitelist()
