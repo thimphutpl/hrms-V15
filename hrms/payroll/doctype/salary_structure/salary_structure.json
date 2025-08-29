@@ -157,8 +157,7 @@
    "fieldname": "employee_grade",
    "fieldtype": "Link",
    "label": "Employee Grade",
-   "options": "Employee Grade",
-   "read_only": 1
+   "options": "Employee Grade"
   },
   {
    "fieldname": "designation",
@@ -920,7 +919,7 @@
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2025-01-27 17:59:09.440868",
+ "modified": "2025-08-29 10:50:37.177380",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
