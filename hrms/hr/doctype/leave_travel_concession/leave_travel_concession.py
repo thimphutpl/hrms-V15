@@ -64,7 +64,7 @@ class LeaveTravelConcession(Document):
 	def post_journal_entry(self,tax,basic_pay,net_amt):
 	#def post_journal_entry(self):
 		ltc_expense_account 	= frappe.db.get_single_value("HR Accounts Settings","ltc_account")
-		#ltc_payable_account 	= frappe.db.get_single_value("HR Accounts Settings","ltc_account_payable")
+		ltc_payable_account 	= frappe.db.get_single_value("HR Accounts Settings","ltc_payable")
 		tax_account 				= frappe.db.get_value("Company", self.company, "default_salary_tax_account")
 		default_bank_account 		= frappe.db.get_value("Branch", self.branch, "expense_bank_account")
 	
@@ -77,13 +77,13 @@ class LeaveTravelConcession(Document):
 				title="Missing Expense Account"
 			)
 
-		# if not ltc_payable_account:
-		# 	frappe.throw(
-		# 		"Ltc Payable Account is not set for {}. Please configure it in the Company.".format(
-		# 			frappe.get_desk_link("Company", self.company)
-		# 		),
-		# 		title="Missing Payable Account"
-		# 	)
+		if not ltc_payable_account:
+			frappe.throw(
+				"Ltc Payable Account is not set for {}. Please configure it in the Company.".format(
+					frappe.get_desk_link("Company", self.company)
+				),
+				title="Missing Payable Account"
+			)
 
 		if not tax_account:
 			frappe.throw(
@@ -122,7 +122,7 @@ class LeaveTravelConcession(Document):
 				"reference_name"			: self.name,
 			})
 		posting.setdefault("to_payables", []).append({
-			"account" 						: ltc_expense_account,
+			"account" 						: ltc_payable_account,
 			"credit_in_account_currency"	: net_amt,
 			# "cost_center"    				: self.cost_center,
 			"party_check"					: 1,
@@ -134,7 +134,7 @@ class LeaveTravelConcession(Document):
 
 		# To Bank
 		posting.setdefault("to_bank", []).append({
-			"account"       				: ltc_expense_account,
+			"account"       				: ltc_payable_account,
 			"debit_in_account_currency"		: net_amt,
 			# "cost_center"   				: self.cost_center,
 			"party_check"					: 1,
@@ -234,6 +234,7 @@ class LeaveTravelConcession(Document):
 			else:
 				
 				d.tax = get_salary_tax(d.amount)
+				d.basic_pay=d.amount
 				d.amount=d.amount-d.tax
 				
 			row = self.append('items', {})

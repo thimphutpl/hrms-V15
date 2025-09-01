@@ -31,8 +31,24 @@ class test(Document):
 				
 	def get_office_goble_ip(self):
 		gobal_ip=frappe.db.get_single_value("HR Settings", "office_gobal_ip")
-		if gobal_ip != self.sign_ip:
+		ip=self.sign_ip
+		start_ip = frappe.db.get_single_value("HR Settings", "office_local_start_ip")
+
+		end_ip = frappe.db.get_single_value("HR Settings", "office_local_end_ip")
+		check_ip=self.is_ip_in_range(ip, start_ip, end_ip)
+		#frappe.throw(str(frappe.request.headers.get("X-Forwarded-For", "").split(",")[0].strip()))
+		if frappe.request.headers.get("X-Forwarded-For", "").split(",")[0].strip():
+			if gobal_ip != self.sign_ip:
+				frappe.throw("you not in offices network")
+
+		elif rappe.request.headers.get("X-Real-IP", ""):
+			if not check_ip:
+				frappe.throw("you not in offices network")
+		else:
 			frappe.throw("you not in offices network")
+
+
+		
 
 	def get_signIn_time(self):
 		if self.workflow_state=="Draft":
@@ -58,6 +74,13 @@ class test(Document):
 			#frappe.throw("pl")
 			self.signout_time=datetime.datetime.now()
 			self.status="Present"
+
+	def is_ip_in_range(self,ip, start_ip, end_ip):
+		import ipaddress
+		ip = ipaddress.IPv4Address(ip)
+		start = ipaddress.IPv4Address(start_ip)
+		end = ipaddress.IPv4Address(end_ip)
+		return start <= ip <= end
 
 def make_travel_advance():
 	print("hi pem")

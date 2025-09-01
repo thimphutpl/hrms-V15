@@ -1354,7 +1354,7 @@ def get_filtered_employees(
 		.on(Employee.name == SalaryStructure.employee)
 		.where(
 			(SalaryStructure.is_active == "Yes")
-			& (Employee.status != "Inactive")
+			&(Employee.status != "Inactive")
 			& (Employee.company == filters.company)
 			
 			& ((Employee.date_of_joining <= SalaryStructure.from_date) | (Employee.date_of_joining.isnull()))
@@ -1477,13 +1477,14 @@ def log_payroll_failure(process, payroll_entry, error):
 
 def create_salary_slips_for_employees(employees, args, publish_progress=True):
 	payroll_entry = frappe.get_cached_doc("Payroll Entry", args.payroll_entry)
-
+	#frappe.throw(str(args))
 	try:
 		salary_slips_exist_for = get_existing_salary_slips(employees, args)
 		count = 0
 
 		employees = list(set(employees) - set(salary_slips_exist_for))
 		for emp in employees:
+			#frappe.msgprint(str(emp))
 			args.update({"doctype": "Salary Slip", "employee": emp})
 			frappe.get_doc(args).insert()
 

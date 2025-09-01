@@ -141,7 +141,7 @@ def post_earned_leaves():
 	date = add_days(frappe.utils.nowdate(), -20)
 	start = get_first_day(date);
 	end = get_last_day(date);
-	from datetime import datetime, timedelta
+	from datetime import datetime, timedelta,date
 	today = datetime.today()
 	first_day_of_year = datetime(today.year, 1, 1)
 	last_day_of_year = datetime(today.year, 12, 31)	
@@ -168,6 +168,9 @@ def post_earned_leaves():
 			)
 
 			if existing_allocation:
+				current_year = datetime.now().year
+				first_day = date(current_year, 1, 1).isoformat()
+				last_day = date(current_year, 12, 31).isoformat()
 				
 				la = frappe.get_doc("Leave Allocation", existing_allocation)
 				leave_sum = frappe.get_all(
@@ -176,8 +179,8 @@ def post_earned_leaves():
         											'leave_type': 'Earned Leave',
         											'employee': employee_name,
         											'docstatus': 1,
-        											'from_date': ['between', ['2025-01-01', '2025-12-31']],
-        											'to_date': ['between', ['2025-01-01', '2025-12-31']]
+        											'from_date': ['between', [first_day, last_day]],
+        											'to_date': ['between', [first_day, last_day]]
     												},
 											fields=['SUM(leaves) as Leave_sum'],
 											as_list=True

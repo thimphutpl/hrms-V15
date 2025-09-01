@@ -136,9 +136,11 @@ class SalarySlip(TransactionBase):
 		self.check_existing()
 		
 		if not (len(self.get("earnings")) or len(self.get("deductions"))):
+			
 			# get details from salary structure
 			self.get_emp_and_working_day_details()
 		else:
+			
 			self.get_working_days_details(lwp=self.leave_without_pay)
 
 		self.set_salary_structure()
@@ -250,6 +252,7 @@ class SalarySlip(TransactionBase):
 
 	@frappe.whitelist()
 	def get_emp_and_working_day_details(self):
+		
 		"""First time, load all the components from salary structure"""
 		if self.employee:
 			self.set("earnings", [])
@@ -272,7 +275,7 @@ class SalarySlip(TransactionBase):
 			.select(ss.name)
 			.where(
 				(ss.is_active == "Yes")
-				& (ss.employee == self.employee)
+			    & (ss.employee == self.employee)
 				& (
 					(ss.from_date <= self.start_date)
 					| (ss.from_date <= self.end_date)
@@ -299,11 +302,13 @@ class SalarySlip(TransactionBase):
 			)
 
 	def pull_sal_struct(self):
+		#frappe.throw(str(self.payment_days))
 		from hrms.payroll.doctype.salary_structure.salary_structure import make_salary_slip
-
+		self.payment_days
 		make_salary_slip(self._salary_structure_doc.name, self)
 
 	def get_working_days_details(self, lwp=None, for_preview=0):
+		
 		payroll_settings = frappe.get_cached_value(
 			"Payroll Settings",
 			None,
@@ -321,15 +326,18 @@ class SalarySlip(TransactionBase):
 			payroll_settings.include_holidays_in_total_working_days
 			and payroll_settings.consider_marked_attendance_on_holidays
 		)
-
+		
 		daily_wages_fraction_for_half_day = flt(payroll_settings.daily_wages_fraction_for_half_day) or 0.5
 
 		working_days = date_diff(self.end_date, self.start_date) + 1
+		
+		
+		
 		if for_preview:
 			self.total_working_days = working_days
 			self.payment_days = working_days
 			return
-
+		
 		holidays = self.get_holidays_for_employee(self.start_date, self.end_date)
 		working_days_list = [add_days(getdate(self.start_date), days=day) for day in range(0, working_days)]
 
@@ -366,7 +374,7 @@ class SalarySlip(TransactionBase):
 		self.total_working_days = working_days
 
 		payment_days = self.get_payment_days(payroll_settings.include_holidays_in_total_working_days)
-
+		
 		if flt(payment_days) > flt(lwp):
 			self.payment_days = flt(payment_days) - flt(lwp)
 
@@ -386,7 +394,7 @@ class SalarySlip(TransactionBase):
 				self.payment_days -= unmarked_days
 		else:
 			self.payment_days = 0
-
+		
 	def get_unmarked_days(
 		self, include_holidays_in_total_working_days: bool, holidays: list | None = None
 	) -> float:

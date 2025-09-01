@@ -38,7 +38,8 @@
   "color",
   "column_break_17",
   "letter_head",
-  "amended_from"
+  "amended_from",
+  "workflow_state"
  ],
  "fields": [
   {
@@ -265,6 +266,12 @@
    "fieldtype": "Data",
    "label": "Reports Name",
    "read_only": 1
+  },
+  {
+   "fieldname": "workflow_state",
+   "fieldtype": "Link",
+   "label": "Workflow State",
+   "options": "Workflow State"
   }
  ],
  "icon": "fa fa-calendar",
@@ -272,7 +279,7 @@
  "is_submittable": 1,
  "links": [],
  "max_attachments": 3,
- "modified": "2025-05-26 12:10:55.781045",
+ "modified": "2025-08-22 22:08:48.669172",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Application",

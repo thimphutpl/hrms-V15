@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestHRAccountsSettings(FrappeTestCase):
+class TestInterestFree(FrappeTestCase):
 	pass

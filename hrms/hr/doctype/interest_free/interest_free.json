@@ -1,16 +1,15 @@
 {
  "actions": [],
- "allow_import": 1,
+ "allow_rename": 1,
  "autoname": "naming_series:",
- "creation": "2022-01-17 18:36:51.450395",
+ "creation": "2025-07-29 14:16:37.714212",
  "doctype": "DocType",
- "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "naming_series",
   "employee",
   "employee_name",
-  "advance_type",
+  "date_of_joining",
   "column_break_4",
   "posting_date",
   "department",
@@ -24,7 +23,6 @@
   "gross_pay",
   "basic_pay",
   "net_pay",
-  "max_amount",
   "purpose",
   "column_break_11",
   "advance_amount",
@@ -275,12 +273,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "net_pay",
-   "fieldtype": "Currency",
-   "label": "Net Pay",
-   "read_only": 1
-  },
-  {
    "fieldname": "section_break_pivz",
    "fieldtype": "Section Break"
   },
@@ -297,12 +289,6 @@
    "fieldname": "recovery_end_date",
    "fieldtype": "Date",
    "label": "Recovery End Date"
-  },
-  {
-   "fieldname": "basic_pay",
-   "fieldtype": "Currency",
-   "label": "Basic Pay",
-   "read_only": 1
   },
   {
    "fieldname": "salary_structure",
@@ -375,41 +361,35 @@
    "options": "Designation"
   },
   {
-   "fieldname": "advance_type",
-   "fieldtype": "Select",
-   "label": "Advance Type",
-   "options": "Employee Advance\nInterest Free Loan"
+   "fetch_from": "employee.date_of_joining",
+   "fieldname": "date_of_joining",
+   "fieldtype": "Read Only",
+   "label": "Date Of Joining"
   },
   {
-   "fieldname": "max_amount",
+   "fieldname": "basic_pay",
    "fieldtype": "Currency",
-   "label": "Max Amount",
-   "read_only": 1
+   "hidden": 1,
+   "label": "Basic Pay"
+  },
+  {
+   "fieldname": "net_pay",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Net Pay"
   }
  ],
+ "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-08-18 20:04:28.454691",
+ "modified": "2025-07-29 14:34:06.765418",
  "modified_by": "Administrator",
  "module": "HR",
- "name": "Employee Advance",
+ "name": "Interest Free",
  "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
   {
-   "create": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Employee",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "amend": 1,
-   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -417,69 +397,13 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "Expense Approver",
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  },
-  {
-   "create": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "HR Manager",
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  },
-  {
-   "create": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "HR User",
+   "role": "System Manager",
    "share": 1,
    "submit": 1,
    "write": 1
   }
  ],
- "search_fields": "employee,employee_name",
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": [
-  {
-   "color": "Red",
-   "title": "Draft"
-  },
-  {
-   "color": "Green",
-   "title": "Paid"
-  },
-  {
-   "color": "Orange",
-   "title": "Unpaid"
-  },
-  {
-   "color": "Blue",
-   "title": "Claimed"
-  },
-  {
-   "color": "Gray",
-   "title": "Returned"
-  },
-  {
-   "color": "Yellow",
-   "title": "Partly Claimed and Returned"
-  },
-  {
-   "color": "Red",
-   "title": "Cancelled"
-  }
- ],
- "title_field": "employee_name",
- "track_changes": 1
+ "states": []
 }

@@ -153,16 +153,16 @@ class EmployeeSeparationClearance(Document):
 			frappe.throw("Supervisor has not granted clearance.")
 		if self.afd_clearance == 0:
 			frappe.throw("Finance and Investment has not granted clearance.")
-		if self.ams_clearance == 0:
-			frappe.throw("Asset Management Section has not granted clearance.")
-		if self.icthr_clearance == 0:
-			frappe.throw("Human Resource & Administration has not granted clearance.")
-		if self.iad_clearance == 0:
-			frappe.throw("Internal Audit has not granted clearance.")
+		# if self.ams_clearance == 0:
+		# 	frappe.throw("Asset Management Section has not granted clearance.")
+		# if self.icthr_clearance == 0:
+		# 	frappe.throw("Human Resource & Administration has not granted clearance.")
+		# if self.iad_clearance == 0:
+		# 	frappe.throw("Internal Audit has not granted clearance.")
 		if self.ada_clearance == 0:
 			frappe.throw("Asset Declaration Administrator has not granted clearance.")
-		if self.pc_clearance == 0:
-			frappe.throw("Procurement and Contracts has not granted clearance.")
+		# if self.pc_clearance == 0:
+		# 	frappe.throw("Procurement and Contracts has not granted clearance.")
 		# if self.sws_clearance == 0:
 		# 	frappe.throw("SWS Treasurer has not granted clearance.")
 

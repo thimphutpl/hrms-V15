@@ -7,11 +7,12 @@
  "engine": "InnoDB",
  "field_order": [
   "employee_settings",
-  "emp_created_by",
-  "standard_working_hours",
   "column_break_9",
   "retirement_age",
   "return_day_dsa",
+  "column_break_nfku",
+  "emp_created_by",
+  "standard_working_hours",
   "reminders_section",
   "column_break_11",
   "send_work_anniversary_reminders",
@@ -56,6 +57,7 @@
   "unlink_payment_on_cancellation_of_employee_advance",
   "approver_settings_tab",
   "hr_manager",
+  "hr_approver",
   "column_break_zguo",
   "hr_manager_name",
   "separation_clearance_approver_section",
@@ -78,8 +80,14 @@
   "column_break_bbgs",
   "enote_status_notification",
   "enote_reviewer_notification",
+  "concept_note",
+  "concept_note_rejection",
+  "user_creation",
   "attendance_tab",
-  "office_gobal_ip"
+  "office_gobal_ip",
+  "office_local_start_ip",
+  "office_local_end_ip",
+  "test"
  ],
  "fields": [
   {
@@ -510,13 +518,56 @@
    "fieldname": "office_gobal_ip",
    "fieldtype": "Data",
    "label": "Office Gobal Ip"
+  },
+  {
+   "fieldname": "concept_note",
+   "fieldtype": "Link",
+   "label": "Concept Note",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "concept_note_rejection",
+   "fieldtype": "Link",
+   "label": "Concept Note Rejection",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "user_creation",
+   "fieldtype": "Link",
+   "label": " User Creation",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "office_local_start_ip",
+   "fieldtype": "Data",
+   "label": "Office local start ip"
+  },
+  {
+   "fieldname": "office_local_end_ip",
+   "fieldtype": "Data",
+   "label": "Office local end ip"
+  },
+  {
+   "fieldname": "column_break_nfku",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "test",
+   "fieldtype": "Data",
+   "label": "test"
+  },
+  {
+   "fieldname": "hr_approver",
+   "fieldtype": "Link",
+   "label": "Hr Approver",
+   "options": "Employee"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-07-19 21:07:02.984778",
+ "modified": "2025-08-28 11:30:20.634641",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",

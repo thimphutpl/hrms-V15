@@ -36,11 +36,15 @@ class TravelAuthorization(Document):
 		self.set_status()
 		self.make_travel_advance()
 		self.validate_estimated_amount()
-		validate_workflow_states(self)
+		#validate_workflow_states(self)
 
 	def on_update(self):
 		self.check_date_overlap()
 		self.validate_duplicate_entry()
+
+	def on_submit(self):
+		if self.advance_amount: 
+			self.post_journal_entry()
 
 	def on_cancel(self):
 		self.set_status(update=True)
@@ -57,6 +61,72 @@ class TravelAuthorization(Document):
 	def validate_estimated_amount(self):
 		if flt(self.advance_amount) > flt(self.estimated_amount):
 			frappe.throw("your estimate amount is less than advance amount ")
+
+	def post_journal_entry(self):
+		advance_account = frappe.db.get_value("Company", self.company, "travel_advance_account")
+		bank_account = frappe.db.get_value("Branch", self.branch, "expense_bank_account")
+		#frappe.throw(advance_account)
+
+		if not advance_account:
+			frappe.throw(
+				"Travel Advance Account is not set for {}. Please configure it in the Company.".format(
+					frappe.get_desk_link("Company", self.company)
+				),
+				title="Missing Travel Advance Account"
+			)
+
+		if not bank_account:
+			frappe.throw(
+				"Default Expense Bank Account is not set for {}. Please configure it in the Branch.".format(
+					frappe.get_desk_link("Branch", self.branch)
+				),
+				title="Missing Expense Bank Account"
+			)
+
+		# Posting Journal Entry
+		accounts = []
+		accounts.append({
+			"account": advance_account,
+			"debit": flt(self.advance_amount),
+			"debit_in_account_currency": flt(self.advance_amount),
+			"cost_center": self.cost_center,
+			"party_check": 1,
+			"party_type": "Employee",
+			"party": self.employee,
+			"is_advance": "Yes",
+			"reference_type": "Travel Authorization",
+			"reference_name": self.name,
+		})
+
+		accounts.append({
+			"account": bank_account,
+			"credit": flt(self.advance_amount),
+			"credit_in_account_currency": flt(self.advance_amount),
+			"cost_center": self.cost_center,
+		})
+
+		je = frappe.new_doc("Journal Entry")
+		
+		voucher_type = "Bank Entry"
+		naming_series = "Bank Payment Voucher"
+		
+		je.update({
+				"doctype": "Journal Entry",
+				"voucher_type": voucher_type,
+				"naming_series": naming_series,
+				"title": "Travel Advance - "+self.employee,
+				"user_remark": "Travek Advance - "+self.employee,
+				"posting_date": nowdate(),
+				"company": self.company,
+				"accounts": accounts,
+				"branch": self.branch
+		})
+
+		if self.advance_amount:
+			je.save(ignore_permissions = True)
+			# self.db_set("journal_entry", je.name)
+			# self.db_set("journal_entry_status", "Forwarded to accounts for processing payment on {0}".format(now_datetime().strftime('%Y-%m-%d %H:%M:%S')))
+			# frappe.msgprint(_('{} posted to accounts').format(frappe.get_desk_link(je.doctype,je.name)))
 
 	def validate_travel_dates(self):
 		for item in self.get("items", []):

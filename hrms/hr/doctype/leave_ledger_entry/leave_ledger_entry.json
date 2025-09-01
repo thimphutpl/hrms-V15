@@ -18,7 +18,9 @@
   "is_carry_forward",
   "is_expired",
   "is_lwp",
-  "amended_from"
+  "amended_from",
+  "is_adjusted_leave",
+  "leave_adjustment_id"
  ],
  "fields": [
   {
@@ -121,13 +123,25 @@
    "options": "Company",
    "read_only": 1,
    "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_adjusted_leave",
+   "fieldtype": "Check",
+   "label": "Is Adjusted Leave"
+  },
+  {
+   "fieldname": "leave_adjustment_id",
+   "fieldtype": "Link",
+   "label": "Leave Adjustment ID",
+   "options": "Leave Adjustment"
   }
  ],
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-05-25 23:04:13.556210",
+ "modified": "2025-08-09 12:50:47.494305",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Ledger Entry",
