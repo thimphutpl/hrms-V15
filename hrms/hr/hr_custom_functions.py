@@ -267,42 +267,101 @@ def post_casual_leaves():
 ##
 # Post earned leave on the first day of every month
 ##
-def post_earned_leaves():	
-	# if not getdate(frappe.utils.nowdate()) == getdate(get_first_day(frappe.utils.nowdate())):
-	# 	return 0
-	
-	date = add_days(frappe.utils.nowdate(), -20)
-	start = get_first_day(date);
-	end = get_last_day(date);
-	employees = frappe.db.sql("select name, employee_name, date_of_joining from `tabEmployee` where status = 'Active' and employment_type NOT IN('Armed Forces', 'GCE')", as_dict=True)
-	
+
+def post_earned_leaves():
+	from datetime import datetime
+
+	today = getdate(nowdate())
+	fiscal_start = today.replace(month=1, day=1)
+	fiscal_end = today.replace(month=12, day=31)	
+	employees = frappe.db.sql(
+		"select name, employee_name, date_of_joining from `tabEmployee` where status = 'Active' and employment_type NOT IN('Armed Forces', 'GCE')",
+		as_dict=True
+	)	
+
 	for e in employees:
-		if e.name== "GYAL201310":
-			if cint(date_diff(end, getdate(e.date_of_joining))) > 14:
-				la = frappe.new_doc("Leave Allocation")
-				la.employee = e.name
-				la.employee_name = e.employee_name
-				la.leave_type = "Earned Leave"
-				la.from_date = str(start)
-				la.to_date = str(end)
-				la.carry_forward = cint(1)
-				la.new_leaves_allocated = flt(1.75)
-				la.submit()
+		doj = getdate(e.date_of_joining)
+		# Allocation period starts from joining date or fiscal start, whichever is later
+		from_date = max(doj, fiscal_start)
+		to_date = fiscal_end
+
+		# Only allocate if employee will have >14 days in fiscal year
+		if cint(date_diff(to_date, doj)) > 14:
+			leave_type = "Earned Leave"
+			from_date_str = from_date.strftime('%Y-%m-%d')
+			to_date_str = to_date.strftime('%Y-%m-%d')
+
+			existing_allocation = frappe.db.exists("Leave Allocation", {
+				"employee": e.name,
+				"leave_type": leave_type,
+				"from_date": from_date_str,
+				"to_date": to_date_str,
+				"docstatus": 1
+			})
+
+			max_leaves_allowed = frappe.db.get_value("Leave Type", leave_type, "max_leaves_allowed")
+			max_leaves_allowed = flt(max_leaves_allowed) if max_leaves_allowed else 0
+
+			allocations_sum = frappe.db.sql("""
+				SELECT SUM(new_leaves_allocated)
+				FROM `tabLeave Allocation`
+				WHERE employee=%s AND leave_type=%s AND from_date=%s AND to_date=%s AND docstatus=1
+			""", (e.name, leave_type, from_date_str, to_date_str))[0][0] or 0
+
+			if existing_allocation:
+				la = frappe.get_doc("Leave Allocation", existing_allocation)
+				if max_leaves_allowed == 0 or flt(allocations_sum) + 2.5 <= max_leaves_allowed:
+					la.new_leaves_allocated = flt(la.new_leaves_allocated) + 2.5
+					la.flags.ignore_validate_update_after_submit = True
+					la.save()
+					frappe.db.commit()
+					print(f"Leave Allocation updated successfully for {e.name}!")
+				else:
+					print(f"Allocation cap reached for {e.name}. Skipping.")
 			else:
-				pass
-		else:
-			if cint(date_diff(end, getdate(e.date_of_joining))) > 14:
 				la = frappe.new_doc("Leave Allocation")
 				la.employee = e.name
 				la.employee_name = e.employee_name
-				la.leave_type = "Earned Leave"
-				la.from_date = str(start)
-				la.to_date = str(end)
+				la.leave_type = leave_type
+				la.from_date = from_date_str
+				la.to_date = to_date_str
 				la.carry_forward = cint(1)
 				la.new_leaves_allocated = flt(2.5)
 				la.submit()
-			else:
-				pass
+				print(f"Leave Allocation submitted successfully for {e.name}!")
+
+
+
+def update_leave_ledger_entry(employee, leave_type, from_date, to_date, leaves):
+    # Check if an LLE already exists for this period
+    existing_lle = frappe.db.exists("Leave Ledger Entry", {
+        "employee": employee,
+        "leave_type": leave_type,
+        "from_date": from_date,
+        "to_date": to_date,
+        "transaction_type": "Leave Allocation"
+    })
+    
+    if existing_lle:
+        # Update existing LLE
+        lle = frappe.get_doc("Leave Ledger Entry", existing_lle)
+        lle.leaves = flt(lle.leaves) + leaves
+        lle.flags.ignore_validate_update_after_submit = True
+        lle.save()
+    else:
+        # Create new LLE
+        lle = frappe.new_doc("Leave Ledger Entry")
+        lle.employee = employee
+        lle.leave_type = leave_type
+        lle.from_date = from_date
+        lle.to_date = to_date
+        lle.leaves = leaves
+        lle.is_carry_forward = 1
+        lle.transaction_type = "Leave Allocation"
+        lle.transaction_date = getdate(nowdate())
+        lle.submit()
+
+
 
 #function to get the difference between two dates
 @frappe.whitelist()
