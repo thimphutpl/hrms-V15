@@ -332,39 +332,6 @@ def post_earned_leaves():
 				la.submit()
 				print(f"Leave Allocation submitted successfully for {e.name}!")
 
-
-
-def update_leave_ledger_entry(employee, leave_type, from_date, to_date, leaves):
-	# Check if an LLE already exists for this period
-	existing_lle = frappe.db.exists("Leave Ledger Entry", {
-		"employee": employee,
-		"leave_type": leave_type,
-		"from_date": from_date,
-		"to_date": to_date,
-		"transaction_type": "Leave Allocation"
-	})
-	
-	if existing_lle:
-		# Update existing LLE
-		lle = frappe.get_doc("Leave Ledger Entry", existing_lle)
-		lle.leaves = flt(lle.leaves) + leaves
-		lle.flags.ignore_validate_update_after_submit = True
-		lle.save()
-	else:
-		# Create new LLE
-		lle = frappe.new_doc("Leave Ledger Entry")
-		lle.employee = employee
-		lle.leave_type = leave_type
-		lle.from_date = from_date
-		lle.to_date = to_date
-		lle.leaves = leaves
-		lle.is_carry_forward = 1
-		lle.transaction_type = "Leave Allocation"
-		lle.transaction_date = getdate(nowdate())
-		lle.submit()
-
-
-
 #function to get the difference between two dates
 @frappe.whitelist()
 def get_date_diff(start_date, end_date):
