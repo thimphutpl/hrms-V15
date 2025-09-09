@@ -137,7 +137,8 @@
   {
    "fieldname": "description",
    "fieldtype": "Small Text",
-   "label": "Reason for Transfer"
+   "label": "Reason for Transfer",
+   "reqd": 1
   },
   {
    "fieldname": "sb_supervisor_details",
@@ -171,7 +172,9 @@
    "depends_on": "eval:frappe.user.has_role(\"HR Manager\")",
    "fieldname": "rejection_reason",
    "fieldtype": "Small Text",
-   "label": "Reason for Rejection"
+   "label": "Reason for Rejection",
+   "permlevel": 1,
+   "reqd": 1
   },
   {
    "fieldname": "transfer_type",
@@ -201,7 +204,8 @@
    "fieldtype": "Link",
    "ignore_user_permissions": 1,
    "label": "New Division",
-   "options": "Department"
+   "options": "Department",
+   "reqd": 1
   },
   {
    "fetch_from": "section",
@@ -235,7 +239,8 @@
    "fieldtype": "Link",
    "label": "Current Division",
    "options": "Department",
-   "read_only": 1
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fetch_from": "employee.section",
@@ -263,14 +268,16 @@
    "fieldtype": "Link",
    "label": "Current Supervisor",
    "options": "Employee",
-   "read_only": 1
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fieldname": "new_reports_to",
    "fieldtype": "Link",
    "ignore_user_permissions": 1,
    "label": "New Supervisor",
-   "options": "Employee"
+   "options": "Employee",
+   "reqd": 1
   },
   {
    "fetch_from": "old_branch.cost_center",
@@ -278,7 +285,8 @@
    "fieldtype": "Link",
    "label": "Current Cost Center",
    "options": "Cost Center",
-   "read_only": 1
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fetch_from": "new_branch.cost_center",
@@ -286,7 +294,8 @@
    "fieldtype": "Link",
    "label": "New Cost Center",
    "options": "Cost Center",
-   "read_only": 1
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fetch_from": "employee.employee_name",
@@ -301,14 +310,16 @@
    "fieldname": "current_supervisor_name",
    "fieldtype": "Data",
    "label": "Current Supervisor Name",
-   "read_only": 1
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fetch_from": "new_reports_to.employee_name",
    "fieldname": "new_supervisor_name",
    "fieldtype": "Data",
    "label": "New Supervisor Name",
-   "read_only": 1
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fieldname": "sb_reports_to",
@@ -347,7 +358,8 @@
    "fieldtype": "Link",
    "label": "Current Designation",
    "options": "Designation",
-   "read_only": 1
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fetch_from": "employee.unit",
@@ -361,7 +373,8 @@
    "fieldname": "new_designation",
    "fieldtype": "Link",
    "label": "New Designation",
-   "options": "Designation"
+   "options": "Designation",
+   "reqd": 1
   },
   {
    "fieldname": "new_unit",
@@ -391,7 +404,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-02-20 17:12:35.477046",
+ "modified": "2025-09-09 15:55:59.024680",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Transfer",
