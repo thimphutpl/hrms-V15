@@ -36,6 +36,7 @@ from hrms.hr.utils import (
 )
 from hrms.mixins.pwa_notifications import PWANotificationsMixin
 from hrms.utils import get_employee_email
+from erpnext.custom_workflow import validate_workflow_states
 
 
 class LeaveDayBlockedError(frappe.ValidationError):
@@ -84,6 +85,8 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		self.validate_salary_processed_days()
 		self.validate_attendance()
 		self.set_half_day_date()
+		validate_workflow_states(self)
+		
 		if frappe.db.get_value("Leave Type", self.leave_type, "is_optional_leave"):
 			self.validate_optional_leave()
 		self.validate_applicable_after()
@@ -99,8 +102,8 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		self.notify_approval_status()
 
 	def on_submit(self):
-		if self.status in ["Open", "Cancelled"]:
-			frappe.throw(_("Only Leave Applications with status 'Approved' and 'Rejected' can be submitted"))
+		# if self.status in ["Open", "Cancelled"]:
+		# 	frappe.throw(_("Only Leave Applications with status 'Approved' and 'Rejected' can be submitted"))
 
 		self.validate_back_dated_application()
 		self.update_attendance()
@@ -131,7 +134,6 @@ class LeaveApplication(Document, PWANotificationsMixin):
 	def publish_update(self):
 		employee_user = frappe.db.get_value("Employee", self.employee, "user_id", cache=True)
 		hrms.refetch_resource("hrms:my_leaves", employee_user)
-		hrms.refetch_resource("hrms:team_leaves", employee_user)
 
 	def validate_applicable_after(self):
 		if self.leave_type:
@@ -257,15 +259,10 @@ class LeaveApplication(Document, PWANotificationsMixin):
 
 		for dt in daterange(getdate(self.from_date), getdate(self.to_date)):
 			date = dt.strftime("%Y-%m-%d")
-			# check for existing attenadnce absent or if half day with half day status absent,
 			attendance_name = frappe.db.exists(
-				"Attendance",
-				dict(
-					employee=self.employee,
-					attendance_date=date,
-					docstatus=("!=", 2),
-				),
+				"Attendance", dict(employee=self.employee, attendance_date=date, docstatus=("!=", 2))
 			)
+
 			# don't mark attendance for holidays
 			# if leave type does not include holidays within leaves as leaves
 			if date in holiday_dates:
@@ -286,19 +283,9 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		)
 
 		if attendance_name:
-			# update existing attendance, change absent to on leave or half day
+			# update existing attendance, change absent to on leave
 			doc = frappe.get_doc("Attendance", attendance_name)
-			half_day_status = None if status == "On Leave" else "Present"
-			modify_half_day_status = 1 if doc.status == "Absent" and status == "Half Day" else 0
-			doc.db_set(
-				{
-					"status": status,
-					"leave_type": self.leave_type,
-					"leave_application": self.name,
-					"half_day_status": half_day_status,
-					"modify_half_day_status": modify_half_day_status,
-				}
-			)
+			doc.db_set({"status": status, "leave_type": self.leave_type, "leave_application": self.name})
 		else:
 			# make new attendance and submit it
 			doc = frappe.new_doc("Attendance")
@@ -309,9 +296,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
 			doc.leave_type = self.leave_type
 			doc.leave_application = self.name
 			doc.status = status
-			doc.half_day_status = "Present" if status == "Half Day" else None
-			doc.modify_half_day_status = 1 if status == "Half Day" else 0
-			doc.flags.ignore_validate = True  # ignores check leave record validation in attendance
+			doc.flags.ignore_validate = True
 			doc.insert(ignore_permissions=True)
 			doc.submit()
 
@@ -567,31 +552,14 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		)
 
 	def validate_attendance(self):
-		attendance_dates = frappe.get_all(
-			"Attendance",
-			filters={
-				"employee": self.employee,
-				"attendance_date": ("between", [self.from_date, self.to_date]),
-				"status": ("in", ["Present", "Work From Home"]),
-				"docstatus": 1,
-				"half_day_status": ("!=", "Absent"),
-			},
-			fields=["name", "attendance_date"],
-			order_by="attendance_date",
+		attendance = frappe.db.sql(
+			"""select name from `tabAttendance` where employee = %s and (attendance_date between %s and %s)
+					and status = 'Present' and docstatus = 1""",
+			(self.employee, self.from_date, self.to_date),
 		)
-		if attendance_dates:
+		if attendance:
 			frappe.throw(
-				_("Attendance for employee {0} is already marked for the following dates: {1}").format(
-					self.employee,
-					(
-						"<br><ul><li>"
-						+ "</li><li>".join(
-							get_link_to_form("Attendance", a.name, label=formatdate(a.attendance_date))
-							for a in attendance_dates
-						)
-						+ "</li></ul>"
-					),
-				),
+				_("Attendance for employee {0} is already marked for this day").format(self.employee),
 				AttendanceAlreadyMarkedError,
 			)
 
@@ -701,8 +669,8 @@ class LeaveApplication(Document, PWANotificationsMixin):
 				pass
 
 	def create_leave_ledger_entry(self, submit=True):
-		if self.status != "Approved" and submit:
-			return
+		# if self.status != "Approved" and submit:
+		# 	return
 
 		expiry_date = get_allocation_expiry_for_cf_leaves(
 			self.employee, self.leave_type, self.to_date, self.from_date
@@ -1198,6 +1166,7 @@ def get_leave_entries(employee, leave_type, from_date, to_date):
 		FROM `tabLeave Ledger Entry`
 		WHERE employee=%(employee)s AND leave_type=%(leave_type)s
 			AND docstatus=1
+			AND is_adjusted_leave = 0
 			AND (leaves<0
 				OR is_expired=1)
 			AND (from_date between %(from_date)s AND %(to_date)s
@@ -1410,16 +1379,16 @@ def get_approved_leaves_for_period(employee, leave_type, from_date, to_date):
 
 @frappe.whitelist()
 def get_leave_approver(employee):
-	leave_approver, department = frappe.db.get_value("Employee", employee, ["leave_approver", "department"])
+	
+	leave_approver = frappe.db.get_value("Employee", employee, "reports_to")
+	
+	if not leave_approver:
+		frappe.throw("Employee doesn't have report to")
+	#frappe.throw(leave_approver)
+	leave_approver_mail=frappe.db.get_value("Employee", leave_approver, "user_id")
+	#frappe.throw(leave_approver_mail)
 
-	if not leave_approver and department:
-		leave_approver = frappe.db.get_value(
-			"Department Approver",
-			{"parent": department, "parentfield": "leave_approvers", "idx": 1},
-			"approver",
-		)
-
-	return leave_approver
+	return leave_approver_mail
 
 
 def on_doctype_update():

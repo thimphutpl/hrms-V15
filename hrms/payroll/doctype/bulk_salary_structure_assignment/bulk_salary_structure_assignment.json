@@ -147,7 +147,7 @@
  "hide_toolbar": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-01-13 13:48:46.095481",
+ "modified": "2024-07-09 19:33:40.135057",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Bulk Salary Structure Assignment",
@@ -163,7 +163,8 @@
    "write": 1
   }
  ],
- "sort_field": "creation",
+ "read_only": 1,
+ "sort_field": "modified",
  "sort_order": "DESC",
  "states": []
 }

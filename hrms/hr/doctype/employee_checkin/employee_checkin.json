@@ -25,7 +25,6 @@
   "shift_timings_section",
   "shift_start",
   "shift_end",
-  "offshift",
   "column_break_vyyt",
   "shift_actual_start",
   "shift_actual_end"
@@ -74,7 +73,6 @@
    "in_list_view": 1,
    "label": "Time",
    "permlevel": 1,
-   "read_only_depends_on": "eval:doc.attendance;",
    "reqd": 1
   },
   {
@@ -166,18 +164,10 @@
    "fieldname": "fetch_geolocation",
    "fieldtype": "Button",
    "label": "Fetch Geolocation"
-  },
-  {
-   "default": "0",
-   "fieldname": "offshift",
-   "fieldtype": "Check",
-   "hidden": 1,
-   "label": "Off-shift",
-   "read_only": 1
   }
  ],
  "links": [],
- "modified": "2025-03-05 15:36:10.014354",
+ "modified": "2024-05-29 21:19:11.550766",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Checkin",
@@ -272,7 +262,7 @@
    "role": "Employee"
   }
  ],
- "sort_field": "creation",
+ "sort_field": "modified",
  "sort_order": "ASC",
  "states": [],
  "title_field": "employee_name",

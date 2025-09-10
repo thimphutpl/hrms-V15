@@ -162,7 +162,7 @@ def get_feedback(interview: str) -> list[dict]:
 		.left_join(employee)
 		.on(interview_feedback.interviewer == employee.user_id)
 		.where((interview_feedback.interview == interview) & (interview_feedback.docstatus == 1))
-		.orderby(interview_feedback.creation)
+		.orderby(interview_feedback.modified)
 	).run(as_dict=True)
 
 
@@ -185,13 +185,18 @@ def get_skill_wise_average_rating(interview: str) -> list[dict]:
 
 
 @frappe.whitelist()
-def update_job_applicant_status(status: str, job_applicant: str):
+def update_job_applicant_status(args):
+	import json
+
 	try:
-		if not job_applicant:
+		if isinstance(args, str):
+			args = json.loads(args)
+
+		if not args.get("job_applicant"):
 			frappe.throw(_("Please specify the job applicant to be updated."))
 
-		job_applicant = frappe.get_doc("Job Applicant", job_applicant)
-		job_applicant.status = status
+		job_applicant = frappe.get_doc("Job Applicant", args["job_applicant"])
+		job_applicant.status = args["status"]
 		job_applicant.save()
 
 		frappe.msgprint(
@@ -328,7 +333,7 @@ def create_interview_feedback(data, interview_name, interviewer, job_applicant):
 
 	for d in data.skill_set:
 		d = frappe._dict(d)
-		interview_feedback.append("skill_assessment", d)
+		interview_feedback.append("skill_assessment", {"skill": d.skill, "rating": d.rating})
 
 	interview_feedback.feedback = data.feedback
 	interview_feedback.result = data.result

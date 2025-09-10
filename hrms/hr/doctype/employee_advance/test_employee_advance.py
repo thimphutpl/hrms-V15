@@ -2,7 +2,7 @@
 # See license.txt
 
 import frappe
-from frappe.tests import IntegrationTestCase, change_settings
+from frappe.tests.utils import FrappeTestCase, change_settings
 from frappe.utils import flt, nowdate
 
 import erpnext
@@ -14,7 +14,7 @@ from hrms.hr.doctype.employee_advance.employee_advance import (
 	make_bank_entry,
 	make_return_entry,
 )
-from hrms.hr.doctype.expense_claim.expense_claim import get_advances, get_allocation_amount
+from hrms.hr.doctype.expense_claim.expense_claim import get_advances
 from hrms.hr.doctype.expense_claim.test_expense_claim import (
 	get_payable_account,
 	make_expense_claim,
@@ -23,7 +23,7 @@ from hrms.payroll.doctype.salary_component.test_salary_component import create_s
 from hrms.payroll.doctype.salary_structure.test_salary_structure import make_salary_structure
 
 
-class TestEmployeeAdvance(IntegrationTestCase):
+class TestEmployeeAdvance(FrappeTestCase):
 	def setUp(self):
 		frappe.db.delete("Employee Advance")
 		self.update_company_in_fiscal_year()
@@ -353,11 +353,7 @@ def get_advances_for_claim(claim, advance_name, amount=None):
 		if amount:
 			allocated_amount = amount
 		else:
-			allocated_amount = get_allocation_amount(
-				paid_amount=entry.paid_amount,
-				claimed_amount=entry.claimed_amount,
-				return_amount=entry.return_amount,
-			)
+			allocated_amount = flt(entry.paid_amount) - flt(entry.claimed_amount)
 
 		claim.append(
 			"advances",
@@ -366,8 +362,7 @@ def get_advances_for_claim(claim, advance_name, amount=None):
 				"posting_date": entry.posting_date,
 				"advance_account": entry.advance_account,
 				"advance_paid": entry.paid_amount,
-				"return_amount": entry.return_amount,
-				"unclaimed_amount": entry.paid_amount - entry.claimed_amount,
+				"unclaimed_amount": allocated_amount,
 				"allocated_amount": allocated_amount,
 			},
 		)

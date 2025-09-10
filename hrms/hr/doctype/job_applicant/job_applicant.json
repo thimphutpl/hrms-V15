@@ -183,7 +183,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "fetch_from": "job_title.designation",
    "fetch_if_empty": 1,
    "fieldname": "designation",
    "fieldtype": "Link",
@@ -195,7 +194,7 @@
  "idx": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-16 13:06:05.312255",
+ "modified": "2023-09-14 17:03:48.838409",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Applicant",
@@ -216,7 +215,7 @@
  ],
  "search_fields": "applicant_name, email_id, job_title, phone_number",
  "sender_field": "email_id",
- "sort_field": "creation",
+ "sort_field": "modified",
  "sort_order": "ASC",
  "states": [],
  "subject_field": "notes",

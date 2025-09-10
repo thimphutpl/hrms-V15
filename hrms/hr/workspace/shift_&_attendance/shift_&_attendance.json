@@ -1,5 +1,4 @@
 {
- "app": "hrms",
  "charts": [
   {
    "chart_name": "Attendance Count",
@@ -15,7 +14,7 @@
  "hide_custom": 1,
  "icon": "milestone",
  "idx": 0,
- "is_hidden": 0,
+ "is_hidden": 1,
  "label": "Shift & Attendance",
  "links": [
   {
@@ -242,7 +241,7 @@
    "type": "Link"
   }
  ],
- "modified": "2025-04-11 16:43:18.393364",
+ "modified": "2025-08-13 16:26:28.422497",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Shift & Attendance",
@@ -293,6 +292,5 @@
    "type": "DocType"
   }
  ],
- "title": "Shift & Attendance",
- "type": "Workspace"
+ "title": "Shift & Attendance"
 }

@@ -1,0 +1,212 @@
+{
+ "actions": [],
+ "creation": "2025-02-15 01:17:14.270525",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "processing_branch",
+  "column_break_cdxt",
+  "fiscal_year",
+  "month",
+  "status",
+  "section_break_ekxx",
+  "employees",
+  "more_info_section",
+  "start_date",
+  "end_date",
+  "column_break_ajwd",
+  "company",
+  "pay_slips_created",
+  "pay_slips_submitted",
+  "amended_from",
+  "section_break_mexy",
+  "attendance_detail_html"
+ ],
+ "fields": [
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Muster Roll Payment Entry",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "processing_branch",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Processing Branch",
+   "options": "Branch",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_cdxt",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "fiscal_year",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Fiscal Year",
+   "options": "Fiscal Year",
+   "reqd": 1
+  },
+  {
+   "fieldname": "month",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Month",
+   "options": "\nJanuary\nFebruary\nMarch\nApril\nMay\nJune\nJuly\nAugust\nSeptember\nOctober\nNovember\nDecember",
+   "reqd": 1
+  },
+  {
+   "fieldname": "more_info_section",
+   "fieldtype": "Section Break",
+   "label": "More Info"
+  },
+  {
+   "fieldname": "column_break_ajwd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_ekxx",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "employees",
+   "fieldtype": "Table",
+   "label": "Muster Roll Employee Detail",
+   "options": "Muster Roll Employee Detail"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "no_copy": 1,
+   "options": "Draft\nSubmitted\nCancelled\nQueued\nFailed",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "pay_slips_created",
+   "fieldtype": "Check",
+   "label": "Pay Slips Created",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "pay_slips_submitted",
+   "fieldtype": "Check",
+   "label": "Pay Slips Submitted",
+   "read_only": 1
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "label": "Start Date",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "End Date",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_mexy",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "attendance_detail_html",
+   "fieldtype": "HTML"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-02-21 17:42:51.815804",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Muster Roll Payment Entry",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts User",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

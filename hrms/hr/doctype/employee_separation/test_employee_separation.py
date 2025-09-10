@@ -2,19 +2,13 @@
 # See license.txt
 
 import frappe
+from frappe.tests.utils import FrappeTestCase
 from frappe.utils import getdate
-
-from hrms.tests.utils import HRMSTestSuite
 
 test_dependencies = ["Employee Onboarding"]
 
 
-class TestEmployeeSeparation(HRMSTestSuite):
-	@classmethod
-	def setUpClass(cls):
-		super().setUpClass()
-		cls.make_employees()
-
+class TestEmployeeSeparation(FrappeTestCase):
 	def test_employee_separation(self):
 		separation = create_employee_separation()
 

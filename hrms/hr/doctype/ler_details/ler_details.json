@@ -1,0 +1,119 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-08-29 11:52:42.516288",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "employee",
+  "employee_name",
+  "ref",
+  "sb_amount_rate",
+  "earned_leave_allocation",
+  "earned_leave_balance",
+  "total_leave_balance",
+  "enchashable_days",
+  "carry_forward_days",
+  "cb_01",
+  "casual_leave_allocation",
+  "casual_leave_balance"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Employee",
+   "options": "Employee",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ref",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Ref ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_amount_rate",
+   "fieldtype": "Section Break",
+   "label": "Leave Details"
+  },
+  {
+   "fieldname": "earned_leave_allocation",
+   "fieldtype": "Link",
+   "label": "Earned Leave Allocation",
+   "options": "Leave Allocation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "earned_leave_balance",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Earned Leave Balance",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb_01",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "casual_leave_allocation",
+   "fieldtype": "Link",
+   "label": "Casual Leave Allocation",
+   "options": "Leave Allocation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "casual_leave_balance",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Casual Leave Balance",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_leave_balance",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Total Leave Balance",
+   "read_only": 1
+  },
+  {
+   "fieldname": "enchashable_days",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Enchashable Days",
+   "read_only": 1
+  },
+  {
+   "fieldname": "carry_forward_days",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Carry Forward Days",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-08-29 12:26:15.146053",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "LER Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

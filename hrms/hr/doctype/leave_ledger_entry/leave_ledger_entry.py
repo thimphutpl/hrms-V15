@@ -61,19 +61,35 @@ def validate_leave_allocation_against_leave_application(ledger):
 		)
 
 
-def create_leave_ledger_entry(ref_doc, args, submit=True):
-	ledger = frappe._dict(
-		doctype="Leave Ledger Entry",
-		employee=ref_doc.employee,
-		employee_name=ref_doc.employee_name,
-		leave_type=ref_doc.leave_type,
-		transaction_type=ref_doc.doctype,
-		transaction_name=ref_doc.name,
-		is_carry_forward=0,
-		is_expired=0,
-		is_lwp=0,
-	)
-	ledger.update(args)
+def create_leave_ledger_entry(ref_doc, args, submit=True, leave_type=None):
+	if ref_doc.doctype != "Bulk Leave Encashment":
+		ledger = frappe._dict(
+			doctype='Leave Ledger Entry',
+			employee=ref_doc.employee,
+			employee_name=ref_doc.employee_name,
+			leave_type=ref_doc.leave_type,
+			transaction_type=ref_doc.doctype,
+			transaction_name=ref_doc.name,
+			is_carry_forward=0,
+			is_expired=0,
+			is_lwp=0,
+			is_adjusted_leave=0,
+			leave_adjustment_id=None
+		)
+		ledger.update(args)
+	else:
+		ledger = frappe._dict(
+			doctype='Leave Ledger Entry',
+			leave_type=ref_doc.leave_type,
+			transaction_type=ref_doc.doctype,
+			transaction_name=ref_doc.name,
+			is_carry_forward=0,
+			is_expired=0,
+			is_lwp=0,
+			is_adjusted_leave=0,
+			leave_adjustment_id=None
+		)
+		ledger.update(args)
 
 	if submit:
 		doc = frappe.get_doc(ledger)

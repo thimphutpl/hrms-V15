@@ -28,6 +28,7 @@
   "leave_approver",
   "leave_approver_name",
   "follow_via_email",
+  "leave_approver_designation",
   "column_break_18",
   "posting_date",
   "status",
@@ -36,6 +37,7 @@
   "color",
   "column_break_17",
   "letter_head",
+  "workflow_state",
   "amended_from"
  ],
  "fields": [
@@ -160,6 +162,7 @@
    "options": "User"
   },
   {
+   "fetch_from": "leave_approver.full_name",
    "fieldname": "leave_approver_name",
    "fieldtype": "Data",
    "label": "Leave Approver Name",
@@ -173,12 +176,12 @@
    "default": "Open",
    "fieldname": "status",
    "fieldtype": "Select",
+   "hidden": 1,
    "in_standard_filter": 1,
    "label": "Status",
    "no_copy": 1,
    "options": "Open\nApproved\nRejected\nCancelled",
-   "permlevel": 1,
-   "reqd": 1
+   "permlevel": 1
   },
   {
    "default": "Today",
@@ -248,6 +251,17 @@
    "fieldname": "sb_other_details",
    "fieldtype": "Section Break",
    "label": "Other Details"
+  },
+  {
+   "fieldname": "leave_approver_designation",
+   "fieldtype": "Data",
+   "label": "Leave Approver Designation"
+  },
+  {
+   "fieldname": "workflow_state",
+   "fieldtype": "Link",
+   "label": "Workflow State",
+   "options": "Workflow State"
   }
  ],
  "icon": "fa fa-calendar",
@@ -255,7 +269,7 @@
  "is_submittable": 1,
  "links": [],
  "max_attachments": 3,
- "modified": "2024-04-08 13:56:03.818019",
+ "modified": "2025-09-05 11:04:22.911641",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Application",
@@ -345,8 +359,9 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "search_fields": "employee,employee_name,leave_type,from_date,to_date,total_leave_days",
- "sort_field": "creation",
+ "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
  "timeline_field": "employee",

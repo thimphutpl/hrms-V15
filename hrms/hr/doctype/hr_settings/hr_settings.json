@@ -11,6 +11,7 @@
   "standard_working_hours",
   "column_break_9",
   "retirement_age",
+  "return_day_dsa",
   "reminders_section",
   "column_break_11",
   "send_work_anniversary_reminders",
@@ -52,7 +53,28 @@
   "allow_employee_checkin_from_mobile_app",
   "allow_geolocation_tracking",
   "unlink_payment_section",
-  "unlink_payment_on_cancellation_of_employee_advance"
+  "unlink_payment_on_cancellation_of_employee_advance",
+  "approver_settings_tab",
+  "hr_manager",
+  "hr_approver",
+  "hrgm",
+  "column_break_zguo",
+  "hr_manager_name",
+  "separation_clearance_approver_section",
+  "accounts_finance",
+  "procurement",
+  "general_manager",
+  "column_break_wguy",
+  "accounts_finance_name",
+  "procurement_name",
+  "general_manager_name",
+  "notification_setting_tab",
+  "enote_section",
+  "enote_approval_notification",
+  "enote_copyto_notification",
+  "column_break_wcru",
+  "enote_status_notification",
+  "enote_reviewer_notification"
  ],
  "fields": [
   {
@@ -336,13 +358,136 @@
    "fieldname": "prevent_self_leave_approval",
    "fieldtype": "Check",
    "label": "Prevent self approval for leaves even if user has permissions"
+  },
+  {
+   "fieldname": "return_day_dsa",
+   "fieldtype": "Select",
+   "label": "Return Day DSA (%)",
+   "options": "\n100\n70\n50\n20\n0"
+  },
+  {
+   "fieldname": "approver_settings_tab",
+   "fieldtype": "Tab Break",
+   "label": "Approver Settings"
+  },
+  {
+   "fieldname": "hr_manager",
+   "fieldtype": "Link",
+   "label": "HR Manager",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "column_break_zguo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "hr_manager.employee_name",
+   "fieldname": "hr_manager_name",
+   "fieldtype": "Data",
+   "label": "HR Manager Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "separation_clearance_approver_section",
+   "fieldtype": "Section Break",
+   "label": "Separation Clearance Approver"
+  },
+  {
+   "fieldname": "column_break_wguy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "notification_setting_tab",
+   "fieldtype": "Tab Break",
+   "label": "Notification Setting"
+  },
+  {
+   "fieldname": "enote_section",
+   "fieldtype": "Section Break",
+   "label": "Enote"
+  },
+  {
+   "fieldname": "enote_approval_notification",
+   "fieldtype": "Link",
+   "label": "eNote Approval Notification",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "enote_copyto_notification",
+   "fieldtype": "Link",
+   "label": "eNote CopyTo Notification",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "column_break_wcru",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "enote_status_notification",
+   "fieldtype": "Link",
+   "label": "eNote Status Notification",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "enote_reviewer_notification",
+   "fieldtype": "Link",
+   "label": "eNote Reviewer Notification",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "accounts_finance",
+   "fieldtype": "Link",
+   "label": "Accounts & Finance",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "procurement",
+   "fieldtype": "Link",
+   "label": "Procurement & Human Resource",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "accounts_finance.employee_name",
+   "fieldname": "accounts_finance_name",
+   "fieldtype": "Data",
+   "label": "Accounts & Finance"
+  },
+  {
+   "fetch_from": "procurement.employee_name",
+   "fieldname": "procurement_name",
+   "fieldtype": "Data",
+   "label": "Procurement & Human Resource"
+  },
+  {
+   "fieldname": "general_manager",
+   "fieldtype": "Link",
+   "label": "General Manager",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "general_manager.employee_name",
+   "fieldname": "general_manager_name",
+   "fieldtype": "Data",
+   "label": "General Manager Name"
+  },
+  {
+   "fieldname": "hr_approver",
+   "fieldtype": "Link",
+   "label": "HR Approver",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "hrgm",
+   "fieldtype": "Link",
+   "label": "HRGM",
+   "options": "Employee"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-01-30 12:41:22.594071",
+ "modified": "2025-05-16 13:07:18.678322",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",
@@ -377,7 +522,7 @@
    "role": "Employee"
   }
  ],
- "sort_field": "creation",
+ "sort_field": "modified",
  "sort_order": "ASC",
  "states": [],
  "track_changes": 1

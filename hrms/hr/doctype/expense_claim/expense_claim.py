@@ -112,7 +112,6 @@ class ExpenseClaim(AccountsController, PWANotificationsMixin):
 	def publish_update(self):
 		employee_user = frappe.db.get_value("Employee", self.employee, "user_id", cache=True)
 		hrms.refetch_resource("hrms:my_claims", employee_user)
-		hrms.refetch_resource("hrms:team_claims", employee_user)
 
 	def on_submit(self):
 		if self.approval_status == "Draft":
@@ -413,8 +412,6 @@ def get_total_reimbursed_amount(doc):
 
 
 def get_outstanding_amount_for_claim(claim):
-	precision = frappe.get_precision("Expense Claim", "grand_total")
-
 	if isinstance(claim, str):
 		claim = frappe.db.get_value(
 			"Expense Claim",
@@ -435,7 +432,7 @@ def get_outstanding_amount_for_claim(claim):
 		- flt(claim.total_advance_amount)
 	)
 
-	return flt(outstanding_amt, precision)
+	return outstanding_amt
 
 
 @frappe.whitelist()

@@ -8,65 +8,55 @@
  "engine": "InnoDB",
  "field_order": [
   "select_payroll_period",
-  "posting_date",
   "company",
+  "processing_branch",
+  "cost_center",
   "column_break_5",
+  "fiscal_year",
+  "month",
+  "status",
   "currency",
   "exchange_rate",
-  "payroll_payable_account",
-  "status",
   "section_break_cypo",
-  "salary_slip_based_on_timesheet",
   "payroll_frequency",
+  "posting_date",
   "start_date",
   "end_date",
   "column_break_13",
-  "deduct_tax_for_unclaimed_employee_benefits",
-  "deduct_tax_for_unsubmitted_tax_exemption_proof",
+  "salary_slips_created",
+  "salary_slips_submitted",
   "employees_tab",
   "section_break_17",
   "branch",
   "department",
   "column_break_21",
   "designation",
-  "grade",
+  "employee",
   "number_of_employees",
   "section_break_24",
   "employees",
   "section_break_26",
   "validate_attendance",
   "attendance_detail_html",
-  "accounting_dimensions_tab",
-  "accounting_dimensions_section",
-  "cost_center",
-  "dimension_col_break",
-  "project",
-  "account",
-  "payment_account",
-  "column_break_35",
-  "bank_account",
-  "salary_slips_created",
-  "salary_slips_submitted",
   "failure_details_section",
   "error_message",
   "section_break_41",
-  "amended_from",
-  "connections_tab"
+  "amended_from"
  ],
  "fields": [
   {
-   "default": "Today",
    "fieldname": "posting_date",
    "fieldtype": "Date",
-   "label": "Posting Date",
-   "reqd": 1
+   "hidden": 1,
+   "label": "Posting Date"
   },
   {
    "fieldname": "payroll_frequency",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Payroll Frequency",
    "mandatory_depends_on": "eval:doc.salary_slip_based_on_timesheet == 0",
-   "options": "\nMonthly\nFortnightly\nBimonthly\nWeekly\nDaily"
+   "options": "\nMonthly"
   },
   {
    "fieldname": "company",
@@ -118,12 +108,6 @@
    "fieldtype": "HTML"
   },
   {
-   "default": "0",
-   "fieldname": "salary_slip_based_on_timesheet",
-   "fieldtype": "Check",
-   "label": "Salary Slip Based on Timesheet"
-  },
-  {
    "fieldname": "select_payroll_period",
    "fieldtype": "Tab Break",
    "label": "Overview"
@@ -132,53 +116,22 @@
    "fieldname": "start_date",
    "fieldtype": "Date",
    "label": "Start Date",
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fieldname": "end_date",
    "fieldtype": "Date",
    "label": "End Date",
-   "reqd": 1
+   "read_only": 1
   },
   {
-   "default": "0",
-   "fieldname": "deduct_tax_for_unclaimed_employee_benefits",
-   "fieldtype": "Check",
-   "label": "Deduct Tax For Unclaimed Employee Benefits"
-  },
-  {
-   "default": "0",
-   "fieldname": "deduct_tax_for_unsubmitted_tax_exemption_proof",
-   "fieldtype": "Check",
-   "label": "Deduct Tax For Unsubmitted Tax Exemption Proof"
-  },
-  {
-   "default": ":Company",
+   "fetch_from": "processing_branch.cost_center",
    "fieldname": "cost_center",
    "fieldtype": "Link",
    "label": "Cost Center",
    "options": "Cost Center",
+   "read_only": 1,
    "reqd": 1
-  },
-  {
-   "fieldname": "project",
-   "fieldtype": "Link",
-   "label": "Project",
-   "options": "Project"
-  },
-  {
-   "fieldname": "account",
-   "fieldtype": "Section Break",
-   "label": "Payment Entry"
-  },
-  {
-   "allow_on_submit": 1,
-   "description": "Select Payment Account to make Bank Entry",
-   "fetch_from": "bank_account.account",
-   "fieldname": "payment_account",
-   "fieldtype": "Link",
-   "label": "Payment Account",
-   "options": "Account"
   },
   {
    "fieldname": "amended_from",
@@ -193,7 +146,6 @@
    "default": "0",
    "fieldname": "salary_slips_created",
    "fieldtype": "Check",
-   "hidden": 1,
    "label": "Salary Slips Created",
    "no_copy": 1,
    "read_only": 1
@@ -202,50 +154,26 @@
    "default": "0",
    "fieldname": "salary_slips_submitted",
    "fieldtype": "Check",
-   "hidden": 1,
    "label": "Salary Slips Submitted",
    "no_copy": 1,
    "read_only": 1
   },
   {
-   "fieldname": "accounting_dimensions_section",
-   "fieldtype": "Section Break",
-   "label": "Accounting Dimensions"
-  },
-  {
-   "fieldname": "dimension_col_break",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "bank_account",
-   "fieldtype": "Link",
-   "label": "Bank Account",
-   "options": "Bank Account"
-  },
-  {
    "depends_on": "company",
    "fieldname": "currency",
    "fieldtype": "Link",
+   "hidden": 1,
    "in_list_view": 1,
    "label": "Currency",
-   "options": "Currency",
-   "reqd": 1
+   "options": "Currency"
   },
   {
    "depends_on": "company",
    "fieldname": "exchange_rate",
    "fieldtype": "Float",
+   "hidden": 1,
    "label": "Exchange Rate",
-   "precision": "9",
-   "reqd": 1
-  },
-  {
-   "depends_on": "company",
-   "fieldname": "payroll_payable_account",
-   "fieldtype": "Link",
-   "label": "Payroll Payable Account",
-   "options": "Account",
-   "reqd": 1
+   "precision": "9"
   },
   {
    "collapsible": 1,
@@ -293,17 +221,8 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "column_break_35",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "column_break_13",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "accounting_dimensions_tab",
-   "fieldtype": "Tab Break",
-   "label": "Accounting & Payment"
   },
   {
    "fieldname": "section_break_17",
@@ -320,22 +239,41 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "connections_tab",
-   "fieldtype": "Tab Break",
-   "label": "Connections",
-   "show_dashboard": 1
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee"
   },
   {
-   "fieldname": "grade",
+   "fieldname": "fiscal_year",
    "fieldtype": "Link",
-   "label": "Grade",
-   "options": "Employee Grade"
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Fiscal Year",
+   "options": "Fiscal Year",
+   "reqd": 1
+  },
+  {
+   "fieldname": "month",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Month",
+   "options": "\nJanuary\nFebruary\nMarch\nApril\nMay\nJune\nJuly\nAugust\nSeptember\nOctober\nNovember\nDecember",
+   "reqd": 1
+  },
+  {
+   "fieldname": "processing_branch",
+   "fieldtype": "Link",
+   "label": "Processing Branch",
+   "options": "Branch",
+   "reqd": 1
   }
  ],
  "icon": "fa fa-cog",
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-22 15:27:16.652848",
+ "modified": "2025-04-17 15:52:54.942779",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Payroll Entry",
@@ -352,9 +290,21 @@
    "share": 1,
    "submit": 1,
    "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
+   "share": 1,
+   "submit": 1,
+   "write": 1
   }
  ],
- "sort_field": "creation",
+ "sort_field": "modified",
  "sort_order": "DESC",
  "states": []
 }

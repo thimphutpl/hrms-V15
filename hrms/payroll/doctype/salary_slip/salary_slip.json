@@ -10,19 +10,19 @@
   "section_break_6",
   "employee",
   "employee_name",
+  "designation",
+  "devision",
+  "section",
+  "column_break_obdl",
   "company",
   "department",
-  "designation",
   "branch",
-  "column_break_obdl",
-  "posting_date",
-  "letter_head",
+  "cost_center",
   "column_break_18",
+  "fiscal_year",
+  "posting_date",
   "status",
-  "salary_withholding",
-  "salary_withholding_cycle",
-  "currency",
-  "exchange_rate",
+  "month",
   "section_break_gsts",
   "payroll_frequency",
   "start_date",
@@ -31,27 +31,21 @@
   "salary_structure",
   "payroll_entry",
   "mode_of_payment",
-  "column_break_wyhp",
-  "salary_slip_based_on_timesheet",
   "section_break_gerh",
+  "letter_head",
   "deduct_tax_for_unclaimed_employee_benefits",
   "deduct_tax_for_unsubmitted_tax_exemption_proof",
-  "payment_days_tab",
-  "total_working_days",
-  "unmarked_days",
-  "leave_without_pay",
-  "column_break_geio",
-  "absent_days",
-  "payment_days",
-  "help_section",
-  "payment_days_calculation_help",
+  "column_break_vtdh",
+  "currency",
+  "exchange_rate",
   "earnings_and_deductions_tab",
-  "timesheets_section",
-  "timesheets",
-  "column_break_ghjr",
-  "total_working_hours",
-  "hour_rate",
-  "base_hour_rate",
+  "payment_days_section",
+  "payment_days",
+  "leave_without_pay",
+  "unmarked_days",
+  "column_break_tnzi",
+  "absent_days",
+  "total_working_days",
   "earning_deduction_sb",
   "earnings",
   "column_break_k1jz",
@@ -62,6 +56,7 @@
   "gross_year_to_date",
   "base_gross_year_to_date",
   "column_break_25",
+  "employer_pf_contribution",
   "total_deduction",
   "base_total_deduction",
   "net_pay_info",
@@ -99,6 +94,8 @@
   "column_break_ieob",
   "bank_name",
   "bank_account_no",
+  "gis_number",
+  "gis_policy_number",
   "leave_details_section",
   "leave_details"
  ],
@@ -161,7 +158,6 @@
    "fetch_from": "employee.branch",
    "fieldname": "branch",
    "fieldtype": "Link",
-   "in_standard_filter": 1,
    "label": "Branch",
    "oldfieldname": "branch",
    "oldfieldtype": "Link",
@@ -194,7 +190,6 @@
    "fieldname": "company",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "in_standard_filter": 1,
    "label": "Company",
    "options": "Company",
    "reqd": 1
@@ -207,13 +202,6 @@
    "label": "Letter Head",
    "options": "Letter Head",
    "print_hide": 1
-  },
-  {
-   "default": "0",
-   "fieldname": "salary_slip_based_on_timesheet",
-   "fieldtype": "Check",
-   "label": "Salary Slip Based on Timesheet",
-   "read_only": 1
   },
   {
    "fieldname": "start_date",
@@ -230,19 +218,17 @@
   {
    "fieldname": "salary_structure",
    "fieldtype": "Link",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
    "label": "Salary Structure",
    "options": "Salary Structure",
    "read_only": 1,
-   "reqd": 1,
    "search_index": 1
   },
   {
+   "default": "Monthly",
    "fieldname": "payroll_frequency",
    "fieldtype": "Select",
    "label": "Payroll Frequency",
-   "options": "\nMonthly\nFortnightly\nBimonthly\nWeekly\nDaily"
+   "options": "\nMonthly"
   },
   {
    "fieldname": "total_working_days",
@@ -270,25 +256,6 @@
    "reqd": 1
   },
   {
-   "fieldname": "timesheets",
-   "fieldtype": "Table",
-   "label": "Salary Slip Timesheet",
-   "options": "Salary Slip Timesheet"
-  },
-  {
-   "fieldname": "total_working_hours",
-   "fieldtype": "Float",
-   "label": "Total Working Hours",
-   "print_hide_if_no_value": 1
-  },
-  {
-   "fieldname": "hour_rate",
-   "fieldtype": "Currency",
-   "label": "Hour Rate",
-   "options": "currency",
-   "print_hide_if_no_value": 1
-  },
-  {
    "fieldname": "bank_name",
    "fieldtype": "Data",
    "label": "Bank Name"
@@ -302,12 +269,14 @@
    "default": "0",
    "fieldname": "deduct_tax_for_unclaimed_employee_benefits",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Deduct Tax For Unclaimed Employee Benefits"
   },
   {
    "default": "0",
    "fieldname": "deduct_tax_for_unsubmitted_tax_exemption_proof",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Deduct Tax For Unsubmitted Tax Exemption Proof"
   },
   {
@@ -430,13 +399,6 @@
    "fieldname": "section_break_75",
    "fieldtype": "Tab Break",
    "label": "Bank Details"
-  },
-  {
-   "fieldname": "base_hour_rate",
-   "fieldtype": "Currency",
-   "label": "Hour Rate (Company Currency)",
-   "options": "Company:company:default_currency",
-   "print_hide_if_no_value": 1
   },
   {
    "fieldname": "base_gross_pay",
@@ -566,19 +528,11 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "column_break_geio",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "column_break_dqnd",
    "fieldtype": "Column Break"
   },
   {
    "fieldname": "column_break_ieob",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_ghjr",
    "fieldtype": "Column Break"
   },
   {
@@ -691,32 +645,8 @@
    "read_only": 1
   },
   {
-   "fieldname": "payment_days_tab",
-   "fieldtype": "Tab Break",
-   "label": "Payment Days"
-  },
-  {
    "fieldname": "column_break_k1jz",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_wyhp",
-   "fieldtype": "Column Break"
-  },
-  {
-   "depends_on": "eval:doc.salary_slip_based_on_timesheet",
-   "fieldname": "timesheets_section",
-   "fieldtype": "Section Break",
-   "label": "Timesheet Details"
-  },
-  {
-   "fieldname": "help_section",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "payment_days_calculation_help",
-   "fieldtype": "HTML",
-   "label": "Payment Days Calculation Help"
   },
   {
    "fieldname": "earning_deduction_sb",
@@ -724,21 +654,68 @@
    "oldfieldtype": "Section Break"
   },
   {
-   "fieldname": "salary_withholding",
+   "fieldname": "column_break_vtdh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "payment_days_section",
+   "fieldtype": "Section Break",
+   "label": "Payment Days"
+  },
+  {
+   "fieldname": "column_break_tnzi",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "branch.cost_center",
+   "fieldname": "cost_center",
    "fieldtype": "Link",
-   "label": "Salary Withholding",
-   "no_copy": 1,
-   "options": "Salary Withholding",
-   "print_hide": 1,
+   "label": "Cost Center",
+   "options": "Cost Center",
    "read_only": 1
   },
   {
-   "fieldname": "salary_withholding_cycle",
+   "fieldname": "fiscal_year",
+   "fieldtype": "Link",
+   "label": "Fiscal Year",
+   "options": "Fiscal Year",
+   "reqd": 1
+  },
+  {
+   "fieldname": "month",
+   "fieldtype": "Select",
+   "label": "Month",
+   "options": "\nJanuary\nFebruary\nMarch\nApril\nMay\nJune\nJuly\nAugust\nSeptember\nOctober\nNovember\nDecember"
+  },
+  {
+   "fieldname": "employer_pf_contribution",
+   "fieldtype": "Currency",
+   "label": "Employer PF Contribution"
+  },
+  {
+   "fieldname": "devision",
+   "fieldtype": "Link",
+   "label": "Division",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section",
+   "fieldtype": "Link",
+   "label": "Section",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fieldname": "gis_number",
    "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Salary Withholding Cycle",
-   "no_copy": 1,
-   "print_hide": 1,
+   "label": "GIS Number",
+   "read_only": 1
+  },
+  {
+   "fieldname": "gis_policy_number",
+   "fieldtype": "Data",
+   "label": "GIS Policy Number",
    "read_only": 1
   }
  ],
@@ -746,7 +723,7 @@
  "idx": 9,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-07-01 21:25:36.651583",
+ "modified": "2025-03-04 10:13:18.723218",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Slip",
@@ -785,7 +762,7 @@
  ],
  "search_fields": "employee_name",
  "show_name_in_global_search": 1,
- "sort_field": "creation",
+ "sort_field": "modified",
  "sort_order": "DESC",
  "states": [
   {
@@ -806,5 +783,6 @@
   }
  ],
  "timeline_field": "employee",
- "title_field": "employee_name"
+ "title_field": "employee_name",
+ "track_changes": 1
 }

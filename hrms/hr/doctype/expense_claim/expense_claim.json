@@ -394,6 +394,7 @@
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Expense Claim",
+ "name_case": "Title Case",
  "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
@@ -486,7 +487,7 @@
  ],
  "search_fields": "employee,employee_name",
  "show_name_in_global_search": 1,
- "sort_field": "creation",
+ "sort_field": "modified",
  "sort_order": "DESC",
  "states": [
   {

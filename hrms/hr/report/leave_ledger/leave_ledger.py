@@ -71,7 +71,8 @@ def get_columns() -> list[dict]:
 		{
 			"label": _("Transaction Type"),
 			"fieldname": "transaction_type",
-			"fieldtype": "Data",
+			"fieldtype": "Link",
+			"options": "DocType",
 			"width": 130,
 		},
 		{
@@ -145,8 +146,8 @@ def get_data(filters: Filters) -> list[dict]:
 		)
 		.where(
 			(Ledger.docstatus == 1)
-			& (Ledger.from_date[from_date:to_date])
-			& (Ledger.to_date[from_date:to_date])
+			# & (Ledger.from_date[from_date:to_date])
+			# & (Ledger.to_date[from_date:to_date])
 		)
 	)
 

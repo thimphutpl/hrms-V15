@@ -8,19 +8,7 @@ from frappe.utils import getdate
 
 
 def execute(filters=None):
-	data = []
-	provident_fund_components = ["Provident Fund", "Additional Provident Fund", "Provident Fund Loan"]
-	if not frappe.db.exists("Salary Component", {"component_type": ["in", provident_fund_components]}):
-		frappe.msgprint(
-			_(
-				"Salary components of type Provident Fund, Additional Provident Fund or Provident Fund Loan are not set up."
-			),
-			title=_("Missing Salary Components"),
-			indicator="red",
-		)
-	else:
-		data = get_data(filters)
-
+	data = get_data(filters)
 	columns = get_columns(filters) if len(data) else []
 
 	return columns, data
@@ -90,7 +78,7 @@ def prepare_data(entry, component_type_dict):
 		component_type = component_type_dict.get(d.salary_component)
 
 		if data_list.get(d.name):
-			data_list[d.name][component_type] = d.amount
+			data_list[d.name][type] = d.amount
 		else:
 			data_list.setdefault(
 				d.name,
@@ -98,7 +86,7 @@ def prepare_data(entry, component_type_dict):
 					"employee": d.employee,
 					"employee_name": d.employee_name,
 					"pf_account": employee_account_dict.get(d.employee),
-					component_type: d.amount,
+					type: d.amount,
 				},
 			)
 
@@ -120,8 +108,8 @@ def get_data(filters):
 
 	component_type_dict = frappe._dict(
 		frappe.db.sql(
-			""" select name, component_type from `tabSalary Component`
-		where component_type in ('Provident Fund', 'Additional Provident Fund', 'Provident Fund Loan')"""
+			""" select name, type from `tabSalary Component`
+		where type in ('Deduction', 'Additional Provident Fund', 'Provident Fund Loan')"""
 		)
 	)
 

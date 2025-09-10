@@ -24,7 +24,7 @@
    "link_fieldname": "interview_type"
   }
  ],
- "modified": "2024-03-27 13:09:52.310012",
+ "modified": "2021-09-30 13:00:16.471518",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Interview Type",
@@ -67,8 +67,7 @@
    "write": 1
   }
  ],
- "sort_field": "creation",
+ "sort_field": "modified",
  "sort_order": "DESC",
- "states": [],
  "track_changes": 1
 }

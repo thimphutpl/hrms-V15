@@ -6,7 +6,10 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "purpose_of_travel"
+  "purpose_of_travel",
+  "description",
+  "column_break_bosu",
+  "disabled"
  ],
  "fields": [
   {
@@ -14,10 +17,25 @@
    "fieldtype": "Data",
    "label": "Purpose of Travel",
    "unique": 1
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "fieldname": "column_break_bosu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "label": "Disabled"
   }
  ],
  "links": [],
- "modified": "2024-03-27 13:10:27.112282",
+ "modified": "2025-02-06 20:41:49.648748",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Purpose of Travel",
@@ -37,7 +55,7 @@
   }
  ],
  "quick_entry": 1,
- "sort_field": "creation",
+ "sort_field": "modified",
  "sort_order": "DESC",
  "states": []
 }

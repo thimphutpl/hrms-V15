@@ -1,5 +1,4 @@
 {
- "app": "hrms",
  "charts": [
   {
    "chart_name": "Expense Claims",
@@ -15,7 +14,7 @@
  "hide_custom": 1,
  "icon": "expenses",
  "idx": 0,
- "is_hidden": 0,
+ "is_hidden": 1,
  "label": "Expense Claims",
  "links": [
   {
@@ -257,7 +256,7 @@
    "type": "Link"
   }
  ],
- "modified": "2025-01-15 16:41:35.604928",
+ "modified": "2025-08-13 16:26:09.056914",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Expense Claims",
@@ -295,6 +294,5 @@
    "type": "DocType"
   }
  ],
- "title": "Expense Claims",
- "type": "Workspace"
+ "title": "Expense Claims"
 }

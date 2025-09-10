@@ -18,7 +18,10 @@
   "reallocate_leaves",
   "create_new_employee_id",
   "new_employee_id",
-  "amended_from"
+  "amended_from",
+  "section_break_mplw",
+  "reason_for_transfer_column",
+  "reason_for_transfer"
  ],
  "fields": [
   {
@@ -109,14 +112,29 @@
    "options": "Employee Transfer",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "section_break_mplw",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "reason_for_transfer",
+   "fieldtype": "Long Text",
+   "label": "Reason for Transfer"
+  },
+  {
+   "fieldname": "reason_for_transfer_column",
+   "fieldtype": "Column Break",
+   "label": "Reason for Transfer"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-03-27 13:09:42.664274",
+ "modified": "2025-05-23 16:05:58.668383",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Transfer",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {
@@ -157,7 +175,7 @@
   }
  ],
  "quick_entry": 1,
- "sort_field": "creation",
+ "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
  "title_field": "employee_name",

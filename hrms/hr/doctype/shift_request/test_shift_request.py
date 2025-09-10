@@ -2,24 +2,18 @@
 # See license.txt
 
 import frappe
-from frappe.tests import change_settings
+from frappe.tests.utils import FrappeTestCase, change_settings
 from frappe.utils import add_days, nowdate
 
 from erpnext.setup.doctype.employee.test_employee import make_employee
 
 from hrms.hr.doctype.shift_request.shift_request import OverlappingShiftRequestError
 from hrms.hr.doctype.shift_type.test_shift_type import setup_shift_type
-from hrms.tests.utils import HRMSTestSuite
 
 test_dependencies = ["Shift Type"]
 
 
-class TestShiftRequest(HRMSTestSuite):
-	@classmethod
-	def setUpClass(cls):
-		super().setUpClass()
-		cls.make_employees()
-
+class TestShiftRequest(FrappeTestCase):
 	def setUp(self):
 		for doctype in ["Shift Request", "Shift Assignment", "Shift Type"]:
 			frappe.db.delete(doctype)
