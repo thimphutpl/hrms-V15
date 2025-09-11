@@ -15,6 +15,7 @@
   "reminders_section",
   "send_birthday_reminders",
   "enable_bulk_overtime_payment",
+  "email_group",
   "column_break_11",
   "send_work_anniversary_reminders",
   "column_break_18",
@@ -1202,13 +1203,19 @@
    "fieldtype": "Link",
    "label": "Employee Separation Clearance Status Notification Template",
    "options": "Email Template"
+  },
+  {
+   "fieldname": "email_group",
+   "fieldtype": "Link",
+   "label": "Email Group",
+   "options": "Email Group"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-02-17 19:03:03.410768",
+ "modified": "2025-09-11 11:49:39.302736",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",
