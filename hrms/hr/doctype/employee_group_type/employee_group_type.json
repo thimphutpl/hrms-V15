@@ -1,0 +1,62 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:employee_group_name",
+ "creation": "2025-09-12 10:44:29.958566",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "employee_group_name",
+  "section_break_wjog",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_wjog",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Employee Group Type",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "employee_group_name",
+   "fieldtype": "Data",
+   "label": "Employee Group Name",
+   "unique": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-09-12 10:46:06.632548",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Employee Group Type",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
