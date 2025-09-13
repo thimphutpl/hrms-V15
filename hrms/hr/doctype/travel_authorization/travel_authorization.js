@@ -15,18 +15,7 @@ frappe.ui.form.on("Travel Authorization", {
 	refresh(frm) {
 		frm.call("has_travel_claim").then((r) => {
 			if (!r.message.has_travel_claim) {
-				if (
-					frm.doc.docstatus === 1 &&
-					frappe.model.can_create("Travel Advance")
-				) {
-					frm.add_custom_button(
-						__("Advance"),
-						function () {
-							frm.events.make_travel_advance(frm);
-						},
-						__("Create"),
-					);
-				}
+				
 
 				if (
 					frm.doc.docstatus === 1 &&
@@ -85,20 +74,7 @@ frappe.ui.form.on("Travel Authorization", {
 		});
 	},
 
-	make_travel_advance: function (frm) {
-		let method = "hrms.hr.doctype.travel_advance.travel_advance.make_travel_advance";
-		return frappe.call({
-			method: method,
-			args: {
-				dt: frm.doc.doctype,
-				dn: frm.doc.name,
-			},
-			callback: function (r) {
-				var doclist = frappe.model.sync(r.message);
-				frappe.set_route("Form", doclist[0].doctype, doclist[0].name);
-			},
-		});
-	},
+	
 
 	employee: function (frm) {
 		if (frm.doc.employee) 
