@@ -173,8 +173,7 @@
    "fieldname": "rejection_reason",
    "fieldtype": "Small Text",
    "label": "Reason for Rejection",
-   "permlevel": 1,
-   "reqd": 1
+   "permlevel": 1
   },
   {
    "fieldname": "transfer_type",
@@ -404,7 +403,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-09-09 15:55:59.024680",
+ "modified": "2025-09-22 16:41:48.843217",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Transfer",
