@@ -527,8 +527,8 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 				basic_pay_arrears += (flt(e['amount']))
 			if e['salary_component'] == 'Communication Allowance':
 				comm_amt = (flt(e['amount']))
-			if e['salary_component'] =='Overtime Allowance':
-				ovt_amt = (flt(e['amount']))
+			# if e['salary_component'] =='Overtime Allowance':
+			# 	ovt_amt = (flt(e['amount']))
 			
 			
 			gross_amt += flt(e['amount'])
@@ -576,7 +576,7 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 			else:
 				if d['salary_component'] == 'Salary Tax':
 					if not tax_included:
-						tax_amt = get_salary_tax(math.floor(flt(gross_amt) - flt(gis_amt) - flt(pf_amt) - (flt(comm_amt) * 0.5)-ovt_amt))
+						tax_amt = get_salary_tax(math.floor(flt(gross_amt) - flt(gis_amt) - flt(pf_amt) - (flt(comm_amt) * 0.5)))
 						tax_amt = roundoff(tax_amt)
 						d['amount'] = flt(tax_amt)
 						tax_included = 1
