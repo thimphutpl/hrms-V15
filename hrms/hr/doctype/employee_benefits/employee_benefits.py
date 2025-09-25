@@ -352,6 +352,21 @@ class EmployeeBenefits(Document):
 				docstatus = frappe.db.get_value("Journal Entry", a, "docstatus")
 				if docstatus and docstatus != 2:
 					frappe.throw("Cancel Journal Entry {0} before cancelling this document".format(frappe.get_desk_link("Journal Entry", a)))
+				frappe.db.sql("""
+							  update `tabJournal Entry Account` set reference_type = NULL, reference_name = NUll where reference_name = '{}'
+							  """.format(self.name))
+				frappe.db.sql("""
+							  update `tabGL Entry` set voucher_type = NULL, voucher_no = NUll where voucher_no = '{}'
+							  """.format(self.name))
+				frappe.db.sql("""
+							update `tabGL Entry` set against_voucher_type = NULL, against_voucher = NUll where against_voucher = '{}'
+							""".format(self.name))
+				frappe.db.sql("""
+							delete from `tabPayment Ledger Entry` where voucher_no = '{}'
+							""".format(self.name))
+				frappe.db.sql("""
+							delete from `tabPayment Ledger Entry` where against_voucher_no = '{}'
+							""".format(self.name))
 		self.db_set("journal",None)
 
 
