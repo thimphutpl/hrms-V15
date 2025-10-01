@@ -21,6 +21,7 @@
   "column_break_8",
   "joining_date",
   "qualification",
+  "dob",
   "bank_details_section",
   "bank",
   "account_no",
@@ -207,13 +208,20 @@
   {
    "fieldname": "mobile_number",
    "fieldtype": "Data",
-   "label": "Mobile Number"
+   "label": "Mobile Number",
+   "reqd": 1
+  },
+  {
+   "fieldname": "dob",
+   "fieldtype": "Date",
+   "label": "DoB",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-05-01 12:15:06.843781",
+ "modified": "2025-09-30 17:07:36.184777",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Muster Roll Application Item",

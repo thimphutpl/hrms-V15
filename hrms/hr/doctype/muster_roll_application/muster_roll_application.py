@@ -184,6 +184,7 @@ class MusterRollApplication(Document):
 						"bank_account_type": a.bank_account_type,
 						"nationality":a.nationality,
 						"mobile_number":a.mobile_number,
+						"dob":a.dob,
 					}
 
 					if a.is_existing == 1:
