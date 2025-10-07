@@ -16,19 +16,18 @@ from hrms.hr.hr_custom_functions import get_salary_tax
 from erpnext.custom_workflow import notify_workflow_states
 from erpnext.accounts.doctype.hr_accounts_settings.hr_accounts_settings import get_bank_account
 from hrms.hr.doctype.leave_application.leave_application import get_leave_balance_on
-from frappe.query_builder import DocType, Order
 
 class LeaveEncashment(Document):
 	def validate(self):			
 		set_employee_name(self)
 		validate_active_employee(self.employee)
 		self.get_leave_details_for_encashment()		
-		#self.get_leave_balance()
+		# self.get_leave_balance()
 		self.validate_balances()
 		self.check_duplicate_entry()
 		if not self.encashment_date:
 		 	self.encashment_date = getdate(nowdate())
-		if 	self.workflow_state != "Approved":
+		if self.workflow_state != "Approved":
 			notify_workflow_states(self)
 
 	def before_submit(self):
@@ -211,15 +210,13 @@ class LeaveEncashment(Document):
 		le = frappe.get_doc("Employee Group",frappe.db.get_value("Employee",self.employee,"employee_group")) # Line added by SHIV on 2018/10/15
 		if flt(self.balance_before) <= flt(le.min_encashment_days):
 			msg = "Minimum leave balance {0} required to encash.".format(le.encashment_min)
-			# frappe.throw(msg)
 			if self.employment_type =="Deputation" and flt(self.balance_before) < flt(encashment_min):
-			        msg = "Minimum leave balance {0} required to encash.".format(le.encashment_min)
+					msg = "Minimum leave balance {0} required to encash.".format(le.encashment_min)
 			elif self.employment_type !="Deputation":
-			        msg = "Minimum leave balance {0} required to encash.".format(le.encashment_min)
+					msg = "Minimum leave balance {0} required to encash.".format(le.encashment_min)
 		msg = ""
 		InsufficientError=""
 		if flt(self.balance_after) < 0:
-				#frappe.throw(str(self.balance_after))
 				InsufficientError="Insufficient leave balance"				
 
 		if msg:
@@ -229,7 +226,7 @@ class LeaveEncashment(Document):
 		if self.employee:
 				group_doc = frappe.get_doc("Employee Group", self.employee_group)
 				self.encashment_days  = group_doc.min_encashment_days				
-				self.balance_before = get_leave_balance_on(self.employee, self.leave_type, str(self.encashment_date))				
+				self.balance_before = get_leave_balance_on(self.employee, self.leave_type, str(self.encashment_date))
 				self.balance_after  = flt(self.balance_before) - flt(self.encashment_days)			
 	
 	def check_duplicate_entry(self):
@@ -284,8 +281,8 @@ class LeaveEncashment(Document):
 
 		if not frappe.db.get_value("Leave Type", self.leave_type, "allow_encashment"):
 			frappe.throw(_("Leave Type {0} is not encashable").format(self.leave_type))
-		allocation = self.get_leave_allocation()		
-		leave_bal_mr_cl=self.get_laave_bal_mr()		
+		allocation = self.get_leave_allocation()
+		leave_bal_mr_cl=self.get_laave_bal_mr()
 		
 		if not allocation:
 			frappe.throw(
@@ -294,14 +291,23 @@ class LeaveEncashment(Document):
 				)
 			)
 
-		self.leave_balance = (
-			allocation.total_leaves_allocated
-			- allocation.carry_forwarded_leaves_count
-			# adding this because the function returns a -ve number
-			+ get_leaves_for_period(
+		leaves_till_date = 0
+		if allocation.from_date:
+			leaves_till_date = get_leaves_for_period(
 				self.employee, self.leave_type, allocation.from_date, self.encashment_date
 			)
-		)	
+
+		default_balance = (
+			flt(allocation.total_leaves_allocated)
+			- flt(allocation.carry_forwarded_leaves_count)
+			+ flt(leaves_till_date)
+		)
+
+		if flt(allocation.get("credits")) or flt(allocation.get("debits")):
+			self.leave_balance = flt(allocation.balance)
+		else:
+			self.leave_balance = default_balance
+
 		employee_group = frappe.db.get_value("Employee", self.employee, "employee_group")
 		encashment_min = frappe.db.get_value("Employee Group", employee_group, "encashment_min")
 		encashable_days = frappe.db.get_value("Employee Group", employee_group, "max_encashment_days")
@@ -314,13 +320,11 @@ class LeaveEncashment(Document):
 		self.balance_after=self.balance_before-encashable_days
 		# need to chnage this 
 		# flt(encashment_min)
-		# frappe.throw(str(self.leave_balance))
 		if self.balance_before < flt(encashment_min):		
 			frappe.throw(_("Minimum '{}' days is Mandatory for Encashment").format(cint(encashment_min)),title="Leave Balance")
 		
 		# self.encashable_days = encashable_days if encashable_days > 0 else 0
 		self.encashable_days = encashable_days if encashable_days and encashable_days > 0 else 0
-		# frappe.throw(str(self.encashable_days))
 		self.encashment_days = frappe.db.get_value("Employee Group", employee_group, "max_encashment_days")
 		# per_day_encashment = frappe.db.get_value("Salary Structure", salary_structure, "leave_encashment_amount_per_day")
 		
@@ -328,7 +332,6 @@ class LeaveEncashment(Document):
 		pay = get_basic_and_gross_pay(employee=self.employee, effective_date=today())
 		
 		leave_encashment_type = frappe.db.get_value("Employee Group", employee_group, "leave_encashment_type")
-		# frappe.throw(str(flt(leave_encashment_type)))
 		if leave_encashment_type == "Flat Amount":
 			self.flat_amount	   	= flt(employee_group.leave_encashment_amount)
 			self.encashment_amount 	= flt(employee_group.leave_encashment_amount)
@@ -345,37 +348,74 @@ class LeaveEncashment(Document):
 		self.leave_encashment_type = leave_encashment_type
 		# self.salary_structure = salary_structure
 		self.encashment_tax = get_salary_tax(round(self.encashment_amount))
-		# frappe.throw(str(self.encashment_tax))
 		self.payable_amount = flt(self.encashment_amount) - flt(self.encashment_tax)
 
 		self.leave_allocation = allocation.name
 		return True
 
+	
 	def get_leave_allocation(self):
-		from frappe.query_builder.functions import Sum
-		
-		date = self.encashment_date or getdate()
+		"""Return the active leave allocation along with ledger summary as of the encashment date."""
+		from frappe.utils import getdate, nowdate
+		from frappe.utils.data import flt
 
-		LeaveAllocation = frappe.qb.DocType("Leave Allocation")
-		leave_allocation = (
-			frappe.qb.from_(LeaveAllocation)
-			.select(
-				LeaveAllocation.name,
-				LeaveAllocation.from_date,
-				LeaveAllocation.to_date,
-				Sum(LeaveAllocation.total_leaves_allocated).as_("total_leaves_allocated"),
-				LeaveAllocation.carry_forwarded_leaves_count,
-				)
-			.where(
-				((LeaveAllocation.from_date <= date)
-				 & (date<=LeaveAllocation.to_date))
-				& (LeaveAllocation.docstatus == 1)
-				& (LeaveAllocation.leave_type == self.leave_type)
-				& (LeaveAllocation.employee == self.employee)
-				)
-		).run(as_dict=True)
+		as_of = getdate(self.encashment_date) if getattr(self, "encashment_date", None) else getdate(nowdate())
 
-		return leave_allocation[0] if leave_allocation else None
+		allocation_row = frappe.db.sql(
+			"""
+			select
+				name,
+				from_date,
+				to_date,
+				total_leaves_allocated,
+				carry_forwarded_leaves_count
+			from `tabLeave Allocation`
+			where
+				employee = %(employee)s
+				and leave_type = %(leave_type)s
+				and docstatus = 1
+				and %(as_of)s between from_date and to_date
+			order by to_date desc
+			limit 1
+			""",
+			{"employee": self.employee, "leave_type": self.leave_type, "as_of": as_of},
+			as_dict=True,
+		)
+
+		if not allocation_row:
+			return None
+
+		allocation = frappe._dict(allocation_row[0])
+
+		ledger_row = frappe.db.sql(
+			"""
+			select
+				coalesce(sum(leaves), 0) as net,
+				coalesce(sum(case when leaves > 0 then leaves else 0 end), 0) as credits,
+				coalesce(sum(case when leaves < 0 then leaves else 0 end), 0) as debits
+			from `tabLeave Ledger Entry`
+			where
+				employee = %(employee)s
+				and leave_type = %(leave_type)s
+				and docstatus = 1
+				and from_date <= %(as_of)s
+			""",
+			{"employee": self.employee, "leave_type": self.leave_type, "as_of": as_of},
+			as_dict=True,
+		)
+
+		if ledger_row and ledger_row[0]:
+			row = ledger_row[0]
+			allocation.balance = flt(row.get("net") or 0)
+			allocation.credits = flt(row.get("credits") or 0)
+			allocation.debits = flt(row.get("debits") or 0)
+		else:
+			allocation.balance = 0
+			allocation.credits = 0
+			allocation.debits = 0
+
+		return allocation
+
 
 	def get_laave_bal_mr(self):		
 		date = self.encashment_date or getdate()
