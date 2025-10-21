@@ -69,7 +69,7 @@ class EmployeeAdvance(Document):
 			self.max_amount=max_amount_intrs_fre_ln * self.gross_pay
 	def on_submit(self):
 		self.post_journal_entry()
-		self.update_salary_structure()
+		
 
 	def on_cancel(self):
 		self.ignore_linked_doctypes = ("GL Entry", "Payment Ledger Entry")
@@ -161,8 +161,10 @@ class EmployeeAdvance(Document):
 					"Salary Structure", {"employee": self.employee, "is_active": "Yes"}
 				)
 				row = doc.append("deductions", {})
-				row.salary_component = "Salary Advance Deduction"
-				if self.advance_type=="Interest Free Loan":
+				#row.salary_component = "Salary Advance Deduction"
+				if self.advance_type=="Employee Advance":
+					row.salary_component = "Salary Advance Deduction"
+				else:
 					row.salary_component = "Interest Free Loan"
 
 				row.from_date = self.recovery_start_date
@@ -251,6 +253,7 @@ class EmployeeAdvance(Document):
 			frappe.msgprint(_('{} posted to accounts').format(frappe.get_desk_link(je.doctype,je.name)))
 
 	def set_status(self, update=False):
+		
 		precision = self.precision("paid_amount")
 		total_amount = flt(flt(self.claimed_amount) + flt(self.return_amount), precision)
 		status = None
@@ -276,6 +279,7 @@ class EmployeeAdvance(Document):
 				self.paid_amount, precision
 			):
 				status = "Paid"
+				self.update_salary_structure()
 			else:
 				status = "Unpaid"
 		elif self.docstatus == 2:

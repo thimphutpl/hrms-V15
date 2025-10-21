@@ -277,3 +277,27 @@ def get_client_ip_api():
 	)
 
 	return {"client_ip": client_ip}	
+
+
+@frappe.whitelist()
+def is_ip_authorized():
+	#frappe.throw("nd")
+	client_ip = frappe.request.remote_addr
+	#frappe.throw(str(client_ip))
+	if frappe.request.headers.get('X-Real-IP'):
+		frappe.throw("dz")
+	elif frappe.request.headers.get('X-Forwarded-For'):
+		
+		client_ip = frappe.request.headers.get('X-Forwarded-For').split(',')[0]
+		#frappe.throw(str(client_ip))
+		office_ip = frappe.db.get_single_value("HR Settings", "office_gobal_ip")
+		return client_ip == office_ip
+	elif frappe.request.remote_addr:
+		frappe.throw("pl")
+		client_ip = frappe.request.remote_addr
+		start_ip = frappe.db.get_single_value("HR Settings", "office_local_start_ip")
+		end_ip = frappe.db.get_single_value("HR Settings", "office_local_end_ip")
+		return start_ip <= client_ip <= end_ip
+	else:
+		frappe.throw("xx")
+		return false

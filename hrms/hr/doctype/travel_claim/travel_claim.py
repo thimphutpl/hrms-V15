@@ -167,19 +167,19 @@ class TravelClaim(Document):
 				"doctype": "Journal Entry",
 				"voucher_type": voucher_type,
 				"naming_series": naming_series,
-				"title": "Travel Advance - "+self.employee,
-				"user_remark": "Travek Advance - "+self.employee,
+				"title": "Travel Claim - "+self.employee,
+				"user_remark": "Travek Claim - "+self.employee,
 				"posting_date": nowdate(),
 				"company": self.company,
 				"accounts": accounts,
 				"branch": self.branch
 		})
 
-		if self.advance_amount:
-			je.save(ignore_permissions = True)
-			self.db_set("journal_entry", je.name)
-			self.db_set("journal_entry_status", "Forwarded to accounts for processing payment on {0}".format(now_datetime().strftime('%Y-%m-%d %H:%M:%S')))
-			frappe.msgprint(_('{} posted to accounts').format(frappe.get_desk_link(je.doctype, je.name)))
+		#if self.advance_amount:
+		je.save(ignore_permissions = True)
+		self.db_set("journal_entry", je.name)
+		self.db_set("journal_entry_status", "Forwarded to accounts for processing payment on {0}".format(now_datetime().strftime('%Y-%m-%d %H:%M:%S')))
+		frappe.msgprint(_('{} posted to accounts').format(frappe.get_desk_link(je.doctype, je.name)))
 
 
 @frappe.whitelist()

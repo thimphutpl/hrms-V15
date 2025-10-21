@@ -322,6 +322,7 @@ def make_salary_slip(
 	for_preview=0,
 	ignore_permissions=False,
 ):
+
 	def postprocess(source, target):
 		if employee:
 			target.employee = employee

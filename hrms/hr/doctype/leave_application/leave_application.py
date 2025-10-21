@@ -995,6 +995,7 @@ def get_leave_allocation_records(employee, date, leave_type=None):
 			(Ledger.from_date <= date)
 			& (Ledger.docstatus == 1)
 			& (Ledger.transaction_type == "Leave Allocation")
+			#& (Ledger.transaction_type.isin(["Leave Allocation"]))
 			& (Ledger.employee == employee)
 			& (Ledger.is_expired == 0)
 			& (Ledger.is_lwp == 0)

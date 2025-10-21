@@ -3,7 +3,7 @@
 
 
 import unicodedata
-from datetime import date
+from datetime import date,datetime
 
 import frappe
 from frappe import _, msgprint
@@ -160,10 +160,13 @@ class SalarySlip(TransactionBase):
 		self.base_total_in_words = money_in_words(base_total, company_currency)
 
 	def calculate_employer_pf_contribution(self):
-		basic_pay = flt(next((e.amount for e in self.earnings if e.salary_component == 'Basic Pay'), 0))
-		self.employer_pf_contribution = basic_pay * get_payroll_settings(self.employee).get('employer_pf', 0) * 0.01
-
+		
+		basic_pay = flt(next((e.amount for e in self.earnings if e.salary_component == 'Basic Salary'), 0))
+		self.employer_pf_contribution = round(basic_pay * get_payroll_settings(self.employee).get('employer_pf', 0) * 0.01)
+		#self.employer_pf_contribution = basic_pay * get_payroll_settings(self.employee).get('employer_pf', 0) * 0.01
+		#frappe.throw(str(self.employer_pf_contribution))
 	def on_update(self):
+		
 		self.publish_update()
 
 	def on_submit(self):
@@ -689,22 +692,37 @@ class SalarySlip(TransactionBase):
 		self.set_net_total_in_words()
 
 	def calculate_component_amounts(self, component_type):
+		#frappe.throw("1")
 		if not getattr(self, "_salary_structure_doc", None):
 			self.set_salary_structure_doc()
 
 		self.add_structure_components(component_type)
 
 	def set_salary_structure_doc(self) -> None:
+		#frappe.throw("2")
 		self._salary_structure_doc = frappe.get_cached_doc("Salary Structure", self.salary_structure)
 
 	def add_structure_components(self, component_type):
+		#frappe.throw("3")
 		self.data, self.default_data = self.get_data_for_eval()
 
 		for struct_row in self._salary_structure_doc.get(component_type):
-			self.add_structure_component(struct_row, component_type)
+			#frappe.msgprint(str(struct_row.from_date))
+			# frappe.throw(self.posting_date)
+			# self.add_structure_component(struct_row, component_type)
+			posting_date_obj = datetime.strptime(self.posting_date, "%Y-%m-%d").date()
+			if struct_row.salary_component == 'Salary Advance Deduction':
+        
+				if struct_row.to_date and struct_row.to_date > posting_date_obj:
+					self.add_structure_component(struct_row, component_type)
+				
+			else:
+				
+				self.add_structure_component(struct_row, component_type)
 
 	def add_structure_component(self, struct_row, component_type):
 		amount = struct_row.amount
+		#frappe.throw("4")
 		# default behavior, the system does not add if component amount is zero
 		# if remove_if_zero_valued is unchecked, then ask system to add component row
 		remove_if_zero_valued = frappe.get_cached_value(
@@ -729,6 +747,7 @@ class SalarySlip(TransactionBase):
 
 	def get_data_for_eval(self):
 		"""Returns data for evaluating formula"""
+		#frappe.throw("5")
 		data = frappe._dict()
 		employee = frappe.get_cached_doc("Employee", self.employee).as_dict()
 
@@ -752,6 +771,7 @@ class SalarySlip(TransactionBase):
 		return data, default_data
 
 	def get_component_abbr_map(self):
+		#frappe.throw("6")
 		def _fetch_component_values():
 			return {
 				component_abbr: 0
@@ -770,8 +790,10 @@ class SalarySlip(TransactionBase):
 		default_amount=None,
 		remove_if_zero_valued=None,
 	):
+		#frappe.throw("7")
 		component_row = None
 		for d in self.get(component_type):
+			#frappe.msgprint(str(d.salary_component))
 			if d.salary_component != component_data.salary_component:
 				continue
 
@@ -819,6 +841,7 @@ class SalarySlip(TransactionBase):
 		salary_component=None,
 		field_to_select="amount",
 	):
+		frappe.throw("8")
 		ss = frappe.qb.DocType("Salary Slip")
 		sd = frappe.qb.DocType("Salary Detail")
 
@@ -887,8 +910,10 @@ class SalarySlip(TransactionBase):
 		return amount, additional_amount
 
 	def get_component_totals(self, component_type, depends_on_payment_days=0):
+		#frappe.throw("9")
 		total = 0.0
 		for d in self.get(component_type):
+			
 			if not d.do_not_include_in_total:
 				if depends_on_payment_days:
 					amount = self.get_amount_based_on_payment_days(d)[0]
@@ -943,6 +968,7 @@ class SalarySlip(TransactionBase):
 		self.db_set("status", status)
 
 	def process_salary_structure(self, for_preview=0):
+		#frappe.throw("11")
 		"""Calculate salary after salary structure details have been updated"""
 		self.pull_emp_details()
 		self.get_working_days_details(for_preview=for_preview)

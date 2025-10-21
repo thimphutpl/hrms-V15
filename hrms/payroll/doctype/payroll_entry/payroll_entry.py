@@ -195,7 +195,7 @@ class PayrollEntry(Document):
 
 	@frappe.whitelist()
 	def create_salary_slips(self):
-		#frappe.throw("hi")
+		#frappe.throw("hi0")
 		"""
 		Creates salary slip for selected employees if already not created
 		"""
@@ -231,7 +231,7 @@ class PayrollEntry(Document):
 					indicator="blue",
 				)
 			else:
-				
+					
 				create_salary_slips_for_employees(employees, args, publish_progress=False)
 				# since this method is called via frm.call this doc needs to be updated manually
 				self.reload()
@@ -836,7 +836,7 @@ class PayrollEntry(Document):
 
 	@frappe.whitelist()
 	def make_bank_entry(self):
-		#frappe.throw("hi")
+		
 		"""
 			---------------------------------------------------------------------------------
 			type            Dr            Cr               voucher_type
@@ -854,7 +854,7 @@ class PayrollEntry(Document):
 		company_cc              = company.get("cost_center")
 		default_employer_pf_account = company.get("employer_contribution_pf_account")
 		salary_component_pf     = "PF"
-
+		
 		if not default_bank_account:
 			frappe.throw(_("Please set default <b>Expense Bank Account</b> for processing branch {}")\
 				.format(frappe.get_desk_link("Branch", self.processing_branch)))
@@ -864,12 +864,14 @@ class PayrollEntry(Document):
 			frappe.throw(_("Please set <b>Default Cost Center</b> for the Company"))
 		elif not default_employer_pf_account:
 			frappe.throw(_("Please set account for <b>Employer Contribution to PF</b> for the Company"))
-
+		
 		salary_slip_total = 0
 		salary_details = self.get_salary_slip_details()
-
+		
 		posting        = frappe._dict()
 		for salary_detail in salary_details:
+			#frappe.msgprint(str(salary_detail.gl_head))
+			#frappe.msgprint(f"GL Head: {str(salary_detail.gl_head)}, Party: {str(salary_detail.party)}, Party Type: {str(salary_detail.party_type)}")
 			salary_slip_total += (-1 * flt(salary_detail.amount) if salary_detail.parentfield == "deductions" else flt(salary_detail.amount))
 			posting.setdefault("to_payables", []).append({
 				"account"        : salary_detail.gl_head,
@@ -885,14 +887,16 @@ class PayrollEntry(Document):
 				"salary_component": salary_detail.salary_component
 			})
 
-			# Remittance
+			# #Remittance
 			if salary_detail.is_remittable and salary_detail.parentfield == "deductions":
 				remittance_amount = 0.0
 				remittance_gl_list = [salary_detail.gl_head, default_employer_pf_account] if salary_detail.salary_component == salary_component_pf else [salary_detail.gl_head]
-
+				
 				for rem in remittance_gl_list:
 					if rem == default_employer_pf_account:
+						
 						for d in self.get_cc_wise_entries(salary_component_pf):
+							
 							remittance_amount += flt(d.amount)
 							posting.setdefault(salary_detail.salary_component, []).append({
 								"account"					: rem,
@@ -907,6 +911,7 @@ class PayrollEntry(Document):
 								"salary_component"			: salary_detail.salary_component
 							})
 					else:
+						
 						remittance_amount += flt(salary_detail.amount)
 						posting.setdefault(salary_detail.salary_component, []).append({
 							"account"       			: rem,
@@ -933,6 +938,7 @@ class PayrollEntry(Document):
 
 		# To Bank
 		if posting.get("to_payables") and len(posting.get("to_payables")):
+			# frappe.throw(str(salary_slip_total))
 			posting.setdefault("to_bank", []).append({
 				"account"       				: default_payable_account,
 				"debit_in_account_currency"		: flt(salary_slip_total),
@@ -1075,6 +1081,7 @@ class PayrollEntry(Document):
 		return result
 
 	def get_cc_wise_entries(self, salary_component_pf):
+		#frappe.throw(str(self.name))
 		return frappe.db.sql("""
 			select
 				t1.cost_center             as cost_center,
@@ -1477,7 +1484,7 @@ def log_payroll_failure(process, payroll_entry, error):
 
 def create_salary_slips_for_employees(employees, args, publish_progress=True):
 	payroll_entry = frappe.get_cached_doc("Payroll Entry", args.payroll_entry)
-	#frappe.throw(str(args))
+	
 	try:
 		salary_slips_exist_for = get_existing_salary_slips(employees, args)
 		count = 0
