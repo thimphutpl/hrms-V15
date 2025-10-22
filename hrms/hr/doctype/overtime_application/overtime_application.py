@@ -6,10 +6,16 @@ from frappe import _
 from frappe.utils import getdate,flt,cint,today,add_to_date,time_diff_in_hours,nowdate
 from frappe.model.document import Document
 from erpnext.custom_workflow import validate_workflow_states, notify_workflow_states
-from datetime import datetime
+from datetime import datetime, timedelta
+
 class OvertimeApplication(Document):
 	def validate(self):
+		
 		validate_workflow_states(self)
+		self.prevent_double_claim()
+		self.validate_child_dates()
+		self.prevent_time_overlap()
+		self.set_month_and_fy_from_first_date()
 		self.validate_dates()
 		self.calculate_totals()
 		self.validate_eligible_creteria()
@@ -17,7 +23,176 @@ class OvertimeApplication(Document):
 			notify_workflow_states(self)
 		self.processed = 0
 		self.validate_total_claim_amount()
+
 	
+
+# class OvertimeApplication(Document):
+# 	def validate(self):
+# 		self.prevent_double_claim()
+# 		self.validate_child_dates()
+# 		self.prevent_time_overlap()
+
+	# Automatically set month and fiscal year from first child table date added by Kinzang.N
+	def set_month_and_fy_from_first_date(self):
+		if not self.get("items"):
+			return
+		for row in self.get("items"):
+			if row.date:
+				date_obj = getdate(row.date)
+				self.month = date_obj.strftime("%B")  # e.g., January
+				fy = frappe.db.get_value(
+                    "Fiscal Year",
+                    {"year_start_date": ("<=", date_obj), "year_end_date": (">=", date_obj)},
+                    "name",
+                )
+				self.fiscal_year = fy
+				break  # only use the first date
+
+    # Prevent duplicate OT in same month/fiscal year added by Kinzang.N
+	def prevent_double_claim(self):
+		if not self.employee or not self.get("items"):
+			return
+		date_info = []
+		for row in self.get("items"):
+			if not row.date:
+				continue
+			date = getdate(row.date)
+			fiscal_year = frappe.db.get_value(
+				"Fiscal Year",
+				{"year_start_date": ("<=", date), "year_end_date": (">=", date)},
+				"name",
+            )
+			month = date.strftime("%B")
+			if fiscal_year and month:
+				date_info.append((fiscal_year, month))
+				
+				date_info = list(set(date_info))
+				for fiscal_year, month in date_info:
+					existing = frappe.db.sql("""
+					SELECT DISTINCT oa.name
+                		FROM `tabOvertime Application` oa
+                		INNER JOIN `tabOvertime Application Item` oad
+                    	ON oa.name = oad.parent
+                		WHERE oa.employee=%s
+                  			AND oa.name != %s
+                  			AND oa.docstatus < 2
+                  			AND MONTH(oad.date) = MONTH(%s)
+                  			AND YEAR(oad.date) = YEAR(%s)
+                		LIMIT 1
+            		""", (self.employee, self.name, date, date))
+					
+					if existing:
+						frappe.throw(
+                    f"Overtime Application <b>{existing[0][0]}</b> already exists "
+                    f"for {month}, {fiscal_year}. Duplicate claims are not allowed."
+                )
+
+    # Ensure child table dates match month/fiscal year Added by Kinzang.N on 22/10/2025
+	def validate_child_dates(self):
+		if not self.month or not self.fiscal_year or not self.get("items"):
+			return
+		fy_doc = frappe.get_doc("Fiscal Year", self.fiscal_year)
+		fy_start, fy_end = fy_doc.year_start_date, fy_doc.year_end_date
+		for row in self.get("items"):
+			if not row.date:
+				continue
+			date_obj = getdate(row.date)
+			child_month = date_obj.strftime("%B")
+			if child_month != self.month:
+				frappe.throw(f"Row #{row.idx}: Date {row.date} is not in selected month {self.month}.")
+
+			if not (fy_start <= date_obj <= fy_end):
+				frappe.throw(f"Row #{row.idx}: Date {row.date} is outside Fiscal Year {self.fiscal_year}.")
+
+    # Prevent overlapping time. added by Kinzang.N
+	def prevent_time_overlap(self):
+		if not self.employee or not self.get("items"):
+			return
+		
+		
+		
+		def parse_datetime(date_str, time_val):
+			"""Combine date and time into a datetime object.
+       			Handles string (HH:MM / HH:MM:SS) and timedelta (ERPNext Time field)."""
+			date_obj = getdate(date_str)
+
+
+			# If Time field returns timedelta Added BY Kinzang.n
+			if isinstance(time_val, timedelta):
+				hours = time_val.seconds // 3600
+				minutes = (time_val.seconds % 3600) // 60
+				seconds = time_val.seconds % 60
+				t = datetime.strptime(f"{hours:02d}:{minutes:02d}:{seconds:02d}", "%H:%M:%S").time()
+				return datetime.combine(date_obj, t)
+
+        # If string
+			if isinstance(time_val, str):
+				for fmt in ("%H:%M:%S", "%H:%M"):
+					try:
+						t = datetime.strptime(time_val, fmt).time()
+						return datetime.combine(date_obj, t)
+					except ValueError:
+						continue
+			frappe.throw(f"Invalid time format: {time_val}")
+
+
+			# for fmt in ("%H:%M:%S", "%H:%M"):
+			# 	try:
+			# 		t = datetime.strptime(time_val, fmt).time()
+			# 		return datetime.combine(date_obj, t)
+			# 	except ValueError:
+			# 		continue
+			# frappe.throw(f"Invalid time format: {time_val}")
+				
+				# Store already processed times in current doc
+				# 
+		times_by_date = {}
+		for row in self.get("items"):
+			if not row.date or not row.from_date or not row.to_date:
+				continue
+			new_from_dt = parse_datetime(row.date, row.from_date)
+			new_to_dt = parse_datetime(row.date, row.to_date)
+				
+			if new_from_dt >= new_to_dt:
+				frappe.throw(f"Row #{row.idx}: 'From Time' must be earlier than 'To Time'.")
+					
+					# Check overlap with DB
+			existing_rows = frappe.db.sql("""
+            	SELECT oad.date, oad.from_date, oad.to_date, oa.name
+            	FROM `tabOvertime Application Item` oad
+            	INNER JOIN `tabOvertime Application` oa ON oa.name = oad.parent
+            	WHERE oa.employee=%s
+              		AND oa.name != %s
+              		AND oa.docstatus < 2
+              		AND oad.date=%s
+        	""", (self.employee, self.name, row.date), as_dict=True)
+				
+			for ex in existing_rows:
+				ex_from_dt = parse_datetime(ex["date"], ex["from_date"])
+				ex_to_dt = parse_datetime(ex["date"], ex["to_date"])
+					
+				#Check if times overlap
+				if new_from_dt < ex_to_dt and new_to_dt > ex_from_dt:
+					frappe.throw(
+						f"Row #{row.idx}: Time {row.from_date}-{row.to_date} overlaps with "
+						f"existing overtime {ex['from_date']}-{ex['to_date']} in {ex['name']}."
+					)
+
+        	# Check overlap within same document
+			date_key = row.date
+			if date_key not in times_by_date:
+				times_by_date[date_key] = []
+
+			for f, t, idx in times_by_date[date_key]:
+				if new_from_dt < t and new_to_dt > f:
+					frappe.throw(
+						f"Row #{row.idx}: Time {row.from_date}-{row.to_date} overlaps with "
+						f"Row #{idx} in the same document."
+                	)
+			times_by_date[date_key].append((new_from_dt, new_to_dt, row.idx))
+
+## till here for code added
+
 	def validate_total_claim_amount(self):
 		if self.total_amount and flt(self.total_amount) <= 0:
 			frappe.throw("Total Claim Amount cannot be 0, please process again")
