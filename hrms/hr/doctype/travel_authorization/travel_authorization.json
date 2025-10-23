@@ -38,6 +38,7 @@
   "reports_to_name",
   "column_break_esiv",
   "approver_designation",
+  "journal_entry",
   "additional_information_section",
   "company",
   "status",
@@ -276,12 +277,19 @@
    "fieldname": "advance_amount",
    "fieldtype": "Currency",
    "label": "Advance Amount"
+  },
+  {
+   "fieldname": "journal_entry",
+   "fieldtype": "Link",
+   "label": "Journal Entry",
+   "options": "Journal Entry",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-15 20:26:29.855357",
+ "modified": "2025-10-22 20:44:36.630370",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",
@@ -339,14 +347,28 @@
    "write": 1
   },
   {
+   "create": 1,
+   "delete": 1,
    "email": 1,
    "export": 1,
-   "permlevel": 1,
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "All",
-   "share": 1
+   "role": "Verifier",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Approver",
+   "share": 1,
+   "write": 1
   }
  ],
  "sort_field": "modified",

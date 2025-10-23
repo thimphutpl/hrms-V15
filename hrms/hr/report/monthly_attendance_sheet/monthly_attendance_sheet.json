@@ -6,11 +6,11 @@
  "docstatus": 0,
  "doctype": "Report",
  "filters": [],
- "idx": 23,
+ "idx": 31,
  "is_standard": "Yes",
  "json": "{}",
  "letterhead": null,
- "modified": "2025-09-19 15:36:48.607980",
+ "modified": "2025-10-22 18:19:36.143364",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Monthly Attendance Sheet",
@@ -18,7 +18,7 @@
  "prepared_report": 0,
  "ref_doctype": "Attendance",
  "report_name": "Monthly Attendance Sheet",
- "report_type": "Report Builder",
+ "report_type": "Script Report",
  "roles": [
   {
    "role": "System Manager"

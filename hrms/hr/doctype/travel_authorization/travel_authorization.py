@@ -36,7 +36,7 @@ class TravelAuthorization(Document):
 		self.set_status()
 		self.make_travel_advance()
 		self.validate_estimated_amount()
-		#validate_workflow_states(self)
+		validate_workflow_states(self)
 
 	def on_update(self):
 		self.check_date_overlap()
@@ -124,7 +124,9 @@ class TravelAuthorization(Document):
 
 		if self.advance_amount:
 			je.save(ignore_permissions = True)
-			# self.db_set("journal_entry", je.name)
+			self.db_set("journal_entry", je.name)
+			
+			frappe.db.commit()
 			# self.db_set("journal_entry_status", "Forwarded to accounts for processing payment on {0}".format(now_datetime().strftime('%Y-%m-%d %H:%M:%S')))
 			# frappe.msgprint(_('{} posted to accounts').format(frappe.get_desk_link(je.doctype,je.name)))
 
