@@ -266,7 +266,9 @@ class OvertimeApplication(Document):
 	def update_salary_structure(self, cancel=False):
 		if cancel:
 			rem_list = []
-			if self.salary_structure:
+			#added by Kinzang Non 24/10/2025
+			if hasattr(self, "salary_structure") and self.salary_structure:
+			#if self.salary_structure:
 				doc = frappe.get_doc("Salary Structure", self.salary_structure)
 				for d in doc.get("earnings"):
 					if d.salary_component == self.salary_component and self.name in (d.reference_number, d.ref_docname):
