@@ -3,6 +3,7 @@ from frappe import _
 from frappe.utils import flt, cint, getdate, date_diff, nowdate,now_datetime,format_time
 from frappe.utils.data import get_first_day, get_last_day, add_days
 from erpnext.custom_utils import get_year_start_date, get_year_end_date
+from erpnext.setup.doctype.employee.employee import get_holiday_list_for_employee
 import json
 import logging
 from datetime import datetime, timedelta
@@ -25,6 +26,18 @@ def sign_in():
         "docstatus": ["<", 2]  # Draft or Submitted
     })
     
+    existing_leave = frappe.db.exists("Leave Application", {
+        "employee": employee,
+        "from_date": ("<=", today),
+        "to_date":(">=", today)
+        "docstatus": 1  # Draft or Submitted
+    })
+
+    # existing_holiday = frappe.db.exists("Daily Attendance Entry", {
+    #     "employee": employee,
+    #     "attendance_date": today,
+    #     "docstatus": ["<", 2]  # Draft or Submitted
+    # })
     if existing_attendance:
         frappe.throw("Attendance for today already exists.")
     
@@ -105,3 +118,21 @@ def is_ip_authorized(ip_address):
     #     return True
     
     # return False
+
+
+
+
+@frappe.whitelist()
+def get_holidays(employee, from_date, to_date, holiday_list=None):
+	"""get holidays between two dates for the given employee"""
+	if not holiday_list:
+		holiday_list = get_holiday_list_for_employee(employee)
+
+	holidays = frappe.db.sql(
+		"""select count(distinct holiday_date) from `tabHoliday` h1, `tabHoliday List` h2
+		where h1.parent = h2.name and h1.holiday_date between %s and %s
+		and h2.name = %s""",
+		(from_date, to_date, holiday_list),
+	)[0][0]
+
+	return holidays

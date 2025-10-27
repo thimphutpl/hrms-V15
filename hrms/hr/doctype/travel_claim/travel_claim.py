@@ -216,7 +216,7 @@ def get_travel_claim(dt, dn):
 		item = d.as_dict()
 		if d.is_last_day == 1:
 			item["dsa_percent"] = return_day_dsa if return_day_dsa else 100
-			item["dsa"] = flt(dsa) * flt(item["dsa_percent"])/100
+			item["dsa"] = flt(dsa) * flt(item["dsa_percent"])
 		else:
 			item["dsa_percent"] = 100
 			if doc.travel_type=="International":

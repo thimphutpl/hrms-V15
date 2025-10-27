@@ -48,19 +48,10 @@
   "column_break_zzku",
   "company",
   "travel_authorization",
+  "workflow_state",
   "amended_from"
  ],
  "fields": [
-  {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Travel Claim",
-   "print_hide": 1,
-   "read_only": 1,
-   "search_index": 1
-  },
   {
    "fieldname": "employee",
    "fieldtype": "Link",
@@ -282,6 +273,7 @@
   {
    "fieldname": "approver",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Approver",
    "no_copy": 1,
    "options": "User",
@@ -294,6 +286,7 @@
   {
    "fieldname": "approver_name",
    "fieldtype": "Data",
+   "ignore_user_permissions": 1,
    "label": "Approver Name",
    "no_copy": 1,
    "read_only": 1
@@ -305,16 +298,33 @@
   {
    "fieldname": "approver_designation",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Approver Designation",
    "no_copy": 1,
    "options": "Designation",
    "read_only": 1
+  },
+  {
+   "fieldname": "workflow_state",
+   "fieldtype": "Link",
+   "label": "Workflow State",
+   "options": "Workflow State"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Travel Claim",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-10-22 20:39:40.655164",
+ "modified": "2025-10-27 12:09:27.214018",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim",
