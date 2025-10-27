@@ -399,7 +399,7 @@ def get_leave_encashment_amount(employee, date):
 
 @frappe.whitelist()
 def get_leave_encashment_tax(amount, benefit_type):
-	if benefit_type == "Provision for Leave Encashment":
+	if benefit_type == "Leave Encashment":
 		encashment_tax = get_salary_tax(amount)
 		return encashment_tax
 
