@@ -153,8 +153,7 @@
    "fieldtype": "Link",
    "label": "Cost Center",
    "options": "Cost Center",
-   "read_only": 1,
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fieldname": "department",
@@ -561,7 +560,7 @@
  "idx": 9,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-08-02 11:33:55.383647",
+ "modified": "2025-06-30 21:19:58.015672",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Slip",
