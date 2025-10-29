@@ -435,14 +435,16 @@ class SalarySlip(TransactionBase):
 		self.post_sws_entry()
 		self.update_ot()
 
-
+# to update OT in OT application
 	def update_ot(self, cancel = False):
 		processed = 1
 		ss_name = self.name
+		payment_made = "Paid" #added by kinzang.n
 		
 		if cancel:
 			processed = 0
-			ss_name = ''
+			ss_name = 'None' # set to None, Not empty string
+			payment_made = "Unpaid" # added by kinzang.n
 			
 		for a in self.ot_items:
 			#added by kinzang N on 24/10/2025 to fetch month
@@ -453,8 +455,8 @@ class SalarySlip(TransactionBase):
 				a.month = ot_month  # updates in memory
 				frappe.db.set_value(a.doctype, a.name, "month", ot_month)  # persists to DB
 				frappe.db.sql(""" 
-					update `tabOvertime Application` set processed = '{0}', salary_slip = '{3}'  where name = '{1}' and employee = '{2}' 
-				""".format(processed, a.reference, self.employee, ss_name))
+					update `tabOvertime Application` set processed = '{0}', salary_slip = '{3}', payment_made = '{4}'  where name = '{1}' and employee = '{2}' 
+				""".format(processed, a.reference, self.employee, ss_name, payment_made))
 		self.reload()	
 
 
