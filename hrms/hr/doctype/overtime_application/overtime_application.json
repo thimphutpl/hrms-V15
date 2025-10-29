@@ -284,7 +284,6 @@
    "default": "Unpaid",
    "fieldname": "payment_made",
    "fieldtype": "Data",
-   "hidden": 1,
    "in_list_view": 1,
    "label": "Payment Status",
    "read_only": 1
@@ -359,7 +358,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-10-22 09:27:14.484915",
+ "modified": "2025-10-29 16:43:22.176133",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Overtime Application",

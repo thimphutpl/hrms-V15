@@ -3,6 +3,8 @@
 
 import frappe
 from frappe import _
+
+from frappe.utils import getdate
 from frappe.utils import getdate,flt,cint,today,add_to_date,time_diff_in_hours,nowdate
 from frappe.model.document import Document
 from erpnext.custom_workflow import validate_workflow_states, notify_workflow_states
@@ -24,7 +26,10 @@ class OvertimeApplication(Document):
 		self.processed = 0
 		self.validate_total_claim_amount()
 
+
 	
+
+
 
 # class OvertimeApplication(Document):
 # 	def validate(self):
@@ -343,3 +348,41 @@ def get_permission_query_conditions(user):
 		or
 		(`tabOvertime Application`.approver = '{user}' and `tabOvertime Application`.workflow_state not in ('Draft','Approved','Rejected','Cancelled'))
 	)""".format(user=user)
+
+
+
+#added by kinang.n to get holiday list from holiday
+@frappe.whitelist()
+def check_if_holiday_for_branch(branch, date):
+	"""
+	Check if the given date is a holiday for the given branch.
+	Uses 'Holiday List Branch' child table to link branches to Holiday Lists.
+	"""
+	if not branch or not date:
+		return 0
+
+	# Step 1: Find Holiday Lists that include this branch
+	holiday_lists = frappe.db.get_all(
+		"Holiday List Branch",
+		filters={"branch": branch},
+		fields=["parent"]
+	)
+	if not holiday_lists:
+		return 0
+
+	# Extract holiday list names
+	holiday_list_names = [h.parent for h in holiday_lists]
+
+	# Step 2: Check if the given date exists in any of those holiday lists
+	is_holiday = frappe.db.exists(
+		"Holiday",
+		{
+			"parent": ["in", holiday_list_names],
+			"holiday_date": getdate(date)
+		}
+	)
+
+	return 1 if is_holiday else 0
+
+
+

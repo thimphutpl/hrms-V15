@@ -59,8 +59,17 @@ frappe.ui.form.on('Overtime Application', {
 		// 		}
 		// 	}
 		// })
+	},
+
+
+	validate: function (frm) {
+		(frm.doc.items || []).forEach(d => {
+			auto_check_late_night(frm, d.doctype, d.name);
+		});
 	}
 });
+
+
 frappe.ui.form.on("Overtime Application Item", {
 	"number_of_hours": function (frm, cdt, cdn) {
 		calculate_amount(frm, cdt, cdn)
@@ -69,40 +78,121 @@ frappe.ui.form.on("Overtime Application Item", {
 	"rate": function (frm, cdt, cdn) {
 		calculate_amount(frm, cdt, cdn)
 	},
+
+
 	"from_date": function (frm, cdt, cdn) {
-		var child = locals[cdt][cdn]
-		var hours = moment(child.to_date).diff(moment(child.from_date), "seconds") / 3600;
-		if (child.to_date && child.from_date) {
+		// if (!validate_ot_time(frm, cdt, cdn)) return;
+
+		auto_check_late_night(frm, cdt, cdn);
+		update_overtime_rate(frm, cdt, cdn);
+
+		let child = locals[cdt][cdn];
+		if (child.from_date && child.to_date) {
+			let from = moment(child.from_date);
+			let to = moment(child.to_date);
+			if (to.isBefore(from)) to.add(1, 'day');
+			let hours = to.diff(from, 'seconds') / 3600;
 			frappe.model.set_value(cdt, cdn, "number_of_hours", hours);
 		}
-		update_overtime_rate(frm, cdt, cdn);
-		// if (frm.doc.employee) {
-		// 	frappe.call({
-		// 		method: "erpnext.setup.doctype.employee.employee.get_overtime_rate",
-		// 		args: {
-		// 			employee: frm.doc.employee,
-		// 			posting_date:child.from_date,
-		// 			is_late_night_ot: child.is_late_night_ot ? 1 : 0,
-		// 			is_holiday: child.is_holiday ? 1 : 0
-		// 		},
-		// 		callback: function(r) {
-		// 			if(r.message) {
-		// 				frm.set_value("rate", r.message)
-		// 				frappe.model.set_value(cdt, cdn, "rate", r.message);
-
-		// 			}
-		// 		}
-		// 	})
-		// }
 	},
+
+
+
+
 
 	"to_date": function (frm, cdt, cdn) {
 		var child = locals[cdt][cdn]
+		auto_check_late_night(frm, cdt, cdn);
+		update_overtime_rate(frm, cdt, cdn);
 		var hours = moment(child.to_date).diff(moment(child.from_date), "seconds") / 3600;
 		if (child.to_date && child.from_date) {
+
+			let from = moment(child.from_date, "HH:mm:ss");// added by kinzang
+			let to = moment(child.to_date, "HH:mm:ss");// added by kinzang
+
+			if (from.hours() >= 22 && (to.hours() < 8 || (to.hours() === 8 && to.minutes() === 0))) {
+				frappe.msgprint({
+					title: __("Invalid Time Range"),
+					message: __("To time is on the next day. Please adjust the date accordingly."),
+					indicator: "red"
+				});
+				frappe.model.set_value(cdt, cdn, "to_date", "");
+				return;
+			}
+
+			if (to.isBefore(from)) to.add(1, 'day'); //adjust if cross-midnight added by kinzang
+			let hours = to.diff(from, 'seconds') / 3600;
 			frappe.model.set_value(cdt, cdn, "number_of_hours", hours);
 		}
+
+
+		// Auto-check late night OT
+		auto_check_late_night(frm, cdt, cdn);
+
+		update_overtime_rate(frm, cdt, cdn);
 	},
+
+
+
+
+// added by Kinzang N. on 29/10/2025
+	is_holiday: function (frm, cdt, cdn) {
+		let row = locals[cdt][cdn];
+
+		// If user checks holiday, uncheck late night OT
+		if (row.is_holiday) {
+			frappe.model.set_value(cdt, cdn, "is_late_night_ot", 0);
+		}
+
+		// mark manual change to preserve user input
+		row._manual_is_holiday = true;
+
+		update_overtime_rate(frm, cdt, cdn);
+	},
+
+	is_late_night_ot: function (frm, cdt, cdn) {
+		let row = locals[cdt][cdn];
+
+		// If user checks late night OT, uncheck holiday
+		if (row.is_late_night_ot) {
+			frappe.model.set_value(cdt, cdn, "is_holiday", 0);
+			row._manual_is_holiday = true; // also treat as manual
+		}
+
+		update_overtime_rate(frm, cdt, cdn);
+	},
+
+	date: function (frm, cdt, cdn) {
+		let row = locals[cdt][cdn];
+		// Reset manual flag if date changed
+		row._manual_is_holiday = false;
+
+		if (frm.doc.branch && row.date) {
+			frappe.call({
+				method: "hrms.hr.doctype.overtime_application.overtime_application.check_if_holiday_for_branch",
+				args: {
+					branch: frm.doc.branch,
+					date: row.date
+				},
+				callback: function (r) {
+					// Only auto-check if user has not manually changed
+					if (!row._manual_is_holiday) {
+						frappe.model.set_value(cdt, cdn, "is_holiday", r.message ? 1 : 0);
+
+						// Ensure mutual exclusivity
+						if (r.message) {
+							frappe.model.set_value(cdt, cdn, "is_late_night_ot", 0);
+						}
+					}
+				}
+			});
+		}
+	},
+
+// till here.
+
+
+
 
 	//disable Future date added by kinzang. N on 22/10/2025
 
@@ -129,13 +219,6 @@ frappe.ui.form.on("Overtime Application Item", {
 		});
 	},
 
-	validate: function (frm) {
-		if (frm.doc.to_date > frappe.datetime.get_today()) {
-			frappe.throw(__('Future dates are not allowed.'));
-		}
-	},
-
-
 
 	items_remove: function (frm, cdt, cdn) {
 		calculate_time(frm, cdt, cdn);
@@ -149,6 +232,55 @@ frappe.ui.form.on("Overtime Application Item", {
 	},
 
 })
+
+
+
+//to auto checked is_late_night_ot when time range is from 22:00 to 24:00 and 00:01 to 8:00, added by kinzang.N . on 29/10/2025
+
+function auto_check_late_night(frm, cdt, cdn) {
+	let row = locals[cdt][cdn];
+	if (!row.from_date || !row.to_date) return;
+
+	let from_time = moment(row.from_date, "HH:mm:ss");
+	let to_time = moment(row.to_date, "HH:mm:ss");
+
+	let from_hour = from_time.hours();
+	let to_hour = to_time.hours();
+
+	function in_late_night_1(hour) {
+		// Late night window 1: 22:00 – 24:00
+		return hour >= 22 && hour < 24;
+	}
+	function in_late_night_2(hour) {
+		// Late night window 2: 00:00 – 08:00
+		return hour >= 0 && hour < 8;
+	}
+
+	let from_in_1 = in_late_night_1(from_hour);
+	let to_in_1 = in_late_night_1(to_hour);
+	let from_in_2 = in_late_night_2(from_hour);
+	let to_in_2 = in_late_night_2(to_hour);
+
+	let fully_in_same_window =
+		(from_in_1 && to_in_1) || (from_in_2 && to_in_2);
+
+	let normal_hours_present =
+		(from_hour >= 8 && from_hour < 22) || (to_hour >= 8 && to_hour < 22);
+
+	if (!row._manual_is_late_night_ot) {
+		if (fully_in_same_window && !normal_hours_present) {
+			frappe.model.set_value(cdt, cdn, "is_late_night_ot", 1);
+			frappe.model.set_value(cdt, cdn, "is_holiday", 0);
+		} else {
+			frappe.model.set_value(cdt, cdn, "is_late_night_ot", 0);
+		}
+	}
+}
+
+//till here
+
+
+
 
 function update_overtime_rate(frm, cdt, cdn) {
 	const child = locals[cdt][cdn];
