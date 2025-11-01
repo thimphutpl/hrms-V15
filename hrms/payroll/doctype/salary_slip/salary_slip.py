@@ -3,7 +3,7 @@
 
 import frappe
 
-from frappe.utils import add_days, cint, cstr, flt, getdate, nowdate, rounded, date_diff, money_in_words
+from frappe.utils import add_days, cint, cstr, flt, getdate, nowdate, rounded, date_diff, money_in_words, add_months
 from frappe.model.naming import make_autoname
 
 from frappe import msgprint, _
@@ -14,6 +14,7 @@ from erpnext.setup.doctype.employee.employee import get_holiday_list_for_employe
 from erpnext.utilities.transaction_base import TransactionBase
 from frappe.model.mapper import get_mapped_doc
 from erpnext import get_company_currency
+import calendar
 
 class SalarySlip(TransactionBase):
 	def autoname(self):
@@ -435,6 +436,10 @@ class SalarySlip(TransactionBase):
 		self.post_sws_entry()
 		self.update_ot()
 
+
+	
+	
+
 # to update OT in OT application
 	def update_ot(self, cancel = False):
 		processed = 1
@@ -445,19 +450,64 @@ class SalarySlip(TransactionBase):
 			processed = 0
 			ss_name = 'None' # set to None, Not empty string
 			payment_made = "Unpaid" # added by kinzang.n
+
+		#to pull prevoiuse month OT.
+		if self.month and self.fiscal_year: 
+			prev_month_date = add_months(getdate(f"{self.fiscal_year}-{int(self.month)}-01"), -1)
+			prev_month_name = calendar.month_name[prev_month_date.month]
+			prev_year = prev_month_date.year
+
 			
+	
+		to_keep = [] 
 		for a in self.ot_items:
+			if not a.reference:
+				continue
+
+			ot_month = frappe.db.get_value("Overtime Application", a.reference, "month")
+			if ot_month and ot_month == prev_month_name:
+				to_keep.append(a)
+			else: 
+
+				frappe.db.delete("Overtime Item", {"name": a.name})
+
+		self.ot_items = to_keep
+
+		for a in self.ot_items:
+
 			#added by kinzang N on 24/10/2025 to fetch month
 			if a.reference:
 				# Pull OT month from Overtime Application
 				ot_month = frappe.db.get_value("Overtime Application", a.reference, "month")
+				
+
 				# Update child table field in Salary Slip
 				a.month = ot_month  # updates in memory
 				frappe.db.set_value(a.doctype, a.name, "month", ot_month)  # persists to DB
 				frappe.db.sql(""" 
 					update `tabOvertime Application` set processed = '{0}', salary_slip = '{3}', payment_made = '{4}'  where name = '{1}' and employee = '{2}' 
 				""".format(processed, a.reference, self.employee, ss_name, payment_made))
-		self.reload()	
+				
+				# Add/update OT component in earnings
+				ot_component_name = "OT"  # your OT salary component name
+				ot_total = sum(flt(a.total_amount) for a in self.ot_items)
+				found = False
+				for earning in self.earnings:
+					if earning.salary_component == ot_component_name:
+						earning.amount = ot_total
+						found = True
+						break
+					if not found:
+						ot_earning = self.append('earnings', {})
+						ot_earning.salary_component = ot_component_name
+						ot_earning.amount = ot_total
+    		# -----------------------------		
+		self.reload()
+
+
+		
+
+
 
 
 
