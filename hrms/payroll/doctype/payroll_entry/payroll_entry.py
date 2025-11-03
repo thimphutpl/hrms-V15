@@ -845,10 +845,12 @@ class PayrollEntry(Document):
 		self.check_permission("write")
 
 		company = frappe.db.get("Company", self.company)
+		
 		default_bank_account    = frappe.db.get_value("Branch", self.processing_branch, "expense_bank_account")
 		default_payable_account = company.get("default_payroll_payable_account")
 		company_cc              = company.get("cost_center")
-		default_employer_pf_account = company.get("employer_contribution_pf_account")
+		default_employer_pf_account = frappe.db.get_value("Company", self.company, "employer_contribution_to_pf")
+		#frappe.throw(str(default_employer_pf_account))
 		salary_component_pf     = "PF"
 
 		if not default_bank_account:
@@ -859,6 +861,7 @@ class PayrollEntry(Document):
 		elif not company_cc:
 			frappe.throw(_("Please set <b>Default Cost Center</b> for the Company"))
 		elif not default_employer_pf_account:
+			
 			frappe.throw(_("Please set account for <b>Employer Contribution to PF</b> for the Company"))
 
 		salary_slip_total = 0

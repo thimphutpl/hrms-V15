@@ -10,9 +10,7 @@
   "description",
   "column_break_ymky",
   "account",
-  "disabled",
-  "section_break_goum",
-  "accounts"
+  "disabled"
  ],
  "fields": [
   {
@@ -35,7 +33,6 @@
   {
    "fieldname": "account",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "Account",
    "options": "Account"
   },
@@ -44,15 +41,6 @@
    "fieldname": "disabled",
    "fieldtype": "Check",
    "label": "Disabled"
-  },
-  {
-   "fieldname": "section_break_goum",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "accounts",
-   "fieldtype": "Table",
-   "options": "Travel Type Item"
   }
  ],
  "index_web_pages_for_search": 1,

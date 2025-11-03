@@ -19,30 +19,30 @@ class BulkLeaveEncashment(Document):
 		# validate_workflow_states(self)
 		if not self.encashment_date:
 			self.encashment_date = getdate(nowdate())
-		if self.process_from_leave_request:
-			self.get_leave_detail_from_ler()
-		else:
-			self.get_leave_details_for_encashment()
+		# if self.process_from_leave_request:
+		# 	self.get_leave_detail_from_ler()
+		# else:
+		self.get_leave_details_for_encashment()
 		self.calculate_amount()
 		# notify_workflow_states(self)
 
 	def on_submit(self):
-		if not self.process_from_leave_request:
-			self.update_encashed_in_leave_allocation()
-		if self.process_from_leave_request:
-			self.create_leave_ledger_entry_ler()
-		else:
-			self.create_leave_ledger_entry()
+		# if not self.process_from_leave_request:
+		self.update_encashed_in_leave_allocation()
+		# if self.process_from_leave_request:
+		# 	self.create_leave_ledger_entry_ler()
+		# else:
+		self.create_leave_ledger_entry()
 		self.post_accounts_entry()
 		# notify_workflow_states(self)
 
 	def on_cancel(self):
-		if not self.process_from_leave_request:
-			self.update_encashed_in_leave_allocation(cancel=1)
-		if self.process_from_leave_request:
-			self.create_leave_ledger_entry_ler(submit=False)
-		else:
-			self.create_leave_ledger_entry(submit=False)
+		# if not self.process_from_leave_request:
+		self.update_encashed_in_leave_allocation(cancel=1)
+		# if self.process_from_leave_request:
+		# 	self.create_leave_ledger_entry_ler(submit=False)
+		# else:
+		self.create_leave_ledger_entry(submit=False)
 		# notify_workflow_states(self)
 	
 	def calculate_amount(self):
@@ -65,57 +65,57 @@ class BulkLeaveEncashment(Document):
 				frappe.db.set_value("Leave Allocation", d.leave_allocation, "total_leaves_encashed",
 					frappe.db.get_value('Leave Allocation', d.leave_allocation, 'total_leaves_encashed') - d.encashable_days)
 
-	def create_leave_ledger_entry_ler(self, submit=True):
-		count = 0
-		for d in self.items:
+	# def create_leave_ledger_entry_ler(self, submit=True):
+	# 	count = 0
+	# 	for d in self.items:
 			
-			days = frappe.db.sql('''
-                            select encashment_days, earned_leave_balance,casual_leave_balance from `tabLeave Encashment Request` 
-                            where ref_id='{0}' and employee='{1}' and leave_period='{2}';
-                                       '''.format(self.leave_encashment_request,d.employee,self.leave_period)
-			)
+	# 		days = frappe.db.sql('''
+    #                         select encashment_days, earned_leave_balance,casual_leave_balance from `tabLeave Encashment Request` 
+    #                         where ref_id='{0}' and employee='{1}' and leave_period='{2}';
+    #                                    '''.format(self.leave_encashment_request,d.employee,self.leave_period)
+	# 		)
    
-			# frappe.throw(frappe.as_json(days[0][0]))
-			encashable_days = days[0][0]
-			earned_leave= days[0][1]
-			casual_leave = days[0][2]
+	# 		# frappe.throw(frappe.as_json(days[0][0]))
+	# 		encashable_days = days[0][0]
+	# 		earned_leave= days[0][1]
+	# 		casual_leave = days[0][2]
 
-			if encashable_days <=  casual_leave: 
-				args = frappe._dict(
-						employee=d.employee,
-						employee_name=d.employee_name,
-						leaves=encashable_days * -1,
-						from_date=self.encashment_date,
-						to_date=self.encashment_date,
-						is_carry_forward=0,
+	# 		if encashable_days <=  casual_leave: 
+	# 			args = frappe._dict(
+	# 					employee=d.employee,
+	# 					employee_name=d.employee_name,
+	# 					leaves=encashable_days * -1,
+	# 					from_date=self.encashment_date,
+	# 					to_date=self.encashment_date,
+	# 					is_carry_forward=0,
 						
-					)
-				create_leave_ledger_entry(self,args,submit, leave_type = "Casual Leave")
-			else:
-				args1 = frappe._dict(
-						employee=d.employee,
-						employee_name=d.employee_name,
-						leaves=casual_leave * -1,
-						from_date=self.encashment_date,
-						to_date=self.encashment_date,
-						is_carry_forward=0,
-					)
-				create_leave_ledger_entry( self,args1,submit, leave_type = "Casual Leave")
-				args2 = frappe._dict(
-						employee=d.employee,
-						employee_name=d.employee_name,
-						leaves=(encashable_days-casual_leave) * -1,
-						from_date=self.encashment_date,
-						to_date=self.encashment_date,
-						is_carry_forward=0
-					)
-				create_leave_ledger_entry( self,args2,submit, leave_type = "Earned Leave")
-			# Increment count properly
-			count += 1
+	# 				)
+	# 			create_leave_ledger_entry(self,args,submit, leave_type = "Casual Leave")
+	# 		else:
+	# 			args1 = frappe._dict(
+	# 					employee=d.employee,
+	# 					employee_name=d.employee_name,
+	# 					leaves=casual_leave * -1,
+	# 					from_date=self.encashment_date,
+	# 					to_date=self.encashment_date,
+	# 					is_carry_forward=0,
+	# 				)
+	# 			create_leave_ledger_entry( self,args1,submit, leave_type = "Casual Leave")
+	# 			args2 = frappe._dict(
+	# 					employee=d.employee,
+	# 					employee_name=d.employee_name,
+	# 					leaves=(encashable_days-casual_leave) * -1,
+	# 					from_date=self.encashment_date,
+	# 					to_date=self.encashment_date,
+	# 					is_carry_forward=0
+	# 				)
+	# 			create_leave_ledger_entry( self,args2,submit, leave_type = "Earned Leave")
+	# 		# Increment count properly
+	# 		count += 1
 
-			# Break the loop if count reaches 2
-			# if count == 2:
-			# 	break
+	# 		# Break the loop if count reaches 2
+	# 		# if count == 2:
+	# 		# 	break
 
 		
 	def create_leave_ledger_entry(self, submit=True):
@@ -199,21 +199,22 @@ class BulkLeaveEncashment(Document):
 			if not allocation:
 				frappe.throw(_("No Leaves Allocated to Employee: {0} for Leave Type: {1}").format(emp.employee, self.leave_type))
 
-			emp.leave_balance = get_leave_balance_on(employee=emp.employee, date=today(), \
-				to_date=today(), leave_type=self.leave_type, consider_all_leaves_in_the_allocation_period=True)
-			emp.casual_leave_balance = get_leave_balance_on(employee=emp.employee, date=today(), \
-				to_date=today(), leave_type="Casual Leave", consider_all_leaves_in_the_allocation_period=True)
+			emp.leave_balance = get_leave_balance_on(employee=emp.employee, date=today(), to_date=today(), leave_type=self.leave_type, consider_all_leaves_in_the_allocation_period=True)
+			emp.casual_leave_balance = get_leave_balance_on(employee=emp.employee, date=today(), to_date=today(), leave_type="Casual Leave", consider_all_leaves_in_the_allocation_period=True)
+			encashment_days = emp.leave_balance + emp.casual_leave_balance
 
 			if not emp.employee_group:
 				emp.employee_group = frappe.db.get_value("Employee", emp.employee, "employee_group")
 			
-			emp.encashable_days = emp.leave_balance + emp.casual_leave_balance
-
-			if emp.encashable_days > emp.leave_balance:
-				frappe.throw("Encashable Days  cannot be more than Leave Balance")
+			# emp.encashable_days = emp.leave_balance + emp.casual_leave_balance
+			emp.encashable_days = 30 if encashment_days >= 30 else encashment_days
+			if emp.encashable_days > encashment_days:
+				frappe.throw("Encashable Days cannot be more than Leave Balance")
 			if emp.encashable_days > 30:
 				emp.encashable_days = 30
 			pay = get_basic_and_gross_pay(employee=emp.employee, effective_date=today())
+			if pay.get("basic_pay") is None:
+				frappe.throw("Basic pay not found for employee: {0}".format(emp.employee))
 			if pay.get("basic_pay") is not None:
 				emp.current_basic_pay = pay.get("basic_pay")
 				emp.encashment_amount = flt((pay.get("basic_pay")/30) * flt(emp.encashable_days),2)
@@ -268,7 +269,8 @@ class BulkLeaveEncashment(Document):
 		
 		default_bank_account = get_bank_account(self.branch)
 		default_payable_account = frappe.db.get_single_value("HR Accounts Settings", "salary_payable_account")
-		company_cc              = frappe.db.get_value("Company", self.company,"company_cost_center")
+		default_encashment_account = frappe.db.get_single_value("HR Accounts Settings", "leave_encashment_account")
+		# company_cc = frappe.db.get_value("Company", self.company,"company_cost_center")
 
 		cc = {}
 		encashment_tax = net_payable = 0 
@@ -303,11 +305,11 @@ class BulkLeaveEncashment(Document):
 		total = total_allowance = 0
 		for rec in cc:
 			payables_je.append("accounts", {
-					"account": "Leave Encashment - BTL",
+					"account": default_encashment_account,
 					"reference_type": self.doctype,
 					"reference_name": self.name,
 					"cost_center": rec,
-					"business_activity": "OTB",
+					"business_activity": "Common",
 					"debit_in_account_currency": flt(cc[rec]['encashment_amount'],2),
 					"debit": flt(cc[rec]['encashment_amount'],2),
 				})
@@ -317,8 +319,8 @@ class BulkLeaveEncashment(Document):
 					"account": tax_account,
 					"reference_type": self.doctype,
 					"reference_name": self.name,
-					"cost_center": company_cc,
-					"business_activity": "OTB",
+					"cost_center": rec,
+					"business_activity": "Common",
 					"credit_in_account_currency": flt(encashment_tax,2),
 					"party_check": 0,
 					"credit": flt(encashment_tax,2),
@@ -328,8 +330,8 @@ class BulkLeaveEncashment(Document):
 				"account": default_payable_account,
 				"reference_type": self.doctype,
 				"reference_name": self.name,
-				"cost_center": company_cc,
-				"business_activity": "OTB",
+				"cost_center": rec,
+				"business_activity": "Common",
 				"credit_in_account_currency": flt(net_payable,2),
 				"credit": flt(net_payable,2),
 				"party_check": 0
@@ -337,7 +339,7 @@ class BulkLeaveEncashment(Document):
 
 		payables_je.flags.ignore_permissions = 1
 		payables_je.insert()
-		# payables_je.submit()
+		payables_je.submit()
 		
 		#Payables JE End -----------------------------------------------------
 		# sthc_je = frappe.new_doc("Journal Entry")
@@ -357,7 +359,7 @@ class BulkLeaveEncashment(Document):
 		# 			"reference_type": self.doctype,
 		# 			"reference_name": self.name,
 		# 			"cost_center": company_cc,
-		# 			"business_activity": "OTB",
+		# 			"business_activity": "Common",
 		# 			"debit_in_account_currency": flt(encashment_tax,2),
 		# 			"debit": flt(encashment_tax,2),
 		# 			"party_check": 0
@@ -368,7 +370,7 @@ class BulkLeaveEncashment(Document):
 		# 		"reference_type": self.doctype,
 		# 		"reference_name": self.name,
 		# 		"cost_center": company_cc,
-		# 		"business_activity": "OTB",
+		# 		"business_activity": "Common",
 		# 		"credit_in_account_currency": flt(encashment_tax,2),
 		# 		"credit": flt(encashment_tax,2),
 		# 	})
@@ -392,8 +394,8 @@ class BulkLeaveEncashment(Document):
 				"account": default_payable_account,
 				"reference_type": self.doctype,
 				"reference_name": self.name,
-				"cost_center": company_cc,
-				"business_activity": "OTB",
+				"cost_center": rec,
+				"business_activity": "Common",
 				"debit_in_account_currency": flt(net_payable,2),
 				"debit": flt(net_payable,2),
 				"party_check": 0
@@ -403,8 +405,8 @@ class BulkLeaveEncashment(Document):
 				"account": default_bank_account,
 				"reference_type": self.doctype,
 				"reference_name": self.name,
-				"cost_center": company_cc,
-				"business_activity": "OTB",
+				"cost_center": rec,
+				"business_activity": "Common",
 				"credit_in_account_currency": flt(net_payable,2),
 				"credit": flt(net_payable,2),
 			})
@@ -412,4 +414,5 @@ class BulkLeaveEncashment(Document):
 		pb_je.flags.ignore_permissions = 1 
 		pb_je.insert()
 		self.db_set("journal_entries_created", 1)
+		self.db_set("journal_entry",pb_je.name)
 		frappe.db.commit()

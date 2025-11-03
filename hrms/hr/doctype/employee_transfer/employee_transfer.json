@@ -7,21 +7,60 @@
  "engine": "InnoDB",
  "field_order": [
   "employee",
-  "employee_name",
-  "transfer_date",
+  "emp_name",
+  "date_of_joining",
+  "grade",
+  "upload_document",
   "column_break_3",
   "company",
+  "transfer_type",
+  "transfer_date",
   "new_company",
-  "department",
+  "description",
+  "rejection_reason",
+  "sb_supervisor_details",
+  "supervisor_name",
+  "supervisor_designation",
+  "cb_supervisor",
+  "supervisor",
   "details_section",
   "transfer_details",
+  "sb_branch_details",
+  "old_branch",
+  "old_cost_center",
+  "column_break_12",
+  "new_branch",
+  "new_cost_center",
+  "sb_transfer_details",
+  "old_department",
+  "old_division",
+  "old_section",
+  "old_designation",
+  "old_unit",
+  "column_break_6",
+  "new_department",
+  "new_division",
+  "new_section",
+  "new_unit",
+  "new_designation",
+  "sb_reports_to",
+  "old_reports_to",
+  "current_supervisor_name",
+  "current_approver",
+  "current_approver_name",
+  "column_break_9",
+  "new_reports_to",
+  "new_supervisor_name",
+  "new_approver",
+  "new_approver_name",
+  "sb_additional_information",
   "reallocate_leaves",
   "create_new_employee_id",
   "new_employee_id",
-  "amended_from",
-  "section_break_mplw",
-  "reason_for_transfer_column",
-  "reason_for_transfer"
+  "sb_benefits",
+  "employee_benefits_status",
+  "workflow_state",
+  "amended_from"
  ],
  "fields": [
   {
@@ -33,15 +72,10 @@
    "reqd": 1
   },
   {
-   "fetch_from": "employee.employee_name",
-   "fieldname": "employee_name",
-   "fieldtype": "Data",
-   "label": "Employee Name",
-   "read_only": 1
-  },
-  {
+   "description": "Only eligible for transfer if employee has served 4 years in a department.",
    "fieldname": "transfer_date",
    "fieldtype": "Date",
+   "in_list_view": 1,
    "label": "Transfer Date",
    "reqd": 1
   },
@@ -53,23 +87,16 @@
    "fetch_from": "employee.company",
    "fieldname": "company",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Company",
    "options": "Company"
   },
   {
    "fieldname": "new_company",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "New Company",
    "options": "Company"
-  },
-  {
-   "bold": 1,
-   "fetch_from": "employee.department",
-   "fieldname": "department",
-   "fieldtype": "Link",
-   "label": "Department",
-   "options": "Department",
-   "read_only": 1
   },
   {
    "fieldname": "details_section",
@@ -79,9 +106,9 @@
   {
    "fieldname": "transfer_details",
    "fieldtype": "Table",
+   "hidden": 1,
    "label": "Employee Transfer Detail",
-   "options": "Employee Property History",
-   "reqd": 1
+   "options": "Employee Property History"
   },
   {
    "default": "0",
@@ -94,6 +121,7 @@
    "default": "0",
    "fieldname": "create_new_employee_id",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Create New Employee Id"
   },
   {
@@ -114,23 +142,298 @@
    "read_only": 1
   },
   {
-   "fieldname": "section_break_mplw",
+   "fieldname": "workflow_state",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Workflow State",
+   "options": "Workflow State",
+   "read_only": 1
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Reason for Transfer"
+  },
+  {
+   "fieldname": "sb_supervisor_details",
+   "fieldtype": "Section Break",
+   "label": "Approver Details"
+  },
+  {
+   "fieldname": "supervisor_name",
+   "fieldtype": "Data",
+   "label": "Approver Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "supervisor_designation",
+   "fieldtype": "Data",
+   "label": "Approver Designation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb_supervisor",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "supervisor",
+   "fieldtype": "Link",
+   "label": "Approver",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:frappe.user.has_role(\"HR Manager\")",
+   "fieldname": "rejection_reason",
+   "fieldtype": "Small Text",
+   "label": "Reason for Rejection"
+  },
+  {
+   "fieldname": "transfer_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Transfer Type",
+   "options": "\nRegular Transfer\nRequest Transfer\nRe-Deployment\nDeputation or Temporary Transfer\nInternal Transfer\nShort Term Transfer\nLong Term Transfer\nDisciplinary Transfer",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "employee.date_of_joining",
+   "fieldname": "date_of_joining",
+   "fieldtype": "Date",
+   "label": "Date of Joining",
+   "read_only": 1
+  },
+  {
+   "fieldname": "new_department",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "New Department",
+   "options": "Department"
+  },
+  {
+   "fieldname": "new_division",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "New Division",
+   "options": "Department"
+  },
+  {
+   "fetch_from": "section",
+   "fieldname": "new_section",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "New Section",
+   "options": "Department"
+  },
+  {
+   "fieldname": "new_branch",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "New Branch",
+   "options": "Branch",
+   "reqd": 1
+  },
+  {
+   "bold": 1,
+   "fetch_from": "employee.department",
+   "fieldname": "old_department",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "Current Department",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.division",
+   "fieldname": "old_division",
+   "fieldtype": "Link",
+   "label": "Current Division",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.section",
+   "fieldname": "old_section",
+   "fieldtype": "Link",
+   "label": "Current Section",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.branch",
+   "fieldname": "old_branch",
+   "fieldtype": "Link",
+   "label": "Current Branch",
+   "options": "Branch",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "employee.reports_to",
+   "fieldname": "old_reports_to",
+   "fieldtype": "Link",
+   "label": "Current Supervisor",
+   "options": "Employee",
+   "read_only": 1
+  },
+  {
+   "fieldname": "new_reports_to",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "New Supervisor",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "old_branch.cost_center",
+   "fieldname": "old_cost_center",
+   "fieldtype": "Link",
+   "label": "Current Cost Center",
+   "options": "Cost Center",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "new_branch.cost_center",
+   "fieldname": "new_cost_center",
+   "fieldtype": "Link",
+   "label": "New Cost Center",
+   "options": "Cost Center",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "emp_name",
+   "fieldtype": "Data",
+   "label": "Employee Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "old_reports_to.employee_name",
+   "fieldname": "current_supervisor_name",
+   "fieldtype": "Data",
+   "label": "Current Supervisor Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "new_reports_to.employee_name",
+   "fieldname": "new_supervisor_name",
+   "fieldtype": "Data",
+   "label": "New Supervisor Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_reports_to",
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "reason_for_transfer",
-   "fieldtype": "Long Text",
-   "label": "Reason for Transfer"
+   "fieldname": "column_break_9",
+   "fieldtype": "Column Break"
   },
   {
-   "fieldname": "reason_for_transfer_column",
-   "fieldtype": "Column Break",
-   "label": "Reason for Transfer"
+   "fieldname": "sb_additional_information",
+   "fieldtype": "Section Break",
+   "label": "Additional Information"
+  },
+  {
+   "fieldname": "sb_transfer_details",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "sb_branch_details",
+   "fieldtype": "Section Break",
+   "label": "Transfer Details"
+  },
+  {
+   "fieldname": "column_break_12",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sb_benefits",
+   "fieldtype": "Section Break",
+   "label": "Employee Benefits"
+  },
+  {
+   "fetch_from": "employee.designation",
+   "fieldname": "old_designation",
+   "fieldtype": "Link",
+   "label": "Current Designation",
+   "options": "Designation",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.unit",
+   "fieldname": "old_unit",
+   "fieldtype": "Link",
+   "label": "Current Unit",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fieldname": "new_designation",
+   "fieldtype": "Link",
+   "label": "New Designation",
+   "options": "Designation"
+  },
+  {
+   "fieldname": "new_unit",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "New Unit",
+   "options": "Department"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "Not Claimed",
+   "fieldname": "employee_benefits_status",
+   "fieldtype": "Select",
+   "label": "Employee Benefit Status",
+   "options": "Not Claimed\nClaimed",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.grade",
+   "fieldname": "grade",
+   "fieldtype": "Link",
+   "label": "Grade",
+   "options": "Employee Grade"
+  },
+  {
+   "fetch_from": "employee.second_approver",
+   "fieldname": "current_approver",
+   "fieldtype": "Link",
+   "label": "Current Approver",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "current_approver.employee_name",
+   "fieldname": "current_approver_name",
+   "fieldtype": "Data",
+   "label": "Current Approver Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "new_approver",
+   "fieldtype": "Link",
+   "label": "New Approver",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "new_approver.employee_name",
+   "fieldname": "new_approver_name",
+   "fieldtype": "Data",
+   "label": "New Approver Name"
+  },
+  {
+   "fieldname": "upload_document",
+   "fieldtype": "Attach",
+   "label": "Upload Document"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-05-23 16:05:58.668383",
+ "modified": "2025-09-23 08:17:03.820855",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Transfer",
@@ -172,12 +475,37 @@
    "share": 1,
    "submit": 1,
    "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Administrator",
+   "share": 1,
+   "write": 1
   }
  ],
  "quick_entry": 1,
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "employee_name",
  "track_changes": 1
 }

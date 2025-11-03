@@ -20,7 +20,7 @@ from frappe.utils import (
 	now_datetime
 )
 from dateutil.relativedelta import relativedelta
-
+from datetime import datetime,date
 import erpnext
 from erpnext.accounts.doctype.journal_entry.journal_entry import get_default_bank_cash_account
 
@@ -58,7 +58,7 @@ class EmployeeAdvance(Document):
 
 	def on_submit(self):
 		self.post_journal_entry()
-		self.update_salary_structure()
+		# self.update_salary_structure()
 
 	def on_cancel(self):
 		self.ignore_linked_doctypes = ("GL Entry", "Payment Ledger Entry")
@@ -191,7 +191,7 @@ class EmployeeAdvance(Document):
 		precision = self.precision("paid_amount")
 		total_amount = flt(flt(self.claimed_amount) + flt(self.return_amount), precision)
 		status = None
-
+		#frappe.throw("hiii11")
 		if self.docstatus == 0:
 			status = "Draft"
 		elif self.docstatus == 1:
@@ -213,6 +213,7 @@ class EmployeeAdvance(Document):
 				self.paid_amount, precision
 			):
 				status = "Paid"
+				self.update_salary_structure()
 			else:
 				status = "Unpaid"
 		elif self.docstatus == 2:
@@ -238,11 +239,20 @@ class EmployeeAdvance(Document):
 	@frappe.whitelist()
 	def calculate_amount(self):
 		deduction = 0.0
-		max_amount = flt(self.basic_pay) * 3
+		employee_group,joining_date=frappe.db.get_value('Employee', self.employee, ['employee_group','date_of_joining'])
+		max_month,min_req=frappe.db.get_value('Employee Group',employee_group,['salary_advance_max_months','minimum_services_required'])
+		#joining_date=frappe.db.get_value('Employee', self.employee, 'date_of_joining')
+		join_d = joining_date if isinstance(joining_date, date) else datetime.strptime(str(joining_date), '%Y-%m-%d').date()
+		current_d=datetime.now().date()
+		year_diff = relativedelta(current_d,join_d).years
+		if int(min_req) > year_diff:
+			frappe.throw("minimum service required to be eligible for salary advance is {} year".format(min_req))
+		max_amount = flt(self.basic_pay) * flt(max_month)
+		
 		if flt(self.advance_amount) > flt(max_amount):
 			frappe.throw(
 				_(
-					"The advance amount cannot exceed 3 times your basic pay. "
+					"The advance amount cannot exceed 2 times your basic pay. "
 					"You are attempting to set an advance of {} while the maximum allowable amount is {}. "
 					"Please adjust the advance amount accordingly.".format(
 						frappe.bold(frappe.format_value(self.advance_amount, {"fieldtype":"Currency"})),

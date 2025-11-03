@@ -118,6 +118,7 @@ def get_start_end_dates(fiscal_year, month, company=None):
 
 
 def get_officiating_employee(employee):
+	
 	if not employee:
 		frappe.throw("Employee is Mandatory")
 		
@@ -144,9 +145,9 @@ def get_approver(employee):
 	# 		{"parent": department, "parentfield": "leave_approvers", "idx": 1},
 	# 		"approver",
 	# 	)
-	department = frappe.db.get_value("Employee", employee, "department")
-	empid=frappe.db.get_value("Department", department, "approver_hod")
-	approver = frappe.db.get_value("Employee", empid, "user_id")
+	empid = frappe.db.get_value("Employee", employee, "second_approver")
+	#empid=frappe.db.get_value("Department", department, "approver_hod")
+	approver = frappe.db.get_value("Employee", empid, "name")
 
 
 	return approver
@@ -155,6 +156,6 @@ def get_approver(employee):
 @frappe.whitelist()
 def get_reports_to(employee):
 	empid = frappe.db.get_value("Employee", employee, "reports_to")
-	reports_to = frappe.db.get_value("Employee", empid, "user_id")
+	reports_to = frappe.db.get_value("Employee", empid, "name")
 	
 	return reports_to

@@ -24,22 +24,16 @@
   "afd",
   "afd_clearance",
   "afd_remarks",
-  "ada",
-  "ada_clearance",
-  "ada_remarks",
   "column_break_29",
   "ams",
   "ams_clearance",
-  "sms_remarks",
+  "ams_remarks",
   "icthr",
   "icthr_clearance",
   "icthr_remarks",
   "iad",
   "iad_clearance",
   "iad_remarks",
-  "pc",
-  "pc_clearance",
-  "pc_remarks",
   "sb_reference",
   "mail_sent",
   "approvers_set",
@@ -256,64 +250,11 @@
    "read_only_depends_on": "eval:frappe.session.user != doc.iad"
   },
   {
-   "fieldname": "ada",
-   "fieldtype": "Link",
-   "label": "Treasurer, NRDCL Welfare Fund",
-   "options": "User",
-   "read_only": 1
-  },
-  {
-   "default": "0",
-   "fieldname": "ada_clearance",
-   "fieldtype": "Check",
-   "label": "Clearance Treasurer, NRDCL Welfare Fund)",
-   "mandatory_depends_on": "eval:frappe.session.user == doc.ada",
-   "read_only": 1
-  },
-  {
-   "depends_on": "eval:doc.ada==frappe.session.user",
-   "fieldname": "ada_remarks",
-   "fieldtype": "Small Text",
-   "label": "Treasurer, NRDCL Welfare Fund Remarks",
-   "mandatory_depends_on": "eval:frappe.session.user == doc.ada",
-   "read_only_depends_on": "eval:frappe.session.user != doc.ada"
-  },
-  {
    "fieldname": "ams",
    "fieldtype": "Link",
    "label": "Asset Declaration Administrator",
    "options": "User",
    "read_only": 1
-  },
-  {
-   "depends_on": "eval:doc.ams==frappe.session.user",
-   "fieldname": "sms_remarks",
-   "fieldtype": "Small Text",
-   "label": "Asset Management Section Remarks",
-   "mandatory_depends_on": "eval:doc.ams==frappe.session.user"
-  },
-  {
-   "fieldname": "pc",
-   "fieldtype": "Link",
-   "label": "Store Incharge (HO & Region)",
-   "options": "User",
-   "read_only": 1
-  },
-  {
-   "default": "0",
-   "fieldname": "pc_clearance",
-   "fieldtype": "Check",
-   "label": "Clearance Acquired (Store Incharge HO & Region)",
-   "mandatory_depends_on": "eval:frappe.session.user == doc.pc",
-   "read_only": 1
-  },
-  {
-   "depends_on": "eval:frappe.session.user == doc.pc",
-   "fieldname": "pc_remarks",
-   "fieldtype": "Small Text",
-   "label": "Store Incharge Remarks",
-   "mandatory_depends_on": "eval:frappe.session.user == doc.pc",
-   "read_only_depends_on": "eval:frappe.session.user != doc.pc"
   },
   {
    "default": "0",
@@ -332,13 +273,20 @@
   {
    "fieldname": "column_break_edas",
    "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.ams==frappe.session.user",
+   "fieldname": "ams_remarks",
+   "fieldtype": "Small Text",
+   "label": "Asset Management Section Remarks",
+   "mandatory_depends_on": "eval:doc.ams==frappe.session.user"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-08-22 11:57:44.652735",
- "modified_by": "sonam.zangmo@thimphutechpark.bt",
+ "modified": "2025-09-22 14:40:56.485796",
+ "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Separation Clearance",
  "naming_rule": "Expression (old style)",
@@ -355,6 +303,29 @@
    "role": "System Manager",
    "share": 1,
    "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Employee",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Approver",
+   "select": 1,
+   "share": 1,
    "write": 1
   }
  ],

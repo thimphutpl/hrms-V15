@@ -131,7 +131,7 @@ class EmployeeBenefits(Document):
 	def validate_benefits(self):
 		for a in self.items:
 			a.payable_amount = flt(a.amount) - flt(a.tax_amount)
-			if a.benefit_type == "Provision for Leave Encashment":
+			if a.benefit_type == "Balance Earned Leave":
 				if self.purpose != "Separation" and self.purpose != "Upgradation":
 					frappe.throw("Leave Encashment cannot be claimed for {}".format(self.purpose))
 
@@ -155,7 +155,7 @@ class EmployeeBenefits(Document):
 		# self.total_amount = 0
 		for a in self.items:
 			# self.total_amount = self.total_amount + a.amount 
-			if a.benefit_type=="Provision for Employee Gratuity Fund":
+			if a.benefit_type=="Gratuity":
 				date_of_joining = frappe.db.get_value("Employee", self.employee, "date_of_joining")
 				employee_group = frappe.db.get_value("Employee", self.employee, "employee_group")
 				today_date = date.today()
@@ -373,6 +373,16 @@ def get_basic_salary(employee):
 	return amount
 
 @frappe.whitelist()
+def get_net_salary(employee):
+	amount = 0
+	query = "select ss.net_pay from `tabSalary Structure` s, `tabSalary Slip` ss where s.name = ss.salary_structure and s.employee=\'" + str(employee) + "\' and s.is_active='Yes' ORDER BY ss.creation DESC LIMIT 1"
+	data = frappe.db.sql(query, as_dict=True)
+	if not data:
+		frappe.throw("Net Salary is not been assigned to the employee.")
+	
+	return data[0].net_pay
+
+@frappe.whitelist()
 def get_leave_encashment_amount(employee, date):
 	basic_pay = amount = 0
 	query = "select d.amount from `tabSalary Structure` s, `tabSalary Detail` d where s.name = d.parent and s.employee=\'" + str(employee) + "\' and d.salary_component in ('Basic Pay') and s.is_active='Yes'"
@@ -389,7 +399,7 @@ def get_leave_encashment_amount(employee, date):
 
 @frappe.whitelist()
 def get_leave_encashment_tax(amount, benefit_type):
-	if benefit_type == "Provision for Leave Encashment":
+	if benefit_type == "Balance Earned Leave":
 		encashment_tax = get_salary_tax(amount)
 		return encashment_tax
 

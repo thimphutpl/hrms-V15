@@ -3,7 +3,7 @@
 
 
 import unicodedata
-from datetime import date
+from datetime import date,datetime
 
 import frappe
 from frappe import _, msgprint
@@ -693,7 +693,16 @@ class SalarySlip(TransactionBase):
 		self.data, self.default_data = self.get_data_for_eval()
 
 		for struct_row in self._salary_structure_doc.get(component_type):
-			self.add_structure_component(struct_row, component_type)
+			#self.add_structure_component(struct_row, component_type)
+			posting_date_obj = datetime.strptime(self.posting_date, "%Y-%m-%d").date()
+			if struct_row.salary_component == 'Salary Advance Deductions':
+        
+				if struct_row.to_date and struct_row.to_date > posting_date_obj:
+					self.add_structure_component(struct_row, component_type)
+				
+			else:
+				
+				self.add_structure_component(struct_row, component_type)
 
 	def add_structure_component(self, struct_row, component_type):
 		amount = struct_row.amount

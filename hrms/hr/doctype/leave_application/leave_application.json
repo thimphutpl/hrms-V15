@@ -159,10 +159,10 @@
    "fieldname": "leave_approver",
    "fieldtype": "Link",
    "label": "Leave Approver",
-   "options": "User"
+   "options": "Employee"
   },
   {
-   "fetch_from": "leave_approver.full_name",
+   "fetch_from": "leave_approver.employee_name",
    "fieldname": "leave_approver_name",
    "fieldtype": "Data",
    "label": "Leave Approver Name",
@@ -253,6 +253,7 @@
    "label": "Other Details"
   },
   {
+   "fetch_from": "leave_approver.designation",
    "fieldname": "leave_approver_designation",
    "fieldtype": "Data",
    "label": "Leave Approver Designation"
@@ -269,7 +270,7 @@
  "is_submittable": 1,
  "links": [],
  "max_attachments": 3,
- "modified": "2025-09-05 11:04:22.911641",
+ "modified": "2025-09-28 10:36:12.892188",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Application",

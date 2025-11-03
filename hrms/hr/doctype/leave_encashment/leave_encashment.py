@@ -211,9 +211,9 @@ class LeaveEncashment(Document):
 			create_leave_ledger_entry(self, args, submit)
 
 	def post_journal_entry(self):
-		encashment_expense_account 	= frappe.db.get_value("Company", self.company, "leave_encashment_expense_account")
-		encashment_payable_account 	= frappe.db.get_value("Company", self.company, "leave_encashment_payable_account")
-		tax_account 				= frappe.db.get_value("Company", self.company, "default_salary_tax_account")
+		encashment_expense_account 	= frappe.db.get_single_value("HR Accounts Settings", "leave_encashment_account")
+		encashment_payable_account 	= frappe.db.get_single_value("HR Accounts Settings", "leave_encashment_account")
+		tax_account 				= frappe.db.get_single_value("HR Accounts Settings", "salary_tax_account")
 		default_bank_account 		= frappe.db.get_value("Branch", self.branch, "expense_bank_account")
 
 		if not encashment_expense_account:

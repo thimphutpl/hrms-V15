@@ -124,7 +124,7 @@ class TravelAuthorization(Document):
 
 		if self.advance_amount:
 			je.save(ignore_permissions = True)
-			# self.db_set("journal_entry", je.name)
+			self.db_set("journal_entry", je.name)
 			# self.db_set("journal_entry_status", "Forwarded to accounts for processing payment on {0}".format(now_datetime().strftime('%Y-%m-%d %H:%M:%S')))
 			# frappe.msgprint(_('{} posted to accounts').format(frappe.get_desk_link(je.doctype,je.name)))
 
@@ -252,18 +252,31 @@ class TravelAuthorization(Document):
 		#frappe.throw(self.employee)
 		
 		#doc = frappe.get_doc(dt, dn)
-		no_of_days=0
+		no_of_days_in=0
+		no_of_days_out=0
 		# #frappe.throw(str(doc.items[0].country))
+		
 		for d in self.items:
+			
 			#frappe.msgprint("hi")
 			if d.is_last_day==1:
 				no_of_day=0
 			else:
-				
-				no_of_day=date_diff(d.to_date, d.from_date) + 1
-			no_of_days+=no_of_day
+				#frappe.msgprint(d.country)
+				if d.country=='Bhutan':
+					no_of_day=date_diff(d.to_date, d.from_date) + 1
+					#frappe.msgprint(str(no_of_day1))
+					c=1
+					no_of_days_in+=no_of_day
+				else:
+					no_of_day=date_diff(d.to_date, d.from_date) + 1
+					no_of_days_out+=no_of_day
+				#no_of_day=date_diff(d.to_date, d.from_date) + 1
+				#no_of_days+=no_of_day1
+			c+=1
+			
 
-
+		#frappe.throw(str(no_of_days_out))
 		
 		if self.items:
 			from_date = self.items[0].from_date
@@ -272,7 +285,8 @@ class TravelAuthorization(Document):
 		employee_grade = frappe.db.get_value("Employee", self.employee, "grade")
 		return_day_dsa = frappe.db.get_single_value("HR Settings", "return_day_dsa")
 		dsa = frappe.db.get_value("Employee Grade", employee_grade, "dsa")
-		#frappe.throw(str(no_of_day))
+		dsa_in= dsa * no_of_days_in
+		#frappe.throw(str(dsa_in))
 
 		if self.travel_type=="International":
 			country=frappe.get_doc("DSA Out Country", self.items[0].country)
@@ -280,10 +294,10 @@ class TravelAuthorization(Document):
 				frappe.throw("country in not set in DSA OUT Countery")
 			grade=False
 			for dsa_int in country.country_dsa_detail:
-			
+				
 				if dsa_int.grade==employee_grade:
 							
-					dsa = flt(dsa_int.dsa) * self.exchange_rate
+					dsa = 130 * self.exchange_rate
 					grade=True
 					break
 
@@ -292,7 +306,7 @@ class TravelAuthorization(Document):
 		
 		
 		
-		self.estimated_amount = flt(dsa) * flt(no_of_days) + (flt(return_day_dsa) /100 * flt(dsa))
+		self.estimated_amount = flt(dsa_in)+flt(dsa) * flt(no_of_days_out) + (flt(return_day_dsa) /100 * flt(dsa))
 		#frappe.throw(str(self.estimated_amount))
 		#adv.travel_authorization = doc.name
 
@@ -321,3 +335,33 @@ def get_reports_to(employee):
 	reports_to = frappe.db.get_value("Employee", empid, "user_id")
 	
 	return reports_to
+def get_permission_query_conditions(user):
+	
+	if not user: user = frappe.session.user
+	user_roles = frappe.get_roles(user)
+	if "HR User" in user_roles or "HR Manager" in user_roles or "Accounts User" in user_roles or "CEO" in user_roles:
+		
+		return
+	
+	else:
+		
+		return """(
+			name in (select name
+				from `tabTravel Authorization`
+				where  owner='{user}' or verifier='{user}' or approver = '{user}')
+		)""".format(user=user)
+
+def has_record_permission(doc, user):
+	return True
+
+	
+	if not user: user = frappe.session.user
+	user_roles = frappe.get_roles(user)
+
+	if "HR User" in user_roles or "HR Manager" in user_roles:
+		return True
+	else:			
+		if frappe.db.exists("Employee", {"name":doc.name, "user_id": user}):
+			return True
+		else:
+			return False

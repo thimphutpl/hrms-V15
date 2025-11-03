@@ -1,0 +1,143 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:AB{####}",
+ "creation": "2025-09-12 14:28:00.003853",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "employee_type",
+  "employee",
+  "employee_name",
+  "column_break_2",
+  "user",
+  "current_branch",
+  "company",
+  "branch",
+  "section_break_4",
+  "get_all_branch",
+  "column_break_beap",
+  "section_break_8",
+  "items",
+  "column_break_irdz"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Employee Type",
+   "options": "Employee\nGEP Employee\nMuster Roll Employee",
+   "reqd": 1
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Dynamic Link",
+   "ignore_user_permissions": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Employee",
+   "options": "employee_type",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "User",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "user.bio",
+   "fieldname": "current_branch",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Current Branch",
+   "options": "Branch",
+   "read_only": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_4",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "get_all_branch",
+   "fieldtype": "Button",
+   "label": "Get All Active Branches"
+  },
+  {
+   "fieldname": "section_break_8",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Approved Branches",
+   "options": "Branch Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Employee Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Assign Branch",
+   "options": "Branch"
+  },
+  {
+   "fieldname": "column_break_beap",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_irdz",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-09-17 13:54:33.373805",
+ "modified_by": "kalden.dorji@thimphutechpark.bt",
+ "module": "HR",
+ "name": "Assign Branch",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

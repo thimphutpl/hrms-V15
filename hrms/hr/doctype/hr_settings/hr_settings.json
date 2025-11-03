@@ -64,14 +64,17 @@
   "accounts_finance",
   "procurement",
   "general_manager",
+  "internal_audit_division",
   "column_break_wguy",
   "accounts_finance_name",
   "procurement_name",
   "general_manager_name",
+  "internal_audit_division_name",
   "notification_setting_tab",
   "enote_section",
   "enote_approval_notification",
   "enote_copyto_notification",
+  "imprest_advance_status_notification_template",
   "column_break_wcru",
   "enote_status_notification",
   "enote_reviewer_notification"
@@ -481,13 +484,30 @@
    "fieldtype": "Link",
    "label": "HRGM",
    "options": "Employee"
+  },
+  {
+   "fieldname": "imprest_advance_status_notification_template",
+   "fieldtype": "Data",
+   "label": "To be Deleted"
+  },
+  {
+   "fieldname": "internal_audit_division",
+   "fieldtype": "Link",
+   "label": "Internal Audit Division",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "internal_audit_division.employee_name",
+   "fieldname": "internal_audit_division_name",
+   "fieldtype": "Data",
+   "label": "Internal Audit Division Name"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-05-16 13:07:18.678322",
+ "modified": "2025-09-22 12:45:39.694056",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",
@@ -522,6 +542,7 @@
    "role": "Employee"
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "ASC",
  "states": [],

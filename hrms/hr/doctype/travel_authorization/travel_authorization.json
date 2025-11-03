@@ -32,16 +32,18 @@
   "advance_amount",
   "approver_detial_section",
   "approver",
-  "reports_to",
+  "verifier",
   "column_break_aysp",
   "approver_name",
-  "reports_to_name",
+  "verifier_name",
   "column_break_esiv",
   "approver_designation",
+  "verifier_designation",
   "additional_information_section",
   "company",
   "status",
   "column_break_stkr",
+  "journal_entry",
   "workflow_state",
   "amended_from"
  ],
@@ -206,7 +208,7 @@
    "fieldtype": "Link",
    "label": "Approver",
    "no_copy": 1,
-   "options": "User",
+   "options": "Employee",
    "read_only": 1
   },
   {
@@ -214,7 +216,7 @@
    "fieldtype": "Column Break"
   },
   {
-   "fetch_from": "approver.full_name",
+   "fetch_from": "approver.employee_name",
    "fieldname": "approver_name",
    "fieldtype": "Data",
    "label": "Approver Name",
@@ -226,24 +228,12 @@
    "fieldtype": "Column Break"
   },
   {
+   "fetch_from": "approver.designation",
    "fieldname": "approver_designation",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "Approver Designation",
    "no_copy": 1,
-   "options": "Designation",
    "read_only": 1
-  },
-  {
-   "fieldname": "reports_to",
-   "fieldtype": "Link",
-   "label": "Reports to",
-   "options": "User"
-  },
-  {
-   "fetch_from": "reports_to.full_name",
-   "fieldname": "reports_to_name",
-   "fieldtype": "Data",
-   "label": "Reports to Name"
   },
   {
    "depends_on": "eval:doc.mode_of_travel==\"Office Car\"",
@@ -283,12 +273,36 @@
    "fieldtype": "Link",
    "label": "Workflow State",
    "options": "Workflow State"
+  },
+  {
+   "fieldname": "verifier",
+   "fieldtype": "Link",
+   "label": "Verifier",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "verifier.employee_name",
+   "fieldname": "verifier_name",
+   "fieldtype": "Data",
+   "label": " Verifier Name"
+  },
+  {
+   "fieldname": "journal_entry",
+   "fieldtype": "Link",
+   "label": "Journal Entry",
+   "options": "Journal Entry"
+  },
+  {
+   "fetch_from": "verifier.designation",
+   "fieldname": "verifier_designation",
+   "fieldtype": "Data",
+   "label": "Verifier Designation"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-08-22 23:12:30.831835",
+ "modified": "2025-09-28 10:53:49.381680",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",

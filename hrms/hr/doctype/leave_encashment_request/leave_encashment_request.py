@@ -64,8 +64,8 @@ class LeaveEncashmentRequest(Document):
 	# 	notify_workflow_states(self)
 
 	# Following method added by SHIV on 2020/10/02
-	def before_cancel(self):
-		self.check_gl_entry()
+	# def before_cancel(self):
+		# self.check_gl_entry()
 
 	def on_cancel_after_draft(self):
 		validate_workflow_states(self)

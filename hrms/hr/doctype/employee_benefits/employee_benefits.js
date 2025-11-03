@@ -85,11 +85,11 @@ frappe.ui.form.on("Separation Item", {
 			frappe.model.set_value(cdt, cdn, "terrain_rate", null);
 			frappe.model.set_value(cdt, cdn, "load_capacity", null);
 		}
-		else if(row.benefit_type != "Provision for Leave Encashment"){
+		else if(row.benefit_type != "Balance Earned Leave"){
 			frappe.model.set_value(cdt, cdn, "earned_leave_balance", null);
 		}
     	var item = locals[cdt][cdn]
-		if(item.benefit_type == "Transfer Grant" || item.benefit_type == "Provision for Travel Allowance" || item.benefit_type == "Provision for Transfer Grant"){
+		if(item.benefit_type == "Transfer Grant" || item.benefit_type == "Provision for Travel Allowance" || item.benefit_type == "Transfer TADA"){
 			return frappe.call({
 				method: "hrms.hr.doctype.employee_benefits.employee_benefits.get_basic_salary",
 				args: {"employee": frm.doc.employee},
@@ -102,7 +102,7 @@ frappe.ui.form.on("Separation Item", {
 				}
 			});
 		}
-		else if(item.benefit_type == "Provision for Employee Gratuity Fund"){
+		else if(item.benefit_type == "Gratuity"){
 			return frappe.call({
 				method: "hrms.hr.doctype.employee_benefits.employee_benefits.get_gratuity_amount",
 				args: {"employee": frm.doc.employee},
@@ -115,7 +115,7 @@ frappe.ui.form.on("Separation Item", {
 				}
 			});
 		}
-		else if (item.benefit_type == "Provision for Leave Encashment"){
+		else if (item.benefit_type == "Balance Earned Leave"){
 			if(frm.doc.purpose == "Separation"){
 				if(frm.doc.separation_date && frm.doc.employee){
 					return frappe.call({
@@ -280,7 +280,7 @@ var get_outstanding_amount = function(frm, cdt, cdn){
 
 var set_tax_amount = function(frm, cdt, cdn){
 	var row = locals[cdt][cdn];
-	if(row.benefit_type == "Provision for Leave Encashment"){
+	if(row.benefit_type == "Balance Earned Leave"){
 		frappe.call({
 			"method": "hrms.hr.doctype.employee_benefits.employee_benefits.get_leave_encashment_tax",
 			"args": {

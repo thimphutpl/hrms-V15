@@ -97,10 +97,11 @@ class TravelClaim(Document):
 		self.set("advances", advances)
 
 	def post_journal_entry(self):
-		travel_expense_account = frappe.db.get_value("Travel Type", self.travel_type, "account")
+		
+		travel_expense_account = frappe.db.get_single_value("HR Accounts Settings", "employee_advance_travel")
 		advance_account = frappe.db.get_value("Company", self.company, "travel_advance_account")
 		bank_account = frappe.db.get_value("Branch", self.branch, "expense_bank_account")
-
+		#frappe.throw(str(travel_expense_account))
 		if not travel_expense_account:
 			frappe.throw(
 				"Travel Expense Account is not set for {}. Please configure it in the Travel Type.".format(
@@ -124,7 +125,7 @@ class TravelClaim(Document):
 				),
 				title="Missing Expense Bank Account"
 			)
-
+		
 		# Posting Journal Entry
 		accounts = []
 		accounts.append({
@@ -167,19 +168,20 @@ class TravelClaim(Document):
 				"doctype": "Journal Entry",
 				"voucher_type": voucher_type,
 				"naming_series": naming_series,
-				"title": "Travel Advance - "+self.employee,
-				"user_remark": "Travek Advance - "+self.employee,
+				"title": "Travel Claim - "+self.employee,
+				"user_remark": "Travel Claim - "+self.employee,
 				"posting_date": nowdate(),
 				"company": self.company,
 				"accounts": accounts,
 				"branch": self.branch
 		})
-
-		if self.advance_amount:
-			je.save(ignore_permissions = True)
-			self.db_set("journal_entry", je.name)
-			self.db_set("journal_entry_status", "Forwarded to accounts for processing payment on {0}".format(now_datetime().strftime('%Y-%m-%d %H:%M:%S')))
-			frappe.msgprint(_('{} posted to accounts').format(frappe.get_desk_link(je.doctype, je.name)))
+		
+		#if self.advance_amount:
+			
+		je.save(ignore_permissions = True)
+		self.db_set("journal_entry", je.name)
+		self.db_set("journal_entry_status", "Forwarded to accounts for processing payment on {0}".format(now_datetime().strftime('%Y-%m-%d %H:%M:%S')))
+		frappe.msgprint(_('{} posted to accounts').format(frappe.get_desk_link(je.doctype, je.name)))
 
 
 @frappe.whitelist()
@@ -220,6 +222,7 @@ def get_travel_claim(dt, dn):
 		else:
 			item["dsa_percent"] = 100
 			if doc.travel_type=="International":
+				
 				dsa_international=frappe.get_doc("DSA Out Country",d.country)
 				if not dsa_international:
 					frappe.throw("set Dsa Out Contry")
@@ -227,7 +230,12 @@ def get_travel_claim(dt, dn):
 				for dsa_int in dsa_international.country_dsa_detail:
 					#frappe.msgprint(str(dsa_int.grade))
 					if dsa_int.grade==employee_grade:
-						item["dsa"] = flt(dsa_int.dsa) * doc.exchange_rate
+						#frappe.msgprint(str(d.country))
+						if d.country=='Bhutan':
+
+							item["dsa"] = flt(dsa_int.dsa) 
+						else:
+							item["dsa"] = flt(dsa_int.dsa) * doc.exchange_rate
 						grade=True
 						break
 					# else:
