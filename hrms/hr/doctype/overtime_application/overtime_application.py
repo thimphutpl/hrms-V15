@@ -303,7 +303,7 @@ class OvertimeApplication(Document):
 
 	# Dont allow duplicate dates
 	def validate_dates(self):				
-		self.posting_date = nowdate()
+		# self.posting_date = nowdate()
 				  
 		for a in self.items:
 			if not a.date:

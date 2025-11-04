@@ -135,7 +135,7 @@ frappe.ui.form.on("Overtime Application Item", {
 
 
 
-// added by Kinzang N. on 29/10/2025
+	// added by Kinzang N. on 29/10/2025
 	is_holiday: function (frm, cdt, cdn) {
 		let row = locals[cdt][cdn];
 
@@ -189,7 +189,7 @@ frappe.ui.form.on("Overtime Application Item", {
 		}
 	},
 
-// till here.
+	// till here.
 
 
 
@@ -240,6 +240,10 @@ frappe.ui.form.on("Overtime Application Item", {
 function auto_check_late_night(frm, cdt, cdn) {
 	let row = locals[cdt][cdn];
 	if (!row.from_date || !row.to_date) return;
+	//bypass everything is its holiday 
+	if (row.is_holiday) {
+		return;
+	}
 
 	let from_time = moment(row.from_date, "HH:mm:ss");
 	let to_time = moment(row.to_date, "HH:mm:ss");
