@@ -44,13 +44,13 @@
   "status",
   "column_break_stkr",
   "amended_from",
-  "workflow_state",
-  "amended_from"
+  "workflow_state"
  ],
  "fields": [
   {
    "fieldname": "employee",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Employee",
@@ -196,6 +196,7 @@
   {
    "fieldname": "approver",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Approver",
    "no_copy": 1,
    "options": "User",
@@ -228,6 +229,7 @@
   {
    "fieldname": "reports_to",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Reports to",
    "options": "User"
   },
@@ -299,7 +301,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-10-27 12:06:19.442420",
+ "modified": "2025-11-08 14:18:55.343138",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",
@@ -369,6 +371,8 @@
    "write": 1
   },
   {
+   "amend": 1,
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -378,6 +382,7 @@
    "report": 1,
    "role": "Approver",
    "share": 1,
+   "submit": 1,
    "write": 1
   }
  ],

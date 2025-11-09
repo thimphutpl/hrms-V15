@@ -46,6 +46,7 @@
   {
    "fieldname": "employee",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Employee",
    "options": "Employee"
   },
@@ -188,6 +189,7 @@
   {
    "fieldname": "approver",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Approver",
    "options": "User",
    "read_only": 1
@@ -268,7 +270,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-02-01 16:13:19.039085",
+ "modified": "2025-11-08 23:27:07.205900",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Separation",

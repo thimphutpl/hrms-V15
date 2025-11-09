@@ -67,6 +67,7 @@
   {
    "fieldname": "employee",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "in_list_view": 1,
    "label": "Employee",
    "options": "Employee",
@@ -348,6 +349,7 @@
   {
    "fieldname": "approver",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Approver",
    "no_copy": 1,
    "options": "User",
@@ -389,7 +391,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-08-18 20:04:28.454691",
+ "modified": "2025-11-08 23:58:16.251913",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Advance",

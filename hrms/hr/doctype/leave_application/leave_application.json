@@ -55,6 +55,7 @@
   {
    "fieldname": "employee",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "in_global_search": 1,
    "in_standard_filter": 1,
    "label": "Employee",
@@ -159,6 +160,7 @@
   {
    "fieldname": "leave_approver",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Leave Approver",
    "options": "User",
    "reqd": 1
@@ -257,6 +259,7 @@
   {
    "fieldname": "reports_to",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Reports to",
    "options": "User"
   },
@@ -279,7 +282,7 @@
  "is_submittable": 1,
  "links": [],
  "max_attachments": 3,
- "modified": "2025-08-22 22:08:48.669172",
+ "modified": "2025-11-07 09:49:21.366603",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Application",

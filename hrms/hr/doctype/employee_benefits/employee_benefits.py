@@ -17,7 +17,7 @@ import math
 
 class EmployeeBenefits(Document):
 	def validate(self):
-		validate_workflow_states(self)
+		#validate_workflow_states(self)
 		# if not self.employee_separation_id  and not self.employee_transfer_id and self.purpose != "Upgradation":			
 		# 	frappe.throw("This document should be created through either Employee Separation or Employee Transfer")
 		self.validate_gratuity()
@@ -356,6 +356,7 @@ def get_gratuity_amount(employee):
 	employee_group = frappe.db.get_value("Employee", employee, "employee_group")
 	today_date = date.today()
 	years_in_service = flt(((today_date - date_of_joining).days)/365)
+	
 	years_in_service = math.ceil(years_in_service) if (years_in_service - int(years_in_service)) >= 0.5 else math.floor(years_in_service)
 	if frappe.db.get_value("Employee", employee, "employment_type") == "Contract":
 		if years_in_service < 1:
@@ -380,21 +381,21 @@ def get_permission_query_conditions(user):
 	if "HR User" in user_roles or "HR Manager" in user_roles:
 		return
 	
-	if "Accounts User" in user_roles or "Accounts Master" in user_roles:
-		return """(
-			exists(select 1
-				from `tabEmployee` as e
-				where e.branch = `tabEmployee Benefits`.branch
-				and e.user_id = '{user}')
-			or
-			exists(select 1
-				from `tabEmployee` e, `tabAssign Branch` ab, `tabBranch Item` bi
-				where e.user_id = '{user}'
-				and ab.employee = e.name
-				and bi.parent = ab.name
-				and bi.branch = `tabEmployee Benefits`.branch)
-		)""".format(user=user)
-
+	# if "Accounts User" in user_roles or "Accounts Master" in user_roles:
+	# 	return """(
+	# 		exists(select 1
+	# 			from `tabEmployee` as e
+	# 			where e.branch = `tabEmployee Benefits`.branch
+	# 			and e.user_id = '{user}')
+	# 		or
+	# 		exists(select 1
+	# 			from `tabEmployee` e, `tabAssign Branch` ab, `tabBranch Item` bi
+	# 			where e.user_id = '{user}'
+	# 			and ab.employee = e.name
+	# 			and bi.parent = ab.name
+	# 			and bi.branch = `tabEmployee Benefits`.branch)
+	# 	)""".format(user=user)
+	
 	return """(
 		`tabEmployee Benefits`.owner = '{user}'
 		or

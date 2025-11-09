@@ -116,6 +116,7 @@ frappe.ui.form.on("Employee Advance", {
 	employee: function (frm) {
 		if (frm.doc.employee) frm.trigger("get_employee_currency");
 		if (frm.doc.employee) {
+			frm.trigger("set_approver")
 			frappe.call({
 				method: "validate_employment_status",
 				doc: frm.doc
@@ -129,7 +130,22 @@ frappe.ui.form.on("Employee Advance", {
 			]);
 		}
 	},
-
+	set_approver: function (frm) {
+		if (frm.doc.employee) {
+			console.log("hi")
+			return frappe.call({
+				method: "hrms.hr.hr_custom_function.get_approver",
+				args: {
+					employee: frm.doc.employee,
+				},
+				callback: function (r) {
+					if (r && r.message) {
+						frm.set_value("approver", r.message);
+					}
+				},
+			});
+		}
+	},
 	posting_date: function (frm) {
 		if (frm.doc.employee) {
 			frappe.run_serially([

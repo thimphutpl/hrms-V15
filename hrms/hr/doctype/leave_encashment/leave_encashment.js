@@ -34,6 +34,7 @@ frappe.ui.form.on("Leave Encashment", {
 	},
 	employee: function (frm) {
 		if (frm.doc.employee) {
+			frm.trigger("set_approver")
 			frappe.run_serially([
 				() => frm.trigger("get_employee_currency"),
 				() => frm.trigger("get_leave_details_for_encashment"),
@@ -56,6 +57,22 @@ frappe.ui.form.on("Leave Encashment", {
 				doc: frm.doc,
 				callback: function (r) {
 					frm.refresh_fields();
+				},
+			});
+		}
+	},
+	set_approver: function (frm) {
+		if (frm.doc.employee) {
+			console.log("hi")
+			return frappe.call({
+				method: "hrms.hr.hr_custom_function.get_approver",
+				args: {
+					employee: frm.doc.employee,
+				},
+				callback: function (r) {
+					if (r && r.message) {
+						frm.set_value("approver", r.message);
+					}
 				},
 			});
 		}

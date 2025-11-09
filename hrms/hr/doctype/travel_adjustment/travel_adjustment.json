@@ -28,7 +28,11 @@
   "dimension_col_break",
   "travel_authorization",
   "amended_from",
-  "workflow_state"
+  "workflow_state",
+  "section_break_avqc",
+  "reports_to",
+  "column_break_jygr",
+  "reports_to_name"
  ],
  "fields": [
   {
@@ -43,6 +47,7 @@
   {
    "fieldname": "employee",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "in_list_view": 1,
    "label": "Employee",
    "no_copy": 1,
@@ -126,6 +131,7 @@
   {
    "fieldname": "approver",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Approver",
    "no_copy": 1,
    "options": "User",
@@ -169,11 +175,31 @@
    "fieldtype": "Link",
    "label": "Workflow State",
    "options": "Workflow State"
+  },
+  {
+   "fieldname": "section_break_avqc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "reports_to",
+   "fieldtype": "Data",
+   "ignore_user_permissions": 1,
+   "label": "Reports to",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_jygr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "reports_to_name",
+   "fieldtype": "Data",
+   "label": "Reports to Name"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-10-27 12:17:17.713334",
+ "modified": "2025-11-08 14:24:31.842570",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Adjustment",
@@ -195,6 +221,7 @@
    "write": 1
   },
   {
+   "cancel": 1,
    "create": 1,
    "email": 1,
    "export": 1,
@@ -203,6 +230,7 @@
    "report": 1,
    "role": "Employee",
    "share": 1,
+   "submit": 1,
    "write": 1
   },
   {
@@ -227,6 +255,21 @@
    "read": 1,
    "report": 1,
    "role": "HR Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Approver",
    "share": 1,
    "submit": 1,
    "write": 1
