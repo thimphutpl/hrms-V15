@@ -351,7 +351,7 @@ class SalaryStructure(Document):
 
 			# Calculating Salary Tax
 			if ed == 'deductions':
-				calc_amt = get_salary_tax(math.floor(flt(total_earning)-flt(pf_amt)-flt(gis_amt)-(comm_allowance*0.5)))
+				calc_amt = get_salary_tax(math.floor(flt(total_earning)-flt(basic_pay)-flt(pf_amt)-flt(gis_amt)-(comm_allowance*0.5)))
 				# calc_amt = roundoff(calc_amt)
 				calc_amt = flt(calc_amt)
 				total_deduction += calc_amt
@@ -396,6 +396,7 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 		comm_amt  = 0.00
 		basic_amt = 0.00
 		deput_amt = 0.00
+		basic_amt = 0.00
 		hra_amt = 0.00
 		gross_amt1 = 0.00
 		tax_amt1  = 0.00
@@ -534,6 +535,8 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 			#Deputation allowance
 			if e['salary_component'] == 'Deputation Allowance':
 				deput_amt = (flt(e['amount']))
+			if e['salary_component'] == "Basic Pay":
+				basic_pay = (flt(e['amount']))
 			# HRA
 			if e['salary_component'] == 'Housing Allowance':
 				hra_amt = (flt(e['amount']))
@@ -604,7 +607,7 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 							tax_amt = get_salary_tax(flt(gross_amt) - flt(gis) - flt(pf) - (flt(comm_amt) * 0.5))
 							# frappe.throw("gross_amount "+str(gross_amt)+" GIS "+str(gis)+" pf "+str(pf)+ " And "+str(comm_amt))
 							if source.employment_type == 'Deputation':
-								gross_amt1 = gross_amt - deput_amt 
+								gross_amt1 = gross_amt - basic_amt 
 								tax_amt1 = get_salary_tax(flt(gross_amt1) - flt(gis) - flt(pf) -(flt(comm_amt) * 0.5))  
 								tax_amt = tax_amt - tax_amt1	
 								
