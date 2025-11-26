@@ -269,7 +269,8 @@ class SalaryStructure(Document):
 						elif frappe.db.exists("Salary Component", {"name": ed_item.salary_component, "is_pf_deductible": 1}):
 							basic_pay_arrears += flt(ed_item.amount)
 						# total_earning += round(amount)
-						total_earning += flt(amount,0)
+						if ed_item.salary_component != 'Basic Pay':
+							total_earning += flt(amount,0)
 
 						if ed_item.salary_component == 'Basic Pay Arrear':
 							basic_pay_arrears += flt(ed_item.amount)
@@ -320,7 +321,10 @@ class SalaryStructure(Document):
 						# calc_amt = roundoff(calc_amt)
 						calc_amt = flt(calc_amt,0)
 						comm_allowance += flt(calc_amt) if m['name'] == 'Communication Allowance' else 0
-						total_earning += calc_amt
+						if ed_item.salary_component != 'Basic Pay' and self.employee_type == "Deputation":
+							total_earning += calc_amt
+						elif self.employee_type != "Deputation":
+							total_earning += calc_amt
 						calc_map.append({'salary_component': m['name'], 'amount': calc_amt})
 				else:
 					if self.get(m['field_name']) and m['name'] == 'SWS':
@@ -351,7 +355,7 @@ class SalaryStructure(Document):
 
 			# Calculating Salary Tax
 			if ed == 'deductions':
-				calc_amt = get_salary_tax(math.floor(flt(total_earning)-flt(basic_pay)-flt(pf_amt)-flt(gis_amt)-(comm_allowance*0.5)))
+				calc_amt = get_salary_tax(math.floor(flt(total_earning)-flt(pf_amt)-flt(gis_amt)-(comm_allowance*0.5)))
 				# calc_amt = roundoff(calc_amt)
 				calc_amt = flt(calc_amt)
 				total_deduction += calc_amt
