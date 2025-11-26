@@ -699,6 +699,7 @@
    "default": "1",
    "fieldname": "eligible_for_leave_encashment",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Eligible for Leave Encashment",
    "print_hide": 1
   },
@@ -1387,7 +1388,7 @@
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2025-04-15 09:50:09.159447",
+ "modified": "2025-11-26 14:57:11.389749",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
