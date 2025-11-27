@@ -49,8 +49,8 @@ class LeaveType(Document):
 		):
 			frappe.throw(_("The fraction of Daily Salary per Leave should be between 0 and 1"))
 
-	def clear_cache(self):
-		from hrms.payroll.doctype.salary_slip.salary_slip import LEAVE_TYPE_MAP
+	# def clear_cache(self):
+	# 	from hrms.payroll.doctype.salary_slip.salary_slip import LEAVE_TYPE_MAP
 
-		frappe.cache().delete_value(LEAVE_TYPE_MAP)
-		return super().clear_cache()
+	# 	frappe.cache().delete_value(LEAVE_TYPE_MAP)
+	# 	return super().clear_cache()

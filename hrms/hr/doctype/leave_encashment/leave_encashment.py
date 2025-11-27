@@ -3,134 +3,144 @@
 
 
 import frappe
-from frappe import _, bold
+from frappe import _
 from frappe.model.document import Document
-from frappe.utils import format_date, get_link_to_form, getdate, nowdate, flt, now_datetime
-
+from frappe.utils import getdate, nowdate, today
+from frappe.utils import date_diff, flt, cint
 from hrms.hr.doctype.leave_application.leave_application import get_leaves_for_period
 from hrms.hr.doctype.leave_ledger_entry.leave_ledger_entry import create_leave_ledger_entry
 from hrms.hr.utils import set_employee_name, validate_active_employee
-from hrms.hr.hr_custom_function import (
-	get_basic_and_gross_pay, get_salary_tax
-)
-
+from hrms.payroll.doctype.salary_structure.salary_structure import get_basic_and_gross_pay, get_salary_tax
+from hrms.hr.hr_custom_functions import get_salary_tax
+from erpnext.custom_workflow import validate_workflow_states, notify_workflow_states
 
 class LeaveEncashment(Document):
 	def validate(self):
+		validate_workflow_states(self)
 		set_employee_name(self)
 		validate_active_employee(self.employee)
-		self.encashment_date = self.encashment_date or getdate()
-		self.set_salary_structure()
 		self.get_leave_details_for_encashment()
+		self.check_duplicate_entry()
+		if not self.encashment_date:
+			self.encashment_date = getdate(nowdate())
+		if self.workflow_state != "Approved":
+			notify_workflow_states(self)
 
-	def set_salary_structure(self):
-		self._salary_structure = frappe.db.get_value("Salary Structure", {'employee': self.employee, 'is_active': 'Yes'}, 'name')
-		if not self._salary_structure:
-			frappe.throw(
-				_("No Salary Structure assigned to Employee {0} on the given date {1}").format(
-					self.employee, frappe.bold(format_date(self.encashment_date))
-				)
-			)
 
 	def before_submit(self):
 		if self.encashment_amount <= 0:
 			frappe.throw(_("You can only submit Leave Encashment for a valid encashment amount"))
 
 	def on_submit(self):
-		if not self.leave_allocation:
-			self.db_set("leave_allocation", self.get_leave_allocation().get("name"))
-
-		self.post_journal_entry()
-
-		# Set encashed leaves in Allocation
-		frappe.db.set_value(
-			"Leave Allocation",
-			self.leave_allocation,
-			"total_leaves_encashed",
-			frappe.db.get_value("Leave Allocation", self.leave_allocation, "total_leaves_encashed")
-			+ self.encashment_days,
-		)
-
+		self.post_expense_claim()
 		self.create_leave_ledger_entry()
+		notify_workflow_states(self)
 
-	def before_cancel(self):
-		# frappe.get_doc("Journal Entry", self.additional_salary).cancel()
-		# self.db_set("additional_salary", "")
-		pass
-
+		# self.create_leave_ledger_entry()
 	def on_cancel(self):
-		self.ignore_linked_doctypes = ("GL Entry", "Payment Ledger Entry")
-
 		if self.leave_allocation:
 			frappe.db.set_value(
 				"Leave Allocation",
 				self.leave_allocation,
 				"total_leaves_encashed",
 				frappe.db.get_value("Leave Allocation", self.leave_allocation, "total_leaves_encashed")
-				- self.encashment_days,
+				- self.encashable_days,
 			)
 		self.create_leave_ledger_entry(submit=False)
 
+	def post_expense_claim(self):
+		cost_center = frappe.get_value("Employee", self.employee, "cost_center")
+		branch = frappe.get_value("Employee", self.employee, "branch")
+		company =frappe.get_value("Employee", self.employee, "company")
+		default_payable_account = frappe.get_cached_value("Company", company, "default_expense_claim_payable_account")
+		taxt_account_head = frappe.get_cached_value("Company", company, "salary_tax_account")
+
+		expense_claim 					= frappe.new_doc("Expense Claim")
+		expense_claim.flags.ignore_mandatory = True
+		expense_claim.company 			= company
+		expense_claim.employee 			= self.employee
+		expense_claim.payable_account 	= default_payable_account
+		expense_claim.cost_center 		= cost_center 
+		expense_claim.is_paid 			= cint(0)
+		expense_claim.expense_approver	= frappe.db.get_value('Employee',self.employee,'expense_approver')
+		expense_claim.branch			= branch
+
+		expense_claim.append('expenses',{
+			"expense_date":			nowdate(),
+			"expense_type":			self.doctype,
+			"amount":				self.basic_pay,
+			"sanctioned_amount":	self.basic_pay,
+			"reference_type":		self.doctype,
+			"reference":			self.name,
+			"cost_center":			cost_center
+		})
+		expense_claim.append('taxes',{
+			"account_head":	taxt_account_head,
+			"add_or_deduct" :"Deduct",
+			"tax_amount":	self.encashment_tax,
+			"cost_center":	cost_center,
+			"description":	"Leave Encashment Tax"
+		})
+		expense_claim.docstatus = 0
+
+		expense_claim.save(ignore_permissions=True)
+		expense_claim.submit()
+		self.db_set("expense_claim", expense_claim.name)
+		frappe.db.commit()
+		frappe.msgprint(
+			_("Expense Claim record {0} created")
+			.format("<a href='/app/Form/Expense Claim/{0}'>{0}</a>")
+			.format(expense_claim.name))
+
+	def create_leave_ledger_entry(self, submit=True):
+		args = frappe._dict(
+			leaves=self.encashable_days * -1,
+			from_date=self.encashment_date,
+			to_date=self.encashment_date,
+			is_carry_forward=0
+		)
+		create_leave_ledger_entry(self, args, submit)
+
+		# create reverse entry for expired leaves
+		to_date = self.get_leave_allocation().get('to_date')
+		if to_date < getdate(nowdate()):
+			args = frappe._dict(
+				leaves=self.encashable_days,
+				from_date=to_date,
+				to_date=to_date,
+				is_carry_forward=0
+			)
+			create_leave_ledger_entry(self, args, submit)
+	def check_duplicate_entry(self):
+		count = frappe.db.count(self.doctype,{"employee": self.employee, "leave_period": self.leave_period, "leave_type": self.leave_type, "docstatus": 1}) \
+					if frappe.db.count(self.doctype,{"employee": self.employee, "leave_period": self.leave_period, "leave_type": self.leave_type, "docstatus": 1}) else 0
+		employee_grp = frappe.db.get_value("Employee",self.employee,"employee_group")
+		frequency = frappe.db.get_value("Employee Group",employee_grp,"encashment_frequency")
+		
+		if flt(count) >= flt(frequency):
+			frappe.throw("You had already Encash {} time for leave period {}".format(frappe.bold(count), frappe.bold(self.leave_period)))
+
 	@frappe.whitelist()
 	def get_leave_details_for_encashment(self):
-		self.set_leave_balance()
-		self.set_actual_encashable_days()
-		self.set_encashment_days()
-		self.set_encashment_amount()
-
-	def get_encashment_settings(self):
-		return frappe.get_cached_value(
-			"Leave Type",
-			self.leave_type,
-			["allow_encashment", "non_encashable_leaves", "max_encashable_leaves"],
-			as_dict=True,
-		)
-
-	def set_actual_encashable_days(self):
-		encashment_settings = self.get_encashment_settings()
-		if not encashment_settings.allow_encashment:
-			frappe.throw(_("Leave Type {0} is not encashable").format(self.leave_type))
-
-		self.actual_encashable_days = self.leave_balance
-		leave_form_link = get_link_to_form("Leave Type", self.leave_type)
-
-		# TODO: Remove this weird setting if possible. Retained for backward compatibility
-		if encashment_settings.non_encashable_leaves:
-			actual_encashable_days = self.leave_balance - encashment_settings.non_encashable_leaves
-			self.actual_encashable_days = actual_encashable_days if actual_encashable_days > 0 else 0
-			frappe.msgprint(
-				_("Excluded {0} Non-Encashable Leaves for {1}").format(
-					bold(encashment_settings.non_encashable_leaves),
-					leave_form_link,
-				),
-			)
-
-		if encashment_settings.max_encashable_leaves:
-			self.actual_encashable_days = min(
-				self.actual_encashable_days, encashment_settings.max_encashable_leaves
-			)
-			frappe.msgprint(
-				_("Maximum encashable leaves for {0} are {1}").format(
-					leave_form_link, bold(encashment_settings.max_encashable_leaves)
-				),
-				title=_("Encashment Limit Applied"),
-			)
-
-	def set_encashment_days(self):
-		# allow overwriting encashment days
-		if not self.encashment_days:
-			self.encashment_days = self.actual_encashable_days
-
-		if self.encashment_days > self.actual_encashable_days:
+		salary_structure =  frappe.db.sql("""select name 
+						from `tabSalary Structure`
+						where employee='{}'
+						and'{}' >= from_date 
+						order by from_date desc limit 1""".format(self.employee, self.encashment_date)
+					)
+		
+		if not salary_structure:
 			frappe.throw(
-				_("Encashment Days cannot exceed {0} {1} as per Leave Type settings").format(
-					bold(_("Actual Encashable Days")),
-					self.actual_encashable_days,
+				_("No Salary Structure assigned for Employee {0} on given date {1}").format(
+					self.employee, self.encashment_date
 				)
 			)
 
-	def set_leave_balance(self):
+		if not frappe.db.get_value("Leave Type", self.leave_type, "allow_encashment"):
+			frappe.throw(_("Leave Type {0} is not encashable").format(self.leave_type))
+
 		allocation = self.get_leave_allocation()
+
 		if not allocation:
 			frappe.throw(
 				_("No Leaves Allocated to Employee: {0} for Leave Type: {1}").format(
@@ -146,23 +156,39 @@ class LeaveEncashment(Document):
 				self.employee, self.leave_type, allocation.from_date, self.encashment_date
 			)
 		)
+		employee_group = frappe.db.get_value("Employee", self.employee, "employee_group")
+		encashable_days = frappe.db.get_value("Employee Group", employee_group, "max_encashment_days")
+
+		if self.leave_balance < frappe.db.get_value("Employee Group", employee_group, "max_encashment_days"):
+			frappe.msgprint(_("Minimum '{}' days is Mandatory for Encashment").format(cint(encashable_days)),title="Leave Balance")
+		
+		self.encashable_days = encashable_days if encashable_days > 0 else 0
+		self.encashment_days = encashable_days
+		# per_day_encashment = frappe.db.get_value("Salary Structure", salary_structure, "leave_encashment_amount_per_day")
+		
+		# getting encashment amount from salary structure
+		pay = get_basic_and_gross_pay(employee=self.employee, effective_date=today())
+		leave_encashment_type = frappe.db.get_value("Employee Group", employee_group, "leave_encashment_type")
+		if leave_encashment_type == "Flat Amount":
+			self.flat_amount	   	= flt(employee_group.leave_encashment_amount)
+			self.encashment_amount 	= flt(employee_group.leave_encashment_amount)
+		elif leave_encashment_type == "Basic Pay":
+			self.basic_pay			= flt(pay.get("basic_pay"))
+			self.encashment_amount 	= (flt(pay.get("basic_pay"))/30)*flt(self.encashment_days)
+		elif leave_encashment_type == "Gross Pay":
+			self.gross_pay			= flt(pay.get("gross_pay"))
+			self.encashment_amount 	= (flt(pay.get("gross_pay"))/30)*flt(self.encashment_days)
+		else:
+			self.encashment_amount = 0
+
+		self.leave_encashment_type = leave_encashment_type
+		# self.salary_structure = salary_structure
+		self.encashment_tax = get_salary_tax(self.encashment_amount)
+		# frappe.throw(str(self.encashment_tax))
+		self.payable_amount = flt(self.encashment_amount) - flt(self.encashment_tax)
+
 		self.leave_allocation = allocation.name
-
-	def set_encashment_amount(self):
-		if not hasattr(self, "_salary_structure"):
-			self.set_salary_structure()
-
-		earnings = get_basic_and_gross_pay(employee=self.employee, effective_date=nowdate())
-
-		if not earnings:
-			error_msg = _(
-				"No salary structure found for Employee: {0}"
-			).format(frappe.bold(self.employee))
-			frappe.throw(error_msg, title=_("No salary structure found"))
-		per_day_encashment = flt(earnings.get("basic_pay", 0))/30
-		self.encashment_amount = self.encashment_days * per_day_encashment if per_day_encashment > 0 else 0
-		self.tax_amount = get_salary_tax(self.encashment_amount)
-		self.net_pay = flt(self.encashment_amount) - flt(self.tax_amount)
+		return True
 
 	def get_leave_allocation(self):
 		date = self.encashment_date or getdate()
@@ -189,7 +215,7 @@ class LeaveEncashment(Document):
 
 	def create_leave_ledger_entry(self, submit=True):
 		args = frappe._dict(
-			leaves=self.encashment_days * -1,
+			leaves=self.encashable_days * -1,
 			from_date=self.encashment_date,
 			to_date=self.encashment_date,
 			is_carry_forward=0,
@@ -202,133 +228,12 @@ class LeaveEncashment(Document):
 			return
 
 		to_date = leave_allocation.get("to_date")
-
-		can_expire = not frappe.db.get_value("Leave Type", self.leave_type, "is_carry_forward")
-		if to_date < getdate() and can_expire:
+		if to_date < getdate(nowdate()):
 			args = frappe._dict(
-				leaves=self.encashment_days, from_date=to_date, to_date=to_date, is_carry_forward=0
+				leaves=self.encashable_days, from_date=to_date, to_date=to_date, is_carry_forward=0
 			)
 			create_leave_ledger_entry(self, args, submit)
 
-	def post_journal_entry(self):
-		encashment_expense_account 	= frappe.db.get_value("Company", self.company, "leave_encashment_expense_account")
-		encashment_payable_account 	= frappe.db.get_value("Company", self.company, "leave_encashment_payable_account")
-		tax_account 				= frappe.db.get_value("Company", self.company, "default_salary_tax_account")
-		default_bank_account 		= frappe.db.get_value("Branch", self.branch, "expense_bank_account")
-
-		if not encashment_expense_account:
-			frappe.throw(
-				"Leave Encashment Expense Account is not set for {}. Please configure it in the Company.".format(
-					frappe.get_desk_link("Company", self.company)
-				),
-				title="Missing Expense Account"
-			)
-
-		if not encashment_payable_account:
-			frappe.throw(
-				"Leave Encashment Payable Account is not set for {}. Please configure it in the Company.".format(
-					frappe.get_desk_link("Company", self.company)
-				),
-				title="Missing Payable Account"
-			)
-
-		if not tax_account:
-			frappe.throw(
-				"Default Salary Tax Account is not set for {}. Please configure it in the Company.".format(
-					frappe.get_desk_link("Company", self.company)
-				),
-				title="Missing Tax Account"
-			)
-
-		if not default_bank_account:
-			frappe.throw(
-				"Default Expense Bank Account is not set for {}. Please configure it in the Branch.".format(
-					frappe.get_desk_link("Branch", self.branch)
-				),
-				title="Missing Bank Account"
-			)
-
-		posting = frappe._dict()
-		# Payables
-		posting.setdefault("to_payables", []).append({
-			"account" 					: encashment_expense_account,
-			"debit_in_account_currency"	: flt(self.encashment_amount),
-			"cost_center"    			: self.cost_center,
-			"party_check"			 	: 0,
-			"reference_type"			: self.doctype,
-			"reference_name"			: self.name,
-		})
-		if flt(self.tax_amount) > 0:
-			posting.setdefault("to_payables", []).append({
-				"account" 					: tax_account,
-				"credit_in_account_currency": flt(self.tax_amount),
-				"cost_center"    			: self.cost_center,
-				"party_check"				: 0,
-				"reference_type"			: self.doctype,
-				"reference_name"			: self.name,
-			})
-		posting.setdefault("to_payables", []).append({
-			"account" 						: encashment_payable_account,
-			"credit_in_account_currency"	: flt(self.net_pay),
-			"cost_center"    				: self.cost_center,
-			"party_check"					: 1,
-			"party_type"					: "Employee",
-			"party"							: self.employee,
-			"reference_type"				: self.doctype,
-			"reference_name"				: self.name,
-		})
-
-		# To Bank
-		posting.setdefault("to_bank", []).append({
-			"account"       				: encashment_payable_account,
-			"debit_in_account_currency"		: flt(self.net_pay),
-			"cost_center"   				: self.cost_center,
-			"party_check"					: 1,
-			"party_type"					: "Employee",
-			"party"							: self.employee,
-			"reference_type"				: self.doctype,
-			"reference_name"				: self.name,
-		})
-		posting.setdefault("to_bank", []).append({
-			"account"       				: default_bank_account,
-			"credit_in_account_currency"	: flt(self.net_pay),
-			"cost_center"   				: self.cost_center,
-			"party_check"   				: 0,
-			"reference_type"				: self.doctype,
-			"reference_name"				: self.name,
-		})
-
-		jv_name, v_title = None, ""
-		for i in posting:
-			if i == "to_payables":
-				title         = "To Payables"
-				voucher_type  = "Journal Entry"
-				naming_series = "Journal Voucher"
-			else:
-				title         = "To Bank"
-				voucher_type  = "Bank Entry"
-				naming_series = "Bank Payment Voucher"
-
-			doc = frappe.get_doc({
-					"doctype"			: "Journal Entry",
-					"voucher_type"		: voucher_type,
-					"naming_series"		: naming_series,
-					"title"				: title,
-					"remark"			: title,
-					"posting_date"		: nowdate(),                     
-					"company"			: self.company,
-					"accounts"			: sorted(posting[i], key=lambda item: item['cost_center']),
-					"branch"			: self.branch,
-				})
-			doc.flags.ignore_permissions = 1 
-			doc.insert()
-			if i == "to_payables":
-				doc.submit()
-			else:
-				self.db_set("journal_entry", doc.name)
-				self.db_set("journal_entry_status", "Forwarded to accounts for processing payment on {0}".format(now_datetime().strftime('%Y-%m-%d %H:%M:%S')))
-
-		frappe.msgprint(_("Payment posting to accounts is successful."), title="Posting Successful")
 
 def create_leave_encashment(leave_allocation):
 	"""Creates leave encashment for the given allocations"""
@@ -345,3 +250,23 @@ def create_leave_encashment(leave_allocation):
 			)
 		)
 		leave_encashment.insert(ignore_permissions=True)
+
+def get_permission_query_conditions(user):
+	if not user: user = frappe.session.user
+	user_roles = frappe.get_roles(user)
+
+	if user == "Administrator":
+		return
+	if "HR User" in user_roles or "HR Manager" in user_roles:
+		return
+
+	return """(
+		`tabLeave Encashment`.owner = '{user}'
+		or
+		exists(select 1
+				from `tabEmployee`
+				where `tabEmployee`.name = `tabLeave Encashment`.employee
+				and `tabEmployee`.user_id = '{user}')
+		or
+		(`tabLeave Encashment`.approver = '{user}' and `tabLeave Encashment`.workflow_state not in ('Draft','Rejected','Approved','Cancelled'))
+	)""".format(user=user)

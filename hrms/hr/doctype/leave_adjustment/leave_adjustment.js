@@ -1,4 +1,4 @@
-// Copyright (c) 2025, Frappe Technologies Pvt. Ltd. and contributors
+// Copyright (c) 2016, Frappe Technologies Pvt. Ltd. and contributors
 // For license information, please see license.txt
 
 frappe.ui.form.on('Leave Adjustment', {
@@ -12,7 +12,10 @@ frappe.ui.form.on('Leave Adjustment', {
 			callback: function(r, rt) {
 				frm.refresh_field("items");
 				frm.refresh_fields();
-			}
+				frm.dirty()
+			},
+			freeze: false,
+			freeze_message: "Loading Employee..... Please Wait"
 		});
 	}
 });

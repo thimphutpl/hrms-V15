@@ -46,6 +46,7 @@
   {
    "fieldname": "employee",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Employee",
    "options": "Employee"
   },
@@ -188,6 +189,7 @@
   {
    "fieldname": "approver",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Approver",
    "options": "User",
    "read_only": 1

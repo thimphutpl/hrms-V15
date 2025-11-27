@@ -9,34 +9,41 @@
  "engine": "InnoDB",
  "field_order": [
   "default_salary_structure",
+  "default_leave_policy",
   "currency",
   "default_base_pay",
-  "dsa",
-  "column_break_ytuy",
-  "fixed_allowance",
+  "government_grade",
+  "maximum_grade",
+  "column_break_vaoa",
+  "sub_level",
   "gis",
-  "sws",
-  "hra",
-  "eligible_for_overtime",
-  "one_off_fixed_payment",
-  "section_break_ozeh",
+  "dsa_per_day",
+  "dsa_per_day_out_country",
+  "sws_contribution",
+  "retirement_age",
+  "pay_scale_section",
   "lower_limit",
-  "column_break_xjwr",
+  "column_break_tgfh",
   "increment_method",
-  "column_break_hsvb",
+  "column_break_hxuk",
   "increment_value",
-  "column_break_zmsn",
+  "column_break_qjhy",
   "upper_limit",
-  "section_break_vhic",
-  "promotion_eligibility_years",
-  "column_break_vxyh",
-  "promotion_grade"
+  "promotion_settings_section",
+  "noof_years_for_next_promotion",
+  "column_break_adwe",
+  "promotion_grade",
+  "allowances_section",
+  "fixed_allowance",
+  "column_break_zzpy",
+  "ltc",
+  "sb_emi_sales",
+  "cost_sharing_quotaamount"
  ],
  "fields": [
   {
    "fieldname": "default_salary_structure",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "Default Salary Structure",
    "options": "Salary Structure"
   },
@@ -57,73 +64,80 @@
    "read_only": 1
   },
   {
-   "fieldname": "column_break_ytuy",
+   "fieldname": "column_break_vaoa",
    "fieldtype": "Column Break"
   },
   {
+   "fieldname": "sub_level",
+   "fieldtype": "Data",
+   "label": "Sub Level"
+  },
+  {
    "fieldname": "gis",
-   "fieldtype": "Currency",
+   "fieldtype": "Data",
    "label": "GIS"
   },
   {
-   "fieldname": "sws",
-   "fieldtype": "Currency",
-   "label": "SWS"
+   "fieldname": "dsa_per_day",
+   "fieldtype": "Data",
+   "label": "DSA Per Day (In Country)"
   },
   {
-   "default": "0",
-   "fieldname": "eligible_for_overtime",
-   "fieldtype": "Check",
-   "hidden": 1,
-   "label": "Eligible for Overtime"
-  },
-  {
-   "fieldname": "section_break_ozeh",
-   "fieldtype": "Section Break"
+   "fieldname": "pay_scale_section",
+   "fieldtype": "Section Break",
+   "label": "PAY SCALE"
   },
   {
    "fieldname": "lower_limit",
    "fieldtype": "Currency",
-   "in_list_view": 1,
    "label": "Lower Limit"
   },
   {
-   "fieldname": "column_break_xjwr",
+   "fieldname": "column_break_tgfh",
    "fieldtype": "Column Break"
   },
   {
-   "default": "Lumpsum",
    "fieldname": "increment_method",
    "fieldtype": "Select",
    "label": "Increment Method",
-   "options": "Lumpsum\nPercent"
+   "options": "\nLumpsum\nPercent"
   },
   {
-   "fieldname": "column_break_hsvb",
+   "fieldname": "column_break_hxuk",
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "column_break_zmsn",
+   "fieldname": "increment_value",
+   "fieldtype": "Currency",
+   "label": "Increment Value"
+  },
+  {
+   "fieldname": "column_break_qjhy",
    "fieldtype": "Column Break"
   },
   {
    "fieldname": "upper_limit",
    "fieldtype": "Currency",
-   "in_list_view": 1,
    "label": "Upper Limit"
   },
   {
-   "fieldname": "section_break_vhic",
-   "fieldtype": "Section Break"
+   "fieldname": "promotion_settings_section",
+   "fieldtype": "Section Break",
+   "label": "PROMOTION SETTINGS"
   },
   {
-   "fieldname": "promotion_eligibility_years",
+   "fieldname": "noof_years_for_next_promotion",
    "fieldtype": "Int",
-   "label": "Promotion Eligibility Years"
+   "label": "No. of Years For Next Promotion"
   },
   {
-   "fieldname": "column_break_vxyh",
+   "fieldname": "column_break_adwe",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "allowances_section",
+   "fieldtype": "Section Break",
+   "label": "Allowances"
   },
   {
    "fieldname": "fixed_allowance",
@@ -131,37 +145,69 @@
    "label": "Fixed Allowance"
   },
   {
-   "fieldname": "increment_value",
-   "fieldtype": "Currency",
-   "in_list_view": 1,
-   "label": "Increment Value"
+   "fieldname": "sws_contribution",
+   "fieldtype": "Data",
+   "label": "SWS Contribution"
   },
   {
-   "fieldname": "dsa",
+   "fieldname": "default_leave_policy",
+   "fieldtype": "Link",
+   "label": "Default Leave Policy",
+   "options": "Leave Policy"
+  },
+  {
+   "fieldname": "government_grade",
+   "fieldtype": "Data",
+   "label": "Government Grade"
+  },
+  {
+   "fieldname": "column_break_zzpy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ltc",
    "fieldtype": "Currency",
-   "label": "DSA (Daily Subsistence Allowance)"
+   "label": "LTC"
   },
   {
    "fieldname": "promotion_grade",
    "fieldtype": "Link",
-   "label": "Next Promotion Grade",
+   "label": "Promote To Grade",
    "options": "Employee Grade"
   },
   {
-   "fieldname": "hra",
-   "fieldtype": "Currency",
-   "label": "HRA"
+   "fieldname": "retirement_age",
+   "fieldtype": "Int",
+   "label": "Retirement Age"
   },
   {
-   "fieldname": "one_off_fixed_payment",
+   "fieldname": "maximum_grade",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Maximum Grade",
+   "options": "Employee Grade"
+  },
+  {
+   "fieldname": "dsa_per_day_out_country",
+   "fieldtype": "Data",
+   "label": "DSA Per Day (Out Country)"
+  },
+  {
+   "fieldname": "sb_emi_sales",
+   "fieldtype": "Section Break",
+   "label": "EMI Sales Settings"
+  },
+  {
+   "fieldname": "cost_sharing_quotaamount",
    "fieldtype": "Currency",
-   "label": "One off FIxed Payment"
+   "label": "Cost Sharing Quota(Amount)",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-18 14:59:21.851690",
- "modified_by": "sonam.zangmo@thimphutechpark.bt",
+ "modified": "2025-11-27 15:55:39.324664",
+ "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Grade",
  "naming_rule": "Set by user",

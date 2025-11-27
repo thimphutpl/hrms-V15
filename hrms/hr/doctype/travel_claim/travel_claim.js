@@ -1,3 +1,6 @@
+// Copyright (c) 2025, Frappe Technologies Pvt. Ltd. and contributors
+// For license information, please see license.txt
+
 frappe.ui.form.on("Travel Claim", {
     onload: function (frm) {
 		let grid = frm.fields_dict['items'].grid;

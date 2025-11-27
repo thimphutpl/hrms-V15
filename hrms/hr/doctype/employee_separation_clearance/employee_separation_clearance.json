@@ -21,6 +21,9 @@
   "supervisor",
   "supervisor_clearance",
   "supervisor_remarks",
+  "gm",
+  "gm_clearance",
+  "gm_remarks",
   "afd",
   "afd_clearance",
   "afd_remarks",
@@ -57,7 +60,7 @@
   {
    "fieldname": "employee",
    "fieldtype": "Link",
-   "label": "Employee ID",
+   "label": "Employee",
    "options": "Employee"
   },
   {
@@ -189,7 +192,7 @@
   {
    "fieldname": "afd",
    "fieldtype": "Link",
-   "label": "Finance & Accounts",
+   "label": "Finance & Investment Division",
    "options": "User",
    "read_only": 1
   },
@@ -197,7 +200,7 @@
    "default": "0",
    "fieldname": "afd_clearance",
    "fieldtype": "Check",
-   "label": "Clearance Acquired (Finance & Accounts)",
+   "label": "Clearance Acquired (Finance & Investment Division)",
    "mandatory_depends_on": "eval:frappe.session.user == doc.afd",
    "read_only": 1
   },
@@ -205,7 +208,7 @@
    "depends_on": "eval:doc.afd==frappe.session.user",
    "fieldname": "afd_remarks",
    "fieldtype": "Small Text",
-   "label": "Finance & Accounts Remarks",
+   "label": "Finance & Investment Division Remarks",
    "mandatory_depends_on": "eval:frappe.session.user == doc.afd",
    "read_only_depends_on": "eval:frappe.session.user != doc.afd"
   },
@@ -235,7 +238,7 @@
   {
    "fieldname": "iad",
    "fieldtype": "Link",
-   "label": "Regional Manager (Appliciable for employee of Region concerned)",
+   "label": "Internal Audit Division",
    "options": "User",
    "read_only": 1
   },
@@ -243,7 +246,8 @@
    "default": "0",
    "fieldname": "iad_clearance",
    "fieldtype": "Check",
-   "label": "Clearance Acquired (Regional Manager)",
+   "hidden": 1,
+   "label": "Clearance Acquired(Internal Audit Division)",
    "mandatory_depends_on": "eval:frappe.session.user == doc.iad",
    "read_only": 1
   },
@@ -251,14 +255,14 @@
    "depends_on": "eval:doc.iad==frappe.session.user",
    "fieldname": "iad_remarks",
    "fieldtype": "Small Text",
-   "label": "Regional Manager Remarks",
+   "label": "Internal Audit Division Remarks",
    "mandatory_depends_on": "eval:frappe.session.user == doc.iad",
    "read_only_depends_on": "eval:frappe.session.user != doc.iad"
   },
   {
    "fieldname": "ada",
    "fieldtype": "Link",
-   "label": "Treasurer, NRDCL Welfare Fund",
+   "label": "Asset Declaration Administrator",
    "options": "User",
    "read_only": 1
   },
@@ -266,7 +270,7 @@
    "default": "0",
    "fieldname": "ada_clearance",
    "fieldtype": "Check",
-   "label": "Clearance Treasurer, NRDCL Welfare Fund)",
+   "label": "Clearance Acquired(Asset Declaration Administrator)",
    "mandatory_depends_on": "eval:frappe.session.user == doc.ada",
    "read_only": 1
   },
@@ -274,14 +278,14 @@
    "depends_on": "eval:doc.ada==frappe.session.user",
    "fieldname": "ada_remarks",
    "fieldtype": "Small Text",
-   "label": "Treasurer, NRDCL Welfare Fund Remarks",
+   "label": "Asset Declaration Administrator Remarks",
    "mandatory_depends_on": "eval:frappe.session.user == doc.ada",
    "read_only_depends_on": "eval:frappe.session.user != doc.ada"
   },
   {
    "fieldname": "ams",
    "fieldtype": "Link",
-   "label": "Asset Declaration Administrator",
+   "label": "Asset Management Section",
    "options": "User",
    "read_only": 1
   },
@@ -295,7 +299,7 @@
   {
    "fieldname": "pc",
    "fieldtype": "Link",
-   "label": "Store Incharge (HO & Region)",
+   "label": "Procurement and Contracts",
    "options": "User",
    "read_only": 1
   },
@@ -303,7 +307,8 @@
    "default": "0",
    "fieldname": "pc_clearance",
    "fieldtype": "Check",
-   "label": "Clearance Acquired (Store Incharge HO & Region)",
+   "hidden": 1,
+   "label": "Clearance Acquired(Procurement and Contracts)",
    "mandatory_depends_on": "eval:frappe.session.user == doc.pc",
    "read_only": 1
   },
@@ -311,7 +316,7 @@
    "depends_on": "eval:frappe.session.user == doc.pc",
    "fieldname": "pc_remarks",
    "fieldtype": "Small Text",
-   "label": "Store Incharge Remarks",
+   "label": "Procurement and Contracts Remarks",
    "mandatory_depends_on": "eval:frappe.session.user == doc.pc",
    "read_only_depends_on": "eval:frappe.session.user != doc.pc"
   },
@@ -319,7 +324,8 @@
    "default": "0",
    "fieldname": "ams_clearance",
    "fieldtype": "Check",
-   "label": "Clearance Acquired (Clearance Asset Declaration Administrator)",
+   "hidden": 1,
+   "label": "Clearance Acquired (Clearance Acquired (Store & Procurement Division))",
    "mandatory_depends_on": "eval:doc.ams==frappe.session.user",
    "read_only": 1
   },
@@ -332,13 +338,36 @@
   {
    "fieldname": "column_break_edas",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "gm",
+   "fieldtype": "Link",
+   "label": "General Manager",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.gm==frappe.session.user",
+   "fieldname": "gm_remarks",
+   "fieldtype": "Small Text",
+   "label": "Genaral Manager Remarks",
+   "mandatory_depends_on": "eval:frappe.session.user == doc.gm",
+   "read_only_depends_on": "eval:frappe.session.user != doc.gm"
+  },
+  {
+   "default": "0",
+   "fieldname": "gm_clearance",
+   "fieldtype": "Check",
+   "label": "Clearance Acquired(General Manager)",
+   "mandatory_depends_on": "eval:frappe.session.user == doc.gm",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-08-22 11:57:44.652735",
- "modified_by": "sonam.zangmo@thimphutechpark.bt",
+ "modified": "2025-11-11 22:14:24.273631",
+ "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Separation Clearance",
  "naming_rule": "Expression (old style)",
@@ -353,6 +382,19 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Employee",
    "share": 1,
    "submit": 1,
    "write": 1

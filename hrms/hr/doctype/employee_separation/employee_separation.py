@@ -45,6 +45,9 @@ def make_employee_benefit(source_name, target_doc=None, skip_item_mapping=False)
 			"fieldmap": {
 				"name": "employee_separation_id",
 				"employee_grade": "grade",
+				"benefit_approver":"approver",
+				"benefit_approver_name":"approver_name",
+				"benefit_approver_designation":"approver_designation"
 			},
 			"postprocess": update_item
 		},
@@ -108,7 +111,7 @@ def get_permission_query_conditions(user):
 
 	if user == "Administrator":
 		return
-	if "HR User" in user_roles or "HR Manager" in user_roles or "Approver" in user_roles:
+	if "HR User" in user_roles or "HR Manager" in user_roles:
 		return
 
 	return """(
@@ -119,6 +122,6 @@ def get_permission_query_conditions(user):
 				where `tabEmployee`.name = `tabEmployee Separation`.employee
 				and `tabEmployee`.user_id = '{user}')
 		or
-		(`tabEmployee Separation`.approver = '{user}' and `tabEmployee Separation`.workflow_state not in ('Draft','Submitted','Rejected','Cancelled') and `tabEmployee Separation`.docstatus = 0)
+		(`tabEmployee Separation`.benefit_approver = '{user}' and `tabEmployee Separation`.workflow_state not in ('Draft','Submitted','Rejected','Cancelled') and `tabEmployee Separation`.docstatus = 0)
 	)""".format(user=user)
 

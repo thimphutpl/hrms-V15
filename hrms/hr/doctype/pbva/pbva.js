@@ -1,21 +1,11 @@
-// Copyright (c) 2025, Frappe Technologies Pvt. Ltd. and contributors
+// Copyright (c) 2022, Frappe Technologies Pvt. Ltd. and contributors
 // For license information, please see license.txt
 
 frappe.ui.form.on('PBVA', {
 	setup: function(frm) {
 		frm.get_docfield("items").allow_bulk_edit = 1;
 	},
-	onload: function(frm) {
-			if(frm.doc.__islocal && !frm.doc.branch) {
-					frappe.call({
-						  method: "erpnext.custom_utils.get_user_info",
-						  args: {"user": frappe.session.user},
-						  callback(r) {
-									cur_frm.set_value("branch", r.message.branch);
-						 }
-					});
-			}
-	},
+	
 	refresh: function(frm) {
 		if(!frm.doc.posting_date) {
 			frm.set_value("posting_date", get_today())
@@ -39,18 +29,20 @@ frappe.ui.form.on('PBVA', {
 			cur_frm.set_value("tax_amount", 0.0);
 			cur_frm.set_value("net_amount", 0.0);
 			refresh_many(["items", "total_amount", "tax_amount", "net_amount"]);
-			
 			//load_accounts(frm.doc.company)
 			return frappe.call({
 				method: "get_pbva_details",
 				doc: frm.doc,
 				callback: function(r, rt) {
 					frm.refresh_field("items");
+					console.log(frm.doc.items)
 					frm.refresh_fields();
 				},
 				freeze: true,
 				freeze_message: "Loading Details..... Please Wait"
 			});
+
+			
 		}
 		else {
 			msgprint("Select Fiscal Year First")
@@ -62,11 +54,12 @@ frappe.ui.form.on('PBVA', {
 			msgprint("Select Fiscal Year First")
 		}*/
 	}
+
 });
 
 function process_pbva(fiscal_year, frm) {
 	frappe.call({
-		method: "erpnext.hr.doctype.pbva.pbva.get_pbva_details",
+		method: "get_pbva_details",
 		args: {"fiscal_year": fiscal_year},
 		callback: function(r) {
 			if(r.message) {
@@ -75,7 +68,7 @@ function process_pbva(fiscal_year, frm) {
 				cur_frm.clear_table("items");
 
 				r.message.forEach(function(pbva) {
-				        var row = frappe.model.add_child(cur_frm.doc, "PBVA Details", "items");
+				    var row = frappe.model.add_child(cur_frm.doc, "PBVA Details", "items");
 					row.employee = pbva['employee']
 					row.employee_name = pbva['employee_name']
 					row.branch = pbva['branch']
@@ -104,20 +97,20 @@ function process_pbva(fiscal_year, frm) {
 }
 
 frappe.ui.form.on("PBVA Details", { 
-	/*"percent": function(frm, cdt, cdn) {
-		calculate_total(frm,cdt,cdn)
-	},
-	"months": function(frm, cdt, cdn) {
-		calculate_total(frm,cdt,cdn)
-	}, */
+	//  "percent": function(frm, cdt, cdn) {
+	//  	calculate_total(frm,cdt,cdn)
+	//  },
+	//  "months": function(frm, cdt, cdn) {
+	//  	calculate_total(frm,cdt,cdn)
+	// }, 
 	"amount": function(frm, cdt, cdn) {
 		calculate_total(frm,cdt,cdn)
 	},
-})
+}),
 
 function calculate_total(frm, cdt, cdn) {
 	var item = locals[cdt][cdn]
-	//item.amount = flt(item.basic_pay) * (flt(item.percent) / 100) * flt(item.months)
+	// item.amount = flt(item.basic_pay) * (flt(item.percent) / 100) * flt(item.months)
 	item.tax_amount = calculate_tax(flt(item.amount))
 	item.balance_amount = item.amount - item.tax_amount
 	var total = 0;
@@ -138,7 +131,7 @@ function calculate_total(frm, cdt, cdn) {
 function calculate_tax(gross_amt) {
 	var tds_amount = 0;
 	cur_frm.call({
-		method: "erpnext.hr.doctype.salary_structure.salary_structure.get_salary_tax",
+		method: "hrms.hr.hr_custom_functions.get_salary_tax",
 		args: { "gross_amt": gross_amt, },
 		async: false,
 		callback: function(r) {
@@ -148,19 +141,4 @@ function calculate_tax(gross_amt) {
 		}
 	})
 	return tds_amount;
-}
-
-function calculate_pbva_percent(employee) {
-	var percent = "";
-	cur_frm.call({
-		method: "erpnext.hr.doctype.pbva.pbva.get_pbva_percent",
-		args: { "employee": employee, },
-		async: false,
-		callback: function(r) {
-			if(r.message) {
-				percent = String(r.message);
-			}
-		}
-	})
-	return percent;
 }

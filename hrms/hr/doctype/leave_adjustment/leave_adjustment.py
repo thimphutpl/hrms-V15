@@ -1,16 +1,16 @@
-# Copyright (c) 2025, Frappe Technologies Pvt. Ltd. and contributors
+# -*- coding: utf-8 -*-
+# Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and contributors
 # For license information, please see license.txt
 
-# import frappe
 from __future__ import unicode_literals
 import frappe
 from frappe.utils import flt
 from frappe.model.document import Document
-from hrms.hr.doctype.leave_application.leave_application import get_leave_balance_on
 from erpnext.setup.doctype.employee.employee import get_holiday_list_for_employee
 from datetime import datetime
 from hrms.hr.doctype.leave_application.leave_application \
 	import get_leave_balance_on, get_leaves_for_period
+
 #from erpnext.hr.doctype.leave_encashment.leave_encashment import get_le_settings
 
 class LeaveAdjustment(Document):
@@ -99,7 +99,6 @@ class LeaveAdjustment(Document):
 			frappe.throw("Please select Leave Type first")
 			if int(frappe.db.get_value("Leave Type",self.leave_type,"allow_negative")) == 0 and flt(actual_balance) < 0:
 				frappe.throw("Negative Balance is not allowed for leave type {}".format(self.leave_type))
-
 	@frappe.whitelist()
 	def get_employees(self):
 		self.check_mandatory()
@@ -136,7 +135,6 @@ class LeaveAdjustment(Document):
 			d.difference = 0
 			row = self.append('items', {})
 			row.update(d)
-
 	@frappe.whitelist()
 	def get_employee_details(self, employee):
 		if not self.adjustment_date:
@@ -164,6 +162,9 @@ class LeaveAdjustment(Document):
 		# 		closing = flt(max_el)
 		return closing, 0
 
+
+
+
 	def get_leave_ledger_entries(self, from_date, to_date, employee, leave_type):
 		records= frappe.db.sql("""
 		SELECT
@@ -175,7 +176,8 @@ class LeaveAdjustment(Document):
 			AND (from_date between %(from_date)s AND %(to_date)s
 				OR to_date between %(from_date)s AND %(to_date)s
 				OR (from_date < %(from_date)s AND to_date > %(to_date)s))
-		and is_adjusted_leave = 0
+		AND is_adjusted_leave = 0
+		AND transaction_type = 'Leave Allocation'
 		""", {
 			"from_date": from_date,
 			"to_date": to_date,
@@ -202,7 +204,6 @@ def get_adjusted_leave_ledger_entries(from_date, to_date, employee, leave_type):
 		"employee": employee,
 		"leave_type": leave_type
 	}, as_dict=1)
-	# frappe.msgprint(str(records))
 	return records
 
 def get_leaves_adjusted(records, from_date, to_date):

@@ -1,3 +1,6 @@
+// Copyright (c) 2025, Frappe Technologies Pvt. Ltd. and contributors
+// For license information, please see license.txt
+
 frappe.ui.form.on("Travel Authorization", {
 	setup: function (frm) {
 		frm.set_query("employee", function () {
@@ -54,11 +57,6 @@ frappe.ui.form.on("Travel Authorization", {
 			}
 		});
 	},
-	// need_advance: function (frm) {
-		
-	// 	frm.toggle_reqd("estimated_amount", frm.doc.need_advance == 1);
-	// 	calculate_advance(frm);
-	// },
 
 	make_travel_claim: function (frm) {
 		let method = "hrms.hr.doctype.travel_claim.travel_claim.get_travel_claim";
@@ -97,29 +95,22 @@ frappe.ui.form.on("Travel Authorization", {
 		});
 	},
 
-	employee: function (frm) {
-		if (frm.doc.employee) 
-		{
-			frm.trigger("get_employee_currency");
-			frm.trigger("set_reports_to");
-			frm.trigger("set_approver")
+	// employee: function (frm) {
+	// 	if (frm.doc.employee) frm.trigger("get_employee_currency");
+	// },
 
-		}
-		
-	},
-
-	get_employee_currency: function (frm) {
-		frappe.db.get_value(
-			"Salary Structure",
-			{ employee: frm.doc.employee},
-			"currency",
-			(r) => {
-				if (r.currency) frm.set_value("currency", r.currency);
-				else frm.set_value("currency", erpnext.get_currency(frm.doc.company));
-				frm.refresh_fields();
-			},
-		);
-	},
+	// get_employee_currency: function (frm) {
+	// 	frappe.db.get_value(
+	// 		"Salary Structure",
+	// 		{ employee: frm.doc.employee},
+	// 		"currency",
+	// 		(r) => {
+	// 			if (r.currency) frm.set_value("currency", r.currency);
+	// 			else frm.set_value("currency", erpnext.get_currency(frm.doc.company));
+	// 			frm.refresh_fields();
+	// 		},
+	// 	);
+	// },
 
     currency: function (frm) {
 		if (frm.doc.currency) {
@@ -158,38 +149,6 @@ frappe.ui.form.on("Travel Authorization", {
 				);
 			},
 		});
-	},
-	set_reports_to: function (frm) {
-		if (frm.doc.employee) {
-			console.log("hi")
-			return frappe.call({
-				method: "hrms.hr.hr_custom_function.get_reports_to",
-				args: {
-					employee: frm.doc.employee,
-				},
-				callback: function (r) {
-					if (r && r.message) {
-						frm.set_value("reports_to", r.message);
-					}
-				},
-			});
-		}
-	},
-	set_approver: function (frm) {
-		if (frm.doc.employee) {
-			console.log("hi")
-			return frappe.call({
-				method: "hrms.hr.hr_custom_function.get_approver",
-				args: {
-					employee: frm.doc.employee,
-				},
-				callback: function (r) {
-					if (r && r.message) {
-						frm.set_value("approver", r.message);
-					}
-				},
-			});
-		}
 	},
 });
 

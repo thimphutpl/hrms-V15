@@ -6,324 +6,332 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "section_break_1",
-  "status",
-  "column_break_1",
-  "rejection_reason",
-  "section_break_2",
-  "employee",
-  "employee_name",
-  "department",
-  "column_break_3",
-  "employment_type",
-  "employee_group",
-  "grade",
-  "section_break_7",
-  "attachment",
-  "actual_hours",
-  "total_hours",
-  "total_hours_lapsed",
-  "total_amount",
-  "overtime_tax",
-  "column_break_14",
-  "purpose",
-  "section_break_13",
-  "items",
-  "section_break_11",
-  "approver_name",
-  "column_break_11",
-  "approver",
-  "approver_designation",
-  "sb_remarks",
-  "remarks",
-  "amended_from",
-  "workflow_state",
-  "sb_additional_info",
-  "company",
-  "branch",
-  "column_break_20",
-  "posting_date",
-  "payment_jv",
-  "business_activity",
-  "overtime_based_on",
-  "rate"
- ],
- "fields": [
-  {
-   "fieldname": "section_break_1",
-   "fieldtype": "Section Break",
-   "label": "Application Status"
-  },
-  {
-   "default": "Open",
-   "depends_on": "eval:doc.workflow_state == \"Waiting GM Approval\"",
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "hidden": 1,
-   "label": "Status",
-   "options": "Open\nApproved\nRejected"
-  },
-  {
-   "fieldname": "column_break_1",
-   "fieldtype": "Column Break"
-  },
-  {
-   "depends_on": "eval:doc.status == \"Rejected\"",
-   "fieldname": "rejection_reason",
-   "fieldtype": "Small Text",
-   "label": "Rejection Reason"
-  },
-  {
-   "fieldname": "section_break_2",
-   "fieldtype": "Section Break",
-   "label": "Employee Information"
-  },
-  {
-   "fieldname": "employee",
-   "fieldtype": "Link",
-   "label": "Employee",
-   "options": "Employee",
-   "reqd": 1
-  },
-  {
-   "fieldname": "column_break_3",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "employee_name",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Employee Name",
-   "read_only": 1,
-   "reqd": 1
-  },
-  {
-   "fieldname": "branch",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Branch",
-   "options": "Branch",
-   "read_only": 1,
-   "reqd": 1
-  },
-  {
-   "fieldname": "overtime_based_on",
-   "fieldtype": "Select",
-   "label": "Overtime Payment Based On",
-   "options": "\nHourly\nCFT\nM3\nSQFT",
-   "reqd": 1
-  },
-  {
-   "fieldname": "rate",
-   "fieldtype": "Float",
-   "label": "Rate",
-   "precision": "2",
-   "reqd": 1
-  },
-  {
-   "fieldname": "section_break_11",
-   "fieldtype": "Section Break",
-   "label": "Approval Details"
-  },
-  {
-   "default": "Today",
-   "fieldname": "posting_date",
-   "fieldtype": "Date",
-   "in_list_view": 1,
-   "label": "Posting Date",
-   "permlevel": 1,
-   "reqd": 1
-  },
-  {
-   "fieldname": "approver",
-   "fieldtype": "Read Only",
-   "label": "Approver Email ID",
-   "options": "employee.second_approver"
-  },
-  {
-   "fieldname": "column_break_11",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "approver_name",
-   "fieldtype": "Read Only",
-   "hidden": 1,
-   "label": "Approver",
-   "options": "employee.second_approver_name"
-  },
-  {
-   "fieldname": "section_break_7",
-   "fieldtype": "Section Break",
-   "label": "Overtime Application Information"
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "total_hours",
-   "fieldtype": "Float",
-   "label": "Total Hours Accepted for Payment",
-   "precision": "2",
-   "read_only": 1,
-   "reqd": 1
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "total_amount",
-   "fieldtype": "Currency",
-   "label": "Total Amount",
-   "read_only": 1,
-   "reqd": 1
-  },
-  {
-   "fieldname": "column_break_14",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "purpose",
-   "fieldtype": "Small Text",
-   "label": "Purpose",
-   "reqd": 1
-  },
-  {
-   "fieldname": "section_break_13",
-   "fieldtype": "Section Break",
-   "label": "Overtime Details"
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "items",
-   "fieldtype": "Table",
-   "options": "Overtime Application Item",
-   "reqd": 1
-  },
-  {
-   "fieldname": "payment_jv",
-   "fieldtype": "Read Only",
-   "hidden": 1,
-   "label": "Journal Entry",
-   "read_only": 1
-  },
-  {
-   "collapsible": 1,
-   "fieldname": "remarks",
-   "fieldtype": "Text",
-   "label": "Remarks"
-  },
-  {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Overtime Application",
-   "print_hide": 1,
-   "read_only": 1
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "workflow_state",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Workflow State",
-   "options": "Workflow State"
-  },
-  {
-   "fieldname": "approver_designation",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Approver Designation",
-   "read_only": 1
-  },
-  {
-   "collapsible": 1,
-   "fieldname": "sb_remarks",
-   "fieldtype": "Section Break",
-   "label": "REMARKS"
-  },
-  {
-   "fieldname": "sb_additional_info",
-   "fieldtype": "Section Break",
-   "label": "ADDITIONAL INFORMATION"
-  },
-  {
-   "fieldname": "column_break_20",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fetch_from": "employee.company",
-   "fieldname": "company",
-   "fieldtype": "Link",
-   "label": "Company",
-   "options": "Company",
-   "read_only": 1
-  },
-  {
-   "default": "OTB",
-   "fetch_from": "employee.business_activity",
-   "fieldname": "business_activity",
-   "fieldtype": "Link",
-   "label": "Business Activity",
-   "options": "Business Activity",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "employee.employment_type",
-   "fieldname": "employment_type",
-   "fieldtype": "Link",
-   "label": "Employment Type",
-   "options": "Employment Type",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "employee.employee_group",
-   "fieldname": "employee_group",
-   "fieldtype": "Link",
-   "label": "Employee Group",
-   "options": "Employee Group",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "employee.grade",
-   "fieldname": "grade",
-   "fieldtype": "Link",
-   "label": "Grade",
-   "options": "Employee Grade",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "employee.department",
-   "fieldname": "department",
-   "fieldtype": "Link",
-   "label": "Department",
-   "options": "Department",
-   "read_only": 1
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "actual_hours",
-   "fieldtype": "Float",
-   "label": "Total Hours Claimed",
-   "read_only": 1
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "total_hours_lapsed",
-   "fieldtype": "Float",
-   "hidden": 1,
-   "label": "Total Hours Lapsed",
-   "read_only": 1
-  },
-  {
-   "fieldname": "attachment",
-   "fieldtype": "Attach",
-   "label": "Attachment",
-   "reqd": 1
-  },
-  {
-   "fieldname": "overtime_tax",
-   "fieldtype": "Currency",
-   "label": "Tax Amount",
-   "read_only": 1
-  }
- ],
+    "section_break_1",
+    "status",
+    "column_break_1",
+    "rejection_reason",
+    "section_break_2",
+    "employee",
+    "employee_name",
+    "department",
+    "branch",
+    "designation",
+    "column_break_3",
+    "employment_type",
+    "employee_group",
+    "grade",
+    "posting_date",
+    "section_break_7",
+    "rate",
+    "actual_hours",
+    "total_hours",
+    "total_hours_lapsed",
+    "total_amount",
+    "column_break_14",
+    "purpose",
+    "section_break_13",
+    "items",
+    "section_break_11",
+    "approve_name",
+    "column_break_11",
+    "approver",
+    "column_break_30",
+    "approver_designation",
+    "sb_remarks",
+    "remarks",
+    "amended_from",
+    "processed",
+    "sb_additional_info",
+    "company",
+    "salary_component",
+    "column_break_20",
+    "payment_jv",
+    "salary_slip",
+    "business_activity",
+    "workflow_state"
+   ],
+   "fields": [
+    {
+     "fieldname": "section_break_1",
+     "fieldtype": "Section Break",
+     "label": "Application Status"
+    },
+    {
+     "default": "Common",
+     "fieldname": "business_activity",
+     "fieldtype": "Link",
+     "label": "Business Activity",
+     "options": "Business Activity",
+     "read_only": 1
+    },
+    {
+     "default": "Open",
+     "fieldname": "status",
+     "fieldtype": "Select",
+     "hidden": 1,
+     "label": "Status",
+     "options": "Open\nApproved\nRejected",
+     "reqd": 1
+    },
+    {
+     "fieldname": "column_break_1",
+     "fieldtype": "Column Break"
+    },
+    {
+     "depends_on": "eval:doc.status == \"Rejected\"",
+     "fieldname": "rejection_reason",
+     "fieldtype": "Small Text",
+     "label": "Rejection Reason"
+    },
+    {
+     "fieldname": "section_break_2",
+     "fieldtype": "Section Break",
+     "label": "Employee Information"
+    },
+    {
+     "fieldname": "employee",
+     "fieldtype": "Link",
+     "label": "Employee",
+     "options": "Employee",
+     "reqd": 1
+    },
+    {
+     "fieldname": "column_break_3",
+     "fieldtype": "Column Break"
+    },
+    {
+     "fetch_from": "employee.employee_name",
+     "fieldname": "employee_name",
+     "fieldtype": "Data",
+     "in_list_view": 1,
+     "label": "Employee Name",
+     "read_only": 1,
+     "reqd": 1
+    },
+    {
+     "fetch_from": "employee.branch",
+     "fieldname": "branch",
+     "fieldtype": "Link",
+     "in_list_view": 1,
+     "label": "Branch",
+     "options": "Branch",
+     "read_only": 1
+    },
+    {
+     "collapsible": 1,
+     "fieldname": "section_break_11",
+     "fieldtype": "Section Break",
+     "label": "Approval Details"
+    },
+    {
+     "default": "Today",
+     "fieldname": "posting_date",
+     "fieldtype": "Date",
+     "in_list_view": 1,
+     "label": "Posting Date",
+     "reqd": 1
+    },
+    {
+     "fieldname": "approver",
+     "fieldtype": "Link",
+     "label": "Approver Email ID",
+     "options": "User",
+     "read_only": 1
+    },
+    {
+     "fieldname": "column_break_11",
+     "fieldtype": "Column Break"
+    },
+    {
+     "fieldname": "section_break_7",
+     "fieldtype": "Section Break",
+     "label": "Overtime Application Information"
+    },
+    {
+     "fieldname": "rate",
+     "fieldtype": "Float",
+     "label": "Hourly Rate",
+     "precision": "2",
+     "read_only": 1
+    },
+    {
+     "fieldname": "total_hours",
+     "fieldtype": "Float",
+     "label": "Total Hours Accepted for Payment",
+     "precision": "2",
+     "read_only": 1,
+     "reqd": 1
+    },
+    {
+     "fieldname": "total_amount",
+     "fieldtype": "Currency",
+     "label": "Total Amount",
+     "read_only": 1,
+     "reqd": 1
+    },
+    {
+     "fieldname": "column_break_14",
+     "fieldtype": "Column Break"
+    },
+    {
+     "fieldname": "purpose",
+     "fieldtype": "Small Text",
+     "label": "Purpose",
+     "reqd": 1
+    },
+    {
+     "fieldname": "section_break_13",
+     "fieldtype": "Section Break",
+     "label": "Overtime Details"
+    },
+    {
+     "allow_bulk_edit": 1,
+     "fieldname": "items",
+     "fieldtype": "Table",
+     "options": "Overtime Application Item",
+     "reqd": 1
+    },
+    {
+     "fieldname": "payment_jv",
+     "fieldtype": "Data",
+     "hidden": 1,
+     "label": "Journal Entry",
+     "read_only": 1
+    },
+    {
+     "collapsible": 1,
+     "fieldname": "remarks",
+     "fieldtype": "Text",
+     "label": "Remarks"
+    },
+    {
+     "fieldname": "approver_designation",
+     "fieldtype": "Data",
+     "label": "Approver Designation",
+     "read_only": 1
+    },
+    {
+     "collapsible": 1,
+     "fieldname": "sb_remarks",
+     "fieldtype": "Section Break",
+     "label": "REMARKS"
+    },
+    {
+     "fieldname": "sb_additional_info",
+     "fieldtype": "Section Break",
+     "label": "ADDITIONAL INFORMATION"
+    },
+    {
+     "fieldname": "column_break_20",
+     "fieldtype": "Column Break"
+    },
+    {
+     "fetch_from": "employee.company",
+     "fieldname": "company",
+     "fieldtype": "Link",
+     "label": "Company",
+     "options": "Company",
+     "read_only": 1
+    },
+    {
+     "fetch_from": "employee.employment_type",
+     "fieldname": "employment_type",
+     "fieldtype": "Link",
+     "label": "Employment Type",
+     "options": "Employment Type",
+     "read_only": 1
+    },
+    {
+     "fetch_from": "employee.employee_group",
+     "fieldname": "employee_group",
+     "fieldtype": "Link",
+     "label": "Employee Group",
+     "options": "Employee Group",
+     "read_only": 1
+    },
+    {
+     "fetch_from": "employee.grade",
+     "fieldname": "grade",
+     "fieldtype": "Link",
+     "label": "Grade",
+     "options": "Employee Grade",
+     "read_only": 1
+    },
+    {
+     "fetch_from": "employee.department",
+     "fieldname": "department",
+     "fieldtype": "Link",
+     "label": "Department",
+     "options": "Department",
+     "read_only": 1
+    },
+    {
+     "fieldname": "actual_hours",
+     "fieldtype": "Float",
+     "label": "Total Hours Claimed",
+     "read_only": 1
+    },
+    {
+     "fieldname": "total_hours_lapsed",
+     "fieldtype": "Float",
+     "hidden": 1,
+     "label": "Total Hours Lapsed",
+     "read_only": 1
+    },
+    {
+     "fieldname": "salary_slip",
+     "fieldtype": "Data",
+     "label": "Salary Slip",
+     "read_only": 1
+    },
+    {
+     "fieldname": "amended_from",
+     "fieldtype": "Link",
+     "label": "Amended From",
+     "no_copy": 1,
+     "options": "Overtime Application",
+     "print_hide": 1,
+     "read_only": 1
+    },
+    {
+     "fieldname": "salary_component",
+     "fieldtype": "Link",
+     "label": "Salary Component",
+     "options": "Salary Component",
+     "read_only": 1
+    },
+    {
+     "default": "0",
+     "fieldname": "processed",
+     "fieldtype": "Check",
+     "label": "Processed"
+    },
+    {
+     "fetch_from": "employee.designation",
+     "fieldname": "designation",
+     "fieldtype": "Link",
+     "label": "Designation",
+     "options": "Designation",
+     "read_only": 1
+    },
+    {
+     "fieldname": "workflow_state",
+     "fieldtype": "Link",
+     "label": "workflow_state",
+     "options": "Workflow State"
+    },
+    {
+     "fetch_from": "approver.full_name",
+     "fieldname": "approve_name",
+     "fieldtype": "Data",
+     "label": "Approver",
+     "read_only": 1
+    },
+    {
+     "fieldname": "column_break_30",
+     "fieldtype": "Column Break"
+    }
+   ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,

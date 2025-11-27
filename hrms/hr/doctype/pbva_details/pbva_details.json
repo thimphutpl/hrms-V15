@@ -6,157 +6,134 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-    "employee",
-    "employee_name",
-    "employment_type",
-    "leaving_type",
-    "branch",
-    "column_break_3",
-    "basic_pay",
-    "date_of_joining",
-    "relieving_date",
-    "days_worked",
-    "pbva_percent",
-    "employee_rating",
-    "column_break_10",
-    "amount",
-    "tpn_number",
-    "tax_amount",
-    "deduction_amount",
-    "balance_amount",
-    "total_rating",
-    "column_break_7",
-    "salary_mode",
-    "bank_name",
-    "bank_ac_no",
-    "bank_branch",
-    "financial_system_code"
-   ],
-   "fields": [
-    {
-     "fieldname": "employee",
-     "fieldtype": "Link",
-     "label": "Employee",
-     "options": "Employee",
-     "read_only": 1,
-     "reqd": 1
-    },
-    {
-     "columns": 2,
-     "fieldname": "employee_name",
-     "fieldtype": "Data",
-     "in_list_view": 1,
-     "label": "Employee Name",
-     "read_only": 1,
-     "reqd": 1
-    },
-    {
-     "fieldname": "employment_type",
-     "fieldtype": "Data",
-     "label": "Employment Type",
-     "read_only": 1
-    },
-    {
-     "fieldname": "leaving_type",
-     "fieldtype": "Data",
-     "label": "Leaving Type",
-     "read_only": 1
-    },
-    {
-     "fieldname": "branch",
-     "fieldtype": "Link",
-     "label": "Branch",
-     "options": "Branch",
-     "read_only": 1,
-     "reqd": 1
-    },
-    {
-     "fieldname": "column_break_3",
-     "fieldtype": "Column Break"
-    },
-    {
-     "fieldname": "basic_pay",
-     "fieldtype": "Currency",
-     "hidden": 1,
-     "label": "Total Basic Pay",
-     "read_only": 1
-    },
-    {
-     "fieldname": "date_of_joining",
-     "fieldtype": "Date",
-     "label": "Date of Joining",
-     "read_only": 1
-    },
-    {
-     "fieldname": "relieving_date",
-     "fieldtype": "Date",
-     "label": "Relieving Date",
-     "read_only": 1
-    },
-    {
-     "fieldname": "days_worked",
-     "fieldtype": "Int",
-     "label": "Days Worked",
-     "read_only": 1
-    },
-    {
-     "fieldname": "column_break_10",
-     "fieldtype": "Column Break"
-    },
-    {
-        "fieldname": "pbva_percent",
-        "fieldtype": "Float",
-        "label": "PBVA percent",
-        "precision": "3",
-        "read_only": 1
-    },
-    {
-     "columns": 2,
-     "fieldname": "amount",
-     "fieldtype": "Currency",
-     "in_list_view": 1,
-     "label": "PBVA Amount",
-     "reqd": 1
-    },
-    {
-     "columns": 1,
-     "fieldname": "tax_amount",
-     "fieldtype": "Currency",
-     "in_list_view": 1,
-     "label": "Tax Amount",
-     "read_only": 1
-    },
-    {
-     "columns": 2,
-     "fieldname": "balance_amount",
-     "fieldtype": "Currency",
-     "in_list_view": 1,
-     "label": "PBVA After Tax",
-     "read_only": 1
-    },
-    {
-     "fieldname": "column_break_7",
-     "fieldtype": "Column Break"
-    },
-    {
-     "default": "Bank",
-     "fieldname": "salary_mode",
-     "fieldtype": "Select",
-     "label": "Salary Mode",
-     "options": "Bank\nCash"
-    },
-    {
-     "fieldname": "bank_name",
-     "fieldtype": "Link",
-     "label": "Bank Name",
-     "options": "Financial Institution"
-    },
-    {
-     "fieldname": "bank_ac_no",
-     "fieldtype": "Data",
-     "label": "Bank A/C No."
-    }
-   ],
+  "employee",
+  "employee_name",
+  "employment_type",
+  "leaving_type",
+  "branch",
+  "column_break_6",
+  "basic_pay",
+  "total_basic_pay",
+  "date_of_joining",
+  "relieving_date",
+  "days_worked",
+  "data_12",
+  "amount",
+  "tax_amount",
+  "balance_amount",
+  "column_break_16",
+  "salary_mode",
+  "bank_name",
+  "bank_ac_no"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee ",
+   "options": "Employee",
+   "reqd": 1
+  },
+  {
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Employee Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "employment_type",
+   "fieldtype": "Data",
+   "label": "Employment Type"
+  },
+  {
+   "fieldname": "leaving_type",
+   "fieldtype": "Data",
+   "label": "Leaving Type"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "basic_pay",
+   "fieldtype": "Currency",
+   "label": "Basic Pay"
+  },
+  {
+   "fieldname": "total_basic_pay",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Total Basic Pay",
+   "reqd": 1
+  },
+  {
+   "fieldname": "date_of_joining",
+   "fieldtype": "Data",
+   "label": "Date of Joining"
+  },
+  {
+   "fieldname": "relieving_date",
+   "fieldtype": "Date",
+   "label": "Relieving Date"
+  },
+  {
+   "fieldname": "days_worked",
+   "fieldtype": "Int",
+   "label": "Days Worked"
+  },
+  {
+   "fieldname": "data_12",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "PBVA Amount",
+   "reqd": 1
+  },
+  {
+   "fieldname": "tax_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Tax Amount"
+  },
+  {
+   "fieldname": "balance_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "PBVA After Tax"
+  },
+  {
+   "fieldname": "column_break_16",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "salary_mode",
+   "fieldtype": "Select",
+   "label": "Salary Mode",
+   "options": "Bank\nCash"
+  },
+  {
+   "fieldname": "bank_name",
+   "fieldtype": "Link",
+   "label": "Bank Name",
+   "options": "Financial Institution"
+  },
+  {
+   "fieldname": "bank_ac_no",
+   "fieldtype": "Data",
+   "label": "Bank A/C No."
+  }
+ ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,

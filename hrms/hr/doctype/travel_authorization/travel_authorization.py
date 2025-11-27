@@ -27,24 +27,15 @@ from erpnext.custom_workflow import validate_workflow_states, notify_workflow_st
 
 class TravelAuthorization(Document):
 	def validate(self):
-
 		validate_active_employee(self.employee)
-		
 		self.validate_travel_dates()
 		self.validate_travel_last_day()
 		self.validate_exchange_rate()
 		self.set_status()
-		self.make_travel_advance()
-		self.validate_estimated_amount()
-		#validate_workflow_states(self)
+		# validate_workflow_states(self)
 
 	def on_update(self):
-		self.check_date_overlap()
 		self.validate_duplicate_entry()
-
-	def on_submit(self):
-		if self.advance_amount: 
-			self.post_journal_entry()
 
 	def on_cancel(self):
 		self.set_status(update=True)
@@ -58,82 +49,41 @@ class TravelAuthorization(Document):
 		else:
 			self.status = status
 
-	def validate_estimated_amount(self):
-		if flt(self.advance_amount) > flt(self.estimated_amount):
-			frappe.throw("your estimate amount is less than advance amount ")
-
-	def post_journal_entry(self):
-		advance_account = frappe.db.get_value("Company", self.company, "travel_advance_account")
-		bank_account = frappe.db.get_value("Branch", self.branch, "expense_bank_account")
-		#frappe.throw(advance_account)
-
-		if not advance_account:
-			frappe.throw(
-				"Travel Advance Account is not set for {}. Please configure it in the Company.".format(
-					frappe.get_desk_link("Company", self.company)
-				),
-				title="Missing Travel Advance Account"
-			)
-
-		if not bank_account:
-			frappe.throw(
-				"Default Expense Bank Account is not set for {}. Please configure it in the Branch.".format(
-					frappe.get_desk_link("Branch", self.branch)
-				),
-				title="Missing Expense Bank Account"
-			)
-
-		# Posting Journal Entry
-		accounts = []
-		accounts.append({
-			"account": advance_account,
-			"debit": flt(self.advance_amount),
-			"debit_in_account_currency": flt(self.advance_amount),
-			"cost_center": self.cost_center,
-			"party_check": 1,
-			"party_type": "Employee",
-			"party": self.employee,
-			"is_advance": "Yes",
-			"reference_type": "Travel Authorization",
-			"reference_name": self.name,
-		})
-
-		accounts.append({
-			"account": bank_account,
-			"credit": flt(self.advance_amount),
-			"credit_in_account_currency": flt(self.advance_amount),
-			"cost_center": self.cost_center,
-		})
-
-		je = frappe.new_doc("Journal Entry")
-		
-		voucher_type = "Bank Entry"
-		naming_series = "Bank Payment Voucher"
-		
-		je.update({
-				"doctype": "Journal Entry",
-				"voucher_type": voucher_type,
-				"naming_series": naming_series,
-				"title": "Travel Advance - "+self.employee,
-				"user_remark": "Travek Advance - "+self.employee,
-				"posting_date": nowdate(),
-				"company": self.company,
-				"accounts": accounts,
-				"branch": self.branch
-		})
-
-		if self.advance_amount:
-			je.save(ignore_permissions = True)
-			# self.db_set("journal_entry", je.name)
-			# self.db_set("journal_entry_status", "Forwarded to accounts for processing payment on {0}".format(now_datetime().strftime('%Y-%m-%d %H:%M:%S')))
-			# frappe.msgprint(_('{} posted to accounts').format(frappe.get_desk_link(je.doctype,je.name)))
-
 	def validate_travel_dates(self):
+		self._validate_overlap_dates()
 		for item in self.get("items", []):
 			if cint(item.halt):
 				self._validate_halt_entry(item)
 			else:
 				self._validate_travel_entry(item)
+
+	def _validate_overlap_dates(self):
+		sorted_itinerary = sorted(self.items, key=lambda x: x.from_date)
+		
+		for i in range(len(sorted_itinerary)):
+			current_item = sorted_itinerary[i]
+			
+			if current_item.from_date and current_item.to_date:
+				if current_item.from_date > current_item.to_date:
+					frappe.throw(
+						f"Row {current_item.idx}: From Date cannot be after To Date",
+						title="Invalid Date Range"
+					)
+			
+			if i < len(sorted_itinerary) - 1:
+				next_item = sorted_itinerary[i + 1]
+				
+				if not (current_item.to_date and next_item.from_date):
+					continue
+				
+				required_next_date = frappe.utils.add_days(current_item.to_date, 1)
+				
+				if next_item.from_date != required_next_date:
+					frappe.throw(
+						f"Row {next_item.idx}: From Date must be exactly 1 day after Row {current_item.idx}'s To Date. "
+						f"Expected {required_next_date}, found {next_item.from_date}",
+						title="Invalid Date Sequence"
+					)
 
 	def _validate_halt_entry(self, item):
 		if not item.halt_at:
@@ -143,12 +93,12 @@ class TravelAuthorization(Document):
 			)
 		if not item.to_date:
 			frappe.throw(
-				_("Row#{0}: <b>Till Date</b> is mandatory.").format(item.idx),
+				_("Row#{0}: <b>To Date</b> is mandatory.").format(item.idx),
 				title="Invalid Date"
 			)
 		if item.to_date < item.from_date:
 			frappe.throw(
-				_("Row#{0}: <b>Till Date</b> cannot be earlier than <b>From Date</b>.").format(item.idx),
+				_("Row#{0}: <b>To Date</b> cannot be earlier than <b>From Date</b>.").format(item.idx),
 				title="Invalid Date"
 			)
 
@@ -159,28 +109,6 @@ class TravelAuthorization(Document):
 				title="Missing Travel Information"
 			)
 		item.to_date = item.from_date  # Ensuring `to_date` is set for non-halt cases
-
-	def check_date_overlap(self):
-		overlap_query = """
-			SELECT t1.idx, t2.idx AS overlap_idx
-			FROM `tabTravel Authorization Item` t1
-			JOIN `tabTravel Authorization Item` t2
-			ON t1.parent = t2.parent
-			AND t1.name != t2.name
-			AND t1.from_date <= t2.to_date
-			AND t1.to_date >= t2.from_date
-			WHERE t1.parent = %s
-		"""
-
-		overlaps = frappe.db.sql(overlap_query, (self.name,), as_dict=True)
-		if overlaps:
-			first_overlap = overlaps[0]
-			frappe.throw(
-				_("Row#{}: Dates are overlapping with dates in Row#{}").format(
-					first_overlap["idx"], first_overlap["overlap_idx"]
-				),
-				title="Date Overlap Detected"
-			)
 
 	def validate_duplicate_entry(self):
 		duplicate_query = """
@@ -242,82 +170,3 @@ class TravelAuthorization(Document):
 		return {
 			"has_travel_claim": bool(travel_claim)
 		}
-
-
-	#@frappe.whitelist()
-	def make_travel_advance(self):
-		"""
-		Creates a Travel Advance document linked to the given Travel Authorization.
-		"""
-		#frappe.throw(self.employee)
-		
-		#doc = frappe.get_doc(dt, dn)
-		no_of_days=0
-		# #frappe.throw(str(doc.items[0].country))
-		for d in self.items:
-			#frappe.msgprint("hi")
-			if d.is_last_day==1:
-				no_of_day=0
-			else:
-				
-				no_of_day=date_diff(d.to_date, d.from_date) + 1
-			no_of_days+=no_of_day
-
-
-		
-		if self.items:
-			from_date = self.items[0].from_date
-			to_date = self.items[-1].from_date if len(self.items) > 1 else from_date
-
-		employee_grade = frappe.db.get_value("Employee", self.employee, "grade")
-		return_day_dsa = frappe.db.get_single_value("HR Settings", "return_day_dsa")
-		dsa = frappe.db.get_value("Employee Grade", employee_grade, "dsa")
-		#frappe.throw(str(no_of_day))
-
-		if self.travel_type=="International":
-			country=frappe.get_doc("DSA Out Country", self.items[0].country)
-			if not country:
-				frappe.throw("country in not set in DSA OUT Countery")
-			grade=False
-			for dsa_int in country.country_dsa_detail:
-			
-				if dsa_int.grade==employee_grade:
-							
-					dsa = flt(dsa_int.dsa) * self.exchange_rate
-					grade=True
-					break
-
-			if grade==False:
-				frappe.throw("DSa is not net grade")
-		
-		
-		
-		self.estimated_amount = flt(dsa) * flt(no_of_days) + (flt(return_day_dsa) /100 * flt(dsa))
-		#frappe.throw(str(self.estimated_amount))
-		#adv.travel_authorization = doc.name
-
-		#return estimated_amount
-@frappe.whitelist()
-def get_approver(employee):
-	# leave_approver, department = frappe.db.get_value("Employee", employee, ["leave_approver", "department"])
-
-	# if not leave_approver and department:
-	# 	leave_approver = frappe.db.get_value(
-	# 		"Department Approver",
-	# 		{"parent": department, "parentfield": "leave_approvers", "idx": 1},
-	# 		"approver",
-	# 	)
-	department = frappe.db.get_value("Employee", employee, "department")
-	empid=frappe.db.get_value("Department", department, "approver")
-	approver = frappe.db.get_value("Employee", empid, "user_id")
-
-
-	return approver
-
-
-@frappe.whitelist()
-def get_reports_to(employee):
-	empid = frappe.db.get_value("Employee", employee, "reports_to")
-	reports_to = frappe.db.get_value("Employee", empid, "user_id")
-	
-	return reports_to

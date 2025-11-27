@@ -150,7 +150,7 @@ class PromotionEntry(Document):
 				# frappe.msgprint(str(is_eligible))
 				# frappe.msgprint(str(e.employee)+" "+str(is_eligible)+" grade:"+str(e.employee_grade))
 				if is_eligible:
-					salary_structure = frappe.db.sql("select sd.amount as amount, ss.employee_grade from `tabSalary Detail` sd, `tabSalary Structure` ss where sd.parent = ss.name and ss.employee = '{0}' and ss.is_active = 'Yes' and sd.salary_component = 'Basic Pay'".format(e.employee), as_dict = True)
+					salary_structure = frappe.db.sql("select sd.amount as amount, ss.employee_grade from `tabSalary Detail` sd, `tabSalary Structure` ss where sd.parent = ss.name and ss.employee = '{0}' and ss.is_active = 'Yes' and sd.salary_component = 'Basic Salary'".format(e.employee), as_dict = True)
 
 					new_grade, new_increment, new_basic_pay = self.get_additional_details(e.employee, salary_structure[0].amount)
 					emp.append({"employee":e.employee, "employee_name": e.employee_name, "department": e.department, "designation": e.designation, "employee_grade": e.employee_grade, "current_basic_pay": salary_structure[0].amount, "new_increment": new_increment, "new_basic_pay": new_basic_pay, "new_employee_grade": new_grade})
@@ -168,7 +168,7 @@ class PromotionEntry(Document):
                     and t1.name = '{}'            
                             """.format(pe_date, e.employee))
 				if is_eligible:
-					salary_structure = frappe.db.sql("select sd.amount as amount,  ss.employee_grade from `tabSalary Detail` sd, `tabSalary Structure` ss where sd.parent = ss.name and ss.employee = '{0}' and ss.is_active = 'Yes' and sd.salary_component = 'Basic Pay'".format(e.employee), as_dict = True)
+					salary_structure = frappe.db.sql("select sd.amount as amount,  ss.employee_grade from `tabSalary Detail` sd, `tabSalary Structure` ss where sd.parent = ss.name and ss.employee = '{0}' and ss.is_active = 'Yes' and sd.salary_component = 'Basic Salary'".format(e.employee), as_dict = True)
 
 					new_grade, new_increment, new_basic_pay, new_promot_date = self.get_additional_details(e.employee, salary_structure[0].amount)
 					emp.append({"employee":e.employee, "employee_name": e.employee_name, "department": e.department, "designation": e.designation, "employee_grade": e.employee_grade, "current_basic_pay": salary_structure[0].amount, "new_increment": new_increment,"new_basic_pay": new_basic_pay, "new_employee_grade": new_grade, "next_promotion_date":new_promot_date})		
@@ -428,7 +428,7 @@ def create_employee_promotion_for_employees(employees, args, publish_progress=Tr
 			ep.new_lower_limit = new_lower_limit
 			ep.new_increment = new_increment
 			ep.new_upper_limit = new_upper_limit
-			salary_structure = frappe.db.sql("select sd.amount as amount from `tabSalary Detail` sd, `tabSalary Structure` ss where sd.parent = ss.name and ss.employee = '{0}' and ss.is_active = 'Yes' and sd.salary_component = 'Basic Pay'".format(emp.employee), as_dict = True)
+			salary_structure = frappe.db.sql("select sd.amount as amount from `tabSalary Detail` sd, `tabSalary Structure` ss where sd.parent = ss.name and ss.employee = '{0}' and ss.is_active = 'Yes' and sd.salary_component = 'Basic Salary'".format(emp.employee), as_dict = True)
 			ep.current_basic_pay = salary_structure[0].amount
 			# bp_diff = flt(salary_structure[0].amount) - flt(new_lower_limit)
 			# new_increment_div = flt(bp_diff) / flt(new_increment)

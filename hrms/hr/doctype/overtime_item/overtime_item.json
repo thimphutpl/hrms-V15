@@ -1,0 +1,80 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-11-06 19:40:10.022536",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+    "reference",
+    "month",
+    "ot_date",
+    "cb_01",
+    "hourly_rate",
+    "total_hours",
+    "total_amount"
+   ],
+   "fields": [
+    {
+     "fieldname": "reference",
+     "fieldtype": "Link",
+     "in_list_view": 1,
+     "label": "Reference OT",
+     "options": "Overtime Application",
+     "read_only": 1
+    },
+    {
+     "fieldname": "ot_date",
+     "fieldtype": "Date",
+     "in_list_view": 1,
+     "label": "OT Date",
+     "read_only": 1
+    },
+    {
+     "fieldname": "cb_01",
+     "fieldtype": "Column Break"
+    },
+    {
+     "fieldname": "hourly_rate",
+     "fieldtype": "Currency",
+     "in_list_view": 1,
+     "label": "Rate",
+     "read_only": 1
+    },
+    {
+     "fieldname": "total_hours",
+     "fieldtype": "Float",
+     "in_list_view": 1,
+     "label": "Total Hour",
+     "read_only": 1
+    },
+    {
+     "fieldname": "total_amount",
+     "fieldtype": "Currency",
+     "in_list_view": 1,
+     "label": "Total Amount",
+     "read_only": 1
+    },
+    {
+     "fieldname": "month",
+     "fieldtype": "Data",
+     "in_list_view": 1,
+     "label": "Month for OT",
+     "read_only": 1
+    }
+   ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-11-06 19:40:10.022536",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Overtime Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -37,6 +37,29 @@ frappe.ui.form.on('Employee Separation', {
 			});
 		}
 	},
+	employee: function (frm) {
+		if (frm.doc.employee) {
+			frm.trigger("set_approver")
+			
+		}
+	},
+
+	set_approver: function (frm) {
+		if (frm.doc.employee) {
+			console.log("hi")
+			return frappe.call({
+				method: "hrms.hr.hr_custom_function.get_approver",
+				args: {
+					employee: frm.doc.employee,
+				},
+				callback: function (r) {
+					if (r && r.message) {
+						frm.set_value("approver", r.message);
+					}
+				},
+			});
+		}
+	},
 	employee_separation_template: function(frm) {
 		frm.set_value("activities" ,"");
 		if (frm.doc.employee_separation_template) {
