@@ -8,9 +8,9 @@ from frappe.model.document import Document
 from frappe.utils import flt
 
 from hrms.hr.utils import get_previous_claimed_amount, validate_active_employee
-from hrms.payroll.doctype.employee_benefit_application.employee_benefit_application import (
-	get_max_benefits,
-)
+#from hrms.payroll.doctype.employee_benefit_application.employee_benefit_application import (
+#	get_max_benefits,
+#)
 from hrms.payroll.doctype.payroll_period.payroll_period import get_payroll_period
 from hrms.payroll.doctype.salary_structure_assignment.salary_structure_assignment import (
 	get_assigned_salary_structure,
