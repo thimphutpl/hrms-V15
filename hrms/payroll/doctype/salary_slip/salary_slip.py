@@ -34,9 +34,9 @@ from erpnext.setup.doctype.employee.employee import get_holiday_list_for_employe
 from erpnext.utilities.transaction_base import TransactionBase
 
 from hrms.hr.utils import validate_active_employee
-from hrms.payroll.doctype.employee_benefit_application.employee_benefit_application import (
-	get_benefit_component_amount,
-)
+# from hrms.payroll.doctype.employee_benefit_application.employee_benefit_application import (
+# 	get_benefit_component_amount,
+# )
 from hrms.payroll.doctype.employee_benefit_claim.employee_benefit_claim import (
 	get_benefit_claim_amount,
 	get_last_payroll_period_benefits,
