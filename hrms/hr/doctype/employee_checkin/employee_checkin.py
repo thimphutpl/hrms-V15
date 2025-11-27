@@ -5,7 +5,7 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import cint, get_datetime
+from frappe.utils import cint, get_datetime,today,now_datetime
 
 from hrms.hr.doctype.shift_assignment.shift_assignment import get_actual_start_end_datetime_of_shift
 from hrms.hr.utils import (
@@ -22,27 +22,59 @@ class CheckinRadiusExceededError(frappe.ValidationError):
 class EmployeeCheckin(Document):
 	def validate(self):
 		validate_active_employee(self.employee)
+		self.validate_checkin_date()
 		self.validate_duplicate_log()
 		self.fetch_shift()
 		self.set_geolocation()
 		self.validate_distance_from_shift_location()
+		
+	def validate_checkin_date(self):
+		# Convert check-in time to datetime object
+		checkin_time = get_datetime(self.time)
+		current_time = now_datetime()
+
+		# Only allow check-in for today or future
+		if checkin_time.date() < current_time.date():
+			frappe.throw(
+				_("You cannot create check-in for past dates.")
+			)	
 
 	def validate_duplicate_log(self):
-		doc = frappe.db.exists(
+		# doc = frappe.db.exists(
+		# 	"Employee Checkin",
+		# 	{
+		# 		"employee": self.employee,
+		# 		"time": self.time,
+		# 		"name": ("!=", self.name),
+		# 		"log_type": self.log_type,
+		# 	},
+		# )
+		# if doc:
+		# 	doc_link = frappe.get_desk_link("Employee Checkin", doc)
+		# 	frappe.throw(
+		# 		_("This employee already has a log with the same timestamp.{0}").format("<Br>" + doc_link)
+		# 	)
+		existing_checkin = frappe.db.exists(
 			"Employee Checkin",
 			{
 				"employee": self.employee,
-				"time": self.time,
-				"name": ("!=", self.name),
 				"log_type": self.log_type,
+				"name": ("!=", self.name),
+				"time": ["between", [
+				today() + " 00:00:00",
+				today() + " 23:59:59"
+			]]
 			},
 		)
-		if doc:
-			doc_link = frappe.get_desk_link("Employee Checkin", doc)
-			frappe.throw(
-				_("This employee already has a log with the same timestamp.{0}").format("<Br>" + doc_link)
-			)
 
+		if existing_checkin:
+		# Get the full document to access the time
+			doc = frappe.get_doc("Employee Checkin", existing_checkin)
+			frappe.throw(
+				_("You already checked {0} at {1}").format(
+					self.log_type, doc.time.strftime("%d-%m-%Y %H:%M:%S")
+				)
+			)
 	@frappe.whitelist()
 	def set_geolocation(self):
 		set_geolocation_from_coordinates(self)
@@ -102,6 +134,11 @@ class EmployeeCheckin(Document):
 		)
 		if checkin_radius <= 0:
 			return
+		# latitude = round(latitude, 2)
+		# longitude = round(longitude, 2)
+		# current_lat = round(self.latitude, 2)
+		# current_long = round(self.longitude, 2)	
+		# frappe.throw(_("Latitude: {0}, Longitude: {1}, Current Latitude: {2}, Current Longitude: {3}").format(latitude, longitude, self.latitude, self.longitude))
 
 		distance = get_distance_between_coordinates(latitude, longitude, self.latitude, self.longitude)
 		if distance > checkin_radius:
@@ -202,6 +239,26 @@ def mark_attendance_and_link_log(
 		try:
 			frappe.db.savepoint("attendance_creation")
 			attendance = frappe.new_doc("Attendance")
+			first_in_log = next((log for log in logs if log.log_type == "IN"), None)
+			last_out_log = next((log for log in reversed(logs) if log.log_type == "OUT"), None)
+
+			# Fetch full documents to ensure latitude/longitude
+			if first_in_log:
+				first_in_doc = frappe.get_doc("Employee Checkin", first_in_log.name)
+				in_latitude = getattr(first_in_doc, "latitude", 0) or 0
+				in_longitude = getattr(first_in_doc, "longitude", 0) or 0
+				in_geolocation = f"{in_latitude}, {in_longitude}"
+			else:
+				in_latitude = in_longitude = 0
+				in_geolocation = ""
+
+
+			if last_out_log:
+				last_out_doc = frappe.get_doc("Employee Checkin", last_out_log.name)
+				out_latitude = getattr(last_out_doc, "latitude", 0) or 0
+				out_longitude = getattr(last_out_doc, "longitude", 0) or 0
+			else:
+				out_latitude = out_longitude = 0
 			attendance.update(
 				{
 					"doctype": "Attendance",
@@ -214,6 +271,12 @@ def mark_attendance_and_link_log(
 					"early_exit": early_exit,
 					"in_time": in_time,
 					"out_time": out_time,
+					"in_latitude": in_latitude,
+					"in_longitude": in_longitude,
+					"out_latitude": out_latitude,
+					"out_longitude": out_longitude,
+					"in_geolocation": in_geolocation,  
+			
 				}
 			).submit()
 
@@ -322,7 +385,6 @@ def add_comment_in_checkins(log_names: list, error_message: str):
 				"content": text,
 			}
 		).insert(ignore_permissions=True)
-
 
 def skip_attendance_in_checkins(log_names: list):
 	EmployeeCheckin = frappe.qb.DocType("Employee Checkin")

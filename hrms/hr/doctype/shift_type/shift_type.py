@@ -53,11 +53,12 @@ class ShiftType(Document):
 
 		logs = self.get_employee_checkins()
 
-		group_key = lambda x: (x["employee"], x["shift_start"])  # noqa
+		group_key = lambda x: (x["employee"], x["shift_start"])  
 		for key, group in groupby(sorted(logs, key=group_key), key=group_key):
 			single_shift_logs = list(group)
 			attendance_date = key[1].date()
 			employee = key[0]
+			
 
 			if not self.should_mark_attendance(employee, attendance_date):
 				continue
@@ -95,6 +96,54 @@ class ShiftType(Document):
 				self.mark_absent_for_dates_with_no_attendance(employee)
 
 			frappe.db.commit()  # nosemgrep
+	# @frappe.whitelist()
+	# def process_auto_attendance_forgot_check_in_out(self):
+	# 	if not cint(self.enable_auto_attendance_forgot_check_in_out):
+	# 		return
+
+	# 	# Get all assigned employees including default shift employees
+	# 	employees = self.get_assigned_employees(self.process_attendance_after, True)
+		
+	# 	for employee in employees:
+	# 		# Get the eligible dates to check for absent
+	# 		dates = self.get_dates_for_attendance(employee)
+
+	# 		for date in dates:
+	# 			# Skip if employee has any checkin/out for this date
+	# 			has_checkin = frappe.db.exists(
+	# 				"Employee Checkin",
+	# 				{
+	# 					"employee": employee,
+	# 					"time": ["between", [f"{date} 00:00:00", f"{date} 23:59:59"]],
+	# 				},
+	# 			)
+	# 			# Skip if employee is on approved leave
+	# 			on_leave = frappe.db.exists(
+	# 				"Leave Application",
+	# 				{
+	# 					"employee": employee,
+	# 					"status": "Approved",
+	# 					"from_date": ["<=", date],
+	# 					"to_date": [">=", date],
+	# 				},
+	# 			)
+
+	# 			if has_checkin or on_leave:
+	# 				continue
+
+	# 			# Mark Absent
+	# 			attendance = mark_attendance(employee, date, "Absent", self.name)
+	# 			if attendance:
+	# 				frappe.get_doc({
+	# 					"doctype": "Comment",
+	# 					"comment_type": "Comment",
+	# 					"reference_doctype": "Attendance",
+	# 					"reference_name": attendance,
+	# 					"content": _("Employee marked Absent due to missing check-in/out."),
+	# 				}).insert(ignore_permissions=True)
+
+	# 	frappe.db.commit()
+		
 
 	def get_employee_checkins(self) -> list[dict]:
 		return frappe.get_all(
@@ -115,7 +164,7 @@ class ShiftType(Document):
 				"skip_auto_attendance": 0,
 				"attendance": ("is", "not set"),
 				"time": (">=", self.process_attendance_after),
-				"shift_actual_end": ("<", self.last_sync_of_checkin),
+				# "shift_actual_end": ("<", self.last_sync_of_checkin),
 				"shift": self.name,
 			},
 			order_by="employee,time",
@@ -309,3 +358,31 @@ def process_auto_attendance_for_all_shifts():
 	for shift in shift_list:
 		doc = frappe.get_cached_doc("Shift Type", shift)
 		doc.process_auto_attendance()
+
+
+def update_last_sync_of_checkin():
+	"""Called from hooks"""
+	shifts = frappe.get_all(
+		"Shift Type",
+		filters={"enable_auto_attendance": 1, "auto_update_last_sync": 1},
+		fields=["name", "last_sync_of_checkin", "start_time", "end_time"],
+	)
+	current_datetime = frappe.flags.current_datetime or get_datetime()
+	for shift in shifts:
+		shift_end = get_actual_shift_end(shift, current_datetime)
+		update_last_sync = None
+		if shift.last_sync_of_checkin:
+			if get_datetime(shift.last_sync_of_checkin) < shift_end < current_datetime:
+				update_last_sync = True
+		elif shift_end < current_datetime:
+			update_last_sync = True
+		if update_last_sync:
+			frappe.db.set_value(
+				"Shift Type", shift.name, "last_sync_of_checkin", shift_end + timedelta(minutes=1)
+			)
+
+# def process_auto_attendance_forgot_check_in_out_for_all_shifts():
+# 	shift_list = frappe.get_all("Shift Type",filters={"enable_auto_attendance_forgot_check_in_out": 1},pluck="name")
+# 	for shift in shift_list:
+# 		doc = frappe.get_cached_doc("Shift Type", shift)
+# 		doc.process_auto_attendance_forgot_check_in_out()

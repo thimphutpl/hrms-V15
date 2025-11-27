@@ -14,6 +14,32 @@ frappe.ui.form.on("Employee Checkin", {
 			hide_field(["fetch_geolocation", "latitude", "longitude", "geolocation"]);
 			return;
 		}
+		if (!frappe.user.has_role(["HR User", "HR Manager", "Administrator"])) {
+
+			frm.set_df_property("device_id", "hidden", 1);
+			frm.set_df_property("skip_auto_attendance", "hidden", 1);
+		}
+	},
+	after_save: function (frm) {
+		frappe.set_route("List", "Employee Checkin");
+	},
+	onload: function (frm) {
+		if (!frm.doc.employee) {
+			frappe.call({
+				method: "frappe.client.get_list",
+				args: {
+					doctype: "Employee",
+					filters: { user_id: frappe.session.user },
+					fields: ["name"]
+				},
+				callback: function (r) {
+					if (r.message) {
+						frm.set_value("employee", r.message[0].name);
+					}
+				}
+			})
+		}
+
 	},
 
 	fetch_geolocation: (frm) => {

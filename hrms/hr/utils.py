@@ -900,13 +900,23 @@ def set_geolocation_from_coordinates(doc):
 
 
 def get_distance_between_coordinates(lat1, long1, lat2, long2):
-	from math import asin, cos, pi, sqrt
+	from math import asin, cos, pi, sqrt,radians,sin
+	r = 6371  # Earth radius in km
+	lat1, long1, lat2, long2 = map(radians, [lat1, long1, lat2, long2])
 
-	r = 6371
-	p = pi / 180
+	dlat = lat2 - lat1
+	dlon = long2 - long1
 
-	a = 0.5 - cos((lat2 - lat1) * p) / 2 + cos(lat1 * p) * cos(lat2 * p) * (1 - cos((long2 - long1) * p)) / 2
-	return 2 * r * asin(sqrt(a)) * 1000
+	a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+	c = 2 * asin(sqrt(a))
+
+	return r * c * 1000
+
+	# r = 6371
+	# p = pi / 180
+
+	# a = 0.5 - cos((lat2 - lat1) * p) / 2 + cos(lat1 * p) * cos(lat2 * p) * (1 - cos((long2 - long1) * p)) / 2
+	# return 2 * r * asin(sqrt(a)) * 1000
 
 
 def check_app_permission():

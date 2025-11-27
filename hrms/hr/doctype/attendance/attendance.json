@@ -20,6 +20,7 @@
   "company",
   "department",
   "attendance_request",
+  "half_day_status",
   "details_section",
   "shift",
   "in_time",
@@ -27,7 +28,18 @@
   "column_break_18",
   "late_entry",
   "early_exit",
-  "amended_from"
+  "modify_half_day_status",
+  "amended_from",
+  "section_break_kkvd",
+  "in_latitude",
+  "column_break_ddmc",
+  "in_longitude",
+  "section_break_gxjw",
+  "in_geolocation",
+  "section_break_qduw",
+  "out_latitude",
+  "column_break_afkp",
+  "out_longitude"
  ],
  "fields": [
   {
@@ -86,7 +98,7 @@
    "no_copy": 1,
    "oldfieldname": "status",
    "oldfieldtype": "Select",
-   "options": "\nPresent\nAbsent\nOn Leave\nHalf Day\nWork From Home",
+   "options": "\nPresent\nAbsent\nOn Leave\nHalf Day\nWork From Home\nTour",
    "reqd": 1,
    "search_index": 1
   },
@@ -202,13 +214,73 @@
   {
    "fieldname": "column_break_18",
    "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "modify_half_day_status",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "modify_half_day_status"
+  },
+  {
+   "depends_on": "eval:doc.status==\"Half Day\";",
+   "fieldname": "half_day_status",
+   "fieldtype": "Select",
+   "label": "Status for Other Half",
+   "no_copy": 1
+  },
+  {
+   "fieldname": "section_break_kkvd",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_ddmc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_gxjw",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "in_latitude",
+   "fieldtype": "Float",
+   "label": "Latitude"
+  },
+  {
+   "fieldname": "in_longitude",
+   "fieldtype": "Float",
+   "label": "Longitude"
+  },
+  {
+   "fieldname": "section_break_qduw",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "out_latitude",
+   "fieldtype": "Float",
+   "label": "Latitude"
+  },
+  {
+   "fieldname": "column_break_afkp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "out_longitude",
+   "fieldtype": "Float",
+   "label": "Longitude"
+  },
+  {
+   "fieldname": "in_geolocation",
+   "fieldtype": "Geolocation",
+   "label": "Geolocation",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-ok",
  "idx": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-02-09 14:17:38.315313",
+ "modified": "2025-11-27 15:05:07.888098",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Attendance",

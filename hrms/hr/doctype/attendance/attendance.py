@@ -21,7 +21,9 @@ from hrms.hr.utils import (
 	get_holiday_dates_for_employee,
 	get_holidays_for_employee,
 	validate_active_employee,
+
 )
+
 
 
 class DuplicateAttendanceError(frappe.ValidationError):
@@ -35,8 +37,7 @@ class OverlappingShiftAttendanceError(frappe.ValidationError):
 class Attendance(Document):
 	def validate(self):
 		from erpnext.controllers.status_updater import validate_status
-
-		validate_status(self.status, ["Present", "Absent", "On Leave", "Half Day", "Work From Home"])
+		validate_status(self.status, ["Present", "Absent", "On Leave", "Half Day", "Work From Home","Tour"])
 		validate_active_employee(self.employee)
 		self.validate_attendance_date()
 		self.validate_duplicate_record()
@@ -226,6 +227,7 @@ class Attendance(Document):
 			)
 
 
+
 @frappe.whitelist()
 def get_events(start, end, filters=None):
 	employee = frappe.db.get_value("Employee", {"user_id": frappe.session.user})
@@ -304,6 +306,8 @@ def mark_attendance(
 				"leave_type": leave_type,
 				"late_entry": late_entry,
 				"early_exit": early_exit,
+				"latitude": getattr(logs[0], "latitude", None),
+        		"longitude": getattr(logs[0], "longitude", None),
 			}
 		)
 		attendance.insert()
@@ -335,6 +339,7 @@ def mark_bulk_attendance(data):
 		}
 		attendance = frappe.get_doc(doc_dict).insert()
 		attendance.submit()
+
 
 
 @frappe.whitelist()

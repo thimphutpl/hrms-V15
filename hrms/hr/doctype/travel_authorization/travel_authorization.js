@@ -10,18 +10,19 @@ frappe.ui.form.on("Travel Authorization", {
 				},
 			};
 		});
+		frm.set_query("employee", erpnext.queries.employee);
 	},
 
 	refresh(frm) {
 		frm.call("has_travel_claim").then((r) => {
 			if (!r.message.has_travel_claim) {
-				
+
 
 				if (
 					frm.doc.docstatus === 1 &&
 					frappe.model.can_create("Travel Claim")
 				) {
-				
+
 					frm.add_custom_button(
 						__("Travel Claim"),
 						function () {
@@ -47,7 +48,7 @@ frappe.ui.form.on("Travel Authorization", {
 		});
 	},
 	// need_advance: function (frm) {
-		
+
 	// 	frm.toggle_reqd("estimated_amount", frm.doc.need_advance == 1);
 	// 	calculate_advance(frm);
 	// },
@@ -74,23 +75,22 @@ frappe.ui.form.on("Travel Authorization", {
 		});
 	},
 
-	
+
 
 	employee: function (frm) {
-		if (frm.doc.employee) 
-		{
+		if (frm.doc.employee) {
 			frm.trigger("get_employee_currency");
 			frm.trigger("set_reports_to");
 			frm.trigger("set_approver")
 
 		}
-		
+
 	},
 
 	get_employee_currency: function (frm) {
 		frappe.db.get_value(
 			"Salary Structure",
-			{ employee: frm.doc.employee},
+			{ employee: frm.doc.employee },
 			"currency",
 			(r) => {
 				if (r.currency) frm.set_value("currency", r.currency);
@@ -100,7 +100,7 @@ frappe.ui.form.on("Travel Authorization", {
 		);
 	},
 
-    currency: function (frm) {
+	currency: function (frm) {
 		if (frm.doc.currency) {
 			var from_currency = frm.doc.currency;
 			var company_currency;
@@ -173,7 +173,7 @@ frappe.ui.form.on("Travel Authorization", {
 });
 
 frappe.ui.form.on("Travel Authorization Item", {
-	from_date: function(frm, cdt, cdn) {
+	from_date: function (frm, cdt, cdn) {
 		let child = locals[cdt][cdn];
 		if (!child.halt && child.from_date != child.to_date) {
 			if (child.from_date) {
@@ -182,7 +182,7 @@ frappe.ui.form.on("Travel Authorization Item", {
 		}
 	},
 
-	to_date: function(frm, cdt, cdn) {
+	to_date: function (frm, cdt, cdn) {
 		let child = locals[cdt][cdn];
 		if (child.from_date) {
 			if (child.to_date < child.from_date) {
