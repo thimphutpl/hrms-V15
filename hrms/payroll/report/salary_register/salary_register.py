@@ -10,6 +10,7 @@ import erpnext
 
 
 def execute(filters=None):
+	exchange_rate=1
 	if not filters:
 		filters = {}
 	currency = None
@@ -55,7 +56,7 @@ def execute(filters=None):
 			row.append(ss_earning_map.get(ss.name, {}).get(e))
 
 		if currency == company_currency:
-			row += [flt(ss.gross_pay) * flt(ss.exchange_rate)]
+			row += [flt(ss.gross_pay) * flt(exchange_rate)]
 		else:
 			row += [ss.gross_pay]
 
@@ -66,8 +67,8 @@ def execute(filters=None):
 
 		if currency == company_currency:
 			row += [
-				flt(ss.total_deduction) * flt(ss.exchange_rate),
-				flt(ss.net_pay) * flt(ss.exchange_rate),
+				flt(ss.total_deduction) * flt(exchange_rate),
+				flt(ss.net_pay) * flt(exchange_rate),
 			]
 		else:
 			row += [ss.total_deduction, ss.net_pay]
@@ -186,8 +187,10 @@ def get_employee_doj_map():
 
 
 def get_ss_earning_map(salary_slips, currency, company_currency):
+	if not currency:
+		currency = "BTN"
 	ss_earnings = frappe.db.sql(
-		"""select sd.parent, sd.salary_component, sd.amount, ss.exchange_rate, ss.name
+		"""select sd.parent, sd.salary_component, sd.amount, ss.name
 		from `tabSalary Detail` sd, `tabSalary Slip` ss where sd.parent=ss.name and sd.parent in (%s)"""
 		% (", ".join(["%s"] * len(salary_slips))),
 		tuple([d.name for d in salary_slips]),
@@ -195,11 +198,12 @@ def get_ss_earning_map(salary_slips, currency, company_currency):
 	)
 
 	ss_earning_map = {}
+	exchange_rate=1
 	for d in ss_earnings:
 		ss_earning_map.setdefault(d.parent, frappe._dict()).setdefault(d.salary_component, 0.0)
 		if currency == company_currency:
 			ss_earning_map[d.parent][d.salary_component] += flt(d.amount) * flt(
-				d.exchange_rate if d.exchange_rate else 1
+				exchange_rate if exchange_rate else 1
 			)
 		else:
 			ss_earning_map[d.parent][d.salary_component] += flt(d.amount)
@@ -208,8 +212,9 @@ def get_ss_earning_map(salary_slips, currency, company_currency):
 
 
 def get_ss_ded_map(salary_slips, currency, company_currency):
+	exchange_rate=1
 	ss_deductions = frappe.db.sql(
-		"""select sd.parent, sd.salary_component, sd.amount, ss.exchange_rate, ss.name
+		"""select sd.parent, sd.salary_component, sd.amount, ss.name
 		from `tabSalary Detail` sd, `tabSalary Slip` ss where sd.parent=ss.name and sd.parent in (%s)"""
 		% (", ".join(["%s"] * len(salary_slips))),
 		tuple([d.name for d in salary_slips]),
@@ -221,7 +226,7 @@ def get_ss_ded_map(salary_slips, currency, company_currency):
 		ss_ded_map.setdefault(d.parent, frappe._dict()).setdefault(d.salary_component, 0.0)
 		if currency == company_currency:
 			ss_ded_map[d.parent][d.salary_component] += flt(d.amount) * flt(
-				d.exchange_rate if d.exchange_rate else 1
+				exchange_rate if exchange_rate else 1
 			)
 		else:
 			ss_ded_map[d.parent][d.salary_component] += flt(d.amount)
