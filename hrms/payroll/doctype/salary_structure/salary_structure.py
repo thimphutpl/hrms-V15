@@ -321,9 +321,9 @@ class SalaryStructure(Document):
 						# calc_amt = roundoff(calc_amt)
 						calc_amt = flt(calc_amt,0)
 						comm_allowance += flt(calc_amt) if m['name'] == 'Communication Allowance' else 0
-						if ed_item.salary_component != 'Basic Pay' and self.employee_type == "Deputation":
+						if ed_item.salary_component != 'Basic Pay' and self.employment_type == "Deputation":
 							total_earning += calc_amt
-						elif self.employee_type != "Deputation":
+						elif self.employment_type != "Deputation":
 							total_earning += calc_amt
 						calc_map.append({'salary_component': m['name'], 'amount': calc_amt})
 				else:
@@ -582,7 +582,10 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 						target.employer_pf = employer_pf_amount
 						d['amount'] = pf
 					if d['salary_component'] == 'Group Insurance Scheme':
-						gis = flt(settings.get("gis"))
+						if source.eligible_for_gis == 1:
+							gis = flt(settings.get("gis"))
+						else:
+							gis = 0.00
 						d['amount'] = gis
 
 					if d['salary_component'] == 'Health Contribution':
@@ -612,8 +615,8 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 							# frappe.throw("gross_amount "+str(gross_amt)+" GIS "+str(gis)+" pf "+str(pf)+ " And "+str(comm_amt))
 							if source.employment_type == 'Deputation':
 								gross_amt1 = gross_amt - basic_amt 
-								tax_amt1 = get_salary_tax(flt(gross_amt1) - flt(gis) - flt(pf) -(flt(comm_amt) * 0.5))  
-								tax_amt = tax_amt - tax_amt1	
+								tax_amt1 = get_salary_tax(flt(gross_amt1) - flt(gis) - flt(pf) -(flt(comm_amt) * 0.5))
+								tax_amt = tax_amt1	
 								
 
 							d['amount'] = flt(tax_amt)
