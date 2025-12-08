@@ -210,7 +210,7 @@ doc_events = {
 scheduler_events = {
 	"cron": {
 		"0 6 * * *": [            
-			"hrms.hr.doctype.leave_allocation.leave_allocation.post_earned_leaves",
+			"hrms.hr.hr_custom_functions.post_earned_leaves",
             "hrms.hr.hr_custom_functions.post_casual_leaves",
 		],
 
