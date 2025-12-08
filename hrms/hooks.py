@@ -208,7 +208,6 @@ doc_events = {
 
 # Scheduled Tasks
 # ---------------
-# hrms/hrms/hr/hr_custom_functions.py
 
 scheduler_events = {
 	"cron": {
