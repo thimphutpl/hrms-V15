@@ -209,12 +209,12 @@ doc_events = {
 # Scheduled Tasks
 scheduler_events = {
 	"cron": {
-		"* 6 * * *": [            
+		"0 6 * * *": [            
 			"hrms.hr.doctype.leave_allocation.leave_allocation.post_earned_leaves",
+            "hrms.hr.hr_custom_functions.post_casual_leaves",
 		],
 
-	},
-	
+	},	
 	"all": [
 		"hrms.hr.doctype.interview.interview.send_interview_reminder",
 	],
@@ -230,7 +230,6 @@ scheduler_events = {
 		"hrms.hr.doctype.daily_work_summary_group.daily_work_summary_group.send_summary",
 		"hrms.hr.doctype.interview.interview.send_daily_feedback_reminder",
 		"hrms.hr.doctype.job_opening.job_opening.close_expired_job_openings",
-		#"hrms.hr.doctype.leave_allocation.leave_allocation.post_earned_leaves",
 		#"hrms.hr.hr_custom_functions.post_leave_credits",
 		
 		
@@ -245,7 +244,7 @@ scheduler_events = {
 	
 	"monthly": [	
 	"hrms.controllers.employee_reminders.send_reminders_in_advance_monthly",
-	"hrms.hr.hr_custom_functions.post_casual_leaves",	
+		
 	],
 }
 
