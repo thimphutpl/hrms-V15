@@ -269,7 +269,9 @@ class SalaryStructure(Document):
 						elif frappe.db.exists("Salary Component", {"name": ed_item.salary_component, "is_pf_deductible": 1}):
 							basic_pay_arrears += flt(ed_item.amount)
 						# total_earning += round(amount)
-						if ed_item.salary_component != 'Basic Pay':
+						if ed_item.salary_component != 'Basic Pay'  and self.employment_type == "Deputation":
+							total_earning += flt(amount,0)
+						elif self.employment_type != "Deputation":
 							total_earning += flt(amount,0)
 
 						if ed_item.salary_component == 'Basic Pay Arrear':
