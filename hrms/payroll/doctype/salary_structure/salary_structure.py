@@ -612,7 +612,10 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 					if d['salary_component'] == 'Salary Tax':
 						employee_grade = source.employee_grade
 						if not tax_included:
-							gis=frappe.db.get_value("Employee Grade",employee_grade,"gis")
+							if source.is_eligible_for_gis:
+								gis=frappe.db.get_value("Employee Grade",employee_grade,"gis")
+							else:
+								gis = 0
 							tax_amt = get_salary_tax(flt(gross_amt) - flt(gis) - flt(pf) - (flt(comm_amt) * 0.5))
 							# frappe.throw("gross_amount "+str(gross_amt)+" GIS "+str(gis)+" pf "+str(pf)+ " And "+str(comm_amt))
 							if source.employment_type == 'Deputation':
