@@ -612,7 +612,7 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 					if d['salary_component'] == 'Salary Tax':
 						employee_grade = source.employee_grade
 						if not tax_included:
-							if source.is_eligible_for_gis:
+							if source.eligible_for_gis:
 								gis=frappe.db.get_value("Employee Grade",employee_grade,"gis")
 							else:
 								gis = 0
