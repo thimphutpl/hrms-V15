@@ -9,6 +9,7 @@ from frappe import _
 from erpnext.accounts.utils import get_fiscal_year
 from erpnext.setup.doctype.employee.employee import get_holiday_list_for_employee
 from erpnext.accounts.doctype.business_activity.business_activity import get_default_ba
+from hrms.payroll.doctype.salary_structure.salary_structure import roundoff
 # from erpnext.accounts.doctype.hr_accounts_settings.hr_accounts_settings import get_bank_account
 
 class PayrollEntry(Document):
@@ -413,7 +414,7 @@ class PayrollEntry(Document):
 		tot_payable_amt= 0
 		for rec in cc:
 			# To Payables
-			tot_payable_amt += (-1*flt(rec.amount) if rec.component_type == 'Deduction' else flt(rec.amount))
+			tot_payable_amt += (-1*roundoff(rec.amount) if rec.component_type == 'Deduction' else roundoff(rec.amount))
 			posting.setdefault("to_payables",[]).append({
 				"account"        : rec.gl_head,
 				"credit_in_account_currency" if rec.component_type == 'Deduction' else "debit_in_account_currency": flt(rec.amount),
@@ -435,10 +436,10 @@ class PayrollEntry(Document):
 					# remit_amount += flt(rec.amount)
 					if r == default_gpf_account:
 						for i in self.get_cc_wise_entries(salary_component_pf):
-							remit_amount += flt(i.amount)
+							remit_amount += roundoff(i.amount)
 							posting.setdefault(rec.salary_component,[]).append({
 								"account"       : r,
-								"debit_in_account_currency" : flt(i.amount),
+								"debit_in_account_currency" : roundoff(i.amount),
 								"cost_center"   : i.cost_center,
 								"party_check"   : 0,
 								"account_type"   : i.account_type if i.party_type == "Employee" else "",
@@ -449,11 +450,11 @@ class PayrollEntry(Document):
 								"salary_component": rec.salary_component
 							})
 					else:
-						remit_amount += flt(rec.amount)
+						remit_amount += (rec.amount)
 						# if "GIS" in rec.salary_component:
 						posting.setdefault(rec.salary_component,[]).append({
 							"account"       : r,
-							"debit_in_account_currency" : flt(rec.amount),
+							"debit_in_account_currency" : roundoff(rec.amount),
 							"cost_center"   : rec.cost_center,
 							"party_check"   : 0,
 							"account_type"   : rec.account_type if rec.party_type == "Employee" else "",
@@ -465,7 +466,7 @@ class PayrollEntry(Document):
 						})
 				posting.setdefault(rec.salary_component,[]).append({
 					"account"       : default_bank_account,
-					"credit_in_account_currency" : flt(remit_amount),
+					"credit_in_account_currency" : roundoff(remit_amount),
 					"cost_center"   : rec.cost_center,
 					"party_check"   : 0,
 					"reference_type": self.doctype,

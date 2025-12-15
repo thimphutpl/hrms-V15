@@ -17,7 +17,7 @@ from hrms.hr.hr_custom_functions import get_month_details, get_payroll_settings,
 # from erpnext.accounts.accounts_custom_functions import get_number_of_days
 from erpnext.custom_utils import nvl
 from frappe.desk.reportview import get_match_cond
-from hrms.payroll.doctype.salary_structure import roundoff
+from hrms.payroll.doctype.salary_structure.salary_structure import roundoff
 import operator
 import math
 
@@ -218,7 +218,12 @@ class SalaryStructure(Document):
 				calc_amt = 0
 				
 		return flt(calc_amt)
-
+	@frappe.whitelist()
+	def roundoff(amount):
+		if amount:
+			return math.ceil(amount) if (amount - int(amount)) >= 0.5 else math.floor(amount)
+		else:
+			return 0
 	@frappe.whitelist()
 	def update_salary_structure(self, new_basic_pay=0, remove_flag=1):
 		'''
@@ -390,6 +395,9 @@ class SalaryStructure(Document):
 			frappe.throw(_("Total deduction cannot be more than total earning"), title="Invalid Data")
 		return del_list_all
 
+
+
+@frappe.whitelist()
 def roundoff(amount):
 	if amount:
 		return math.ceil(amount) if (amount - int(amount)) >= 0.5 else math.floor(amount)
