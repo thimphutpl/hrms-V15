@@ -17,7 +17,7 @@ from hrms.hr.hr_custom_functions import get_month_details, get_payroll_settings,
 # from erpnext.accounts.accounts_custom_functions import get_number_of_days
 from erpnext.custom_utils import nvl
 from frappe.desk.reportview import get_match_cond
-from erpnext.payroll.doctype.salary_structure import roundoff
+from hrms.payroll.doctype.salary_structure import roundoff
 import operator
 import math
 
