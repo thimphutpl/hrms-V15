@@ -46,14 +46,14 @@ class OvertimeApplication(Document):
 				date_obj = getdate(row.date)
 				self.month = date_obj.strftime("%B")  # e.g., January
 				fy = frappe.db.get_value(
-                    "Fiscal Year",
-                    {"year_start_date": ("<=", date_obj), "year_end_date": (">=", date_obj)},
-                    "name",
-                )
+					"Fiscal Year",
+					{"year_start_date": ("<=", date_obj), "year_end_date": (">=", date_obj)},
+					"name",
+				)
 				self.fiscal_year = fy
 				break  # only use the first date
 
-    # Prevent duplicate OT in same month/fiscal year added by Kinzang.N
+	# Prevent duplicate OT in same month/fiscal year added by Kinzang.N
 	def prevent_double_claim(self):
 		if not self.employee or not self.get("items"):
 			return
@@ -66,7 +66,7 @@ class OvertimeApplication(Document):
 				"Fiscal Year",
 				{"year_start_date": ("<=", date), "year_end_date": (">=", date)},
 				"name",
-            )
+			)
 			month = date.strftime("%B")
 			if fiscal_year and month:
 				date_info.append((fiscal_year, month))
@@ -75,24 +75,24 @@ class OvertimeApplication(Document):
 				for fiscal_year, month in date_info:
 					existing = frappe.db.sql("""
 					SELECT DISTINCT oa.name
-                		FROM `tabOvertime Application` oa
-                		INNER JOIN `tabOvertime Application Item` oad
-                    	ON oa.name = oad.parent
-                		WHERE oa.employee=%s
-                  			AND oa.name != %s
-                  			AND oa.docstatus < 2
-                  			AND MONTH(oad.date) = MONTH(%s)
-                  			AND YEAR(oad.date) = YEAR(%s)
-                		LIMIT 1
-            		""", (self.employee, self.name, date, date))
+						FROM `tabOvertime Application` oa
+						INNER JOIN `tabOvertime Application Item` oad
+						ON oa.name = oad.parent
+						WHERE oa.employee=%s
+				  			AND oa.name != %s
+				  			AND oa.docstatus < 2
+				  			AND MONTH(oad.date) = MONTH(%s)
+				  			AND YEAR(oad.date) = YEAR(%s)
+						LIMIT 1
+					""", (self.employee, self.name, date, date))
 					
 					if existing:
 						frappe.throw(
-                    f"Overtime Application <b>{existing[0][0]}</b> already exists "
-                    f"for {month}, {fiscal_year}. Duplicate claims are not allowed."
-                )
+					f"Overtime Application <b>{existing[0][0]}</b> already exists "
+					f"for {month}, {fiscal_year}. Duplicate claims are not allowed."
+				)
 
-    # Ensure child table dates match month/fiscal year Added by Kinzang.N on 22/10/2025
+	# Ensure child table dates match month/fiscal year Added by Kinzang.N on 22/10/2025
 	def validate_child_dates(self):
 		if not self.month or not self.fiscal_year or not self.get("items"):
 			return
@@ -109,7 +109,7 @@ class OvertimeApplication(Document):
 			if not (fy_start <= date_obj <= fy_end):
 				frappe.throw(f"Row #{row.idx}: Date {row.date} is outside Fiscal Year {self.fiscal_year}.")
 
-    # Prevent overlapping time. added by Kinzang.N
+	# Prevent overlapping time. added by Kinzang.N
 	def prevent_time_overlap(self):
 		if not self.employee or not self.get("items"):
 			return
@@ -118,7 +118,7 @@ class OvertimeApplication(Document):
 		
 		def parse_datetime(date_str, time_val):
 			"""Combine date and time into a datetime object.
-       			Handles string (HH:MM / HH:MM:SS) and timedelta (ERPNext Time field)."""
+	   			Handles string (HH:MM / HH:MM:SS) and timedelta (ERPNext Time field)."""
 			date_obj = getdate(date_str)
 
 
@@ -130,7 +130,7 @@ class OvertimeApplication(Document):
 				t = datetime.strptime(f"{hours:02d}:{minutes:02d}:{seconds:02d}", "%H:%M:%S").time()
 				return datetime.combine(date_obj, t)
 
-        # If string
+		# If string
 			if isinstance(time_val, str):
 				for fmt in ("%H:%M:%S", "%H:%M"):
 					try:
@@ -163,14 +163,14 @@ class OvertimeApplication(Document):
 					
 					# Check overlap with DB
 			existing_rows = frappe.db.sql("""
-            	SELECT oad.date, oad.from_date, oad.to_date, oa.name
-            	FROM `tabOvertime Application Item` oad
-            	INNER JOIN `tabOvertime Application` oa ON oa.name = oad.parent
-            	WHERE oa.employee=%s
-              		AND oa.name != %s
-              		AND oa.docstatus < 2
-              		AND oad.date=%s
-        	""", (self.employee, self.name, row.date), as_dict=True)
+				SELECT oad.date, oad.from_date, oad.to_date, oa.name
+				FROM `tabOvertime Application Item` oad
+				INNER JOIN `tabOvertime Application` oa ON oa.name = oad.parent
+				WHERE oa.employee=%s
+			  		AND oa.name != %s
+			  		AND oa.docstatus < 2
+			  		AND oad.date=%s
+			""", (self.employee, self.name, row.date), as_dict=True)
 				
 			for ex in existing_rows:
 				ex_from_dt = parse_datetime(ex["date"], ex["from_date"])
@@ -183,7 +183,7 @@ class OvertimeApplication(Document):
 						f"existing overtime {ex['from_date']}-{ex['to_date']} in {ex['name']}."
 					)
 
-        	# Check overlap within same document
+			# Check overlap within same document
 			date_key = row.date
 			if date_key not in times_by_date:
 				times_by_date[date_key] = []
@@ -193,7 +193,7 @@ class OvertimeApplication(Document):
 					frappe.throw(
 						f"Row #{row.idx}: Time {row.from_date}-{row.to_date} overlaps with "
 						f"Row #{idx} in the same document."
-                	)
+					)
 			times_by_date[date_key].append((new_from_dt, new_to_dt, row.idx))
 
 ## till here for code added
@@ -333,11 +333,32 @@ def get_permission_query_conditions(user):
 	if not user: user = frappe.session.user
 	user_roles = frappe.get_roles(user)
 
-	if user == "Administrator":
-		return
-	if "HR User" in user_roles or "HR Manager" in user_roles:
-		return
+	# if user == "Administrator":
+	# 	return
+	if "Administrator" in user_roles or "System Manager" in user_roles:
+		return	
+	# if "HR User" in user_roles or "HR Manager" in user_roles:
+	# 	return
+	if "HR User" in user_roles or "Approver" in user_roles:
+		
+		assign_branch_name = frappe.db.get_value("Assign Branch", {"user": user}, "name")
+		
+		
+		if assign_branch_name:
+			# Fetch all approved branches from the child table
+			branches = frappe.get_all(
+				"Branch Item",  # child table
+				filters={"parent": assign_branch_name},
+				fields=["branch"]
+			)
+			branch_list = [b.branch for b in branches]
 
+			if branch_list:
+				branch_condition = "', '".join(branch_list)
+				return f"`tabOvertime Application`.branch IN ('{branch_condition}')"
+		return "`tabOvertime Application`.name = ''"
+
+	
 	return """(
 		`tabOvertime Application`.owner = '{user}'
 		or

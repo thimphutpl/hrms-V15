@@ -16,7 +16,7 @@ from erpnext.accounts.doctype.accounts_settings.accounts_settings import get_ban
 
 class TravelAuthorization(Document):
 	def validate(self):
-		validate_workflow_states(self)
+		#validate_workflow_states(self)
 		self.set_employee_supervisor()
 		self.validate_travel_last_day()
 		self.assign_end_date()
@@ -426,59 +426,78 @@ def make_travel_adjustment(source_name, target_doc=None):
 
 @frappe.whitelist()
 def get_employee_dsa(country, grade):
-    Doc = frappe.qb.DocType("Country")
-    Child = frappe.qb.DocType("Country DSA Detail")
-    
-    query = (
-        frappe.qb.from_(Doc)
-        .join(Child).on(Child.parent == Doc.name)
-        .where(
-            (Doc.name == country) &
-            (Child.grade == grade)
-        )
-        .select(
-            Doc.currency,
-            Child.dsa
-        )
-    )
-    
-    return query.run(as_dict=True)
+	Doc = frappe.qb.DocType("Country")
+	Child = frappe.qb.DocType("Country DSA Detail")
+	
+	query = (
+		frappe.qb.from_(Doc)
+		.join(Child).on(Child.parent == Doc.name)
+		.where(
+			(Doc.name == country) &
+			(Child.grade == grade)
+		)
+		.select(
+			Doc.currency,
+			Child.dsa
+		)
+	)
+	
+	return query.run(as_dict=True)
 
 @frappe.whitelist()
 def get_approvers(doctype, txt, searchfield, start, page_len, filters):
-    """
-    Returns the expense approver for the selected employee
-    """
-    if not filters.get("employee"):
-        frappe.throw(_("Please select an employee first"))
+	"""
+	Returns the expense approver for the selected employee
+	"""
+	if not filters.get("employee"):
+		frappe.throw(_("Please select an employee first"))
 
-    employee = filters.get("employee")
-    
-    # Get expense approver from Employee
-    expense_approver = frappe.db.get_value("Employee", employee, "reports_to")
-    
-    if not expense_approver:
-        return []
-    
-    # Return user details if active
-    return frappe.get_all("User",
-        filters={
-            "name": expense_approver,
-            "enabled": 1
-        },
-        fields=["name as value", "full_name as description"],
-        as_list=1
-    )
+	employee = filters.get("employee")
+	
+	# Get expense approver from Employee
+	expense_approver = frappe.db.get_value("Employee", employee, "reports_to")
+	
+	if not expense_approver:
+		return []
+	
+	# Return user details if active
+	return frappe.get_all("User",
+		filters={
+			"name": expense_approver,
+			"enabled": 1
+		},
+		fields=["name as value", "full_name as description"],
+		as_list=1
+	)
 
 # Following code added by SHIV on 2020/09/21
 def get_permission_query_conditions(user):
 	if not user: user = frappe.session.user
 	user_roles = frappe.get_roles(user)
 
-	if user == "Administrator":
+	# if user == "Administrator":
+	# 	return
+	if "Administrator" in user_roles or "HR Manager" in user_roles:
 		return
-	if "HR User" in user_roles or "HR Manager" in user_roles:
-		return
+	if "HR User" in user_roles or "Approver" in user_roles:
+		
+		assign_branch_name = frappe.db.get_value("Assign Branch", {"user": user}, "name")
+		
+		
+		if assign_branch_name:
+			# Fetch all approved branches from the child table
+			branches = frappe.get_all(
+				"Branch Item",  # child table
+				filters={"parent": assign_branch_name},
+				fields=["branch"]
+			)
+			branch_list = [b.branch for b in branches]
+
+			if branch_list:
+				branch_condition = "', '".join(branch_list)
+			return f"`tabTravel Authorization`.branch IN ('{branch_condition}')"
+			
+		return "`tabTravel Authorization`.name = ''"	
 
 	return """(
 		`tabTravel Authorization`.owner = '{user}'
