@@ -17,6 +17,7 @@ from hrms.hr.hr_custom_functions import get_month_details, get_payroll_settings,
 # from erpnext.accounts.accounts_custom_functions import get_number_of_days
 from erpnext.custom_utils import nvl
 from frappe.desk.reportview import get_match_cond
+from erpnext.payroll.doctype.salary_structure import roundoff
 import operator
 import math
 
@@ -439,7 +440,7 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 		full_basic = 0.0
 		for key in ('earnings', 'deductions'):
 			for d in source.get(key):
-				amount          = flt(d.amount)
+				amount          = roundoff(d.amount)
 				deductible_amt  = 0.0
 				deducted_amt    = 0.0
 				outstanding_amt = 0.0
@@ -485,14 +486,14 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 						outstanding_amt = flt(d.total_outstanding_amount) - flt(amount)
 
 				# Leave without pay
-				calc_amount = flt(amount)
+				calc_amount = roundoff(amount)
 				if key == "earnings":
 					if d.depends_on_lwp or source.depend_salary_on_attendance:
 						# calc_amount = round(flt(amount)*flt(payment_days)/flt(days_in_month))
-						calc_amount = flt(flt(amount)*flt(payment_days)/flt(days_in_month),0)
+						calc_amount = roundoff(flt(amount)*flt(payment_days)/flt(days_in_month))
 					else:
 						# calc_amount = round(flt(amount)*(flt(working_days)/flt(days_in_month)))
-						calc_amount = flt(flt(amount)*(flt(working_days)/flt(days_in_month)),0)
+						calc_amount = roundoff(flt(amount)*(flt(working_days)/flt(days_in_month)))
 
 				
 				# following condition added by SHIV on 2021/05/28
