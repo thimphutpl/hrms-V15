@@ -17,7 +17,7 @@
   "column_break_vaoa",
   "sub_level",
   "gis",
-  "dsa_per_day",
+  "dsa",
   "dsa_per_day_out_country",
   "sws_contribution",
   "retirement_age",
@@ -76,11 +76,6 @@
    "fieldname": "gis",
    "fieldtype": "Data",
    "label": "GIS"
-  },
-  {
-   "fieldname": "dsa_per_day",
-   "fieldtype": "Data",
-   "label": "DSA Per Day (In Country)"
   },
   {
    "fieldname": "pay_scale_section",
@@ -190,6 +185,7 @@
   {
    "fieldname": "dsa_per_day_out_country",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "DSA Per Day (Out Country)"
   },
   {
@@ -202,11 +198,16 @@
    "fieldtype": "Currency",
    "label": "Cost Sharing Quota(Amount)",
    "reqd": 1
+  },
+  {
+   "fieldname": "dsa",
+   "fieldtype": "Data",
+   "label": "DSA (Daily Subsistence Allowance)"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-27 15:55:39.324664",
+ "modified": "2025-12-13 11:57:57.624531",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Grade",

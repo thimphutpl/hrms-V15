@@ -28,14 +28,11 @@ from erpnext.custom_workflow import validate_workflow_states, notify_workflow_st
 class TravelClaim(Document):
 	def validate(self):
 		self.get_advance()
-		self.calculate_miscellaneous()
 		self.calculate_amount()
 		# validate_workflow_states(self)
 
 	def on_submit(self):
-		# self.update_travel_authorization()
 		self.post_journal_entry()
-		# self.post_journal_entry()
 
 	def before_cancel(self):
 		if self.journal_entry:
@@ -45,57 +42,89 @@ class TravelClaim(Document):
 				frappe.msgprint(_("Journal Entry {0} has been canceled.").format(self.journal_entry))
 
 	def on_cancel(self):
-		
-		self.ignore_linked_doctypes = ("GL Entry", "Salary Slip", "Journal Entry","Payment Ledger Entry")
-		# if self.journal_entry:
-		journal_entries = frappe.get_all(
-			"Journal Entry",
-			filters={"reference_name": self.name},
-			pluck="name"
-		)
-
-		for je in journal_entries:
-			doc = frappe.get_doc("Journal Entry", je)
-			if doc.docstatus == 1:
-				doc.cancel()
-				doc.db_update()  
-		
-		payment_ledger_entries = frappe.get_all(
-			"Payment Ledger Entry",
-			filters={"voucher_no": self.journal_entry},
-			pluck="name"
-				)
-
-		for entry in payment_ledger_entries:
-			frappe.delete_doc("Payment Ledger Entry", entry, force=1, ignore_permissions=True)
-
-		# self.db_set("journal_entry", "")
-		# self.db_set("journal_entry_status", "")
-		frappe.msgprint(_("Journal Entry {0} has been deleted.").format(self.journal_entry))
+		if self.journal_entry:
+			frappe.delete_doc("Journal Entry", self.journal_entry, force=1, ignore_permissions=True)
+			self.db_set("journal_entry", "")
+			self.db_set("journal_entry_status", "")
+			frappe.msgprint(_("Journal Entry {0} has been deleted.").format(self.journal_entry))
 		# frappe.throw(
 			# 		_("You need to cancel Journal Entry {} to be able to cancel this document.").format(
 			# 			get_link_to_form("Journal Entry", self.journal_entry)
 			# 		),
 			# 		title=_("Not Allowed"),
 			# 	)
-	def calculate_miscellaneous(self):
-		self.miscellaneous_amount = 0
-		for i in self.miscellaneous_item:
-			self.miscellaneous_amount += i.amount
 
+	# def calculate_amount(self):
+	# 	total, advance_amount = 0.0, 0.0
+	# 	for d in self.get("items"):
+	# 		total += flt(d.amount)
+	# 	self.total_amount = flt(total)
+
+	# 	if self.miscellaneous_amount:
+	# 		self.total_amount += flt(self.miscellaneous_amount)
+
+	# 	# for adv in self.get("advances"):
+	# 	# 	advance_amount += flt(adv.advance_amount)
+	# 	# self.advance_amount = flt(advance_amount)
+	# 	self.net_amount = flt(self.total_amount) - flt(self.advance_amount)
 	def calculate_amount(self):
-		total, advance_amount = 0.0, 0.0
+		total,base_total,advance_amount = 0.0, 0.0,0.0
 		for d in self.get("items"):
+			#frappe.msgprint(str(d.mileage_rate))
+			# Recalculate DSA amount based on percentage
+			self.calculate_dsa_amount(d)
+			d.amount=d.amount+d.mileage_amount
 			total += flt(d.amount)
 		self.total_amount = flt(total)
 
 		if self.miscellaneous_amount:
 			self.total_amount += flt(self.miscellaneous_amount)
 
-		for adv in self.get("advances"):
-			advance_amount += flt(adv.advance_amount)
-		self.advance_amount = flt(advance_amount)
 		self.net_amount = flt(self.total_amount) - flt(self.advance_amount)
+
+	def calculate_dsa_amount(self, item):
+		"""Calculate DSA amount based on percentage and base DSA rate"""
+		if not item.dsa_percent:
+			item.dsa_percent = 100
+
+		# Get base DSA rate from employee grade
+		employee_grade = frappe.db.get_value("Employee", self.employee, "grade")
+		base_dsa = frappe.db.get_value("Employee Grade", employee_grade, "dsa")
+
+		if not base_dsa:
+			frappe.throw(
+		        "Daily Subsistence Allowance (DSA) is not set for Employee Grade: {}. Please update it.".format(
+		            frappe.get_desk_link("Employee Grade", employee_grade)
+				),
+				title="Missing DSA Configuration",
+		)
+
+		# Calculate actual DSA amount based on percentage
+		if self.travel_type == "International" and item.country and item.country!='Bhutan':
+			# For international travel, get DSA from DSA Out Country
+			dsa_international = frappe.get_doc("DSA Out Country", item.country)
+			if not dsa_international:
+				frappe.throw(f"DSA rates not set for country: {item.country}")
+
+			grade_found = False
+			for dsa_int in dsa_international.country_dsa_detail:
+				if dsa_int.grade == employee_grade:
+					base_dsa_amount = flt(dsa_int.dsa) * flt(self.exchange_rate)
+					item.dsa = flt(base_dsa_amount) * flt(item.dsa_percent) / 100
+					grade_found = True
+					break
+
+			if not grade_found:
+				frappe.throw(
+					f"DSA rates not set for grade {employee_grade} in country {item.country}"
+				)
+		else:
+			# For domestic travel, use employee grade DSA
+			item.dsa = flt(base_dsa) * flt(item.dsa_percent) / 100
+
+		# Recalculate amount based on updated DSA and number of days
+		item.amount = flt(item.no_of_days) * flt(item.dsa)
+	
 			
 	def get_advance(self):
 		self.set("advances", [])
@@ -126,130 +155,18 @@ class TravelClaim(Document):
 		self.set("advances", advances)
 
 	def post_journal_entry(self):
-		self.post_payable_entry()
-		if self.net_amount > 0:
-			self.post_payment_entry()
-	def post_payable_entry(self):
-		if self.cost_center: 
-			cost_center = self.cost_center
-		else:
-			cost_center = frappe.db.get_value("Employee", self.employee, "cost_center")
-		if not cost_center:
-			frappe.throw("Setup Cost Center for employee in Employee Master")
-
-		# expense_bank_account = frappe.db.get_value("Branch", self.branch, "expense_bank_account")
-		# if not expense_bank_account:
-		# 	frappe.throw("Setup Default Expense Bank Account in {}".format(frappe.get_desk_link("Branch", self.branch)))
 		
-		gl_account = ""	
-		if self.travel_type=="Domestic":
-			expense_account = frappe.db.get_value("Company", self.company, "domestic_travel_expense")
-			if not expense_account:
-				frappe.throw("Please set domestic travel expense in company")
-		if self.travel_type=="International":
-			expense_account = frappe.db.get_value("Company", self.company, "international_travel_expense")
-			if not expense_account:
-				frappe.throw("Please set domestic travel expense in company")
-		
-		# expense_account = frappe.db.get_single_value("HR Accounts Settings", gl_account)
-		payable_account = frappe.db.get_value("Company", self.company, 'default_payable_account')
-		if not expense_account:
-			frappe.throw("Setup Travel/Training Accounts in HR Accounts Settings")
-
-		advance_account = frappe.db.get_value("Company", self.company, 'travel_advance_account')
-		if not advance_account:
-			frappe.throw("Setup Advance to Employee (Travel) in Company")
-
-		# Payables
-		je = frappe.new_doc("Journal Entry")
-		je.flags.ignore_permissions = 1
-		je.title = "Travel Payable (" + self.employee_name + "  " + self.name + ")"
-		je.voucher_type = "Journal Entry"
-		je.naming_series = "Journal Voucher"
-		je.remark = 'Claim payment against : ' + self.name
-		je.posting_date = self.posting_date
-		je.branch = self.branch
-		je.company = self.company
-
-		if self.miscellaneous_amount > 0:
-			for i in self.miscellaneous_item:
-				miscellaneous_expense_account = frappe.db.get_value("Miscellaneous", i.miscellaneous_type, "accounts")
-				if not miscellaneous_expense_account:
-					frappe.throw(f"No account configured for miscellaneous type '{i.miscellaneous_type}' in row #{i.idx}")
-				je.append("accounts", {
-				"account": miscellaneous_expense_account,
-				"reference_type": "Travel Claim",
-				"reference_name": self.name,
-				"cost_center": self.cost_center,
-				"debit_in_account_currency": flt(i.amount),
-				"debit": flt(i.amount),
-			})
-			je.append("accounts", {
-				"account": expense_account,
-				"reference_type": "Travel Claim",
-				"reference_name": self.name,
-				"cost_center": self.cost_center,
-				"debit_in_account_currency": flt(self.total_amount)-flt(self.miscellaneous_amount),
-				"debit": flt(self.total_amount)-flt(self.miscellaneous_amount),
-			})
-
-		else:
-			je.append("accounts", {
-					"account": expense_account,
-					"reference_type": "Travel Claim",
-					"reference_name": self.name,
-					"cost_center": self.cost_center,
-					"debit_in_account_currency": flt(self.total_amount),
-					"debit": flt(self.total_amount),
-				})
-
-		if self.net_amount > 0:
-			je.append("accounts", {
-					"account": payable_account,
-					"reference_type": self.doctype,
-					"reference_name": self.name,
-					"cost_center": self.cost_center,
-					"credit_in_account_currency": flt(self.net_amount,2),
-					"credit": flt(self.net_amount,2),
-					"party_type": "Employee",
-					"party": self.employee, 
-				})
-		else:
-			je.append("accounts", {
-					"account": advance_account,
-					"reference_type": self.doctype,
-					"reference_name": self.name,
-					"cost_center": self.cost_center,
-					"credit_in_account_currency": flt(self.total_amount),
-					"credit": flt(self.total_amount),
-					"party_type": "Employee",
-					"party": self.employee, 
-				})
-
-		if flt(self.advance_amount) > 0 and self.net_amount > 0:
-			je.append("accounts", {
-				"account": advance_account,
-				"party_type": "Employee",
-				"party": self.employee,
-				"reference_type": "Travel Claim",
-				"reference_name": self.name,
-				"cost_center": cost_center,
-				"credit_in_account_currency": flt(self.advance_amount),
-				"credit": flt(self.advance_amount),
-			})
-		# frappe.throw(frappe.as_json(je))
-		je.insert()
-		je.submit()
-	def post_payment_entry(self):
-		# travel_expense_account = frappe.db.get_value("Travel Type", self.travel_type, "account")
+		travel_expense_account = frappe.db.get_single_value("HR Accounts Settings", "employee_advance_travel")
 		advance_account = frappe.db.get_value("Company", self.company, "travel_advance_account")
 		bank_account = frappe.db.get_value("Branch", self.branch, "expense_bank_account")
-		payable_account = frappe.db.get_value("Company", self.company, 'default_payable_account')
-
-
-		if not payable_account:
-			frappe.throw("Default Payable account missing in company")
-			
+		#frappe.throw(str(travel_expense_account))
+		if not travel_expense_account:
+			frappe.throw(
+				"Travel Expense Account is not set for {}. Please configure it in the Travel Type.".format(
+					frappe.get_desk_link("Travel Type", self.travel_type)
+				),
+				title="Missing Travel Expense Account"
+			)
 
 		if not advance_account:
 			frappe.throw(
@@ -266,13 +183,13 @@ class TravelClaim(Document):
 				),
 				title="Missing Expense Bank Account"
 			)
-
+		
 		# Posting Journal Entry
 		accounts = []
 		accounts.append({
-			"account": payable_account,
-			"debit": flt(self.total_amount) - flt(self.advance_amount),
-			"debit_in_account_currency": flt(self.total_amount) - flt(self.advance_amount),
+			"account": travel_expense_account,
+			"debit": flt(self.total_amount),
+			"debit_in_account_currency": flt(self.total_amount),
 			"cost_center": self.cost_center,
 			"party_check": 1,
 			"party_type": "Employee",
@@ -282,16 +199,16 @@ class TravelClaim(Document):
 			"reference_name": self.name,
 		})
 
-		# if flt(self.advance_amount) > 0:
-		# 	accounts.append({
-		# 		"account": advance_account,
-		# 		"credit": flt(self.advance_amount),
-		# 		"credit_in_account_currency": flt(self.advance_amount),
-		# 		"cost_center": self.cost_center,
-		# 		"party_check": 1,
-		# 		"party_type": "Employee",
-		# 		"party": self.employee,
-		# 	})
+		if flt(self.advance_amount) > 0:
+			accounts.append({
+				"account": advance_account,
+				"credit": flt(self.advance_amount),
+				"credit_in_account_currency": flt(self.advance_amount),
+				"cost_center": self.cost_center,
+				"party_check": 1,
+				"party_type": "Employee",
+				"party": self.employee,
+			})
 
 		accounts.append({
 			"account": bank_account,
@@ -309,51 +226,35 @@ class TravelClaim(Document):
 				"doctype": "Journal Entry",
 				"voucher_type": voucher_type,
 				"naming_series": naming_series,
-				"title": "Travel Payment - "+self.employee,
-				"user_remark": "Travek Advance - "+self.employee,
+				"title": "Travel Claim - "+self.employee,
+				"user_remark": "Travel Claim - "+self.employee,
 				"posting_date": nowdate(),
 				"company": self.company,
 				"accounts": accounts,
 				"branch": self.branch
 		})
+		
+		#if self.advance_amount:
+			
+		je.save(ignore_permissions = True)
+		self.db_set("journal_entry", je.name)
+		self.db_set("journal_entry_status", "Forwarded to accounts for processing payment on {0}".format(now_datetime().strftime('%Y-%m-%d %H:%M:%S')))
+		frappe.msgprint(_('{} posted to accounts').format(frappe.get_desk_link(je.doctype, je.name)))
 
-		je.insert()
-		# je.submit()
-
-		if self.advance_amount:
-			je.save(ignore_permissions = True)
-			self.db_set("journal_entry", je.name)
-			self.db_set("journal_entry_status", "Forwarded to accounts for processing payment on {0}".format(now_datetime().strftime('%Y-%m-%d %H:%M:%S')))
-			frappe.msgprint(_('{} posted to accounts').format(frappe.get_desk_link(je.doctype, je.name)))
-
-	@frappe.whitelist()
-	def is_mileage_claim_allowed(self) -> dict[str, bool]:
-		is_allowed = frappe.db.get_value("Mode of Travel", self.mode_of_travel, "allow_mileage_claim")
-		return {
-			"is_allowed": bool(is_allowed)
-		}
 
 @frappe.whitelist()
 def get_travel_claim(dt, dn):
 	doc = frappe.get_doc(dt, dn)
 
-	# employee_grade = frappe.db.get_value("Employee", doc.employee, "grade")
-	# dsa = frappe.db.get_value("Employee Grade", employee_grade, "dsa")
-	# if not dsa:
-	# 	frappe.throw(
-	# 		"Daily Subsistence Allowance (DSA) is not set for Employee Grade: {}. Please update it.".format(
-	# 			frappe.get_desk_link("Employee Grade", employee_grade)
-	# 		),
-	# 		title="Missing DSA Configuration"
-	# 	)
 	employee_grade = frappe.db.get_value("Employee", doc.employee, "grade")
-	if doc.travel_type == "Domestic":
-		dsa = frappe.db.get_value("Employee Grade", employee_grade, "dsa_per_day")
-	elif doc.travel_type == "International":
-		dsa = frappe.db.get_value("Employee Grade", employee_grade, "dsa_per_day_out_country")
-	else:
-		frappe.throw("Invalid Travel Type selected. Please choose either 'Domestic' or 'International'.")
-
+	dsa = frappe.db.get_value("Employee Grade", employee_grade, "dsa")
+	if not dsa:
+		frappe.throw(
+			"Daily Subsistence Allowance (DSA) is not set for Employee Grade: {}. Please update it.".format(
+				frappe.get_desk_link("Employee Grade", employee_grade)
+			),
+			title="Missing DSA Configuration"
+		)
 
 	return_day_dsa = frappe.db.get_single_value("HR Settings", "return_day_dsa")
 
@@ -363,18 +264,48 @@ def get_travel_claim(dt, dn):
 	tc.employee_name = doc.employee_name
 	tc.travel_type = doc.travel_type
 	tc.purpose_of_travel = doc.purpose_of_travel
+	tc.advance_amount=doc.advance_amount
 	tc.mode_of_travel = doc.mode_of_travel
 	tc.branch = doc.branch
 	tc.cost_center = doc.cost_center
 
+	
+
 	for d in doc.get("items"):
+		#frappe.msgprint(str(d.country))
 		item = d.as_dict()
 		if d.is_last_day == 1:
 			item["dsa_percent"] = return_day_dsa if return_day_dsa else 100
 			item["dsa"] = flt(dsa) * flt(item["dsa_percent"])/100
 		else:
 			item["dsa_percent"] = 100
-			item["dsa"] = dsa
+			if doc.travel_type=="International" and d.country and d.country!='Bhutan':
+				
+				dsa_international=frappe.get_doc("DSA Out Country",d.country)
+				if not dsa_international:
+					frappe.throw("set Dsa Out Contry")
+				grade=False
+				for dsa_int in dsa_international.country_dsa_detail:
+					#frappe.msgprint(str(dsa_int.grade))
+					if dsa_int.grade==employee_grade:
+						#frappe.msgprint(str(d.country))
+						if d.country=='Bhutan':
+
+							item["dsa"] = flt(dsa_int.dsa) 
+						else:
+							item["dsa"] = flt(dsa_int.dsa) * doc.exchange_rate
+						grade=True
+						break
+					# else:
+					# 	frappe.throw("set grade in dsa out country1")
+
+				if grade==False:
+					frappe.throw("set grade in dsa out country1")
+
+					#frappe.msgprint(str(employee_grade))
+				
+			else:			
+				item["dsa"] = dsa
 		item["no_of_days"] = date_diff(d.to_date, d.from_date) + 1
 		item["amount"] = flt(item["no_of_days"]) * flt(item["dsa"])
 		tc.append("items", item)
@@ -384,3 +315,4 @@ def get_travel_claim(dt, dn):
 	tc.exchange_rate = doc.exchange_rate
 
 	return tc.as_dict()
+

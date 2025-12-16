@@ -469,7 +469,7 @@ class SalarySlip(TransactionBase):
 	def on_cancel(self):
 		self.update_status()
 		self.update_deduction_balance()
-		self.delete_sws_entry()
+		# self.delete_sws_entry()
 		self.update_ot(cancel = True)
 
 	def delete_sws_entry(self):

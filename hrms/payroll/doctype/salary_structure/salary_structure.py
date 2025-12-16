@@ -477,7 +477,8 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 				# for 0 salary tax
 				if key == 'deductions':
 					if frappe.db.get_value("Salary Component", d.salary_component, "name") == "Salary Tax":
-						if (d.amount or d.default_amount) == 0:
+						# if (d.amount or d.default_amount) == 0:
+						if (d.amount or d.default_amount) > 0:
 							calc_map.setdefault(key, []).append({
 								'salary_component': d.salary_component
 							})
