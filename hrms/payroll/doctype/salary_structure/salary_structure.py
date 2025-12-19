@@ -267,20 +267,20 @@ class SalaryStructure(Document):
 					if ed == 'earnings':
 						if ed_item.salary_component == 'Basic Pay':
 							if flt(new_basic_pay) > 0 and flt(new_basic_pay) != flt(amount):
-								amount = flt(new_basic_pay)
+								amount = roundoff(new_basic_pay)
 							basic_pay = amount
 							ed_item.amount = basic_pay
 						# Following condition added by SHIV on 2019/04/29
 						elif frappe.db.exists("Salary Component", {"name": ed_item.salary_component, "is_pf_deductible": 1}):
-							basic_pay_arrears += flt(ed_item.amount)
+							basic_pay_arrears += roundoff(ed_item.amount)
 						# total_earning += round(amount)
 						if ed_item.salary_component != 'Basic Pay'  and self.employment_type == "Deputation":
-							total_earning += flt(amount,0)
+							total_earning += roundoff(amount)
 						elif self.employment_type != "Deputation":
-							total_earning += flt(amount,0)
+							total_earning += roundoff(amount)
 
 						if ed_item.salary_component == 'Basic Pay Arrear':
-							basic_pay_arrears += flt(ed_item.amount)
+							basic_pay_arrears += roundoff(ed_item.amount)
 					else:
 						''' Ver.3.0.191212 Begins '''
 						# Following line commented and subsequent if condition added by SHIV on 2019/12/12
@@ -291,7 +291,7 @@ class SalaryStructure(Document):
 						else:
 							if flt(ed_item.total_deductible_amount) != flt(ed_item.total_deducted_amount):
 								# total_deduction += round(amount)
-								total_deduction += flt(amount,0)
+								total_deduction += roundoff(amount)
 						''' Ver3.0.191212 Ends '''
 				else:
 					for m in sst_map[ed]:
@@ -575,10 +575,10 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 						percent = flt(settings.get("employee_pf"))
 						if source.employment_type == 'GEP':
 							# pf = round(full_basic*flt(percent)*0.01)
-							pf = flt(full_basic*flt(percent)*0.01,0)
+							pf = roundoff(full_basic*flt(percent)*0.01)
 						else:
 							# pf = round(basic_amt*flt(percent)*0.01)
-							pf = flt(basic_amt*flt(percent)*0.01,0)
+							pf = roundoff(basic_amt*flt(percent)*0.01)
 
 						pf += basic_pay_arrears_pf
 						### Ver.2.0.20191227 Begins, added by SHIV on 2019/12/27
@@ -593,7 +593,7 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 						d['amount'] = pf
 					if d['salary_component'] == 'Group Insurance Scheme':
 						if source.eligible_for_gis == 1:
-							gis = flt(settings.get("gis"))
+							gis = roundoff(settings.get("gis"))
 						else:
 							gis = 0.00
 						d['amount'] = gis
@@ -601,12 +601,12 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 					if d['salary_component'] == 'Health Contribution':
 						percent = flt(settings.get("health_contribution"))
 						# health = round(gross_amt*flt(percent)*0.01)
-						health = flt(gross_amt*flt(percent)*0.01,0)
+						health = roundoff(gross_amt*flt(percent)*0.01)
 
 						if source.employment_type == 'Deputation':	
 							#gross_amt  =  gross_amt - deput_amt
 							# health = round(deput_amt*flt(percent)*0.01)
-							health = flt(deput_amt*flt(percent)*0.01,0)
+							health = roundoff(deput_amt*flt(percent)*0.01)
 
 						d['amount'] = health
 
