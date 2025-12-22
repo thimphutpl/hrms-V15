@@ -1385,7 +1385,7 @@ def get_leave_approver(employee):
 	if not leave_approver:
 		frappe.throw("Employee doesn't have report to")
 	#frappe.throw(leave_approver)
-	leave_approver_mail=frappe.db.get_value("Employee", leave_approver, "name")
+	leave_approver_mail=frappe.db.get_value("Employee", leave_approver, "user_id")
 	#frappe.throw(leave_approver_mail)
 
 	return leave_approver_mail
