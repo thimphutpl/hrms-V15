@@ -90,12 +90,21 @@ class SWSMembership(Document):
 			if exists:
 				frappe.throw("CID ({}) is already registered by other employee".format(a.cid_no))
 
+			# family_details = frappe.db.sql("""
+			# 	select efd.relationship from `tabEmployee Family Details` efd, `tabEmployee` emp 
+			# 	where efd.parent = emp.name
+			# 	and emp.employee = '{0}'
+			# 	and efd.relationship = '{1}' and efd.relationship not in ('Children', 'Spouse')
+			# 	""".format(self.employee,a.relationship))
 			family_details = frappe.db.sql("""
-				select efd.relationship from `tabEmployee Family Details` efd, `tabEmployee` emp 
-				where efd.parent = emp.name
-				and emp.employee = '{0}'
-				and efd.relationship = '{1}' and efd.relationship not in ('Children', 'Spouse')
-				""".format(self.employee,a.relationship))
+				SELECT efd.relationship 
+				FROM `tabEmployee Family Details` efd
+				JOIN `tabEmployee` emp ON efd.parent = emp.name
+				WHERE emp.employee = %s
+				AND efd.relationship = %s
+				AND efd.relationship NOT IN ('Children', 'Spouse')
+			""", (self.employee, a.relationship))
+						
 			if family_details:
 				frappe.throw("Relationship ({0}) already exists in Employee Family Details of employee {1}".format(a.relationship,self.employee))				
 		members_unique = set(members)
