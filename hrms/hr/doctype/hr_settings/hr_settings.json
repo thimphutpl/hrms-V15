@@ -54,6 +54,10 @@
   "allow_geolocation_tracking",
   "unlink_payment_section",
   "unlink_payment_on_cancellation_of_employee_advance",
+  "overtime_settings_section",
+  "overtime_limit",
+  "column_break_pxyc",
+  "overtime_limit_in_hours",
   "approver_settings_tab",
   "hr_manager",
   "hr_approver",
@@ -72,6 +76,8 @@
   "accounts_finance_name",
   "procurement_name",
   "asset_declaration_name",
+  "section_break_hafd",
+  "clearance_approvers",
   "notification_setting_tab",
   "enote_section",
   "enote_approval_notification",
@@ -512,13 +518,45 @@
    "fieldname": "hrgm_name",
    "fieldtype": "Data",
    "label": "HRGM Name"
+  },
+  {
+   "fieldname": "overtime_settings_section",
+   "fieldtype": "Section Break",
+   "label": "OVERTIME SETTINGS"
+  },
+  {
+   "fieldname": "overtime_limit",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Overtime Limit",
+   "options": "\nPer Day\nPer Month\nPer Year"
+  },
+  {
+   "fieldname": "overtime_limit_in_hours",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Overtime Limit in Hours"
+  },
+  {
+   "fieldname": "column_break_pxyc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_hafd",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "clearance_approvers",
+   "fieldtype": "Table",
+   "label": "Separation Clearance Approvers",
+   "options": "Employee Separation Clearance Approvers"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-11-20 12:41:16.057881",
+ "modified": "2025-12-22 16:06:21.514954",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",

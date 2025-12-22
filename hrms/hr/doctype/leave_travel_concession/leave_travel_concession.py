@@ -17,8 +17,8 @@ class LeaveTravelConcession(Document):
 	def on_submit(self):
 		cc_amount = {}
 		for a in self.items:
-			cost_center, ba = frappe.db.get_value("Employee", a.employee, ["cost_center", "business_activity"])
-			cc = str(str(cost_center) + ":" + str(ba))
+			cost_center = frappe.db.get_value("Employee", a.employee, "cost_center")
+			cc = str(cost_center)
 			if cc in cc_amount:
 				cc_amount[cc] = cc_amount[cc] + a.amount
 			else:
@@ -70,7 +70,7 @@ class LeaveTravelConcession(Document):
 					"reference_type": "Leave Travel Concession",
 					"reference_name": self.name,
 					"cost_center": values[0],
-					"business_activity": values[1],
+					# "business_activity": values[1],
 					"debit_in_account_currency": flt(cc_amount[key]),
 					"debit": flt(cc_amount[key]),
 				})
@@ -78,7 +78,7 @@ class LeaveTravelConcession(Document):
 			je.append("accounts", {
 					"account": expense_bank_account,
 					"cost_center": values[0],
-					"business_activity": values[1],
+					# "business_activity": values[1],
 					"credit_in_account_currency": flt(cc_amount[key]),
 					"credit": flt(cc_amount[key]),
 				})

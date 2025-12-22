@@ -197,7 +197,7 @@ class TestEmployeeTaxExemptionDeclaration(FrappeTestCase):
 		).insert()
 
 		# Daily HRA received = 3000
-		# should set HRA exemption as per (rent - 10% of Basic Salary), that's the minimum
+		# should set HRA exemption as per (rent - 10% of Basic Pay), that's the minimum
 		self.assertEqual(declaration.monthly_hra_exemption, 17916.67)
 		self.assertEqual(declaration.annual_hra_exemption, 215000)
 		# 50000 Standard Exemption + 215000 HRA exemption
@@ -345,7 +345,7 @@ class TestEmployeeTaxExemptionDeclaration(FrappeTestCase):
 		)
 
 		frappe.db.set_value(
-			"Company", "_Test Company", {"basic_component": "Basic Salary", "hra_component": "HRA"}
+			"Company", "_Test Company", {"basic_component": "Basic Pay", "hra_component": "HRA"}
 		)
 
 		# salary structure with base 50000, HRA 3000
@@ -504,5 +504,5 @@ def setup_hra_exemption_prerequisites(frequency, employee=None, from_date=None):
 	)
 
 	frappe.db.set_value(
-		"Company", "_Test Company", {"basic_component": "Basic Salary", "hra_component": "HRA"}
+		"Company", "_Test Company", {"basic_component": "Basic Pay", "hra_component": "HRA"}
 	)

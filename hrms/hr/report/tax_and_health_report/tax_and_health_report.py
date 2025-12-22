@@ -52,7 +52,7 @@ def get_columns():
             "width": 80
         },
         {
-            "label": _("Basic Salary"), 
+            "label": _("Basic Pay"), 
             "fieldname": "basicpay", 
             "fieldtype": "Currency", 
             "width": 120

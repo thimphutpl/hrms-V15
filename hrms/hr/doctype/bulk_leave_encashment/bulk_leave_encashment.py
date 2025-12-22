@@ -209,8 +209,9 @@ class BulkLeaveEncashment(Document):
 			
 			emp.encashable_days = emp.leave_balance + emp.casual_leave_balance
 
-			if emp.encashable_days > emp.leave_balance:
-				frappe.throw("Encashable Days  cannot be more than Leave Balance")
+			# if flt(emp.encashable_days) > flt(emp.leave_balance):
+			# 	frappe.throw(str(emp.encashable_days)+" "+str(emp.leave_balance))
+			# 	frappe.throw("Encashable Days  cannot be more than Leave Balance")
 			if emp.encashable_days > 30:
 				emp.encashable_days = 30
 			pay = get_basic_and_gross_pay(employee=emp.employee, effective_date=today())

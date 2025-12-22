@@ -17,6 +17,8 @@
   "designation",
   "sb_official",
   "reason_for_resignation",
+  "section_break_jama",
+  "approvers",
   "sb_remarks",
   "supervisor",
   "supervisor_clearance",
@@ -361,12 +363,23 @@
    "label": "Clearance Acquired(General Manager)",
    "mandatory_depends_on": "eval:frappe.session.user == doc.gm",
    "read_only": 1
+  },
+  {
+   "fieldname": "section_break_jama",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "approvers",
+   "fieldtype": "Table",
+   "label": "Approvers",
+   "options": "Separation Clearance Approver Item",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-11-11 22:14:24.273631",
+ "modified": "2025-12-22 16:04:46.713883",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Separation Clearance",

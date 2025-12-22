@@ -110,8 +110,17 @@ frappe.ui.form.on('Promotion Entry', {
 		frm.refresh();
 	},
 });
-// Submit salary slips
 
+frappe.ui.form.on('Promotion Employee Detail', {
+	new_increment: function(frm, cdt, cdn){
+		let row = locals[cdt][cdn];
+		let new_basic = row.current_basic_pay + row.new_increment;
+		frappe.model.set_value(cdt, cdn, 'new_basic_pay', new_basic);
+	}
+
+});
+
+// Submit salary slips
 const submit_employee_promotions = function (frm) {
 	frappe.confirm(__('This will submit Employee Promotion. Do you want to proceed?'),
 		function() {

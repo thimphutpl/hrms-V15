@@ -183,7 +183,7 @@ def get_columns():
 		},
 		{
 		  "fieldname": "basic",
-		  "label": "Basic Salary",
+		  "label": "Basic Pay",
 		  "fieldtype": "Currency",
 		  "width": 150
 		},

@@ -125,52 +125,58 @@ class EmployeeSeparationClearance(Document):
 
 	@frappe.whitelist()
 	def set_approvers(self):
-		#----------------------------Supervisor------------------------|
-		if not frappe.db.get_value("Employee",self.employee, "reports_to"):
-			frappe.throw("Reports To for employee {} is not set".format(self.employee))
-		supervisor_officiate = get_officiating_employee(frappe.db.get_value("Employee",self.employee, "reports_to"))
-		if supervisor_officiate:
-			self.supervisor = frappe.db.get_value("Employee",supervisor_officiate[0].officiate,"user_id")
-		else:
-			self.supervisor = frappe.db.get_value("Employee",frappe.db.get_value("Employee",self.employee, "reports_to"),"user_id")
+		for approver in frappe.get_all("Employee Separation Clearance Approvers", fields=["employee", "employee_name", "designation", "approver_title"]):
+			row = self.append("approvers", {})
+			row.employee = approver.employee
+			row.employee_name = approver.employee_name
+			row.designation = approver.designation
+			row.approver_title = approver.approver_title
+		# #----------------------------Supervisor------------------------|
+		# if not frappe.db.get_value("Employee",self.employee, "reports_to"):
+		# 	frappe.throw("Reports To for employee {} is not set".format(self.employee))
+		# supervisor_officiate = get_officiating_employee(frappe.db.get_value("Employee",self.employee, "reports_to"))
+		# if supervisor_officiate:
+		# 	self.supervisor = frappe.db.get_value("Employee",supervisor_officiate[0].officiate,"user_id")
+		# else:
+		# 	self.supervisor = frappe.db.get_value("Employee",frappe.db.get_value("Employee",self.employee, "reports_to"),"user_id")
 
-		#--------------------------- Accounts & Finance --------------------------|
-		if not frappe.db.get_single_value("HR Settings", "accounts_finance"):
-			frappe.throw("Accounts & Finance clearance approver is not set in HR Settings")
-		afd_officiate = get_officiating_employee(frappe.db.get_single_value("HR Settings", "accounts_finance"))
-		if afd_officiate:
-			self.afd = frappe.db.get_value("Employee",afd_officiate[0].officiate,"user_id")
-		else:
-			self.afd = frappe.db.get_value("Employee",frappe.db.get_single_value("HR Settings", "accounts_finance"),"user_id")
+		# #--------------------------- Accounts & Finance --------------------------|
+		# if not frappe.db.get_single_value("HR Settings", "accounts_finance"):
+		# 	frappe.throw("Accounts & Finance clearance approver is not set in HR Settings")
+		# afd_officiate = get_officiating_employee(frappe.db.get_single_value("HR Settings", "accounts_finance"))
+		# if afd_officiate:
+		# 	self.afd = frappe.db.get_value("Employee",afd_officiate[0].officiate,"user_id")
+		# else:
+		# 	self.afd = frappe.db.get_value("Employee",frappe.db.get_single_value("HR Settings", "accounts_finance"),"user_id")
 
-		#--------------------------- Procurement & Human Resource --------------------------|
-		if not frappe.db.get_single_value("HR Settings", "procurement"):
-			frappe.throw("Accounts & Finance clearance approver is not set in HR Settings")
-		procurement_officiate = get_officiating_employee(frappe.db.get_single_value("HR Settings", "procurement"))
-		if procurement_officiate:
-			self.icthr = frappe.db.get_value("Employee",procurement_officiate[0].officiate,"user_id")
-		else:
-			self.icthr = frappe.db.get_value("Employee",frappe.db.get_single_value("HR Settings", "procurement"),"user_id")
+		# #--------------------------- Procurement & Human Resource --------------------------|
+		# if not frappe.db.get_single_value("HR Settings", "procurement"):
+		# 	frappe.throw("Accounts & Finance clearance approver is not set in HR Settings")
+		# procurement_officiate = get_officiating_employee(frappe.db.get_single_value("HR Settings", "procurement"))
+		# if procurement_officiate:
+		# 	self.icthr = frappe.db.get_value("Employee",procurement_officiate[0].officiate,"user_id")
+		# else:
+		# 	self.icthr = frappe.db.get_value("Employee",frappe.db.get_single_value("HR Settings", "procurement"),"user_id")
 
-		#--------------------------- Asset Declaration --------------------------|
-		if not frappe.db.get_single_value("HR Settings", "asset"):
-			frappe.throw("Accounts & Finance clearance approver is not set in HR Settings")
-		asset_declaration = get_officiating_employee(frappe.db.get_single_value("HR Settings", "asset"))
-		if asset_declaration:
-			self.ada = frappe.db.get_value("Employee",asset_declaration[0].officiate,"user_id")
-		else:
-			self.ada = frappe.db.get_value("Employee",frappe.db.get_single_value("HR Settings", "asset"),"user_id")
+		# #--------------------------- Asset Declaration --------------------------|
+		# if not frappe.db.get_single_value("HR Settings", "asset"):
+		# 	frappe.throw("Accounts & Finance clearance approver is not set in HR Settings")
+		# asset_declaration = get_officiating_employee(frappe.db.get_single_value("HR Settings", "asset"))
+		# if asset_declaration:
+		# 	self.ada = frappe.db.get_value("Employee",asset_declaration[0].officiate,"user_id")
+		# else:
+		# 	self.ada = frappe.db.get_value("Employee",frappe.db.get_single_value("HR Settings", "asset"),"user_id")
 
-		#--------------------------- General Manager --------------------------|
-		if not frappe.db.get_single_value("HR Settings", "general_manager"):
-			frappe.throw("Accounts & Finance clearance approver is not set in HR Settings")
-		gm_officiate = get_officiating_employee(frappe.db.get_single_value("HR Settings", "general_manager"))
-		if gm_officiate:
-			self.gm = frappe.db.get_value("Employee",gm_officiate[0].officiate,"user_id")
-		else:
-			self.gm = frappe.db.get_value("Employee",frappe.db.get_single_value("HR Settings", "general_manager"),"user_id")
+		# #--------------------------- General Manager --------------------------|
+		# if not frappe.db.get_single_value("HR Settings", "general_manager"):
+		# 	frappe.throw("Accounts & Finance clearance approver is not set in HR Settings")
+		# gm_officiate = get_officiating_employee(frappe.db.get_single_value("HR Settings", "general_manager"))
+		# if gm_officiate:
+		# 	self.gm = frappe.db.get_value("Employee",gm_officiate[0].officiate,"user_id")
+		# else:
+		# 	self.gm = frappe.db.get_value("Employee",frappe.db.get_single_value("HR Settings", "general_manager"),"user_id")
 
-		self.db_set("approvers_set", 1)
+		# self.db_set("approvers_set", 1)
 
 # Following code added by SHIV on 2020/09/21
 def get_permission_query_conditions(user):

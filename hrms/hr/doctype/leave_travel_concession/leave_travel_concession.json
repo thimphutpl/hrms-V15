@@ -1,138 +1,138 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "LTC.YY.###", 
+ "autoname": "LTC.YY.###",
  "creation": "2025-09-01 14:30:37.677384",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-    "company",
-    "section_break0",
-    "fiscal_year",
-    "column_break_2",
-    "posting_date",
-    "column_break_4",
-    "branch",
-    "employee",
-    "amount_details",
-    "get_ltc",
-    "column_break_6",
-    "total_amount",
-    "leave_travel_concession_details",
-    "items",
-    "section_break_12",
-    "journal_entry",
-    "amended_from"
-   ],
-   "fields": [
-    {
-     "fieldname": "company",
-     "fieldtype": "Link",
-     "label": "Company",
-     "options": "Company",
-     "read_only": 1,
-     "reqd": 1
-    },
-    {
-     "fieldname": "section_break0",
-     "fieldtype": "Section Break"
-    },
-    {
-     "fieldname": "fiscal_year",
-     "fieldtype": "Link",
-     "in_list_view": 1,
-     "label": "Fiscal Year",
-     "options": "Fiscal Year",
-     "reqd": 1
-    },
-    {
-     "fieldname": "column_break_2",
-     "fieldtype": "Column Break"
-    },
-    {
-     "fieldname": "posting_date",
-     "fieldtype": "Date",
-     "label": "Posting Date",
-     "reqd": 1
-    },
-    {
-     "fieldname": "column_break_4",
-     "fieldtype": "Column Break"
-    },
-    {
-     "fieldname": "branch",
-     "fieldtype": "Link",
-     "label": "Processing Branch",
-     "options": "Branch",
-     "reqd": 1
-    },
-    {
-     "fieldname": "employee",
-     "fieldtype": "Link",
-     "label": "Employee",
-     "options": "Employee"
-    },
-    {
-     "fieldname": "amount_details",
-     "fieldtype": "Section Break",
-     "label": "Amount Details"
-    },
-    {
-     "fieldname": "get_ltc",
-     "fieldtype": "Button",
-     "label": "Get  LTC Details"
-    },
-    {
-     "fieldname": "column_break_6",
-     "fieldtype": "Column Break"
-    },
-    {
-     "fieldname": "total_amount",
-     "fieldtype": "Currency",
-     "in_list_view": 1,
-     "label": "Total Gross Amount",
-     "read_only": 1,
-     "reqd": 1
-    },
-    {
-     "fieldname": "leave_travel_concession_details",
-     "fieldtype": "Section Break",
-     "label": "Leave Travel Concession Details"
-    },
-    {
-     "allow_bulk_edit": 1,
-     "fieldname": "items",
-     "fieldtype": "Table",
-     "label": "LTC Details",
-     "options": "LTC Details",
-     "reqd": 1
-    },
-    {
-     "fieldname": "section_break_12",
-     "fieldtype": "Section Break"
-    },
-    {
-     "fieldname": "journal_entry",
-     "fieldtype": "Data",
-     "label": "Journal Entry",
-     "read_only": 1
-    },
-    {
-     "fieldname": "amended_from",
-     "fieldtype": "Link",
-     "label": "Amended From",
-     "no_copy": 1,
-     "options": "Leave Travel Concession",
-     "print_hide": 1,
-     "read_only": 1
-    }
-   ],
+  "company",
+  "section_break0",
+  "fiscal_year",
+  "column_break_2",
+  "posting_date",
+  "column_break_4",
+  "branch",
+  "employee",
+  "amount_details",
+  "get_ltc",
+  "column_break_6",
+  "total_amount",
+  "leave_travel_concession_details",
+  "items",
+  "section_break_12",
+  "journal_entry",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break0",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "fiscal_year",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Fiscal Year",
+   "options": "Fiscal Year",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Processing Branch",
+   "options": "Branch",
+   "reqd": 1
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "amount_details",
+   "fieldtype": "Section Break",
+   "label": "Amount Details"
+  },
+  {
+   "fieldname": "get_ltc",
+   "fieldtype": "Button",
+   "label": "Get  LTC Details"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Total Gross Amount",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "leave_travel_concession_details",
+   "fieldtype": "Section Break",
+   "label": "Leave Travel Concession Details"
+  },
+  {
+   "allow_bulk_edit": 1,
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "LTC Details",
+   "options": "LTC Details",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_12",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "journal_entry",
+   "fieldtype": "Data",
+   "label": "Journal Entry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Leave Travel Concession",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-09-01 14:41:32.436695",
- "modified_by": "Administrator",
+ "modified": "2025-12-22 12:13:26.682470",
+ "modified_by": "sonam.zangmo@thimphutechpark.bt",
  "module": "HR",
  "name": "Leave Travel Concession",
  "owner": "Administrator",
@@ -147,6 +147,7 @@
    "report": 1,
    "role": "System Manager",
    "share": 1,
+   "submit": 1,
    "write": 1
   }
  ],

@@ -67,7 +67,7 @@ class TestGratuity(FrappeTestCase):
 				"docstatus": 1,
 				"parent": sal_slip.name,
 				"parentfield": "earnings",
-				"salary_component": "Basic Salary",
+				"salary_component": "Basic Pay",
 			},
 			fields=["amount"],
 			limit=1,
@@ -119,7 +119,7 @@ class TestGratuity(FrappeTestCase):
 				"docstatus": 1,
 				"parent": sal_slip.name,
 				"parentfield": "earnings",
-				"salary_component": "Basic Salary",
+				"salary_component": "Basic Pay",
 			},
 			fields=["amount"],
 			limit=1,
@@ -180,7 +180,7 @@ def setup_gratuity_rule(name: str) -> dict:
 
 	rule = frappe.get_doc("Gratuity Rule", name)
 	rule.applicable_earnings_component = []
-	rule.append("applicable_earnings_component", {"salary_component": "Basic Salary"})
+	rule.append("applicable_earnings_component", {"salary_component": "Basic Pay"})
 	rule.save()
 
 	return rule

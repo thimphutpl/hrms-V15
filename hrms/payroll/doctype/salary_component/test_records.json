@@ -1,7 +1,7 @@
 [
 	{
 		"doctype": "Salary Component",
-		"salary_component": "_Test Basic Salary",
+		"salary_component": "_Test Basic Pay",
 		"type": "Earning",
 		"is_tax_applicable": 1
 	},

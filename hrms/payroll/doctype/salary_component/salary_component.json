@@ -9,32 +9,35 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "overview_tab",
   "salary_component",
   "salary_component_abbr",
   "description",
-  "gl_head",
-  "enabled",
-  "col_break",
+  "disabled",
+  "column_break_4",
   "type",
   "payment_method",
   "based_on",
-  "default_amount",
-  "default",
+  "amount",
   "depends_on_payment_days",
   "is_loan_component",
-  "is_pf_deductible",
-  "sb_posting_settings",
+  "is_income_tax_component",
+  "is_pf_component",
+  "round_to_the_nearest_integer",
+  "remove_if_zero_valued",
+  "accounts_section",
+  "accounts",
+  "accounts_posting_tab",
   "make_party_entry",
-  "colume_break_5",
-  "clubbed_component",
-  "remittance_settings_section",
   "is_remittable",
   "default_bank_for_remittance",
-  "sb_fieldmap",
+  "column_break_ueqn",
+  "clubbed_component",
+  "salary_structure_field_mapping_tab",
   "field_name",
-  "column_break_10",
+  "column_break_zljg",
   "field_method",
-  "column_break_18",
+  "column_break_bvos",
   "field_value"
  ],
  "fields": [
@@ -47,31 +50,120 @@
    "unique": 1
   },
   {
-   "fieldname": "description",
-   "fieldtype": "Small Text",
-   "label": "Description",
-   "width": "300px"
-  },
-  {
-   "fieldname": "gl_head",
-   "fieldtype": "Link",
+   "fieldname": "salary_component_abbr",
+   "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "GL Head",
-   "options": "Account",
-   "reqd": 1
-  },
-  {
-   "fieldname": "col_break",
-   "fieldtype": "Column Break"
+   "label": "Abbr",
+   "print_width": "120px",
+   "reqd": 1,
+   "width": "120px"
   },
   {
    "fieldname": "type",
    "fieldtype": "Select",
-   "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Component Type",
+   "label": "Type",
    "options": "Earning\nDeduction",
    "reqd": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "depends_on_payment_days",
+   "fieldtype": "Check",
+   "label": "Depends on Payment Days",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "label": "Disabled"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Description"
+  },
+  {
+   "fieldname": "accounts",
+   "fieldtype": "Table",
+   "label": "Accounts",
+   "options": "Salary Component Account"
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "label": "Amount"
+  },
+  {
+   "default": "0",
+   "fieldname": "round_to_the_nearest_integer",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Round to the Nearest Integer"
+  },
+  {
+   "fieldname": "overview_tab",
+   "fieldtype": "Tab Break",
+   "label": "Overview"
+  },
+  {
+   "default": "1",
+   "description": "If enabled, the component will not be displayed in the salary slip if the amount is zero",
+   "fieldname": "remove_if_zero_valued",
+   "fieldtype": "Check",
+   "label": "Remove if Zero Valued"
+  },
+  {
+   "fieldname": "salary_structure_field_mapping_tab",
+   "fieldtype": "Tab Break",
+   "label": "Salary Structure Field Mapping"
+  },
+  {
+   "fieldname": "field_name",
+   "fieldtype": "Data",
+   "label": "Field Name"
+  },
+  {
+   "fieldname": "column_break_zljg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "field_method",
+   "fieldtype": "Data",
+   "label": "Field Method"
+  },
+  {
+   "fieldname": "column_break_bvos",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "field_value",
+   "fieldtype": "Data",
+   "label": "Field Value"
+  },
+  {
+   "depends_on": "eval:doc.type === 'Deduction'",
+   "fieldname": "accounts_posting_tab",
+   "fieldtype": "Tab Break",
+   "label": "Accounts Posting"
+  },
+  {
+   "default": "0",
+   "description": "A separate remittance voucher shall be posted to accounts. Applicable only for type `Deduction`.",
+   "fieldname": "is_remittable",
+   "fieldtype": "Check",
+   "label": "Is Remittable?"
+  },
+  {
+   "depends_on": "eval:doc.statistical_component != 1",
+   "fieldname": "accounts_section",
+   "fieldtype": "Section Break"
   },
   {
    "depends_on": "eval:doc.type === 'Earning'",
@@ -82,105 +174,10 @@
   },
   {
    "default": "0",
-   "fieldname": "default_amount",
-   "fieldtype": "Currency",
-   "label": "Default Amount"
-  },
-  {
-   "default": "0",
-   "description": "This component gets auto populated with default values while creating salary structure if default is selected.",
-   "fieldname": "default",
+   "depends_on": "eval:doc.type == \"Deduction\"",
+   "fieldname": "is_loan_component",
    "fieldtype": "Check",
-   "label": "Default"
-  },
-  {
-   "default": "0",
-   "depends_on": "eval:doc.type==\"Earning\"",
-   "fieldname": "is_pf_deductible",
-   "fieldtype": "Check",
-   "label": "Is PF Deductible?"
-  },
-  {
-   "depends_on": "eval:doc.type === 'Deduction'",
-   "fieldname": "sb_posting_settings",
-   "fieldtype": "Tab Break",
-   "label": "Accounts Posting"
-  },
-  {
-   "default": "0",
-   "depends_on": "eval:doc.type === 'Deduction'",
-   "description": "A separate remittance voucher shall be posted to accounts. Applicable only for type `Deduction`.",
-   "fieldname": "is_remittable",
-   "fieldtype": "Check",
-   "in_list_view": 1,
-   "label": "Is Remittable?"
-  },
-  {
-   "default": "0",
-   "depends_on": "eval:doc.type === 'Deduction'",
-   "description": "Employee wise entries shall be created under Journal Entry at the time of salary posting, For example like `Salary Advance Deductions`. Applicable for only type `Deduction`",
-   "fieldname": "make_party_entry",
-   "fieldtype": "Check",
-   "label": "Make Party Wise Entries?"
-  },
-  {
-   "fieldname": "colume_break_5",
-   "fieldtype": "Column Break"
-  },
-  {
-   "depends_on": "eval:doc.type === 'Deduction'",
-   "description": "Entries will be accumulated with clubbed component and posted to accounts. Applicable for only type `Deduction`. <br><b style=\"color: red;\">* Please make sure you do not club the parent component with any other component.</b>",
-   "fieldname": "clubbed_component",
-   "fieldtype": "Link",
-   "label": "Club with Salary Component",
-   "options": "Salary Component"
-  },
-  {
-   "fieldname": "sb_fieldmap",
-   "fieldtype": "Tab Break",
-   "label": "Salary Structure Field Mapping"
-  },
-  {
-   "fieldname": "field_name",
-   "fieldtype": "Data",
-   "label": "Field Name"
-  },
-  {
-   "fieldname": "column_break_10",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "field_method",
-   "fieldtype": "Data",
-   "label": "Field Method"
-  },
-  {
-   "fieldname": "column_break_18",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "field_value",
-   "fieldtype": "Data",
-   "label": "Field Value"
-  },
-  {
-   "depends_on": "eval:doc.type === 'Deduction'",
-   "fieldname": "remittance_settings_section",
-   "fieldtype": "Section Break",
-   "label": "Remittance Settings"
-  },
-  {
-   "depends_on": "eval:doc.type === 'Deduction' && doc.is_remittable",
-   "fieldname": "default_bank_for_remittance",
-   "fieldtype": "Link",
-   "label": "Default Institution For Preparing Remittance Document/Forwarding Letter",
-   "options": "Bank"
-  },
-  {
-   "default": "1",
-   "fieldname": "enabled",
-   "fieldtype": "Check",
-   "label": "Enabled"
+   "label": "Is Loan Component"
   },
   {
    "fieldname": "based_on",
@@ -190,29 +187,47 @@
   },
   {
    "default": "0",
-   "depends_on": "eval:doc.type === 'Deduction'",
-   "fieldname": "is_loan_component",
+   "depends_on": "eval:doc.type == \"Deduction\"",
+   "fieldname": "is_pf_component",
    "fieldtype": "Check",
-   "label": "Is Loan Component"
+   "label": "Is PF Component"
   },
   {
-   "fieldname": "salary_component_abbr",
-   "fieldtype": "Data",
-   "label": "Abbreviation",
-   "read_only": 1
+   "default": "0",
+   "description": "Employee wise entries shall be created under Journal Entry at the time of salary posting, For example like `Salary Advance Deductions`. Applicable for only type `Deduction`",
+   "fieldname": "make_party_entry",
+   "fieldtype": "Check",
+   "label": " Make Party Wise Entries?"
   },
   {
-   "default": "1",
-   "fieldname": "depends_on_payment_days",
+   "fieldname": "default_bank_for_remittance",
+   "fieldtype": "Link",
+   "label": "Default Institution For Preparing Remittance Document/Forwarding Letter",
+   "options": "Bank"
+  },
+  {
+   "fieldname": "column_break_ueqn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Entries will be accumulated with clubbed component and posted to accounts. Applicable for only type `Deduction`. <br><b style=\"color: red;\">* Please make sure you do not club the parent component with any other component.</b>",
+   "fieldname": "clubbed_component",
+   "fieldtype": "Link",
+   "label": "Club with Salary Component",
+   "options": "Salary Component"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.type == \"Deduction\"",
+   "fieldname": "is_income_tax_component",
    "fieldtype": "Check",
-   "label": "Depends on Payment Days",
-   "print_hide": 1
+   "label": "Is Income Tax Component"
   }
  ],
  "icon": "fa fa-flag",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-10 14:48:29.561710",
+ "modified": "2025-02-05 17:04:38.580994",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Component",
@@ -236,7 +251,6 @@
    "role": "Employee"
   }
  ],
- "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

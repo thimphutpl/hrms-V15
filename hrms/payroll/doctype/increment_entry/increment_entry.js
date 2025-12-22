@@ -16,6 +16,10 @@ frappe.ui.form.on('Increment Entry', {
 				}
 			};
 		});
+		if (frm.doc.amended_from) {
+			frm.set_value("salary_increments_created", 0);
+			frm.set_value("salary_increments_submitted", 0);
+		}
 	},
 
 	refresh: function(frm) {

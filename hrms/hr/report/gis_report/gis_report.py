@@ -63,11 +63,11 @@ def get_data(filters):
 
 def get_conditions(filters):
 	conditions = ""
-	if filters.get("month"):
-		month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov",
-			"Dec"].index(filters["month"]) + 1
-		filters["month"] = month
-		conditions += " and t1.month = %(month)s"
+	# if filters.get("month"):
+	# 	month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov",
+	# 		"Dec"].index(filters["month"]) + 1
+	# 	filters["month"] = month
+	# 	conditions += " and t1.month = %(month)s"
 
 	if filters.get("fiscal_year"): conditions += " and t1.fiscal_year = %(fiscal_year)s"
 	if filters.get("company"): conditions += " and t1.company = %(company)s"

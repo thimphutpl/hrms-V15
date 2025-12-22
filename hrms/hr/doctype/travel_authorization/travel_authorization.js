@@ -10,7 +10,10 @@ frappe.ui.form.on("Travel Authorization", {
 	},
 
 	refresh(frm) {
-		frm.call("has_travel_claim").then((r) => {
+		frappe.call({
+			method: "hrms.hr.doctype.travel_authorization.travel_authorization.has_travel_claim",
+			args: {"name": frm.doc.name},
+			callback: function(r){
 			if (!r.message.has_travel_claim) {
 				
 
@@ -41,13 +44,13 @@ frappe.ui.form.on("Travel Authorization", {
 					);
 				}
 			}
-		});
+		}
+	});
 	},
-	// need_advance: function (frm) {
-		
-	// 	frm.toggle_reqd("estimated_amount", frm.doc.need_advance == 1);
-	// 	calculate_advance(frm);
-	// },
+	need_advance: function (frm) {
+		frm.toggle_reqd("estimated_amount", frm.doc.need_advance == 1);
+		calculate_advance(frm);
+	},
 
 	make_travel_claim: function (frm) {
 		let method = "hrms.hr.doctype.travel_claim.travel_claim.get_travel_claim";
@@ -182,7 +185,28 @@ frappe.ui.form.on("Travel Authorization", {
 		}
 	},
 });
-
+function calculate_advance(frm) {
+	if(frm.doc.travel_type == "Domestic"){
+		frappe.call({
+			method: "set_estimate_amount",
+			doc: frm.doc,
+			callback: function(r){
+			frm.set_value("estimated_amount", r.message)
+			frm.refresh_field("estimated_amount");
+			}
+		});
+	}
+	else{
+		frappe.call({
+			method: "make_travel_advance",
+			doc: frm.doc,
+			callback: function(r){
+			frm.set_value("estimated_amount", r.message)
+			frm.refresh_field("estimated_amount");
+			}
+		});
+	}
+}
 frappe.ui.form.on("Travel Authorization Item", {
 	from_date: function(frm, cdt, cdn) {
 		let child = locals[cdt][cdn];

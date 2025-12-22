@@ -295,10 +295,10 @@ def get_basic_salary(employee,benefit_type):
 	
 	
 	amount = net_amount = 0
-	query = "select amount from `tabSalary Structure` s, `tabSalary Detail` d where s.name = d.parent and s.employee=\'" + str(employee) + "\' and d.salary_component in ('Basic Salary') and is_active='Yes'"
+	query = "select amount from `tabSalary Structure` s, `tabSalary Detail` d where s.name = d.parent and s.employee=\'" + str(employee) + "\' and d.salary_component in ('Basic Pay') and is_active='Yes'"
 	data = frappe.db.sql(query, as_dict=True)
 	if not data:
-		frappe.throw("Basic Salary is not been assigned to the employee.")
+		frappe.throw("Basic Pay is not been assigned to the employee.")
 	else:
 		if benefit_type=='LTC':
 			date_of_joining = frappe.db.get_value("Employee", employee, "date_of_joining")
@@ -338,10 +338,10 @@ def get_separation_allowance(employee):
 	
 	
 	amount = net_amount = 0
-	query = "select amount from `tabSalary Structure` s, `tabSalary Detail` d where s.name = d.parent and s.employee=\'" + str(employee) + "\' and d.salary_component in ('Basic Salary') and is_active='Yes'"
+	query = "select amount from `tabSalary Structure` s, `tabSalary Detail` d where s.name = d.parent and s.employee=\'" + str(employee) + "\' and d.salary_component in ('Basic Pay') and is_active='Yes'"
 	data = frappe.db.sql(query, as_dict=True)
 	if not data:
-		frappe.throw("Basic Salary is not been assigned to the employee.")
+		frappe.throw("Basic Pay is not been assigned to the employee.")
 	else:
 		for a in data:
 			amount += a.amount
@@ -386,13 +386,13 @@ def get_leave_encashment_amount(employee, date):
 		FROM `tabSalary Structure` s
 		JOIN `tabSalary Detail` d ON s.name = d.parent
 		WHERE s.employee = %s
-		AND d.salary_component = 'Basic Salary'
+		AND d.salary_component = 'Basic Pay'
 		AND s.is_active = 'Yes'
 	"""
 	data = frappe.db.sql(query, (employee,), as_dict=True)	
 
 	if not data:
-		frappe.throw("Basic Salary has not been assigned to the employee.")
+		frappe.throw("Basic Pay has not been assigned to the employee.")
 
 	basic_pay = flt(data[0]["amount"])
 	leave_balance = get_leave_balance_on(employee, "Earned Leave", date)
@@ -413,10 +413,10 @@ def get_leave_encashment_tax(amount, benefit_type):
 @frappe.whitelist()
 def get_gratuity_amount(employee):
 	basic_pay = amount = 0
-	query = "select amount from `tabSalary Structure` s, `tabSalary Detail` d where s.name = d.parent and s.employee=\'" + str(employee) + "\' and d.salary_component in ('Basic Salary') and is_active='Yes'"
+	query = "select amount from `tabSalary Structure` s, `tabSalary Detail` d where s.name = d.parent and s.employee=\'" + str(employee) + "\' and d.salary_component in ('Basic Pay') and is_active='Yes'"
 	data = frappe.db.sql(query, as_dict=True)
 	if not data:
-		frappe.throw("Basic Salary is not been assigned to the employee.")
+		frappe.throw("Basic Pay is not been assigned to the employee.")
 	else:
 		for a in data:
 			basic_pay += a.amount
