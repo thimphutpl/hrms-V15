@@ -62,11 +62,9 @@ class EmployeeAdvance(Document):
 		self.max_amount=0
 
 		if self.advance_type=="Employee Advance":
-			self.max_amount=max_months * self.basic_pay
-		else:
 			
-			self.advance_account = frappe.db.get_value("Company", self.company, "default_interest_free_loan_account")
-			self.max_amount=max_amount_intrs_fre_ln * self.gross_pay
+			self.max_amount=max_months * self.basic_pay
+		
 	def on_submit(self):
 		self.post_journal_entry()
 		
@@ -127,8 +125,8 @@ class EmployeeAdvance(Document):
 		if not max_months:
 			frappe.throw(_("Salary Advance Max Months is not set for Employee Group of {0}").format(self.employee))
 
-		if not max_amount_intrs_fre_ln:
-			frappe.throw(_("Internest free loan Max Months is not set for Employee Group of {0}").format(self.employee))
+		# if not max_amount_intrs_fre_ln:
+		# 	frappe.throw(_("Internest free loan Max Months is not set for Employee Group of {0}").format(self.employee))
 
 		#return max_months
 		# return {
@@ -801,7 +799,7 @@ def get_permission_query_conditions(user):
 			where `tabEmployee`.name = `tabEmployee Advance`.employee
 			and `tabEmployee`.user_id = '{user}')
 		or
-		(`tabEmployee Advance`.benefit_approver = '{user}' and `tabEmployee Advance`.workflow_state not in  ('Draft','Approved','Rejected','Cancelled'))
+		(`tabEmployee Advance`.approver = '{user}' and `tabEmployee Advance`.workflow_state not in  ('Draft','Approved','Rejected','Cancelled'))
 	)""".format(user=user)
 
 '''

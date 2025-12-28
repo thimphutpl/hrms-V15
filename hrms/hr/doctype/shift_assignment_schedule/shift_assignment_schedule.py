@@ -51,7 +51,8 @@ class ShiftAssignmentSchedule(Document):
 		)
 		self.create_shifts_after = end_date
 		self.save()
-
+	
+	
 
 def process_auto_shift_creation():
 	schedules = frappe.get_all(

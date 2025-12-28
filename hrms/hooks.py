@@ -220,6 +220,7 @@ doc_events = {
     "Project": {
         "validate": "hrms.controllers.employee_boarding_controller.update_employee_boarding_status"
     },
+    
     "Task": {"on_update": "hrms.controllers.employee_boarding_controller.update_task"},
 }
 
@@ -227,17 +228,24 @@ doc_events = {
 # ---------------
 
 scheduler_events = {  
+    "cron": {
+        "* * * * *": [
+            "hrms.hr.doctype.shift_type.shift_type.update_last_sync_of_checkin",
+            "hrms.hr.doctype.shift_type.shift_type.process_auto_attendance_for_all_shifts",
+            "hrms.hr.doctype.shift_assignment_schedule.shift_assignment_schedule.process_auto_shift_creation" 
+        ]
+    },
     "all": [
         "hrms.hr.doctype.interview.interview.send_interview_reminder",
     ],
     "hourly": [
         "hrms.hr.doctype.daily_work_summary_group.daily_work_summary_group.trigger_emails",
     ],
-    "hourly_long": [
-        "hrms.hr.doctype.shift_type.shift_type.update_last_sync_of_checkin",
-		"hrms.hr.doctype.shift_type.shift_type.process_auto_attendance_for_all_shifts",
-		"hrms.hr.doctype.shift_assignment_schedule.shift_assignment_schedule.process_auto_shift_creation",
-    ],
+    # "hourly_long": [
+    #     "hrms.hr.doctype.shift_type.shift_type.update_last_sync_of_checkin",
+	# 	"hrms.hr.doctype.shift_type.shift_type.process_auto_attendance_for_all_shifts",
+	# 	"hrms.hr.doctype.shift_assignment_schedule.shift_assignment_schedule.process_auto_shift_creation",
+    # ],
     "daily": [
         # "hrms.controllers.employee_reminders.send_birthday_reminders",
         # "hrms.controllers.employee_reminders.send_work_anniversary_reminders",

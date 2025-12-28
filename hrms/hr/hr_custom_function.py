@@ -134,9 +134,9 @@ def get_officiating_employee(employee):
 	return officiate
 
 def post_earned_leaves():	
-	if not getdate(frappe.utils.nowdate()) == getdate(get_first_day(frappe.utils.nowdate())):
+	# if not getdate(frappe.utils.nowdate()) == getdate(get_first_day(frappe.utils.nowdate())):
 		
-		return 0
+	# 	return 0
 	
 	date = add_days(frappe.utils.nowdate(), -20)
 	start = get_first_day(date);
@@ -145,9 +145,12 @@ def post_earned_leaves():
 	today = datetime.today()
 	first_day_of_year = datetime(today.year, 1, 1)
 	last_day_of_year = datetime(today.year, 12, 31)	
-	employees = frappe.db.sql("select name, employee_name, date_of_joining from `tabEmployee` where status = 'Active'", as_dict=True)
+	employees = frappe.db.sql("select name, employee_name,employee_group,date_of_joining from `tabEmployee` where status = 'Active'", as_dict=True)
 	
 	for e in employees:
+		leave_credit=2.5
+		if e.employee_group=='GSP':
+			leave_credit=1.5
 		# print(e.name)
 		if cint(date_diff(end, getdate(e.date_of_joining))) > 14:
 			employee_name = e.name
@@ -193,8 +196,8 @@ def post_earned_leaves():
 					print(f"Total Leaves: {total_leaves}")
 				else:
 					print("No leaves found.")
-				if flt(total_leaves) + flt(2.5) <= max_leaves_allowed:
-					la.new_leaves_allocated = flt(la.new_leaves_allocated) + flt(2.5)
+				if flt(total_leaves) + flt(leave_credit) <= max_leaves_allowed:
+					la.new_leaves_allocated = flt(la.new_leaves_allocated) + flt(leave_credit)
 					la.save()
 					frappe.db.commit()
 					print(f"Leave Allocation updated successfully for {employee_name}!")
@@ -209,7 +212,7 @@ def post_earned_leaves():
 				la.from_date = from_date
 				la.to_date = to_date
 				la.carry_forward = cint(1)
-				la.new_leaves_allocated = flt(2.5)
+				la.new_leaves_allocated = flt(leave_credit)
 				la.submit()
 				print(f"Leave Allocation submitted successfully for {employee_name}!")
 				
@@ -246,8 +249,10 @@ def get_approver(employee):
 	# 		{"parent": department, "parentfield": "leave_approvers", "idx": 1},
 	# 		"approver",
 	# 	)
-	department = frappe.db.get_value("Employee", employee, "department")
-	empid=frappe.db.get_value("Department", department, "approver")
+	# department = frappe.db.get_value("Employee", employee, "department")
+	# empid=frappe.db.get_value("Department", department, "approver")
+	# approver = frappe.db.get_value("Employee", empid, "user_id")
+	empid = frappe.db.get_value("Employee", employee, "reports_to")
 	approver = frappe.db.get_value("Employee", empid, "user_id")
 
 

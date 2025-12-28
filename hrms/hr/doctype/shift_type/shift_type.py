@@ -1,14 +1,10 @@
-# Copyright (c) 2018, Frappe Technologies Pvt. Ltd. and contributors
-# For license information, please see license.txt
-
-
 from datetime import datetime, timedelta
 from itertools import groupby
 
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import cint, create_batch, get_datetime, get_time, getdate
+from frappe.utils import add_days, cint, create_batch, get_datetime, get_time, getdate,time_diff
 
 from erpnext.setup.doctype.employee.employee import get_holiday_list_for_employee
 from erpnext.setup.doctype.holiday_list.holiday_list import is_holiday
@@ -27,14 +23,67 @@ EMPLOYEE_CHUNK_SIZE = 50
 
 class ShiftType(Document):
 	def validate(self):
+		start = get_time(self.start_time)
+		end = get_time(self.end_time)
+		self.validate_same_start_and_end(start, end)
+		self.validate_circular_shift(start, end)
 		if self.is_field_modified("start_time") and self.unlinked_checkins_exist():
 			frappe.throw(
 				title=_("Unmarked Check-in Logs Found"),
 				msg=_("Mark attendance for existing check-in/out logs before changing shift settings"),
 			)
+	def validate_same_start_and_end(self, start_time: datetime.time, end_time: datetime.time):
+		if start_time == end_time:
+			frappe.throw(
+				title=_("Invalid Shift Times"),
+				msg=_("Start time and end time cannot be same."),
+			)
+
+	def validate_circular_shift(self, start_time: datetime.time, end_time: datetime.time):
+		shift_start, shift_end = self.get_shift_start_and_shift_end(start_time, end_time)
+		if self.get_total_shift_duration_in_minutes(shift_start, shift_end) >= 1440:
+			max_label = self.get_max_shift_buffer_label()
+			frappe.throw(
+				title=_("Invalid Shift Times"),
+				msg=_("Please reduce {0} to avoid shift time overlapping with itself").format(
+					frappe.bold(max_label)
+				),
+			)
+
+	def get_shift_start_and_shift_end(
+		self, start_time: datetime.time, end_time: datetime.time
+	) -> tuple[datetime]:
+		shift_start = datetime.combine(getdate(), start_time)
+		if start_time < end_time:
+			shift_end = datetime.combine(getdate(), end_time)
+		elif start_time > end_time:
+			shift_end = datetime.combine(add_days(getdate(), 1), end_time)
+		return shift_start, shift_end
+
+	def get_total_shift_duration_in_minutes(
+		self, shift_start: datetime.time, shift_end: datetime.time
+	) -> int:
+		return (
+			(round(time_diff(shift_end, shift_start).total_seconds() / 60))
+			+ (self.allow_check_out_after_shift_end_time or 0)
+			+ (self.begin_check_in_before_shift_start_time or 0)
+		)
+
+	def get_max_shift_buffer_label(self) -> str:
+		labels = {
+			self.meta.get_label(
+				"allow_check_out_after_shift_end_time"
+			): self.allow_check_out_after_shift_end_time,
+			self.meta.get_label(
+				"begin_check_in_before_shift_start_time"
+			): self.begin_check_in_before_shift_start_time,
+		}
+		return max(labels, key=labels.get)
+		
 
 	def is_field_modified(self, fieldname):
 		return not self.is_new() and self.has_value_changed(fieldname)
+
 
 	def unlinked_checkins_exist(self):
 		return frappe.db.exists(
@@ -96,56 +145,18 @@ class ShiftType(Document):
 				self.mark_absent_for_dates_with_no_attendance(employee)
 
 			frappe.db.commit()  # nosemgrep
-	# @frappe.whitelist()
-	# def process_auto_attendance_forgot_check_in_out(self):
-	# 	if not cint(self.enable_auto_attendance_forgot_check_in_out):
-	# 		return
-
-	# 	# Get all assigned employees including default shift employees
-	# 	employees = self.get_assigned_employees(self.process_attendance_after, True)
-		
-	# 	for employee in employees:
-	# 		# Get the eligible dates to check for absent
-	# 		dates = self.get_dates_for_attendance(employee)
-
-	# 		for date in dates:
-	# 			# Skip if employee has any checkin/out for this date
-	# 			has_checkin = frappe.db.exists(
-	# 				"Employee Checkin",
-	# 				{
-	# 					"employee": employee,
-	# 					"time": ["between", [f"{date} 00:00:00", f"{date} 23:59:59"]],
-	# 				},
-	# 			)
-	# 			# Skip if employee is on approved leave
-	# 			on_leave = frappe.db.exists(
-	# 				"Leave Application",
-	# 				{
-	# 					"employee": employee,
-	# 					"status": "Approved",
-	# 					"from_date": ["<=", date],
-	# 					"to_date": [">=", date],
-	# 				},
-	# 			)
-
-	# 			if has_checkin or on_leave:
-	# 				continue
-
-	# 			# Mark Absent
-	# 			attendance = mark_attendance(employee, date, "Absent", self.name)
-	# 			if attendance:
-	# 				frappe.get_doc({
-	# 					"doctype": "Comment",
-	# 					"comment_type": "Comment",
-	# 					"reference_doctype": "Attendance",
-	# 					"reference_name": attendance,
-	# 					"content": _("Employee marked Absent due to missing check-in/out."),
-	# 				}).insert(ignore_permissions=True)
-
-	# 	frappe.db.commit()
-		
-
 	def get_employee_checkins(self) -> list[dict]:
+
+		employees_in_branch = frappe.get_all(
+		"Employee",
+		filters={"branch": self.branch, "status": "Active"},
+		pluck="name"
+		)
+		   
+		if not employees_in_branch:
+			frappe.throw(
+		_("No active employees found in branch '{0}' for shift '{1}'.").format(self.branch, self.name))
+
 		return frappe.get_all(
 			"Employee Checkin",
 			fields=[
@@ -164,8 +175,9 @@ class ShiftType(Document):
 				"skip_auto_attendance": 0,
 				"attendance": ("is", "not set"),
 				"time": (">=", self.process_attendance_after),
-				# "shift_actual_end": ("<", self.last_sync_of_checkin),
+				"shift_actual_end": ("<", self.last_sync_of_checkin),
 				"shift": self.name,
+				"employee": ("in", employees_in_branch),
 			},
 			order_by="employee,time",
 		)
@@ -181,6 +193,7 @@ class ShiftType(Document):
 		total_working_hours, in_time, out_time = calculate_working_hours(
 			logs, self.determine_check_in_and_check_out, self.working_hours_calculation_based_on
 		)
+	
 		if (
 			cint(self.enable_late_entry_marking)
 			and in_time
@@ -218,6 +231,8 @@ class ShiftType(Document):
 
 		for date in dates:
 			timestamp = datetime.combine(date, start_time)
+	
+			
 			shift_details = get_employee_shift(employee, timestamp, True)
 
 			if shift_details and shift_details.shift_type.name == self.name:
@@ -301,20 +316,33 @@ class ShiftType(Document):
 		).run(pluck=True)
 
 	def get_assigned_employees(self, from_date=None, consider_default_shift=False) -> list[str]:
+		# Filters for Shift Assignment
 		filters = {"shift_type": self.name, "docstatus": "1", "status": "Active"}
 		if from_date:
 			filters["start_date"] = (">=", from_date)
 
+		# Employees with manual shift assignment
 		assigned_employees = frappe.get_all("Shift Assignment", filters=filters, pluck="employee")
 
+		# Include default shift employees if requested
 		if consider_default_shift:
 			default_shift_employees = self.get_employees_with_default_shift(filters)
-			assigned_employees = set(assigned_employees + default_shift_employees)
+			assigned_employees = list(set(assigned_employees + default_shift_employees))
 
-		# exclude inactive employees
-		inactive_employees = frappe.db.get_all("Employee", {"status": "Inactive"}, pluck="name")
+		# Only active employees in the correct branch
+		assigned_employees_in_branch = frappe.get_all(
+			"Employee",
+			filters={
+				"name": ("in", assigned_employees),
+				"branch": self.branch,
+				"status": "Active",
+			},
+			pluck="name",
+		)
 
-		return list(set(assigned_employees) - set(inactive_employees))
+		return assigned_employees_in_branch
+
+
 
 	def get_employees_with_default_shift(self, filters: dict) -> list:
 		default_shift_employees = frappe.get_all(
@@ -351,15 +379,6 @@ class ShiftType(Document):
 		if is_holiday(holiday_list, attendance_date):
 			return False
 		return True
-
-
-def process_auto_attendance_for_all_shifts():
-	shift_list = frappe.get_all("Shift Type", filters={"enable_auto_attendance": "1"}, pluck="name")
-	for shift in shift_list:
-		doc = frappe.get_cached_doc("Shift Type", shift)
-		doc.process_auto_attendance()
-
-
 def update_last_sync_of_checkin():
 	"""Called from hooks"""
 	shifts = frappe.get_all(
@@ -381,8 +400,60 @@ def update_last_sync_of_checkin():
 				"Shift Type", shift.name, "last_sync_of_checkin", shift_end + timedelta(minutes=1)
 			)
 
-# def process_auto_attendance_forgot_check_in_out_for_all_shifts():
-# 	shift_list = frappe.get_all("Shift Type",filters={"enable_auto_attendance_forgot_check_in_out": 1},pluck="name")
-# 	for shift in shift_list:
-# 		doc = frappe.get_cached_doc("Shift Type", shift)
-# 		doc.process_auto_attendance_forgot_check_in_out()
+def get_actual_shift_end(shift, current_datetime):
+	time_within_shift = datetime.combine(current_datetime.date(), get_time(shift.start_time))
+	shift_details = get_shift_details(shift.name, time_within_shift)
+	actual_shift_start = shift_details["actual_start"]
+	actual_shift_end = shift_details["actual_end"]
+
+	if (actual_shift_start.date() < actual_shift_end.date()) or (current_datetime < actual_shift_start):
+		# shift start and end are on different days
+		actual_shift_end = add_days(actual_shift_end, -1)
+	return actual_shift_end
+
+# def update_last_sync_of_checkin():
+#     """Automatically updates last_sync_of_checkin for all shifts with auto attendance enabled."""
+    
+#     shifts = frappe.get_all(
+#         "Shift Type",
+#         filters={"enable_auto_attendance": 1, "auto_update_last_sync": 1},
+#         fields=["name", "last_sync_of_checkin", "start_time", "end_time"],
+#     )
+
+#     current_datetime = frappe.flags.current_datetime or get_datetime()
+
+#     for shift in shifts:
+#         last_sync = get_datetime(shift.last_sync_of_checkin) if shift.last_sync_of_checkin else None
+
+#         # Get the actual shift end for today (or last known shift)
+#         shift_end = get_actual_shift_end(shift, current_datetime)
+
+#         # If last_sync is missing or behind current datetime, update it
+#         if not last_sync or last_sync < current_datetime:
+#             new_sync = min(shift_end + timedelta(minutes=1), current_datetime)
+#             frappe.db.set_value("Shift Type", shift.name, "last_sync_of_checkin", new_sync)
+
+
+# def get_actual_shift_end(shift, current_datetime):
+#     """Returns the actual end datetime of the shift based on today's date."""
+    
+#     time_within_shift = datetime.combine(current_datetime.date(), get_time(shift.start_time))
+#     shift_details = get_shift_details(shift.name, time_within_shift)
+
+#     actual_shift_start = shift_details["actual_start"]
+#     actual_shift_end = shift_details["actual_end"]
+
+#     # Adjust if shift crosses midnight or current time is before shift start
+#     if (actual_shift_start.date() < actual_shift_end.date()) or (current_datetime < actual_shift_start):
+#         actual_shift_end = add_days(actual_shift_end, -1)
+
+#     return actual_shift_end
+	
+
+def process_auto_attendance_for_all_shifts():
+	shift_list = frappe.get_all("Shift Type", filters={"enable_auto_attendance": "1"}, pluck="name")
+	for shift in shift_list:
+		doc = frappe.get_cached_doc("Shift Type", shift)
+		doc.process_auto_attendance()
+
+

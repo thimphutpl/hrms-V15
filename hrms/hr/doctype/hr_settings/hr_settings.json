@@ -58,6 +58,7 @@
   "approver_settings_tab",
   "hr_manager",
   "hr_approver",
+  "ceo",
   "column_break_zguo",
   "hr_manager_name",
   "separation_clearance_approver_section",
@@ -92,11 +93,10 @@
   "travel_authorization_approval_notification_template",
   "column_break_ruii",
   "travel_authorization_status_notification_template",
-  "attendance_tab",
-  "office_gobal_ip",
-  "office_local_start_ip",
-  "office_local_end_ip",
-  "test"
+  "travel_claim_settings_section",
+  "travel_claim_approval_notification_template",
+  "column_break_vdyr",
+  "travel_claim_status_notification_template"
  ],
  "fields": [
   {
@@ -519,16 +519,6 @@
    "options": "Employee"
   },
   {
-   "fieldname": "attendance_tab",
-   "fieldtype": "Tab Break",
-   "label": "Attendance"
-  },
-  {
-   "fieldname": "office_gobal_ip",
-   "fieldtype": "Data",
-   "label": "Office Gobal Ip"
-  },
-  {
    "fieldname": "concept_note",
    "fieldtype": "Link",
    "label": "Concept Note",
@@ -547,23 +537,8 @@
    "options": "Email Template"
   },
   {
-   "fieldname": "office_local_start_ip",
-   "fieldtype": "Data",
-   "label": "Office local start ip"
-  },
-  {
-   "fieldname": "office_local_end_ip",
-   "fieldtype": "Data",
-   "label": "Office local end ip"
-  },
-  {
    "fieldname": "column_break_nfku",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "test",
-   "fieldtype": "Data",
-   "label": "test"
   },
   {
    "fieldname": "hr_approver",
@@ -620,13 +595,41 @@
    "fieldtype": "Link",
    "label": "Travel Authorization Status Notification Template",
    "options": "Email Template"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "travel_claim_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Travel Claim Settings"
+  },
+  {
+   "fieldname": "travel_claim_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Travel Claim Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "column_break_vdyr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "travel_claim_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Travel Claim Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "ceo",
+   "fieldtype": "Link",
+   "label": "CEO",
+   "options": "Employee"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-11-27 13:02:06.815282",
+ "modified": "2025-12-20 13:24:53.523064",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",

@@ -1,0 +1,185 @@
+{
+ "actions": [],
+ "autoname": "field:vehicle_no",
+ "creation": "2016-09-03 03:33:27.680331",
+ "doctype": "DocType",
+ "document_type": "Document",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "transport_type",
+  "common_pool",
+  "self_arranged",
+  "is_boulder",
+  "column_break_1",
+  "vehicle_status",
+  "vehicle_detail",
+  "vehicle_no",
+  "owner_cid",
+  "column_break_4",
+  "vehicle_capacity",
+  "driver_details",
+  "drivers_name",
+  "contact_no",
+  "driver_cid",
+  "column_break_14",
+  "user",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "transport_type",
+   "fieldtype": "Section Break",
+   "label": "Transport Type"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "common_pool",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Common Pool Transport"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "self_arranged",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Self Owned Transport"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_boulder",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Is Boulder Transport"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Active",
+   "fieldname": "vehicle_status",
+   "fieldtype": "Select",
+   "label": "Vehicle Status",
+   "options": "Active\nDeregistered\nSuspended"
+  },
+  {
+   "fieldname": "vehicle_detail",
+   "fieldtype": "Section Break",
+   "label": "Vehice  Detail"
+  },
+  {
+   "fieldname": "vehicle_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Vehicle Number",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "owner_cid",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Owner CID"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "vehicle_capacity",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Vehicle Capacity(M3)",
+   "options": "Vehicle Capacity"
+  },
+  {
+   "fieldname": "driver_details",
+   "fieldtype": "Section Break",
+   "label": "Driver's Detail"
+  },
+  {
+   "fieldname": "drivers_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Driver's Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "contact_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Driver's Contact No",
+   "reqd": 1
+  },
+  {
+   "fieldname": "driver_cid",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Driver CID"
+  },
+  {
+   "fieldname": "column_break_14",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "label": "User",
+   "options": "User"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Vehicle",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "links": [],
+ "modified": "2025-12-04 20:50:45.900141",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Vehicle",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Fleet Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Delivery User"
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Delivery Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

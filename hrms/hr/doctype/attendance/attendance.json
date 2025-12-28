@@ -29,17 +29,7 @@
   "late_entry",
   "early_exit",
   "modify_half_day_status",
-  "amended_from",
-  "section_break_kkvd",
-  "in_latitude",
-  "column_break_ddmc",
-  "in_longitude",
-  "section_break_gxjw",
-  "in_geolocation",
-  "section_break_qduw",
-  "out_latitude",
-  "column_break_afkp",
-  "out_longitude"
+  "amended_from"
  ],
  "fields": [
   {
@@ -98,7 +88,7 @@
    "no_copy": 1,
    "oldfieldname": "status",
    "oldfieldtype": "Select",
-   "options": "\nPresent\nAbsent\nOn Leave\nHalf Day\nWork From Home\nTour",
+   "options": "\nPresent\nAbsent\nOn Leave\nHalf Day\nTour",
    "reqd": 1,
    "search_index": 1
   },
@@ -205,6 +195,7 @@
    "read_only": 1
   },
   {
+   "allow_on_submit": 1,
    "depends_on": "shift",
    "fieldname": "out_time",
    "fieldtype": "Datetime",
@@ -223,64 +214,18 @@
    "label": "modify_half_day_status"
   },
   {
-   "depends_on": "eval:doc.status==\"Half Day\";",
+   "depends_on": "// eval:doc.status==\"Half Day\";",
    "fieldname": "half_day_status",
    "fieldtype": "Select",
    "label": "Status for Other Half",
    "no_copy": 1
-  },
-  {
-   "fieldname": "section_break_kkvd",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "column_break_ddmc",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "section_break_gxjw",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "in_latitude",
-   "fieldtype": "Float",
-   "label": "Latitude"
-  },
-  {
-   "fieldname": "in_longitude",
-   "fieldtype": "Float",
-   "label": "Longitude"
-  },
-  {
-   "fieldname": "section_break_qduw",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "out_latitude",
-   "fieldtype": "Float",
-   "label": "Latitude"
-  },
-  {
-   "fieldname": "column_break_afkp",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "out_longitude",
-   "fieldtype": "Float",
-   "label": "Longitude"
-  },
-  {
-   "fieldname": "in_geolocation",
-   "fieldtype": "Geolocation",
-   "label": "Geolocation",
-   "read_only": 1
   }
  ],
  "icon": "fa fa-ok",
  "idx": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-11-27 15:05:07.888098",
+ "modified": "2025-12-05 14:25:14.484649",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Attendance",

@@ -1,7 +1,7 @@
-
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:dzongkhag_name",
  "creation": "2025-04-09 12:16:32.549304",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -119,10 +119,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-04-09 12:16:32.549304",
+ "modified": "2025-12-07 15:41:29.003863",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Dzongkhag",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {

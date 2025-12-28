@@ -20,8 +20,37 @@
   {
    "hidden": 0,
    "is_query_report": 0,
+   "label": "Reports",
+   "link_count": 2,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Monthly Attendance Sheet",
+   "link_count": 0,
+   "link_to": "Monthly Attendance Sheet",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Employees working on a holiday",
+   "link_count": 0,
+   "link_to": "Employees working on a holiday",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
    "label": "Attendance",
-   "link_count": 3,
+   "link_count": 5,
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
@@ -49,9 +78,9 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Upload Attendance",
+   "label": "Attendance Tool Others",
    "link_count": 0,
-   "link_to": "Upload Attendance",
+   "link_to": "Attendance Tool Others",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -59,35 +88,26 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Reports",
-   "link_count": 2,
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Monthly Attendance Sheet",
+   "label": "Attendance Others",
    "link_count": 0,
-   "link_to": "Monthly Attendance Sheet",
-   "link_type": "Report",
+   "link_to": "Attendance Others",
+   "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
   },
   {
    "hidden": 0,
-   "is_query_report": 1,
-   "label": "Employees working on a holiday",
+   "is_query_report": 0,
+   "label": "Overtime Entry",
    "link_count": 0,
-   "link_to": "Employees working on a holiday",
-   "link_type": "Report",
+   "link_to": "Overtime Entry",
+   "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
   }
  ],
- "modified": "2025-03-17 12:57:07.004878",
- "modified_by": "Administrator",
+ "modified": "2025-12-07 12:49:29.491381",
+ "modified_by": "sangay.choden@thimphutechpark.bt",
  "module": "HR",
  "name": "Shift & Attendance",
  "number_cards": [],

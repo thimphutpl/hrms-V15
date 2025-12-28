@@ -76,13 +76,14 @@ class LeaveApplication(Document, PWANotificationsMixin):
         )
 
     def after_insert(self):
+        pass
 
-        notify_workflow_states(self)
+        # notify_workflow_states(self)
 
     def validate(self):
         validate_active_employee(self.employee)
         set_employee_name(self)
-        validate_workflow_states(self)
+        # validate_workflow_states(self)
         self.validate_dates()
         self.validate_balance_leaves()
         self.validate_leave_overlap()

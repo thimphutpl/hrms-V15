@@ -1,13 +1,14 @@
 {
  "actions": [],
  "autoname": "prompt",
- "creation": "2018-04-13 16:22:52.954783",
+ "creation": "2025-11-26 11:32:55.378846",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "start_time",
   "end_time",
+  "branch",
   "column_break_3",
   "holiday_list",
   "color",
@@ -178,13 +179,20 @@
   },
   {
    "default": "0",
+   "description": "Recommended for a single biometric device / checkins via mobile app",
    "fieldname": "auto_update_last_sync",
    "fieldtype": "Check",
    "label": "Automatically update Last Sync of Checkin"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch"
   }
  ],
  "links": [],
- "modified": "2025-11-26 11:31:28.583166",
+ "modified": "2025-12-05 09:46:55.495427",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Shift Type",

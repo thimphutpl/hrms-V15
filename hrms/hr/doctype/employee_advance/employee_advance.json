@@ -352,8 +352,7 @@
    "ignore_user_permissions": 1,
    "label": "Approver",
    "no_copy": 1,
-   "options": "User",
-   "read_only": 1
+   "options": "User"
   },
   {
    "fieldname": "column_break_ymya",
@@ -380,7 +379,7 @@
    "fieldname": "advance_type",
    "fieldtype": "Select",
    "label": "Advance Type",
-   "options": "Employee Advance\nInterest Free Loan"
+   "options": "Employee Advance"
   },
   {
    "fieldname": "max_amount",
@@ -391,7 +390,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-11-08 23:58:16.251913",
+ "modified": "2025-12-04 13:41:47.297756",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Advance",

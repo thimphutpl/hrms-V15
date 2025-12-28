@@ -239,26 +239,6 @@ def mark_attendance_and_link_log(
 		try:
 			frappe.db.savepoint("attendance_creation")
 			attendance = frappe.new_doc("Attendance")
-			first_in_log = next((log for log in logs if log.log_type == "IN"), None)
-			last_out_log = next((log for log in reversed(logs) if log.log_type == "OUT"), None)
-
-			# Fetch full documents to ensure latitude/longitude
-			if first_in_log:
-				first_in_doc = frappe.get_doc("Employee Checkin", first_in_log.name)
-				in_latitude = getattr(first_in_doc, "latitude", 0) or 0
-				in_longitude = getattr(first_in_doc, "longitude", 0) or 0
-				in_geolocation = f"{in_latitude}, {in_longitude}"
-			else:
-				in_latitude = in_longitude = 0
-				in_geolocation = ""
-
-
-			if last_out_log:
-				last_out_doc = frappe.get_doc("Employee Checkin", last_out_log.name)
-				out_latitude = getattr(last_out_doc, "latitude", 0) or 0
-				out_longitude = getattr(last_out_doc, "longitude", 0) or 0
-			else:
-				out_latitude = out_longitude = 0
 			attendance.update(
 				{
 					"doctype": "Attendance",
@@ -270,12 +250,7 @@ def mark_attendance_and_link_log(
 					"late_entry": late_entry,
 					"early_exit": early_exit,
 					"in_time": in_time,
-					"out_time": out_time,
-					"in_latitude": in_latitude,
-					"in_longitude": in_longitude,
-					"out_latitude": out_latitude,
-					"out_longitude": out_longitude,
-					"in_geolocation": in_geolocation,  
+					"out_time": out_time
 			
 				}
 			).submit()
@@ -294,6 +269,65 @@ def mark_attendance_and_link_log(
 	else:
 		frappe.throw(_("{} is an invalid Attendance Status.").format(attendance_status))
 
+
+# def calculate_working_hours(logs, check_in_out_type, working_hours_calc_type):
+# 	"""Given a set of logs in chronological order calculates the total working hours based on the parameters.
+# 	Zero is returned for all invalid cases.
+
+# 	:param logs: The List of 'Employee Checkin'.
+# 	:param check_in_out_type: One of: 'Alternating entries as IN and OUT during the same shift', 'Strictly based on Log Type in Employee Checkin'
+# 	:param working_hours_calc_type: One of: 'First Check-in and Last Check-out', 'Every Valid Check-in and Check-out'
+# 	"""
+# 	total_hours = 0
+# 	in_time = out_time = None
+# 	if check_in_out_type == "Alternating entries as IN and OUT during the same shift":
+# 		in_time = logs[0].time
+# 		if len(logs) >= 2:
+# 			out_time = logs[-1].time
+# 		if working_hours_calc_type == "First Check-in and Last Check-out":
+# 			# assumption in this case: First log always taken as IN, Last log always taken as OUT
+# 			total_hours = time_diff_in_hours(in_time, logs[-1].time)
+# 		elif working_hours_calc_type == "Every Valid Check-in and Check-out":
+# 			logs = logs[:]
+# 			while len(logs) >= 2:
+# 				total_hours += time_diff_in_hours(logs[0].time, logs[1].time)
+# 				del logs[:2]
+
+# 	elif check_in_out_type == "Strictly based on Log Type in Employee Checkin":
+# 		if working_hours_calc_type == "First Check-in and Last Check-out":
+# 			first_in_log_index = find_index_in_dict(logs, "log_type", "IN")
+# 			first_in_log = logs[first_in_log_index] if first_in_log_index or first_in_log_index == 0 else None
+# 			last_out_log_index = find_index_in_dict(reversed(logs), "log_type", "OUT")
+# 			last_out_log = (
+# 				logs[len(logs) - 1 - last_out_log_index]
+# 				if last_out_log_index or last_out_log_index == 0
+# 				else None
+# 			)
+# 			in_time = getattr(first_in_log, "time", None)
+# 			out_time = getattr(last_out_log, "time", None)
+# 			if first_in_log and last_out_log:
+# 				total_hours = time_diff_in_hours(in_time, out_time)
+# 		elif working_hours_calc_type == "Every Valid Check-in and Check-out":
+# 			in_log = out_log = None
+# 			for log in logs:
+# 				if in_log and out_log:
+# 					if not in_time:
+# 						in_time = in_log.time
+# 					out_time = out_log.time
+# 					total_hours += time_diff_in_hours(in_log.time, out_log.time)
+# 					in_log = out_log = None
+# 				if not in_log:
+# 					in_log = log if log.log_type == "IN" else None
+# 					if in_log and not in_time:
+# 						in_time = in_log.time
+# 				elif not out_log:
+# 					out_log = log if log.log_type == "OUT" else None
+
+# 			if in_log and out_log:
+# 				out_time = out_log.time
+# 				total_hours += time_diff_in_hours(in_log.time, out_log.time)
+
+# 	return total_hours, in_time, out_time
 
 def calculate_working_hours(logs, check_in_out_type, working_hours_calc_type):
 	"""Given a set of logs in chronological order calculates the total working hours based on the parameters.
@@ -363,6 +397,15 @@ def find_index_in_dict(dict_list, key, value):
 	return next((index for (index, d) in enumerate(dict_list) if d[key] == value), None)
 
 
+
+# def time_diff_in_hours(start, end):
+# 	return round(float((end - start).total_seconds()) / 3600, 2)
+
+
+# def find_index_in_dict(dict_list, key, value):
+# 	return next((index for (index, d) in enumerate(dict_list) if d[key] == value), None)
+
+
 def handle_attendance_exception(log_names: list, error_message: str):
 	frappe.db.rollback(save_point="attendance_creation")
 	frappe.clear_messages()
@@ -402,3 +445,4 @@ def update_attendance_in_checkins(log_names: list, attendance_id: str):
 		.set("attendance", attendance_id)
 		.where(EmployeeCheckin.name.isin(log_names))
 	).run()
+

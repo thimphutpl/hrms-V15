@@ -35,6 +35,7 @@ class OverlappingShiftAttendanceError(frappe.ValidationError):
 
 
 class Attendance(Document):
+
 	def validate(self):
 		from erpnext.controllers.status_updater import validate_status
 		validate_status(self.status, ["Present", "Absent", "On Leave", "Half Day", "Work From Home","Tour"])
@@ -305,9 +306,7 @@ def mark_attendance(
 				"shift": shift,
 				"leave_type": leave_type,
 				"late_entry": late_entry,
-				"early_exit": early_exit,
-				"latitude": getattr(logs[0], "latitude", None),
-        		"longitude": getattr(logs[0], "longitude", None),
+				"early_exit": early_exit
 			}
 		)
 		attendance.insert()

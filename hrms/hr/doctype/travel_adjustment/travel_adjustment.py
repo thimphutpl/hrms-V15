@@ -32,7 +32,7 @@ class TravelAdjustment(Document):
         """Validate the document before saving."""
         validate_active_employee(self.employee)
         self._validate_travel_last_day()
-        validate_workflow_states(self)
+        # validate_workflow_states(self)
 
     def on_update(self):
         """Check for date overlaps when the document is updated."""
@@ -234,16 +234,16 @@ def get_permission_query_conditions(user):
 				AND `tabTravel Adjustment`.docstatus != 2
 			)
 			OR
-			(`tabTravel Adjustment`.approver = '{user}'
-			 AND `tabTravel Adjustment`.workflow_state NOT IN ('Draft', 'Rejected', 'Cancelled', 'Waiting for Verification'))
-	"""
-    if "Verifier" in user_roles:
-        conditions += f"""
-			OR
 			(`tabTravel Adjustment`.reports_to = '{user}'
-			 AND `tabTravel Adjustment`.workflow_state = 'Waiting for Verification')
-		"""
-    conditions += ")"
+			 AND `tabTravel Adjustment`.workflow_state NOT IN ('Draft'))
+	)"""
+    # if "Verifier" in user_roles:
+    #     conditions += f"""
+	# 		OR
+	# 		(`tabTravel Adjustment`.reports_to = '{user}'
+	# 		 AND `tabTravel Adjustment`.workflow_state = 'Waiting for Verification')
+	# 	"""
+    # conditions += ")"
 
     return conditions
 

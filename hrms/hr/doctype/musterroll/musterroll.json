@@ -1,0 +1,67 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-11-28 14:50:16.945797",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "from_date",
+  "to_date",
+  "column_break_3",
+  "rate_per_day",
+  "rate_per_hour",
+  "rate_per_hour_normal"
+ ],
+ "fields": [
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "From Date"
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "To Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rate_per_day",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Rate Per Day"
+  },
+  {
+   "fieldname": "rate_per_hour",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Rate Per Hour (Holiday)(Rate * 1.5 / 8)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "rate_per_hour_normal",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Rate Per Hour  (Rate/ 8))",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-11-28 14:50:16.945797",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Musterroll",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

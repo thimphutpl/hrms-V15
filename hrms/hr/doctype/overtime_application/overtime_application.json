@@ -152,19 +152,21 @@
    "fieldtype": "Float",
    "label": "Hourly Rate",
    "precision": "2",
-   "read_only": 1
-  },
-  {
-   "fieldname": "total_hours",
-   "fieldtype": "Float",
-   "label": "Total Hours Accepted for Payment",
-   "precision": "2",
    "read_only": 1,
    "reqd": 1
   },
   {
+   "fieldname": "total_hours",
+   "fieldtype": "Float",
+   "hidden": 1,
+   "label": "Total Hours Accepted for Payment",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
    "fieldname": "total_amount",
    "fieldtype": "Currency",
+   "ignore_user_permissions": 1,
    "label": "Total Amount",
    "read_only": 1,
    "reqd": 1
@@ -341,7 +343,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-03 10:42:21.934701",
+ "modified": "2025-12-28 18:20:08.253181",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Overtime Application",
