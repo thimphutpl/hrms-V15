@@ -48,6 +48,7 @@ class IncrementEntry(Document):
 			from `tabEmployee` t1
 			where t1.status = 'Active'
 			and t1.increment_cycle = '{}' 
+			and t1.employment_type='Regular Contract'
 			and not exists(select 1
 					from `tabSalary Increment` as t3
 					where t3.employee = t1.name
