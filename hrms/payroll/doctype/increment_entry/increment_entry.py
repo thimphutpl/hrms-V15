@@ -181,6 +181,9 @@ class IncrementEntry(Document):
 			if salary_structure:
 				sst_doc = frappe.get_doc("Salary Structure", salary_structure)
 				date_of_reference = sst_doc.from_date if getdate(sst_doc.from_date) < getdate(frappe.db.get_value("Employee",employee,"date_of_joining")) else frappe.db.get_value("Employee",employee,"date_of_joining")
+				promotion_date = frappe.db.get_value("Employee",employee,"promotion_due_date")
+				if promotion_date:
+					date_of_reference = promotion_date
 				for d in sst_doc.earnings:
 					if d.salary_component == 'Basic Pay':
 						old_basic = flt(d.amount)
