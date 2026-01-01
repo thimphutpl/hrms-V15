@@ -10,6 +10,7 @@ def execute(filters=None):
 	columns = get_columns()
 	data = get_data(filters)
 	frappe.errprint(str(data))
+	data = add_total_row(data)
 	return columns, data, filters
 
 def get_data( filters=None):
@@ -318,3 +319,38 @@ def get_columns():
 		  "width": 130
 		},
 	]
+
+def add_total_row(data):
+	if not data:
+		return data
+
+	total_row = {
+		"month_year": "",
+		"type": "<b>Total</b>",
+		"basic": 0,
+		"others": 0,
+		"total": 0,
+		"pf": 0,
+		"gis": 0,
+		"totalPfGis": 0,
+		"taxable": 0,
+		"tds": 0,
+		"health": 0,
+		"receipt_number": "",
+		"receipt_date": "",
+		"posting_date": ""
+	}
+
+	for row in data:
+		total_row["basic"] += flt(row.get("basic"))
+		total_row["others"] += flt(row.get("others"))
+		total_row["total"] += flt(row.get("total"))
+		total_row["pf"] += flt(row.get("pf"))
+		total_row["gis"] += flt(row.get("gis"))
+		total_row["totalPfGis"] += flt(row.get("totalPfGis"))
+		total_row["taxable"] += flt(row.get("taxable"))
+		total_row["tds"] += flt(row.get("tds"))
+		total_row["health"] += flt(row.get("health"))
+
+	data.append(total_row)
+	return data
