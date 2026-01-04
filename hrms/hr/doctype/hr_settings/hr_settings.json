@@ -96,7 +96,15 @@
   "travel_claim_settings_section",
   "travel_claim_approval_notification_template",
   "column_break_vdyr",
-  "travel_claim_status_notification_template"
+  "travel_claim_status_notification_template",
+  "leave_encashment_settings_section",
+  "encashment_approval_notification_template",
+  "column_break_xgyr",
+  "encashment_status_notification_template",
+  "employee_advance_section",
+  "employee_advance_approval_notification_template",
+  "column_break_citu",
+  "employee_advance_status_notification_template"
  ],
  "fields": [
   {
@@ -623,13 +631,55 @@
    "fieldtype": "Link",
    "label": "CEO",
    "options": "Employee"
+  },
+  {
+   "fieldname": "leave_encashment_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Leave Encashment Settings"
+  },
+  {
+   "fieldname": "encashment_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Encashment Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "column_break_xgyr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "encashment_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Encashment Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "employee_advance_section",
+   "fieldtype": "Section Break",
+   "label": "Employee Advance"
+  },
+  {
+   "fieldname": "employee_advance_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Employee Advance Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "column_break_citu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "employee_advance_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Employee Advance Status Notification Template",
+   "options": "Email Template"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-12-20 13:24:53.523064",
+ "modified": "2026-01-01 15:13:03.987692",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",
