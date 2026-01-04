@@ -20,6 +20,7 @@ from hrms.hr.doctype.leave_ledger_entry.leave_ledger_entry import (
 )
 from hrms.hr.utils import set_employee_name, validate_active_employee
 from hrms.hr.hr_custom_function import get_basic_and_gross_pay, get_salary_tax
+from erpnext.custom_workflow import validate_workflow_states, notify_workflow_states
 
 
 class LeaveEncashment(Document):
@@ -30,6 +31,9 @@ class LeaveEncashment(Document):
         self.encashment_date = self.encashment_date or getdate()
         self.set_salary_structure()
         self.get_leave_details_for_encashment()
+        validate_workflow_states(self)
+        if self.workflow_state not in ("Approved","Cancelled","Draft"):
+            notify_workflow_states(self)
 
     def set_salary_structure(self):
         self._salary_structure = frappe.db.get_value(
@@ -51,7 +55,7 @@ class LeaveEncashment(Document):
     def on_submit(self):
         if not self.leave_allocation:
             self.db_set("leave_allocation", self.get_leave_allocation().get("name"))
-
+        notify_workflow_states(self)
         self.post_journal_entry()
 
         # Set encashed leaves in Allocation
@@ -74,6 +78,7 @@ class LeaveEncashment(Document):
 
     def on_cancel(self):
         self.ignore_linked_doctypes = ("GL Entry", "Payment Ledger Entry")
+        notify_workflow_states(self)
 
         if self.leave_allocation:
             frappe.db.set_value(

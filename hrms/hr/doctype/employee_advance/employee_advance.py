@@ -23,6 +23,7 @@ from dateutil.relativedelta import relativedelta
 
 import erpnext
 from erpnext.accounts.doctype.journal_entry.journal_entry import get_default_bank_cash_account
+from erpnext.custom_workflow import validate_workflow_states, notify_workflow_states
 
 import hrms
 from hrms.hr.utils import validate_active_employee
@@ -53,6 +54,9 @@ class EmployeeAdvance(Document):
 		self.validate_dates()
 		self.calculate_amount()
 		self.set_max_amount()
+		validate_workflow_states(self)
+		if self.workflow_state not in ("Approved by CEO","Cancelled","Draft"):
+			notify_workflow_states(self)
 
 
 	def set_max_amount(self):
@@ -66,10 +70,12 @@ class EmployeeAdvance(Document):
 			self.max_amount=max_months * self.basic_pay
 		
 	def on_submit(self):
+		notify_workflow_states(self)
 		self.post_journal_entry()
 		
 
 	def on_cancel(self):
+		notify_workflow_states(self)
 		self.ignore_linked_doctypes = ("GL Entry", "Payment Ledger Entry")
 		self.check_linked_payment_entry()
 		self.update_salary_structure(cancel=True)

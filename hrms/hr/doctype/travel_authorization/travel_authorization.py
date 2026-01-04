@@ -29,9 +29,7 @@ from erpnext.custom_workflow import validate_workflow_states, notify_workflow_st
 
 class TravelAuthorization(Document):
 	def validate(self):
-		#frappe.throw("hi")
 		validate_active_employee(self.employee)
-
 		self.validate_travel_dates()
 		self.validate_travel_last_day()
 		self.set_reports_to_inernational()
@@ -39,16 +37,16 @@ class TravelAuthorization(Document):
 		self.set_status()
 		self.make_travel_advance()
 		self.validate_estimated_amount()
-		#validate_workflow_states(self)
-		# if self.workflow_state != "Approved":
-		# 	notify_workflow_states(self)
+		validate_workflow_states(self)
+		if self.workflow_state != "Approved":
+			notify_workflow_states(self)
 
 	def on_update(self):
 		self.check_date_overlap()
 		self.validate_duplicate_entry()
 
 	def on_submit(self):
-		# notify_workflow_states(self)
+		notify_workflow_states(self)
 		self.create_attendance()
 		if self.advance_amount:
 			self.post_journal_entry()
@@ -56,7 +54,7 @@ class TravelAuthorization(Document):
 	def on_cancel(self):
 		self.cancel_attendance()
 		self.set_status(update=True)
-		# notify_workflow_states(self)
+		notify_workflow_states(self)
 
 	def set_status(self, update=False):
 		status_map = {0: "Draft", 1: "Submitted", 2: "Cancelled"}
