@@ -10,14 +10,18 @@
   "repeat_on_days",
   "column_break_iprq",
   "enabled",
+  "fiscal_year",
   "create_shifts_after",
+  "end_date",
   "shift_details_section",
-  "employee",
-  "employee_name",
   "shift_type",
   "column_break_toss",
   "company",
-  "shift_status"
+  "shift_status",
+  "section_break_ijnn",
+  "branch",
+  "get_all_employee",
+  "shift_assignment_schedule_employee"
  ],
  "fields": [
   {
@@ -36,14 +40,6 @@
    "fieldname": "shift_details_section",
    "fieldtype": "Section Break",
    "label": "Shift Details"
-  },
-  {
-   "fieldname": "employee",
-   "fieldtype": "Link",
-   "in_standard_filter": 1,
-   "label": "Employee",
-   "options": "Employee",
-   "reqd": 1
   },
   {
    "fetch_from": "employee.company",
@@ -70,13 +66,6 @@
   {
    "fieldname": "schedule_settings_section",
    "fieldtype": "Section Break"
-  },
-  {
-   "fetch_from": "employee.employee_name",
-   "fieldname": "employee_name",
-   "fieldtype": "Data",
-   "label": "Employee Name",
-   "read_only": 1
   },
   {
    "default": "Today",
@@ -107,6 +96,38 @@
    "fieldtype": "Select",
    "label": "Status",
    "options": "Active\nInactive"
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "End Date"
+  },
+  {
+   "fieldname": "fiscal_year",
+   "fieldtype": "Link",
+   "label": "Fiscal Year",
+   "options": "Fiscal Year"
+  },
+  {
+   "fieldname": "section_break_ijnn",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "shift_assignment_schedule_employee",
+   "fieldtype": "Table",
+   "label": "Shift Assignment Schedule Employee",
+   "options": "Shift Assignment Schedule Employee"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch"
+  },
+  {
+   "fieldname": "get_all_employee",
+   "fieldtype": "Button",
+   "label": "Get All Employee"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -116,7 +137,7 @@
    "link_fieldname": "schedule"
   }
  ],
- "modified": "2025-12-12 12:45:10.577634",
+ "modified": "2026-01-04 11:50:24.647798",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Shift Assignment Schedule",
@@ -158,6 +179,5 @@
  ],
  "sort_field": "creation",
  "sort_order": "DESC",
- "states": [],
- "title_field": "employee_name"
+ "states": []
 }
