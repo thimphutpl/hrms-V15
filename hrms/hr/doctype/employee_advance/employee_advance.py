@@ -247,7 +247,8 @@ class EmployeeAdvance(Document):
 		year_diff = relativedelta(current_d,join_d).years
 		if int(min_req) > year_diff:
 			frappe.throw("minimum service required to be eligible for salary advance is {} year".format(min_req))
-		max_amount = flt(self.basic_pay) * flt(max_month)
+		# max_amount = flt(self.basic_pay) * flt(max_month)
+		max_amount = flt(self.net_pay) * flt(max_month)
 		
 		if flt(self.advance_amount) > flt(max_amount):
 			frappe.throw(
