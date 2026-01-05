@@ -332,8 +332,32 @@ def make_salary_slip(
 			target.employee = employee
 			if posting_date:
 				target.posting_date = posting_date
+		
+		salary_details = frappe.get_all(
+			"Salary Detail",
+			filters={"parent": source.name},
+			fields=["salary_component", "bank_name"]
+		)
+
+		if not salary_details:
+			frappe.throw("No Salary Details found in Salary Structure.")
 
 		target.run_method("process_salary_structure", for_preview=for_preview)
+		#---------For EMI Sales--------------------------------------------------
+		for sd in target.deductions:
+			if sd.salary_component == 'EMI Sales':
+				principal_amount = interest_amount = 0
+				data = frappe.db.sql("select ifnull(interest,0) interest_amount, ifnull(principal, 0) principal_amount from `tabEMI Payment Schedule` where parent = '{}' and year(due_date) = '{}' and month(due_date) = MONTH(STR_TO_DATE('{}', '%M')) and docstatus = 1".format(sd.reference_number, target.fiscal_year, target.month),as_dict=1)
+				if data:
+					principal_amount = data[0].principal_amount
+					interest_amount = data[0].interest_amount
+				emi_doc = frappe.get_doc("EMI Sales", sd.reference_number)
+				sd.total_outstanding_amount = emi_doc.outstanding_amount - emi_doc.monthly_deduction
+				sd.total_deducted_amount = sd.total_deductible_amount - sd.total_outstanding_amount
+				sd.interest_amount = interest_amount
+				sd.principal_amount = principal_amount
+		#----------EMI Sales Part Ends------------------------------------------
+
 
 	doc = get_mapped_doc(
 		"Salary Structure",

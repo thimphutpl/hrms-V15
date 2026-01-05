@@ -21,6 +21,8 @@
   "column_break_11",
   "total_deducted_amount",
   "total_outstanding_amount",
+  "interest_amount",
+  "principal_amount",
   "section_break_lula",
   "reference_type",
   "reference_name",
@@ -169,11 +171,29 @@
    "fieldname": "do_not_include_in_total",
    "fieldtype": "Check",
    "label": "Do not include in Total"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.salary_component == \"EMI Sales\"",
+   "fieldname": "interest_amount",
+   "fieldtype": "Currency",
+   "label": "Interest Amount(EMI Sales)",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.salary_component == \"EMI Sales\"",
+   "fieldname": "principal_amount",
+   "fieldtype": "Currency",
+   "label": "Principal Amount(EMI Sales)",
+   "precision": "2",
+   "read_only": 1
   }
  ],
  "istable": 1,
  "links": [],
- "modified": "2025-08-06 14:54:12.030456",
+ "modified": "2025-12-28 13:56:53.428569",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Detail",

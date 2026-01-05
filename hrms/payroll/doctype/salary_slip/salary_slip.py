@@ -743,10 +743,31 @@ class SalarySlip(TransactionBase):
 				
 				self.add_structure_component(struct_row, component_type)
 
+	# def add_structure_component(self, struct_row, component_type):
+	# 	amount = struct_row.amount
+	# 	# default behavior, the system does not add if component amount is zero
+	# 	# if remove_if_zero_valued is unchecked, then ask system to add component row
+	# 	remove_if_zero_valued = frappe.get_cached_value(
+	# 		"Salary Component", struct_row.salary_component, "remove_if_zero_valued"
+	# 	)
+
+	# 	default_amount = 0
+
+	# 	if (
+	# 		amount
+	# 		or (not remove_if_zero_valued and amount is not None and not self.data[struct_row.abbr])
+	# 	):
+	# 		self.update_component_row(
+	# 			struct_row,
+	# 			amount,
+	# 			component_type,
+	# 			data=self.data,
+	# 			default_amount=amount,
+	# 			remove_if_zero_valued=remove_if_zero_valued,
+	# 		)
+	
 	def add_structure_component(self, struct_row, component_type):
 		amount = struct_row.amount
-		# default behavior, the system does not add if component amount is zero
-		# if remove_if_zero_valued is unchecked, then ask system to add component row
 		remove_if_zero_valued = frappe.get_cached_value(
 			"Salary Component", struct_row.salary_component, "remove_if_zero_valued"
 		)
@@ -765,7 +786,10 @@ class SalarySlip(TransactionBase):
 				default_amount=amount,
 				remove_if_zero_valued=remove_if_zero_valued,
 			)
-			
+			if self.get(component_type):
+				last_row = self.get(component_type)[-1]
+				last_row.bank_name = getattr(struct_row, "bank_name", None)
+
 
 	def get_data_for_eval(self):
 		"""Returns data for evaluating formula"""
@@ -824,6 +848,10 @@ class SalarySlip(TransactionBase):
 				"depends_on_payment_days",
 				"salary_component",
 				"abbr",
+				"total_deductible_amount",
+				"reference_name",
+				"reference_type",
+				"reference_number"
 			):
 				component_row.set(attr, component_data.get(attr))
 
