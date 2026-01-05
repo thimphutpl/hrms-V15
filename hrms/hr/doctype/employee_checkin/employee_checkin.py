@@ -119,6 +119,7 @@ class EmployeeCheckin(Document):
 			filters={
 				"employee": self.employee,
 				"shift_type": self.shift,
+				"branch": self.branch,
 				"start_date": ["<=", self.time],
 				"shift_location": ["is", "set"],
 				"docstatus": 1,
@@ -134,11 +135,6 @@ class EmployeeCheckin(Document):
 		)
 		if checkin_radius <= 0:
 			return
-		# latitude = round(latitude, 2)
-		# longitude = round(longitude, 2)
-		# current_lat = round(self.latitude, 2)
-		# current_long = round(self.longitude, 2)	
-		# frappe.throw(_("Latitude: {0}, Longitude: {1}, Current Latitude: {2}, Current Longitude: {3}").format(latitude, longitude, self.latitude, self.longitude))
 
 		distance = get_distance_between_coordinates(latitude, longitude, self.latitude, self.longitude)
 		if distance > checkin_radius:
