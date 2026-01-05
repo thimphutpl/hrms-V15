@@ -24,7 +24,7 @@ class EmployeeSeparationClearance(Document):
 		
 		if action == "Save":
 			self.verifyUpdate()           
-			if self.icthr_clearance + self.ada_clearance + self.afd_clearance + self.iad_clearance + self.ams_clearance + self.pc_clearance == 6:
+			if self.supervisor_clearance + self.hr_clearance + self.fad_clearance  + self.tdg_clearance + self.edg_clearance + self.td_clearance + self.smli_clearance + self.ped_clearance + self.pmb_clearance == 9:
 				self.verifyUpdate()
 				self.verifyUpdate()
 		
@@ -37,41 +37,46 @@ class EmployeeSeparationClearance(Document):
 	def verifyUpdate(self):
 		user = frappe.session.user
 		
-		if user == self.iad:
-			self.iad_clearance = 1
-		if user == self.icthr:
-			self.icthr_clearance = 1
-		if user == self.afd:
-			self.afd_clearance = 1
-		if user == self.ams:
-			self.ams_clearance = 1
-		if user == self.pc:
-			self.pc_clearance = 1
-		if user == self.ada:
-			self.ada_clearance = 1
+		if user == self.hr:
+			self.hr_clearance = 1
+		if user == self.fad:
+			self.fad_clearance = 1
+		if user == self.tdg:
+			self.tdg_clearance = 1
+		if user == self.edg:
+			self.edg_clearance = 1
+		if user == self.td:
+			self.td_clearance = 1
+		if user == self.smli:
+			self.smli_clearance = 1
 		if user == self.supervisor:
 			self.supervisor_clearance = 1
-		if user == self.gm:
-			self.gm_clearance = 1
+		if user == self.ped:
+			self.ped_clearance = 1
+		if user == self.pmb:
+			self.pmb_clearance = 1  
 
 	def reApply(self):
-		self.iad_clearance = 0
-		self.afd_clearance = 0
-		self.icthr_clearance = 0
-		self.ada_clearance = 0
-		self.ams_clearance = 0
-		self.pc_clearance = 0
+		self.hr_clearance = 0
+		self.fad_clearance = 0
+		self.tdg_clearance = 0
+		self.edg_clearance = 0
+		self.td_clearance = 0
+		self.smli_clearance = 0
 		self.supervisor_clearance = 0
-		self.gm_clearance = 0
+		self.ped_clearance = 0
+		self.pmb_clearance = 0
 
-		self.iad_remarks = ""
-		self.afd_remarks = ""
-		self.icthr_remarks = ""
-		self.ada_remarks = ""
-		self.ams_remarks = ""
-		self.pc_remarks = ""
+		self.hr_remarks = ""
+		self.fad_remarks = ""
+		self.tdg_remarks = ""
+		self.edg_remarks = ""
+		self.td_remarks = ""
+		self.smli_remarks = ""
 		self.supervisor_remarks = ""
-		self.gm_remarks = ""
+		self.ped_remarks = ""
+		self.pmb_remarks = ""
+		
 
 	def on_cancel(self):
 		self.update_reference()
@@ -79,18 +84,23 @@ class EmployeeSeparationClearance(Document):
 	def check_signatures(self):
 		if self.supervisor_clearance == 0:
 			frappe.throw("Supervisor has not granted clearance.")
-		if self.afd_clearance == 0:
-			frappe.throw("Finance and Investment has not granted clearance.")
-		# if self.ams_clearance == 0:
-		# 	frappe.throw("Asset Management Section has not granted clearance.")
-		if self.icthr_clearance == 0:
-			frappe.throw("Human Resource & Administration has not granted clearance.")
-		# if self.iad_clearance == 0:
-		# 	frappe.throw("Internal Audit has not granted clearance.")
-		if self.ada_clearance == 0:
-			frappe.throw("Asset Declaration Administrator has not granted clearance.")
-		# if self.pc_clearance == 0:
-		# 	frappe.throw("Procurement and Contracts has not granted clearance.")
+		if self.hr_clearance == 0:
+			frappe.throw("HR & Admin Division has not granted clearance.")
+		if self.fad_clearance == 0:
+			frappe.throw("Finance & Accounts Division has not granted clearance.")
+		if self.tdg_clearance == 0:
+			frappe.throw("Tata Division General Manager has not granted clearance.")
+		if self.edg_clearance == 0:
+			frappe.throw("Eicher Division General Manager has not granted clearance.")
+		if self.td_clearance == 0:
+			frappe.throw("Toyota Division has not granted clearance.")
+		if self.smli_clearance == 0:
+			frappe.throw("SMLI & Home Division Manager has not granted clearance.")
+		if self.ped_clearance == 0:
+			frappe.throw("Petroleum Division has not granted clearance.")
+		if self.pmb_clearance == 0:
+			frappe.throw("Planning Monitoring & Business Development has not granted clearance.")
+		
 
 	def update_reference(self):
 		id = frappe.get_doc("Employee Separation",self.employee_separation_id)
@@ -108,75 +118,108 @@ class EmployeeSeparationClearance(Document):
 		receipients = []
 		if self.supervisor:
 			receipients.append(self.supervisor)
-		if self.afd:
-			receipients.append(self.afd)
-		if self.ams:
-			receipients.append(self.ams)
-		if self.icthr:
-			receipients.append(self.icthr)
-		if self.iad:
-			receipients.append(self.iad)
-		if self.ada:
-			receipients.append(self.ada)
-		if self.pc:
-			receipients.append(self.pc)
-
+		if self.hr:
+			receipients.append(self.hr)
+		if self.fad:
+			receipients.append(self.fad)
+		if self.tdg:
+			receipients.append(self.tdg)
+		if self.edg:
+			receipients.append(self.edg)
+		if self.td:
+			receipients.append(self.td)
+		if self.smli:
+			receipients.append(self.smli)
+		if self.ped:
+			receipients.append(self.ped)
+		if self.pmb:
+			receipients.append(self.pmb)
 		return receipients
 
 	@frappe.whitelist()
 	def set_approvers(self):
-		for approver in frappe.get_all("Employee Separation Clearance Approvers", fields=["employee", "employee_name", "designation", "approver_title"]):
-			row = self.append("approvers", {})
-			row.employee = approver.employee
-			row.employee_name = approver.employee_name
-			row.designation = approver.designation
-			row.approver_title = approver.approver_title
-		# #----------------------------Supervisor------------------------|
-		# if not frappe.db.get_value("Employee",self.employee, "reports_to"):
-		# 	frappe.throw("Reports To for employee {} is not set".format(self.employee))
-		# supervisor_officiate = get_officiating_employee(frappe.db.get_value("Employee",self.employee, "reports_to"))
-		# if supervisor_officiate:
-		# 	self.supervisor = frappe.db.get_value("Employee",supervisor_officiate[0].officiate,"user_id")
-		# else:
-		# 	self.supervisor = frappe.db.get_value("Employee",frappe.db.get_value("Employee",self.employee, "reports_to"),"user_id")
+		#----------------------------Supervisor------------------------|
+		if not frappe.db.get_value("Employee",self.employee, "reports_to"):
+			frappe.throw("Reports To for employee {} is not set".format(self.employee))
+		supervisor_officiate = get_officiating_employee(frappe.db.get_value("Employee",self.employee, "reports_to"))
+		if supervisor_officiate:
+			self.supervisor = frappe.db.get_value("Employee",supervisor_officiate[0].officiate,"user_id")
+		else:
+			self.supervisor = frappe.db.get_value("Employee",frappe.db.get_value("Employee",self.employee, "reports_to"),"user_id")
 
-		# #--------------------------- Accounts & Finance --------------------------|
-		# if not frappe.db.get_single_value("HR Settings", "accounts_finance"):
-		# 	frappe.throw("Accounts & Finance clearance approver is not set in HR Settings")
-		# afd_officiate = get_officiating_employee(frappe.db.get_single_value("HR Settings", "accounts_finance"))
-		# if afd_officiate:
-		# 	self.afd = frappe.db.get_value("Employee",afd_officiate[0].officiate,"user_id")
-		# else:
-		# 	self.afd = frappe.db.get_value("Employee",frappe.db.get_single_value("HR Settings", "accounts_finance"),"user_id")
+		#--------------------------- HR & Admin Division --------------------------|
+		if not frappe.db.get_single_value("HR Settings", "hr_division"):
+			frappe.throw("HR & Admin Division clearance approver is not set in HR Settings")
+		hr_officiate = get_officiating_employee(frappe.db.get_single_value("HR Settings", "hr_division"))
+		if hr_officiate:
+			self.hr = frappe.db.get_value("Employee",hr_officiate[0].officiate,"user_id")
+		else:
+			self.hr = frappe.db.get_value("Employee",frappe.db.get_single_value("HR Settings", "hr_division"),"user_id")
+   
+		#--------------------------- Accounts & Finance --------------------------|
+		if not frappe.db.get_single_value("HR Settings", "accounts_finance"):
+			frappe.throw("Accounts & Finance clearance approver is not set in HR Settings")
+		fad_officiate = get_officiating_employee(frappe.db.get_single_value("HR Settings", "accounts_finance"))
+		if fad_officiate:
+			self.fad = frappe.db.get_value("Employee",fad_officiate[0].officiate,"user_id")
+		else:
+			self.fad = frappe.db.get_value("Employee",frappe.db.get_single_value("HR Settings", "accounts_finance"),"user_id")
 
-		# #--------------------------- Procurement & Human Resource --------------------------|
-		# if not frappe.db.get_single_value("HR Settings", "procurement"):
-		# 	frappe.throw("Accounts & Finance clearance approver is not set in HR Settings")
-		# procurement_officiate = get_officiating_employee(frappe.db.get_single_value("HR Settings", "procurement"))
-		# if procurement_officiate:
-		# 	self.icthr = frappe.db.get_value("Employee",procurement_officiate[0].officiate,"user_id")
-		# else:
-		# 	self.icthr = frappe.db.get_value("Employee",frappe.db.get_single_value("HR Settings", "procurement"),"user_id")
+		#--------------------------- Tata Division General Manager --------------------------|
+		if not frappe.db.get_single_value("HR Settings", "tata_division_general_manager"):
+			frappe.throw("Tata Division General Manager clearance approver is not set in HR Settings")
+		tdg_officiate = get_officiating_employee(frappe.db.get_single_value("HR Settings", "tata_division_general_manager"))
+		if tdg_officiate:
+			self.tdg = frappe.db.get_value("Employee",tdg_officiate[0].officiate,"user_id")
+		else:
+			self.tdg = frappe.db.get_value("Employee",frappe.db.get_single_value("HR Settings", "tata_division_general_manager"),"user_id")
 
-		# #--------------------------- Asset Declaration --------------------------|
-		# if not frappe.db.get_single_value("HR Settings", "asset"):
-		# 	frappe.throw("Accounts & Finance clearance approver is not set in HR Settings")
-		# asset_declaration = get_officiating_employee(frappe.db.get_single_value("HR Settings", "asset"))
-		# if asset_declaration:
-		# 	self.ada = frappe.db.get_value("Employee",asset_declaration[0].officiate,"user_id")
-		# else:
-		# 	self.ada = frappe.db.get_value("Employee",frappe.db.get_single_value("HR Settings", "asset"),"user_id")
+		#--------------------------- Eicher Division General Manager --------------------------|
+		if not frappe.db.get_single_value("HR Settings", "eicher_division_general_manager"):
+			frappe.throw("Eicher Division General Manager clearance approver is not set in HR Settings")
+		edg_officiate = get_officiating_employee(frappe.db.get_single_value("HR Settings", "eicher_division_general_manager"))
+		if edg_officiate:
+			self.edg = frappe.db.get_value("Employee",edg_officiate[0].officiate,"user_id")
+		else:
+			self.edg = frappe.db.get_value("Employee",frappe.db.get_single_value("HR Settings", "eicher_division_general_manager"),"user_id")
 
-		# #--------------------------- General Manager --------------------------|
-		# if not frappe.db.get_single_value("HR Settings", "general_manager"):
-		# 	frappe.throw("Accounts & Finance clearance approver is not set in HR Settings")
-		# gm_officiate = get_officiating_employee(frappe.db.get_single_value("HR Settings", "general_manager"))
-		# if gm_officiate:
-		# 	self.gm = frappe.db.get_value("Employee",gm_officiate[0].officiate,"user_id")
-		# else:
-		# 	self.gm = frappe.db.get_value("Employee",frappe.db.get_single_value("HR Settings", "general_manager"),"user_id")
+		#--------------------------- Petroleum Division Manager --------------------------|
+		if not frappe.db.get_single_value("HR Settings", "petroleum_division"):
+			frappe.throw("Petroleum Division Manager clearance approver is not set in HR Settings")
+		ped_officiate = get_officiating_employee(frappe.db.get_single_value("HR Settings", "petroleum_division"))
+		if ped_officiate:
+			self.ped = frappe.db.get_value("Employee",ped_officiate[0].officiate,"user_id")
+		else:
+			self.ped = frappe.db.get_value("Employee",frappe.db.get_single_value("HR Settings", "petroleum_division"),"user_id")
 
-		# self.db_set("approvers_set", 1)
+		#--------------------------- SMLI & Home Division Manager --------------------------|
+		if not frappe.db.get_single_value("HR Settings", "home_division"):
+			frappe.throw("Petroleum Division Manager clearance approver is not set in HR Settings")
+		smli_officiate = get_officiating_employee(frappe.db.get_single_value("HR Settings", "home_division"))
+		if smli_officiate:
+			self.smli = frappe.db.get_value("Employee",smli_officiate[0].officiate,"user_id")
+		else:
+			self.smli = frappe.db.get_value("Employee",frappe.db.get_single_value("HR Settings", "home_division"),"user_id")
+   
+		#--------------------------- Toyota Division Manager --------------------------|
+		if not frappe.db.get_single_value("HR Settings", "toyota_division_manager"):
+			frappe.throw("Petroleum Division Manager clearance approver is not set in HR Settings")
+		td_officiate = get_officiating_employee(frappe.db.get_single_value("HR Settings", "toyota_division_manager"))
+		if td_officiate:
+			self.td = frappe.db.get_value("Employee",td_officiate[0].officiate,"user_id")
+		else:
+			self.td = frappe.db.get_value("Employee",frappe.db.get_single_value("HR Settings", "toyota_division_manager"),"user_id")
+   
+		#--------------------------- Planning Monitoring & Business Development --------------------------|
+		if not frappe.db.get_single_value("HR Settings", "planning_monitoring"):
+			frappe.throw("Petroleum Division Manager clearance approver is not set in HR Settings")
+		pmb_officiate = get_officiating_employee(frappe.db.get_single_value("HR Settings", "planning_monitoring"))
+		if pmb_officiate:
+			self.pmb = frappe.db.get_value("Employee",pmb_officiate[0].officiate,"user_id")
+		else:
+			self.pmb = frappe.db.get_value("Employee",frappe.db.get_single_value("HR Settings", "planning_monitoring"),"user_id")
+
+		self.db_set("approvers_set", 1)
 
 # Following code added by SHIV on 2020/09/21
 def get_permission_query_conditions(user):
@@ -198,19 +241,22 @@ def get_permission_query_conditions(user):
 		or
 		(`tabEmployee Separation Clearance`.supervisor = '{user}' and `tabEmployee Separation Clearance`.docstatus = 0)
 		or
-		(`tabEmployee Separation Clearance`.afd = '{user}' and `tabEmployee Separation Clearance`.docstatus = 0)
+		(`tabEmployee Separation Clearance`.hr = '{user}' and `tabEmployee Separation Clearance`.docstatus = 0)
 		or
-		(`tabEmployee Separation Clearance`.ada = '{user}' and `tabEmployee Separation Clearance`.docstatus = 0)
+		(`tabEmployee Separation Clearance`.fad = '{user}' and `tabEmployee Separation Clearance`.docstatus = 0)
 		or
-		(`tabEmployee Separation Clearance`.icthr = '{user}' and `tabEmployee Separation Clearance`.docstatus = 0)
+		(`tabEmployee Separation Clearance`.tdg = '{user}' and `tabEmployee Separation Clearance`.docstatus = 0)
 		or
-		(`tabEmployee Separation Clearance`.iad = '{user}' and `tabEmployee Separation Clearance`.docstatus = 0)
+		(`tabEmployee Separation Clearance`.edg = '{user}' and `tabEmployee Separation Clearance`.docstatus = 0)
 		or
-		(`tabEmployee Separation Clearance`.ama = '{user}' and `tabEmployee Separation Clearance`.docstatus = 0)
+		(`tabEmployee Separation Clearance`.td = '{user}' and `tabEmployee Separation Clearance`.docstatus = 0)
 		or
-		(`tabEmployee Separation Clearance`.pc = '{user}' and `tabEmployee Separation Clearance`.docstatus = 0)
+		(`tabEmployee Separation Clearance`.smli = '{user}' and `tabEmployee Separation Clearance`.docstatus = 0)
+		or
+		(`tabEmployee Separation Clearance`.ped = '{user}' and `tabEmployee Separation Clearance`.docstatus = 0)
+		or
+		(`tabEmployee Separation Clearance`.pmb = '{user}' and `tabEmployee Separation Clearance`.docstatus = 0)
 
 	)""".format(user=user)
-
 
 

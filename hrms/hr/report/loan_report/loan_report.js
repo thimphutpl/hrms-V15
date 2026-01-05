@@ -1,5 +1,6 @@
-// Copyright (c) 2025, Frappe Technologies Pvt. Ltd. and contributors
+// Copyright (c) 2022, Frappe Technologies Pvt. Ltd. and contributors
 // For license information, please see license.txt
+/* eslint-disable */
 
 frappe.query_reports["Loan Report"] = {
 	"filters": [
@@ -14,9 +15,9 @@ frappe.query_reports["Loan Report"] = {
 			"fieldname": "month",
 			"label": __("Month"),
 			"fieldtype": "Select",
-			"options": "\nJan\nFeb\nMar\nApr\nMay\nJun\nJul\nAug\nSep\nOct\nNov\nDec",
-			"default": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][frappe.datetime.str_to_obj(frappe.datetime.get_today()).getMonth()],
-		},
+			"options": "\nJanuary\nFebruary\nMarch\nApril\nMay\nJune\nJuly\nAugust\nSeptember\nOctober\nNovember\nDecember",
+			"default": frappe.datetime.str_to_user(frappe.datetime.get_today(), "MMMM") // sets current month
+		},		
 		{
 			"fieldname": "cost_center",
 			"label": __("Cost Center"),
@@ -30,10 +31,10 @@ frappe.query_reports["Loan Report"] = {
 			"options": "Employee"
 		},
 		{
-			"fieldname": "bank",
+			"fieldname": "bank_name",
 			"label": __("Bank"),
 			"fieldtype": "Link",
-			"options": "Financial Institution"
+			"options": "Bank"
 		},
 		{
 			"fieldname": "company",

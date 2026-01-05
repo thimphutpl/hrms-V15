@@ -24,6 +24,7 @@
   "total_hours",
   "total_hours_lapsed",
   "total_amount",
+  "attach",
   "column_break_14",
   "purpose",
   "section_break_13",
@@ -284,13 +285,19 @@
    "hidden": 1,
    "label": "Total Hours Lapsed",
    "read_only": 1
+  },
+  {
+   "fieldname": "attach",
+   "fieldtype": "Attach",
+   "label": "Attach",
+   "reqd": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-22 15:40:40.608823",
+ "modified": "2025-12-24 12:19:27.115503",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Overtime Application",

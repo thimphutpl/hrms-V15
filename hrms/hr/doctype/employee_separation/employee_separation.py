@@ -105,23 +105,45 @@ def make_exit_interview(source_name, target_doc=None):
     return doc
 
 # Following code added by SHIV on 2020/09/21
-def get_permission_query_conditions(user):
-	if not user: user = frappe.session.user
-	user_roles = frappe.get_roles(user)
+# def get_permission_query_conditions(user):
+# 	if not user: user = frappe.session.user
+# 	user_roles = frappe.get_roles(user)
 
+# 	if user == "Administrator":
+# 		return
+# 	if "HR User" in user_roles or "HR Manager" in user_roles:
+# 		return
+
+# 	return """(
+# 		`tabEmployee Separation`.owner = '{user}' and `tabEmployee Separation`.docstatus = 0
+# 		or
+# 		exists(select 1
+# 				from `tabEmployee`
+# 				where `tabEmployee`.name = `tabEmployee Separation`.employee
+# 				and `tabEmployee`.user_id = '{user}')
+# 		or
+# 		(`tabEmployee Separation`.benefit_approver = '{user}' and `tabEmployee Separation`.workflow_state not in ('Draft','Submitted','Rejected','Cancelled') and `tabEmployee Separation`.docstatus = 0)
+# 	)""".format(user=user)
+
+
+def get_permission_query_conditions(user):
+	if not user:
+		user = frappe.session.user
+
+	roles = frappe.get_roles(user)
+
+	# HR & Admin → full access
 	if user == "Administrator":
 		return
-	if "HR User" in user_roles or "HR Manager" in user_roles:
+	if "HR User" in roles or "HR Manager" in roles:
 		return
 
-	return """(
-		`tabEmployee Separation`.owner = '{user}' and `tabEmployee Separation`.docstatus = 0
-		or
-		exists(select 1
-				from `tabEmployee`
-				where `tabEmployee`.name = `tabEmployee Separation`.employee
-				and `tabEmployee`.user_id = '{user}')
-		or
-		(`tabEmployee Separation`.benefit_approver = '{user}' and `tabEmployee Separation`.workflow_state not in ('Draft','Submitted','Rejected','Cancelled') and `tabEmployee Separation`.docstatus = 0)
-	)""".format(user=user)
-
+	# Employee → only own separation
+	return """
+		`tabEmployee Separation`.employee = (
+			select e.name
+			from `tabEmployee` e
+			where e.user_id = '{user}'
+			limit 1
+		)
+	""".format(user=user)

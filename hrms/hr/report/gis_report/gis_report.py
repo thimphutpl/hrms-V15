@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe.utils import flt, cstr
 from frappe import msgprint, _
+import calendar
 
 
 def execute(filters=None):
@@ -45,11 +46,11 @@ def get_columns(data):
 def get_data(filters):
 	conditions, filters = get_conditions(filters)
 	data = frappe.db.sql("""select 
-				t1.employee as n, t3.employee_name, t1.designation, t3.passport_number, 
-				t3.date_of_birth, t3.date_of_joining, t3.employee_group, t1.gis_number, t1.gis_policy_number,
+				t1.employee, t3.employee_name, t1.designation, t3.passport_number, 
+				t3.date_of_birth, t3.date_of_joining, t3.employee_group, t3.grade, t1.gis_number, t1.gis_policy_number,
 				sum(case when t2.salary_component = 'Basic Pay' then ifnull(t2.amount,0) else 0 end) as basicpay,
 				sum(case when t2.salary_component = 'GIS' then ifnull(t2.amount,0) else 0 end) as gisamount,
-							t1.company, t1.branch, t1.cost_center, t1.department, t1.division, t1.section,t1.fiscal_year, t1.month
+							t1.company, t1.cost_center, t1.branch, t1.department, t1.division, t1.section,t1.fiscal_year, t1.month
 						from `tabSalary Slip` t1, `tabSalary Detail` t2, `tabEmployee` t3
 						where t1.docstatus = 1 %s
 					  	and t3.employee_group !='Temporary'
@@ -63,15 +64,31 @@ def get_data(filters):
 
 def get_conditions(filters):
 	conditions = ""
-	# if filters.get("month"):
-	# 	month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov",
-	# 		"Dec"].index(filters["month"]) + 1
-	# 	filters["month"] = month
-	# 	conditions += " and t1.month = %(month)s"
 
-	if filters.get("fiscal_year"): conditions += " and t1.fiscal_year = %(fiscal_year)s"
-	if filters.get("company"): conditions += " and t1.company = %(company)s"
-	if filters.get("employee"): 
-		conditions += " and t1.employee = %(employee)s "
-	if filters.get("cost_center"): conditions += " and exists(select 1 from `tabCost Center` cc where t1.cost_center = cc.name and (cc.parent_cost_center = '{0}' or cc.name = '{0}'))".format(filters.cost_center)
+	# Month filter (month stored as text)
+	if filters.get("month"):
+		conditions += """
+			AND LOWER(TRIM(t1.month)) = LOWER(TRIM(%(month)s))
+		"""
+
+	if filters.get("fiscal_year"):
+		conditions += " AND t1.fiscal_year = %(fiscal_year)s"
+
+	if filters.get("company"):
+		conditions += " AND t1.company = %(company)s"
+
+	if filters.get("employee"):
+		conditions += " AND t1.employee = %(employee)s"
+
+	if filters.get("cost_center"):
+		conditions += """
+			AND EXISTS (
+				SELECT 1
+				FROM `tabCost Center` cc
+				WHERE cc.name = t1.cost_center
+				  AND (cc.name = %(cost_center)s
+				       OR cc.parent_cost_center = %(cost_center)s)
+			)
+		"""
+
 	return conditions, filters

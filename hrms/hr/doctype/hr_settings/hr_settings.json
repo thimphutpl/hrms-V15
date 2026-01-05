@@ -67,15 +67,23 @@
   "hr_approver_name",
   "hrgm_name",
   "separation_clearance_approver_section",
-  "general_manager",
+  "hr_division",
   "accounts_finance",
-  "procurement",
-  "asset",
+  "tata_division_general_manager",
+  "eicher_division_general_manager",
+  "petroleum_division",
+  "home_division",
+  "toyota_division_manager",
+  "planning_monitoring",
   "column_break_wguy",
-  "general_manager_name",
+  "hr_name",
   "accounts_finance_name",
-  "procurement_name",
-  "asset_declaration_name",
+  "tata_division_name",
+  "eicher_division_name",
+  "petroleum_division_name",
+  "home_division_name",
+  "toyota_division_name",
+  "planning_monitoring_name",
   "section_break_hafd",
   "clearance_approvers",
   "notification_setting_tab",
@@ -84,7 +92,11 @@
   "enote_copyto_notification",
   "column_break_wcru",
   "enote_status_notification",
-  "enote_reviewer_notification"
+  "enote_reviewer_notification",
+  "sb_overtime",
+  "overtime_approval_notification_template",
+  "column_break_jhnx",
+  "overtime_status_notification_template"
  ],
  "fields": [
   {
@@ -447,52 +459,14 @@
   {
    "fieldname": "accounts_finance",
    "fieldtype": "Link",
-   "label": "Accounts & Finance",
-   "options": "Employee"
-  },
-  {
-   "fieldname": "procurement",
-   "fieldtype": "Link",
-   "label": "Procurement & Human Resource",
+   "label": "Finance & Accounts Division",
    "options": "Employee"
   },
   {
    "fetch_from": "accounts_finance.employee_name",
    "fieldname": "accounts_finance_name",
    "fieldtype": "Data",
-   "label": "Accounts & Finance",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "procurement.employee_name",
-   "fieldname": "procurement_name",
-   "fieldtype": "Data",
-   "label": "Procurement & Human Resource",
-   "read_only": 1
-  },
-  {
-   "fieldname": "general_manager",
-   "fieldtype": "Link",
-   "label": "General Manager",
-   "options": "Employee"
-  },
-  {
-   "fetch_from": "general_manager.employee_name",
-   "fieldname": "general_manager_name",
-   "fieldtype": "Data",
-   "label": "General Manager Name",
-   "read_only": 1
-  },
-  {
-   "fieldname": "asset",
-   "fieldtype": "Link",
-   "label": "Asset Declaration Administrator",
-   "options": "Employee"
-  },
-  {
-   "fieldname": "asset_declaration_name",
-   "fieldtype": "Data",
-   "label": "Asset Declaration Administrator",
+   "label": "Finance & Accounts Name",
    "read_only": 1
   },
   {
@@ -550,13 +524,132 @@
    "fieldtype": "Table",
    "label": "Separation Clearance Approvers",
    "options": "Employee Separation Clearance Approvers"
+  },
+  {
+   "fieldname": "hr_division",
+   "fieldtype": "Link",
+   "label": "HR & Admin Division",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "hr_division.employee_name",
+   "fieldname": "hr_name",
+   "fieldtype": "Data",
+   "label": "HR & Admin Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "tata_division_general_manager",
+   "fieldtype": "Link",
+   "label": "Tata Division General Manager",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "eicher_division_general_manager",
+   "fieldtype": "Link",
+   "label": "Eicher Division General Manager",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "petroleum_division",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Petroleum Division General Manager",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "petroleum_division.employee_name",
+   "fieldname": "petroleum_division_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Petroleum Division General Manager Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "home_division",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "SMLI & Home Division Manager",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "home_division.employee_name",
+   "fieldname": "home_division_name",
+   "fieldtype": "Data",
+   "label": "SMLI & Home Division Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "toyota_division_manager",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Toyota Division General Manager",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "toyota_division_manager.employee_name",
+   "fieldname": "toyota_division_name",
+   "fieldtype": "Data",
+   "label": "Toyota Division General Manager Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "planning_monitoring",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Planning Monitoring & Business Development",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "planning_monitoring.employee_name",
+   "fieldname": "planning_monitoring_name",
+   "fieldtype": "Data",
+   "label": "Planning Monitoring & Business Development Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "tata_division_general_manager.employee_name",
+   "fieldname": "tata_division_name",
+   "fieldtype": "Data",
+   "label": "Tata Division General Manager Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "eicher_division_general_manager.employee_name",
+   "fieldname": "eicher_division_name",
+   "fieldtype": "Data",
+   "label": "Eicher Division General Manager Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "overtime_approval_notification_template",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Overtime Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "sb_overtime",
+   "fieldtype": "Section Break",
+   "label": "Overtime Notification Settings"
+  },
+  {
+   "fieldname": "column_break_jhnx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "overtime_status_notification_template",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Overtime Status Notification Template",
+   "options": "Email Template"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-12-22 16:06:21.514954",
+ "modified": "2025-12-25 11:26:29.046521",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",

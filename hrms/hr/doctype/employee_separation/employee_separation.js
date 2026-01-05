@@ -8,6 +8,30 @@ frappe.ui.form.on('Employee Separation', {
 		frm.add_fetch("employee_separation_template", "designation", "designation");
 		frm.add_fetch("employee_separation_template", "employee_grade", "employee_grade");
 	},
+
+	// added sonam
+	onload: function(frm) {
+		if (
+			!frappe.user.has_role("HR User") &&
+			!frappe.user.has_role("HR Manager") &&
+			frappe.session.user !== "Administrator"
+		) {
+			frappe.call({
+				method: "frappe.client.get_value",
+				args: {
+					doctype: "Employee",
+					filters: { user_id: frappe.session.user },
+					fieldname: ["name"]
+				},
+				callback: function(r) {
+					if (r.message) {
+						frm.set_value("employee", r.message.name);
+						frm.set_df_property("employee", "read_only", 1);
+					}
+				}
+			});
+		}
+	},
 	refresh: function(frm) {
 		if (frm.doc.docstatus == 1 && frm.doc.exit_interview == null && frm.doc.reason_for_resignation != "Death" && frm.doc.reason_for_resignation != 'Termination without Benefits'){
 			frm.add_custom_button(__('Exit Interview'), function(){

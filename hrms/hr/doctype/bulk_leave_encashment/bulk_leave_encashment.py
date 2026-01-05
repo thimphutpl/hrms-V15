@@ -61,7 +61,6 @@ class BulkLeaveEncashment(Document):
 					frappe.db.get_value('Leave Allocation', d.leave_allocation, 'total_leaves_encashed') + d.encashable_days)
 		else:
 			for d in self.items:
-				frappe.throw(str(d))
 				frappe.db.set_value("Leave Allocation", d.leave_allocation, "total_leaves_encashed",
 					frappe.db.get_value('Leave Allocation', d.leave_allocation, 'total_leaves_encashed') - d.encashable_days)
 
@@ -304,11 +303,10 @@ class BulkLeaveEncashment(Document):
 		total = total_allowance = 0
 		for rec in cc:
 			payables_je.append("accounts", {
-					"account": "Leave Encashment - BTL",
+					"account": "Leave Encashment (405581) - STCBL",
 					"reference_type": self.doctype,
 					"reference_name": self.name,
 					"cost_center": rec,
-					"business_activity": "OTB",
 					"debit_in_account_currency": flt(cc[rec]['encashment_amount'],2),
 					"debit": flt(cc[rec]['encashment_amount'],2),
 				})
@@ -319,7 +317,6 @@ class BulkLeaveEncashment(Document):
 					"reference_type": self.doctype,
 					"reference_name": self.name,
 					"cost_center": company_cc,
-					"business_activity": "OTB",
 					"credit_in_account_currency": flt(encashment_tax,2),
 					"party_check": 0,
 					"credit": flt(encashment_tax,2),
@@ -330,7 +327,6 @@ class BulkLeaveEncashment(Document):
 				"reference_type": self.doctype,
 				"reference_name": self.name,
 				"cost_center": company_cc,
-				"business_activity": "OTB",
 				"credit_in_account_currency": flt(net_payable,2),
 				"credit": flt(net_payable,2),
 				"party_check": 0
@@ -338,6 +334,7 @@ class BulkLeaveEncashment(Document):
 
 		payables_je.flags.ignore_permissions = 1
 		payables_je.insert()
+		self.db_set("journal_entries_created", payables_je.name)
 		# payables_je.submit()
 		
 		#Payables JE End -----------------------------------------------------
@@ -394,7 +391,6 @@ class BulkLeaveEncashment(Document):
 				"reference_type": self.doctype,
 				"reference_name": self.name,
 				"cost_center": company_cc,
-				"business_activity": "OTB",
 				"debit_in_account_currency": flt(net_payable,2),
 				"debit": flt(net_payable,2),
 				"party_check": 0
@@ -405,12 +401,11 @@ class BulkLeaveEncashment(Document):
 				"reference_type": self.doctype,
 				"reference_name": self.name,
 				"cost_center": company_cc,
-				"business_activity": "OTB",
 				"credit_in_account_currency": flt(net_payable,2),
 				"credit": flt(net_payable,2),
 			})
 
 		pb_je.flags.ignore_permissions = 1 
 		pb_je.insert()
-		self.db_set("journal_entries_created", 1)
+		self.db_set("journal_entries_created", pb_je.name)
 		frappe.db.commit()

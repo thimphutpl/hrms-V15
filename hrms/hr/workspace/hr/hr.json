@@ -451,8 +451,49 @@
   {
    "hidden": 0,
    "is_query_report": 0,
+   "label": "Key Reports",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Monthly Attendance Sheet",
+   "link_count": 0,
+   "link_to": "Monthly Attendance Sheet",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Employee Leave Balance",
+   "link_count": 0,
+   "link_to": "Employee Leave Balance",
+   "link_type": "Report",
+   "onboard": 0,
+   "report_ref_doctype": "Employee",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Employee Exits",
+   "link_count": 0,
+   "link_to": "Employee Exits",
+   "link_type": "Report",
+   "onboard": 0,
+   "report_ref_doctype": "Exit Interview",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
    "label": "Other Transaction",
-   "link_count": 7,
+   "link_count": 8,
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
@@ -530,47 +571,16 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Key Reports",
-   "link_count": 3,
+   "label": "Employee Advance",
+   "link_count": 0,
+   "link_to": "Employee Advance",
    "link_type": "DocType",
    "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Monthly Attendance Sheet",
-   "link_count": 0,
-   "link_to": "Monthly Attendance Sheet",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Employee Leave Balance",
-   "link_count": 0,
-   "link_to": "Employee Leave Balance",
-   "link_type": "Report",
-   "onboard": 0,
-   "report_ref_doctype": "Employee",
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Employee Exits",
-   "link_count": 0,
-   "link_to": "Employee Exits",
-   "link_type": "Report",
-   "onboard": 0,
-   "report_ref_doctype": "Exit Interview",
    "type": "Link"
   }
  ],
- "modified": "2025-11-12 16:06:51.425997",
- "modified_by": "Administrator",
+ "modified": "2026-01-01 15:57:48.265265",
+ "modified_by": "sonam.norbu@thimphutechpark.bt",
  "module": "HR",
  "name": "HR",
  "number_cards": [],
