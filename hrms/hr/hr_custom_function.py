@@ -21,7 +21,8 @@ def get_payroll_settings(employee=None):
 							d.gis,
 							g.health_contribution,
 							g.employee_pf,
-							g.employer_pf
+							g.employer_pf,
+							g.day_care_deduction
 						from `tabEmployee` e, `tabEmployee Group` g, `tabEmployee Grade` d
 						where e.name = '{}'
 						and g.name = e.employee_group

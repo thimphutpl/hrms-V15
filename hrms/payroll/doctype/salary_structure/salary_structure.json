@@ -49,6 +49,7 @@
   "column_break_gpiw",
   "eligible_for_sws",
   "eligible_for_overtime_and_payment",
+  "eligible_for_day_care",
   "column_break_frfr",
   "eligible_for_leave_encashment",
   "eligible_for_ltc",
@@ -417,12 +418,18 @@
    "fieldname": "fuel_allowances",
    "fieldtype": "Currency",
    "label": "Value(Fuel Allowance)"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_day_care",
+   "fieldtype": "Check",
+   "label": "Eligible for Day Care"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2025-12-22 12:36:52.910011",
+ "modified": "2026-01-05 16:27:13.062372",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",

@@ -75,6 +75,9 @@ frappe.ui.form.on("Salary Structure", {
 	eligible_for_fuel_allowances: function(frm){
 		calculate_others(frm);
 	},
+	eligible_for_day_care: function(frm){
+		calculate_others(frm);
+	},
 	fuel_allowances_method: function(frm){
 		calculate_others(frm);
 	},

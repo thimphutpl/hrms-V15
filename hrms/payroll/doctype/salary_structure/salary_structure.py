@@ -126,7 +126,7 @@ class SalaryStructure(Document):
 		'''
 		self.validate_salary_component()
 
-		basic_pay = comm_allowance = gis_amt = sws_amt = pf_amt = health_cont_amt = tax_amt = basic_pay_arrears = payscale_lower_limit= 0
+		basic_pay = comm_allowance = gis_amt = sws_amt = pf_amt = health_cont_amt = tax_amt = basic_pay_arrears = payscale_lower_limit= day_care_amt= 0
 		total_earning = total_deduction = net_pay = 0
 		payscale_lower_limit = frappe.db.get_value("Employee Grade", frappe.db.get_value("Employee",self.employee,"grade"), "lower_limit")
 		settings = get_payroll_settings(self.employee)
@@ -250,6 +250,12 @@ class SalaryStructure(Document):
 						gis_amt = flt(settings.get("gis"))
 						# calc_amt = roundoff(gis_amt)
 						calc_amt = flt(gis_amt)
+						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
+
+					elif self.get(m['field_name']) and m['name'] == 'Day Care':
+						day_care_amt = flt(settings.get("day_care_deduction"))
+						# calc_amt = roundoff(day_care_amt_amt)
+						calc_amt = flt(day_care_amt)
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
 
 					elif self.get(m['field_name']) and m['name'] == 'PF':
