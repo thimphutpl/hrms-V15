@@ -63,6 +63,7 @@
    "label": "Shift",
    "options": "Shift Type",
    "permlevel": 1,
+   "read_only": 1,
    "search_index": 1
   },
   {
@@ -185,7 +186,7 @@
   }
  ],
  "links": [],
- "modified": "2026-01-05 17:11:05.152140",
+ "modified": "2026-01-05 19:22:52.627262",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Checkin",
