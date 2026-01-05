@@ -25,6 +25,7 @@
    "options": "Currency"
   },
   {
+   "allow_bulk_edit": 1,
    "fieldname": "country_dsa_detail",
    "fieldtype": "Table",
    "label": "Country DSA Detail",
@@ -34,7 +35,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-15 19:33:48.462518",
+ "modified": "2026-01-05 16:07:25.414950",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "DSA Out Country",
