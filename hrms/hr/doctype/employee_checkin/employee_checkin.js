@@ -41,27 +41,6 @@ frappe.ui.form.on("Employee Checkin", {
 			});
 		}
 	},
-
-
-	onload: function (frm) {
-		if (!frm.doc.employee) {
-			frappe.call({
-				method: "frappe.client.get_list",
-				args: {
-					doctype: "Employee",
-					filters: { user_id: frappe.session.user },
-					fields: ["name"]
-				},
-				callback: function (r) {
-					if (r.message) {
-						frm.set_value("employee", r.message[0].name);
-					}
-				}
-			})
-		}
-
-	},
-
 	fetch_geolocation: (frm) => {
 		hrms.fetch_geolocation(frm);
 	},
