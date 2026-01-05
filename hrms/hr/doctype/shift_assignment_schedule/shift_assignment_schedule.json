@@ -121,6 +121,8 @@
   {
    "fieldname": "branch",
    "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Branch",
    "options": "Branch"
   },
@@ -137,7 +139,7 @@
    "link_fieldname": "schedule"
   }
  ],
- "modified": "2026-01-04 11:50:24.647798",
+ "modified": "2026-01-05 10:43:59.749791",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Shift Assignment Schedule",
