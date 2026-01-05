@@ -10,6 +10,7 @@
   "employee_details_section",
   "employee",
   "employee_name",
+  "branch",
   "column_break_3",
   "company",
   "department",
@@ -134,11 +135,17 @@
    "label": "Schedule",
    "options": "Shift Assignment Schedule",
    "read_only": 1
+  },
+  {
+   "fetch_from": "employee.branch",
+   "fieldname": "branch",
+   "fieldtype": "Read Only",
+   "label": "Branch"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-07-04 14:30:40.840689",
+ "modified": "2026-01-05 18:23:15.536271",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Shift Assignment",
