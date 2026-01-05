@@ -8,6 +8,7 @@
  "field_order": [
   "employee",
   "employee_name",
+  "branch",
   "log_type",
   "shift",
   "column_break_4",
@@ -171,10 +172,17 @@
    "hidden": 1,
    "label": "Off-shift",
    "read_only": 1
+  },
+  {
+   "fetch_from": "employee.branch",
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch"
   }
  ],
  "links": [],
- "modified": "2025-11-21 11:13:11.563064",
+ "modified": "2026-01-05 10:05:30.269958",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Checkin",
