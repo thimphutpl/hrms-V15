@@ -26,7 +26,7 @@ class EmployeeCheckin(Document):
 		self.validate_duplicate_log()
 		self.fetch_shift()
 		self.set_geolocation()
-		self.validate_distance_from_shift_location()
+		self.validate_distance_from_shift_location()	
 		
 	def validate_checkin_date(self):
 		# Convert check-in time to datetime object

@@ -23,6 +23,26 @@ frappe.ui.form.on("Employee Checkin", {
 	after_save: function (frm) {
 		frappe.set_route("List", "Employee Checkin");
 	},
+	employee: function (frm) {
+		if (frm.doc.employee) {
+			frappe.call({
+				method: "fetch_shift",
+				doc: frm.doc,
+				// <- this calls your doc method directly
+				args: {
+
+					args: {}  // no arguments needed
+				},
+				callback: function (r) {
+					// r.message is undefined because your method doesn't return anything
+					// but your method will set the fields on the document automatically
+					frm.refresh_fields(); // make sure the updated shift fields show in the form
+				}
+			});
+		}
+	},
+
+
 	onload: function (frm) {
 		if (!frm.doc.employee) {
 			frappe.call({
