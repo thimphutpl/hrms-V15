@@ -53,7 +53,6 @@
   {
    "fieldname": "employee",
    "fieldtype": "Link",
-   "ignore_user_permissions": 1,
    "in_list_view": 1,
    "label": "Employee",
    "options": "Employee",
@@ -262,7 +261,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-11-08 22:44:02.833214",
+ "modified": "2026-01-05 13:02:48.884419",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Encashment",
