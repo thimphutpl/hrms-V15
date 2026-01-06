@@ -43,8 +43,8 @@ class TravelAuthorization(Document):
 	def validate_estimated_amount(self):
 		if flt(self.advance_amount) > flt(self.estimated_amount):
 			frappe.throw("Your estimated amount is less than the advance amount.")
-		if flt(self.advance_amount) > (flt(self.estimated_amount) * 0.75):
-			frappe.throw("Advance amount cannot be more than 75% of the estimated amount.")
+		if flt(self.advance_amount) > (flt(self.estimated_amount) * 0.90):
+			frappe.throw("Advance amount cannot be more than 90% of the estimated amount.")
 
 	def post_journal_entry(self):
 		advance_account = frappe.db.get_value("Company", self.company, "travel_advance_account")
