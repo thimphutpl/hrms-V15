@@ -70,23 +70,33 @@ class BulkLeaveEncashment(Document):
 	def get_leave_details_for_encashment(self):
 		if not frappe.db.get_value("Leave Type", self.leave_type, 'allow_encashment'):
 			frappe.throw(_("Leave Type {0} is not encashable").format(self.leave_type))
+		max_encashable_days = 30  	
 
 		for emp in self.items:
 			allocation = self.get_leave_allocation(emp.employee)
-
+			
+	
 			if not allocation:
 				frappe.throw(_("No Leaves Allocated to Employee: {0} for Leave Type: {1}").format(emp.employee, self.leave_type))
 
-			emp.leave_balance = get_leave_balance_on(employee=emp.employee, date=today(), \
-				to_date=today(), leave_type=self.leave_type, consider_all_leaves_in_the_allocation_period=True)
-
+			leave_balance = get_leave_balance_on(
+				employee=emp.employee, 
+				date=allocation.to_date,
+				to_date=allocation.to_date,
+				leave_type=self.leave_type, 
+				consider_all_leaves_in_the_allocation_period=True)
+            
 			if not emp.employee_group:
 				emp.employee_group = frappe.db.get_value("Employee", emp.employee, "employee_group")
 			
-			emp.encashable_days = 30 if emp.leave_balance >= 30 else emp.leave_balance
+			# emp.encashable_days = 30 if emp.leave_balance >= 30 else emp.leave_balance
+			# emp.leave_balance = emp.encashable_days
+			emp.leave_balance = leave_balance if leave_balance <= max_encashable_days else max_encashable_days
+			emp.encashable_days = emp.leave_balance  
 
 			if emp.encashable_days > emp.leave_balance:
 				frappe.throw("Encashable Days  cannot be more than Leave Balance")
+			# frappe.throw("Leave Balance: "+str(emp.leave_balance)+" Encashable Days: "+str(emp.encashable_days)+"allocation: "+str(allocation)+"employee_group: "+str(emp.employee_group))	
 
 			pay = get_basic_and_gross_pay(employee=emp.employee, effective_date=today())
 			if pay.get("basic_pay") is not None:
@@ -104,6 +114,7 @@ class BulkLeaveEncashment(Document):
 		leave_allocation = frappe.db.sql("""select name, to_date, total_leaves_allocated, carry_forwarded_leaves_count from `tabLeave Allocation` where '{0}'
 		between from_date and to_date and docstatus=1 and leave_type='{1}'
 		and employee = '{2}'""".format(self.encashment_date or getdate(nowdate()), self.leave_type, employee), as_dict=1)
+		# frappe.throw(str(leave_allocation))
 		return leave_allocation[0] if leave_allocation else None
 		
 	@frappe.whitelist()
@@ -149,12 +160,12 @@ class BulkLeaveEncashment(Document):
 			cost_center = frappe.db.get_value("Branch", det.branch, "cost_center")
 			if cost_center not in cc:
 				cc.update({
-        			cost_center: {
-               			"payable_amount": det.payable_amount,
-               			"encashment_amount": det.encashment_amount,
-               			"encashment_tax": det.encashment_tax,
-                    }
-           		})
+					cost_center: {
+			   			"payable_amount": det.payable_amount,
+			   			"encashment_amount": det.encashment_amount,
+			   			"encashment_tax": det.encashment_tax,
+					}
+		   		})
 			else:
 				cc[cost_center]['payable_amount'] += det.payable_amount
 				cc[cost_center]['encashment_amount'] += det.encashment_amount
