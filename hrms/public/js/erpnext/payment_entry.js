@@ -7,7 +7,7 @@ frappe.ui.form.on("Payment Entry", {
 			let doctypes = [];
 
 			if (frm.doc.party_type == "Customer") {
-				doctypes = ["Sales Order", "Sales Invoice", "Journal Entry", "Dunning"];
+				doctypes = ["Sales Order", "Sales Invoice", "Journal Entry", "Dunning", "Hall Booking"];
 			} else if (frm.doc.party_type == "Supplier") {
 				doctypes = ["Purchase Order", "Purchase Invoice", "Journal Entry"];
 			} else if (frm.doc.party_type == "Employee") {
@@ -37,6 +37,7 @@ frappe.ui.form.on("Payment Entry", {
 				"Expense Claim",
 				"Leave Encashment",
 				"Dunning",
+				"Hall Booking",
 			];
 
 			if (in_list(party_type_doctypes, child.reference_doctype)) {
