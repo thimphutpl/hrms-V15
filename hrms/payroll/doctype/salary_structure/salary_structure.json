@@ -14,6 +14,8 @@
   "company",
   "branch",
   "cost_center",
+  "department",
+  "division",
   "column_break1",
   "is_active",
   "from_date",
@@ -424,12 +426,28 @@
    "fieldname": "eligible_for_day_care",
    "fieldtype": "Check",
    "label": "Eligible for Day Care"
+  },
+  {
+   "fetch_from": "employee.department",
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Department",
+   "options": "Department"
+  },
+  {
+   "fetch_from": "employee.division",
+   "fieldname": "division",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Division",
+   "options": "Division"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2026-01-05 16:27:13.062372",
+ "modified": "2026-01-06 09:37:22.459190",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
