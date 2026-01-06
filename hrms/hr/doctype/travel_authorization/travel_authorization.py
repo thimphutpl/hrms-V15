@@ -36,7 +36,7 @@ class TravelAuthorization(Document):
 		self.validate_exchange_rate()
 		self.set_status()
 		self.make_travel_advance()
-		# self.validate_estimated_amount()
+		self.validate_estimated_amount()
 		validate_workflow_states(self)
 		if self.workflow_state != "Approved":
 			notify_workflow_states(self)
@@ -71,7 +71,7 @@ class TravelAuthorization(Document):
 			user_id,employee_name=frappe.get_value("Employee",ceo,["user_id","employee_name"])
 			self.reports_to=user_id
 			self.reports_to_name=employee_name
-	else
+		else:
 			return
 
 	def create_attendance(self):
@@ -112,9 +112,9 @@ class TravelAuthorization(Document):
 				"delete from tabAttendance where reference_name = %s", (self.name)
 			)
 
-	# def validate_estimated_amount(self):
-	# 	if flt(self.advance_amount) > flt(self.estimated_amount):
-	# 		frappe.throw("your estimate amount is less than advance amount ")
+	def validate_estimated_amount(self):
+		if flt(self.advance_amount) > flt(self.estimated_amount):
+			frappe.throw("your estimate amount is less than advance amount ")
 
 	def post_journal_entry(self):
 		advance_account = frappe.db.get_value(
