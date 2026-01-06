@@ -371,7 +371,15 @@ def get_basic_salary(employee):
 		for a in data:
 			amount += a.amount
 	return amount
+@frappe.whitelist()
+def get_tada(employee):
+	employee_grade=frappe.db.get_value("Employee",employee,"grade")
+	dsa=frappe.db.get_value("Employee Grade",employee_grade,"dsa")
+	if not dsa:
+		frappe.throw("No DSA is set with employee")
 
+	return dsa
+	
 @frappe.whitelist()
 def get_net_salary(employee):
 	amount = 0

@@ -6,20 +6,47 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "section_break_cjtu"
+  "relationship",
+  "full_name",
+  "gender",
+  "date_of_birth",
+  "cid_no"
  ],
  "fields": [
   {
-   "fieldname": "section_break_cjtu",
-   "fieldtype": "Section Break"
+   "fieldname": "relationship",
+   "fieldtype": "Select",
+   "label": "Relationship",
+   "options": "\nSelf\nSpouse\nFather\nMother\nChildren\nFather-in-law\nMother-in-law\nBrother\nSister"
+  },
+  {
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "label": "Full Name"
+  },
+  {
+   "fieldname": "gender",
+   "fieldtype": "Link",
+   "label": "Gender",
+   "options": "Gender"
+  },
+  {
+   "fieldname": "date_of_birth",
+   "fieldtype": "Date",
+   "label": "Date of Birth"
+  },
+  {
+   "fieldname": "cid_no",
+   "fieldtype": "Data",
+   "label": "CID No./Passport /Work Permit"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-07-25 13:03:49.583095",
- "modified_by": "Administrator",
+ "modified": "2025-12-23 12:24:42.725302",
+ "modified_by": "sonam.zangmo@thimphutechpark.bt",
  "module": "HR",
  "name": "Retirement Benefits Nominees",
  "owner": "Administrator",
