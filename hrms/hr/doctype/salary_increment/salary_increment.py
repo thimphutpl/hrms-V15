@@ -127,10 +127,23 @@ class SalaryIncrement(Document):
             else self.date_of_reference
         )
 
-        prorate_ref_date = service_ref_date
+        def calc_months(ref_date, eff_date):
+            return frappe.db.sql("""
+                select (
+                    case
+                        when day(%(ref)s) > 1 and day(%(ref)s) <= 15
+                            then timestampdiff(MONTH, %(ref)s, %(eff)s) + 1
+                        else timestampdiff(MONTH, %(ref)s, %(eff)s)
+                    end
+                ) as no_of_months
+            """, {"ref": str(ref_date), "eff": str(eff_date)})[0][0] or 0
+
+        service_months = flt(calc_months(service_ref_date, effective_date))
+        self.total_months = service_months
+
         promotion_date = frappe.db.get_value("Employee", self.employee, "promotion_due_date")
-        if promotion_date and getdate(promotion_date) <= getdate(effective_date):
-            prorate_ref_date = promotion_date
+        has_valid_promotion = bool(promotion_date and getdate(promotion_date) <= getdate(effective_date))
+        promotion_months = flt(calc_months(promotion_date, effective_date)) if has_valid_promotion else 0
 
         for d in sst_doc.earnings:
             if d.salary_component == "Basic Pay":
@@ -141,22 +154,7 @@ class SalaryIncrement(Document):
             frappe.throw(_("Basic Pay not found in Salary Structure earnings for {0}").format(self.salary_structure))
 
         group_doc = frappe.get_doc("Employee Group", self.employee_group)
-        self.minimum_months = group_doc.minimum_months
-
-        def calc_months(ref_date):
-            return frappe.db.sql("""
-                select (
-                    case
-                        when day(%(ref)s) > 1 and day(%(ref)s) <= 15
-                            then timestampdiff(MONTH, %(ref)s, %(eff)s) + 1
-                        else timestampdiff(MONTH, %(ref)s, %(eff)s)
-                    end
-                ) as no_of_months
-            """, {"ref": str(ref_date), "eff": str(effective_date)})[0][0] or 0
-
-        self.total_months = flt(calc_months(service_ref_date))
-
-        prorate_months = flt(calc_months(prorate_ref_date))
+        self.minimum_months = flt(group_doc.minimum_months or 0)
 
         grade = frappe.get_doc("Employee Grade", self.grade)
         self.payscale_minimum = grade.lower_limit
@@ -164,30 +162,42 @@ class SalaryIncrement(Document):
         self.payscale_increment = grade.increment_value
         self.payscale_maximum = grade.upper_limit
 
-        if flt(self.total_months) >= flt(self.minimum_months):
-            self.calculated_factor = 1 if flt(self.total_months) / 12 >= 1 else round(
-                flt(self.total_months if cint(group_doc.increment_prorated) else 12) / 12, 2
-            )
+        self.increment = 0
+        self.calculated_increment = 0
+        self.calculated_factor = 0
+        self.new_basic = flt(self.old_basic)
+        
+        eligibility_months = promotion_months if has_valid_promotion else service_months
 
-            self.calculated_increment = (
+        if eligibility_months >= self.minimum_months:
+            base_increment = (
                 (flt(self.old_basic) * flt(self.payscale_increment) * 0.01)
                 if self.payscale_increment_method == "Percent"
                 else flt(self.payscale_increment)
             )
 
+          
+            prorate_months = promotion_months if has_valid_promotion else service_months
+
             if cint(group_doc.increment_prorated):
                 months_for_prorate = prorate_months if prorate_months < 12 else 12
-                self.calculated_increment = round((flt(self.calculated_increment) / 12) * flt(months_for_prorate))
+                self.calculated_factor = 1 if months_for_prorate >= 12 else round(flt(months_for_prorate) / 12, 2)
+                self.calculated_increment = round((flt(base_increment) / 12) * flt(months_for_prorate))
+            else:
+                self.calculated_factor = 1
+                self.calculated_increment = flt(base_increment)
 
             self.increment = flt(self.calculated_increment)
             self.new_basic = flt(self.old_basic) + flt(self.increment)
         else:
+            self.increment = 0
+            self.calculated_increment = 0
+            self.calculated_factor = 0
             self.new_basic = flt(self.old_basic)
 
         if preserve_values:
             self.increment = saved_increment
             self.new_basic = saved_new_basic
-
 
 def get_salary_structure(employee, effective_date):
     sst = frappe.db.sql("""
