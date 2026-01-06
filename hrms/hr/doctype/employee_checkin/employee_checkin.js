@@ -2,6 +2,7 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Employee Checkin", {
+
 	refresh: async (frm) => {
 		if (!frm.doc.__islocal) frm.trigger("add_fetch_shift_button");
 
@@ -19,27 +20,21 @@ frappe.ui.form.on("Employee Checkin", {
 			frm.set_df_property("device_id", "hidden", 1);
 			frm.set_df_property("skip_auto_attendance", "hidden", 1);
 		}
+		if (!frm.is_new()) {
+			lock_fields(frm);
+		}
+	},
+	on_submit(frm) {
+		lock_fields(frm);
+	},
+
+	onload_post_render(frm) {
+		if (!frm.is_new()) {
+			lock_fields(frm);
+		}
 	},
 	after_save: function (frm) {
 		frappe.set_route("List", "Employee Checkin");
-	},
-	employee: function (frm) {
-		if (frm.doc.employee) {
-			frappe.call({
-				method: "fetch_shift",
-				doc: frm.doc,
-				// <- this calls your doc method directly
-				args: {
-
-					args: {}  // no arguments needed
-				},
-				callback: function (r) {
-					// r.message is undefined because your method doesn't return anything
-					// but your method will set the fields on the document automatically
-					frm.refresh_fields(); // make sure the updated shift fields show in the form
-				}
-			});
-		}
 	},
 	fetch_geolocation: (frm) => {
 		hrms.fetch_geolocation(frm);
@@ -69,3 +64,9 @@ frappe.ui.form.on("Employee Checkin", {
 		});
 	},
 });
+function lock_fields(frm) {
+	frm.set_df_property("log_type", "read_only", 1);
+	frm.set_df_property("time", "read_only", 1);
+	frm.set_df_property("employee", "read_only", 1);
+	frm.set_df_property("fetch_geolocation", "hidden", 1);
+}
