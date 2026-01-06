@@ -380,10 +380,7 @@ def calculate_working_hours(logs, check_in_out_type, working_hours_calc_type):
 
 			if in_log and out_log:
 				out_time = out_log.time
-				total_hours += time_diff_in_hours(in_log.time, out_log.time)
-	if total_hours > lunch_break:
-		total_hours -= lunch_break
-		
+				total_hours += time_diff_in_hours(in_log.time, out_log.time)		
 	return total_hours, in_time, out_time
 
 
