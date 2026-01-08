@@ -85,14 +85,30 @@ class BulkLeaveEncashment(Document):
 				to_date=allocation.to_date,
 				leave_type=self.leave_type, 
 				consider_all_leaves_in_the_allocation_period=True)
-            
+			
 			if not emp.employee_group:
 				emp.employee_group = frappe.db.get_value("Employee", emp.employee, "employee_group")
 			
 			# emp.encashable_days = 30 if emp.leave_balance >= 30 else emp.leave_balance
 			# emp.leave_balance = emp.encashable_days
 			emp.leave_balance = leave_balance if leave_balance <= max_encashable_days else max_encashable_days
-			emp.encashable_days = emp.leave_balance  
+			emp.encashable_days = emp.leave_balance 
+			excess = leave_balance - max_encashable_days
+			if excess > 0 and self.leave_type == "Earned Leave":
+				from hrms.hr.doctype.leave_ledger_entry.leave_ledger_entry import create_leave_ledger_entry
+
+				args = frappe._dict(
+					employee = emp.employee,
+					employee_name = emp.employee_name,
+					leaves = -excess,
+					from_date = self.encashment_date,
+					to_date = self.encashment_date,
+					transaction_type = "Leave Allocation",
+					is_expired = 1,
+					remarks = "Auto-expired excess Earned Leave beyond cap"
+				)
+				create_leave_ledger_entry(self, args, submit=True)
+ 
 
 			if emp.encashable_days > emp.leave_balance:
 				frappe.throw("Encashable Days  cannot be more than Leave Balance")
@@ -149,7 +165,7 @@ class BulkLeaveEncashment(Document):
 			frappe.throw("Setup Tax Account in HR Accounts Settings")
 		
 		default_bank_account = get_bank_account(self.branch)
-		default_payable_account = frappe.db.get_single_value("HR Accounts Settings", "salary_payable_account")
+		default_payable_account = frappe.db.get_single_value("HR Accounts Settings", "leave_encashment_payable")
 		company_cc = frappe.db.get_value("Branch", self.branch,"cost_center")
 
 		cc = {}
@@ -210,6 +226,8 @@ class BulkLeaveEncashment(Document):
 				"reference_type": self.doctype,
 				"reference_name": self.name,
 				"cost_center": company_cc,
+				# "party_type": "Employee",
+				# "party": det.employee,
 				"credit_in_account_currency": flt(net_payable,2),
 				"credit": flt(net_payable,2),
 				"party_check": 0
@@ -272,6 +290,8 @@ class BulkLeaveEncashment(Document):
 				"reference_type": self.doctype,
 				"reference_name": self.name,
 				"cost_center": company_cc,
+				# "party_type": "Employee",
+				# "party": det.employee,
 				"debit_in_account_currency": flt(net_payable,2),
 				"debit": flt(net_payable,2),
 				"party_check": 0

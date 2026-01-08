@@ -74,15 +74,24 @@ class LeaveTravelConcession(Document):
 		ltc_account = frappe.db.get_single_value("HR Accounts Settings","ltc_account")
 		if not ltc_account:
 			frappe.throw("Setup LTC Account in HR Accounts Settings")
+
 		expense_bank_account = frappe.db.get_value("Branch", self.branch, "expense_bank_account")
-		
 		if not expense_bank_account:
 			frappe.throw("Setup Expense Bank Account in Branch")
+
+		default_payable_account = frappe.db.get_single_value("HR Accounts Settings", "ltc_payable")	
+		if not default_payable_account:
+			frappe.throw("Setup ltc_payable account in HR Accounts Settings")
+
+		company_cc = frappe.db.get_value("Branch", self.branch,"cost_center")	
+
 		total_credit = 0
 		for key in cc_amount.keys():
 			values = key.split(":")
 			je.append("accounts", {
-					"account": ltc_account,
+					# "account": ltc_account,
+					# change by sanga
+					"account": default_payable_account,
 					"reference_type": self.doctype,
 					"reference_name": self.name,
 					"cost_center": values[0],
@@ -101,10 +110,108 @@ class LeaveTravelConcession(Document):
 			})
 
 		je.insert()
-
 		self.db_set("journal_entry", je.name)
+		# frappe.throw(frappe.as_json(je))
+
+		# #Payables Journal Entry -----------------------------------------------
+		# payables_je = frappe.new_doc("Journal Entry")
+		# payables_je.voucher_type= "Journal Entry"
+		# payables_je.naming_series = "Journal Voucher"
+		# payables_je.title = "Bulk LTC "+str(self.fiscal_year)+" - To Payables"
+		# payables_je.remark =  "Bulk LTC "+str(self.fiscal_year)+" - To Payables"
+		# payables_je.posting_date = self.posting_date               
+		# payables_je.company = self.company
+		# payables_je.branch = self.branch
+		# payables_je.reference_type = self.doctype
+		# payables_je.reference_name =  self.name
+		# total = total_allowance = 0
+
+		# total_credit = 0
+		# for key in cc_amount.keys():
+		# 	for item in self.items:
+		# 		cost_center = frappe.db.get_value("Branch", item.branch, "cost_center")
+		# 		payables_je.append("accounts", {
+		# 				# "account": "Leave Travel Concession - CDCL",
+		# 				"account":ltc_account,
+		# 				"reference_type": self.doctype,
+		# 				"reference_name": self.name,
+		# 				"cost_center": cost_center,
+		# 				# "debit_in_account_currency": self.total_amount,
+		# 				# "debit": self.total_amount,
+		# 				"debit_in_account_currency": flt(cc_amount[key],2),
+		# 				"debit": flt(cc_amount[key],2),
+		# 			})
+		# 		total_credit += flt(cc_amount[key])	
+
+		# 		#Salary Payble
+		# 		payables_je.append("accounts", {
+		# 				"account": default_payable_account,
+		# 				"reference_type": self.doctype,
+		# 				"reference_name": self.name,
+		# 				"cost_center": company_cc,
+		# 				# "credit_in_account_currency": self.total_amount,
+		# 				# "credit": self.total_amount,
+		# 				"credit_in_account_currency": total_credit,
+		# 				"credit": total_credit,
+		# 				"party_check": 0
+		# 			})
+
+		# 		payables_je.flags.ignore_permissions = 1
+		# 		payables_je.insert()
+		# 		# payables_je.submit()
+		# 		# frappe.throw(frappe.as_json(payables_je))
+
+		# ---------------- PAYABLES JOURNAL ENTRY ----------------
+		payables_je = frappe.new_doc("Journal Entry")
+		payables_je.flags.ignore_permissions = 1
+		payables_je.voucher_type = "Journal Entry"
+		payables_je.naming_series = "Journal Voucher"
+		payables_je.title = f"Bulk LTC {self.fiscal_year} - To Payables"
+		payables_je.remark = f"Bulk LTC {self.fiscal_year} - To Payables"
+		payables_je.posting_date = self.posting_date
+		payables_je.company = self.company
+		payables_je.branch = self.branch
+		payables_je.reference_type = self.doctype
+		payables_je.reference_name = self.name
+
+		total_amount = 0
+
+		# Debit: LTC Expense (per cost center)
+		for cc, amount in cc_amount.items():
+			payables_je.append("accounts", {
+				"account": ltc_account,
+				"debit": flt(amount, 2),
+				"debit_in_account_currency": flt(amount, 2),
+				"cost_center": cc,
+				"reference_type": self.doctype,
+				"reference_name": self.name,
+			})
+			total_amount += flt(amount)
+
+		# Credit: LTC Payable (ONE LINE ONLY)
+		payables_je.append("accounts", {
+			"account": default_payable_account,
+			"credit": flt(total_amount, 2),
+			"credit_in_account_currency": flt(total_amount, 2),
+			"cost_center": company_cc,
+			"reference_type": self.doctype,
+			"reference_name": self.name,
+			"party_check": 0
+		})
+
+		payables_je.insert()
+
 
 	def on_cancel(self):
+		self.ignore_linked_doctypes = (
+			"GL Entry",
+			"Journal Entry",
+			"Payment Ledger Entry",
+			"Stock Ledger Entry",
+			"Repost Item Valuation",
+			"Serial and Batch Bundle",
+			"POL Entry"
+		)
 		jv_doc = frappe.get_doc("Journal Entry", self.journal_entry)
 		# jv = frappe.db.get_value("Journal Entry", self.journal_entry, "docstatus")
 		if jv_doc and jv_doc.docstatus != 2:
