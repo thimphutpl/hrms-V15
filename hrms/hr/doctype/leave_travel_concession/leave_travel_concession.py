@@ -200,7 +200,16 @@ class LeaveTravelConcession(Document):
 		})
 
 		payables_je.insert()
+		self.db_set("jv", payables_je.name)
 
+
+	# def on_cancel(self):
+	# 	jv_doc = frappe.get_doc("Journal Entry", self.journal_entry)
+	# 	# jv = frappe.db.get_value("Journal Entry", self.journal_entry, "docstatus")
+	# 	if jv_doc and jv_doc.docstatus != 2:
+	# 		frappe.throw("Can not cancel LTC without canceling the corresponding journal entry " + str(self.journal_entry))
+	# 	else:
+	# 		self.db_set("journal_entry", None)
 
 	def on_cancel(self):
 		self.ignore_linked_doctypes = (
@@ -212,12 +221,20 @@ class LeaveTravelConcession(Document):
 			"Serial and Batch Bundle",
 			"POL Entry"
 		)
-		jv_doc = frappe.get_doc("Journal Entry", self.journal_entry)
-		# jv = frappe.db.get_value("Journal Entry", self.journal_entry, "docstatus")
-		if jv_doc and jv_doc.docstatus != 2:
-			frappe.throw("Can not cancel LTC without canceling the corresponding journal entry " + str(self.journal_entry))
-		else:
-			self.db_set("journal_entry", None)
+		for je_name in filter(None, [self.journal_entry, self.jv]):
+			je = frappe.get_doc("Journal Entry", je_name)
+			if je.docstatus == 1:
+				je.flags.ignore_permissions = True
+				je.cancel()
+				# je.status ="Cancelled"
+			elif je.docstatus == 0:
+				je.delete()
+
+		self.db_set("journal_entry", None)
+		self.db_set("jv", None)
+	
+		
+
 
 
 	@frappe.whitelist()

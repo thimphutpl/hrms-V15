@@ -872,28 +872,80 @@ def get_number_of_leave_days(
 	return final
 
 
+# @frappe.whitelist()
+# def get_leave_details(employee, date):
+# 	allocation_records = get_leave_allocation_records(employee, date)
+# 	leave_allocation = {}
+# 	precision = cint(frappe.db.get_single_value("System Settings", "float_precision", cache=True))
+
+# 	for d in allocation_records:
+# 		allocation = allocation_records.get(d, frappe._dict())
+# 		remaining_leaves = get_leave_balance_on(
+# 			employee, d, date, to_date=allocation.to_date, consider_all_leaves_in_the_allocation_period=True
+# 		)
+
+# 		end_date = allocation.to_date
+# 		leaves_taken = get_leaves_for_period(employee, d, allocation.from_date, end_date) * -1
+# 		leaves_pending = get_leaves_pending_approval_for_period(employee, d, allocation.from_date, end_date)
+# 		expired_leaves = allocation.total_leaves_allocated - (remaining_leaves + leaves_taken)
+# 		max_allowed = 30
+# 		if remaining_leaves > max_allowed:
+# 			remaining_leaves = max_allowed
+# 		leave_allocation[d] = {
+# 			"total_leaves": flt(allocation.total_leaves_allocated, precision),
+# 			"expired_leaves": flt(expired_leaves, precision) if expired_leaves > 0 else 0,
+# 			"leaves_taken": flt(leaves_taken, precision),
+# 			"leaves_pending_approval": flt(leaves_pending, precision),
+# 			"remaining_leaves": flt(remaining_leaves, precision),
+# 		}
+
+# 	# is used in set query
+# 	lwp = frappe.get_list("Leave Type", filters={"is_lwp": 1}, pluck="name")
+
+# 	return {
+# 		"leave_allocation": leave_allocation,
+# 		# "leave_approver": get_leave_approver(employee),
+# 		"lwps": lwp,
+# 	}
+
+
 @frappe.whitelist()
-def get_leave_details(employee, date):
+def get_leave_details(employee, date, for_salary_slip=False):
 	allocation_records = get_leave_allocation_records(employee, date)
 	leave_allocation = {}
-	precision = cint(frappe.db.get_single_value("System Settings", "float_precision", cache=True))
+	precision = (
+		cint(frappe.db.get_single_value("System Settings", "float_precision")) or 2
+	)
 
 	for d in allocation_records:
 		allocation = allocation_records.get(d, frappe._dict())
+		to_date = date if for_salary_slip else allocation.to_date
 		remaining_leaves = get_leave_balance_on(
-			employee, d, date, to_date=allocation.to_date, consider_all_leaves_in_the_allocation_period=True
+			employee,
+			d,
+			date,
+			to_date=to_date,
+			consider_all_leaves_in_the_allocation_period=(
+				False if for_salary_slip else True
+			),
 		)
 
-		end_date = allocation.to_date
-		leaves_taken = get_leaves_for_period(employee, d, allocation.from_date, end_date) * -1
-		leaves_pending = get_leaves_pending_approval_for_period(employee, d, allocation.from_date, end_date)
-		expired_leaves = allocation.total_leaves_allocated - (remaining_leaves + leaves_taken)
-		max_allowed = 30
-		if remaining_leaves > max_allowed:
-			remaining_leaves = max_allowed
+		leaves_taken = (
+			get_leaves_for_period(employee, d, allocation.from_date, to_date) * -1
+		)
+
+		leaves_pending = get_leaves_pending_approval_for_period(
+			employee, d, allocation.from_date, to_date
+		)
+		expired_leaves = allocation.total_leaves_allocated - (
+			remaining_leaves + leaves_taken
+		)
+
 		leave_allocation[d] = {
 			"total_leaves": flt(allocation.total_leaves_allocated, precision),
-			"expired_leaves": flt(expired_leaves, precision) if expired_leaves > 0 else 0,
+			"expired_leaves": (
+				flt(expired_leaves, precision) if expired_leaves > 0 else 0
+			),
 			"leaves_taken": flt(leaves_taken, precision),
 			"leaves_pending_approval": flt(leaves_pending, precision),
 			"remaining_leaves": flt(remaining_leaves, precision),
@@ -904,68 +956,10 @@ def get_leave_details(employee, date):
 
 	return {
 		"leave_allocation": leave_allocation,
-		# "leave_approver": get_leave_approver(employee),
+		"leave_approver": get_leave_approver(employee),
 		"lwps": lwp,
 	}
 
-
-# @frappe.whitelist()
-# def get_leave_balance_on(
-#     employee: str,
-#     leave_type: str,
-#     date: datetime.date,
-#     to_date: datetime.date | None = None,
-#     consider_all_leaves_in_the_allocation_period: bool = False,
-#     for_consumption: bool = False,
-# ):
-#     # frappe.throw("hi")
-#     if not to_date:
-#         to_date = nowdate()
-
-#     allocation_records = get_leave_allocation_records(employee, date, leave_type)
-#     allocation = allocation_records.get(leave_type, frappe._dict())
-
-#     end_date = (
-#         allocation.to_date
-#         if cint(consider_all_leaves_in_the_allocation_period)
-#         else date
-#     )
-#     cf_expiry = get_allocation_expiry_for_cf_leaves(
-#         employee, leave_type, to_date, allocation.from_date
-#     )
-
-#     leaves_taken = get_leaves_for_period(
-#         employee, leave_type, allocation.from_date, end_date
-#     )
-	
-#     remaining_leaves = get_remaining_leaves(allocation, leaves_taken, date, cf_expiry)
-#     #frappe.msgprint(str(remaining_leaves))
-
-#     if for_consumption:
-#         return remaining_leaves
-#     else:
-#         if leave_type=="Earned Leave":
-#             #frappe.throw(str(end_date))
-#             total_leaves=0
-#             Ledger = frappe.qb.DocType("Leave Ledger Entry")
-
-#             query = (
-#                 frappe.qb.from_(Ledger)
-#                 .select(Sum(Ledger.leaves).as_("total_leaves"))
-#                 .where(
-#                     (Ledger.employee == employee)
-#                     & (Ledger.leave_type == 'Earned Leave')
-#                     & (Ledger.transaction_type == 'Merge CL To EL')
-#                     & (Ledger.from_date == allocation.from_date)
-#                     & (Ledger.to_date == end_date)
-#                 )
-#             )
-
-#             result = query.run(as_dict=True)
-#             total_leaves = result[0]['total_leaves'] if result else 0
-#             #frappe.throw(str(total_leaves ))
-#             remaining_leaves.leave_balance +=flt(total_leaves)
-#         return remaining_leaves.get("leave_balance")
 
 @frappe.whitelist()
 def get_leave_balance_on(
@@ -976,56 +970,114 @@ def get_leave_balance_on(
 	consider_all_leaves_in_the_allocation_period: bool = False,
 	for_consumption: bool = False,
 ):
-	"""
-	Returns the leave balance for an employee.
-	
-	:param employee: Employee ID
-	:param leave_type: Leave type (Casual Leave, Earned Leave, etc.)
-	:param date: Date to check balance on
-	:param to_date: Optional future date for allocation expiry consideration
-	:param consider_all_leaves_in_the_allocation_period: Whether to consider entire allocation period
-	:param for_consumption: Whether balance is for consumption (True) or display (False)
-	"""
+	# frappe.throw("hi")
 	if not to_date:
 		to_date = nowdate()
 
 	allocation_records = get_leave_allocation_records(employee, date, leave_type)
 	allocation = allocation_records.get(leave_type, frappe._dict())
 
-	if not allocation:
-		return 0 if not for_consumption else frappe._dict(leave_balance=0, leave_balance_for_consumption=0)
+	end_date = (
+		allocation.to_date
+		if cint(consider_all_leaves_in_the_allocation_period)
+		else date
+	)
+	cf_expiry = get_allocation_expiry_for_cf_leaves(
+		employee, leave_type, to_date, allocation.from_date
+	)
 
-	end_date = allocation.to_date if cint(consider_all_leaves_in_the_allocation_period) else date
-	cf_expiry = get_allocation_expiry_for_cf_leaves(employee, leave_type, to_date, allocation.from_date)
-
-	# Leaves already taken in this allocation period
-	leaves_taken = get_leaves_for_period(employee, leave_type, allocation.from_date, end_date)
-	remaining_leaves = get_remaining_leaves(allocation, leaves_taken, date, cf_expiry)
+	leaves_taken = get_leaves_for_period(
+		employee, leave_type, allocation.from_date, end_date
+	)
 	
+	remaining_leaves = get_remaining_leaves(allocation, leaves_taken, date, cf_expiry)
+	#frappe.msgprint(str(remaining_leaves))
 
 	if for_consumption:
 		return remaining_leaves
 	else:
-		# Special handling for Earned Leave to include merged Casual Leave
-		if leave_type == "Earned Leave":
+		if leave_type=="Earned Leave":
+			#frappe.throw(str(end_date))
+			total_leaves=0
 			Ledger = frappe.qb.DocType("Leave Ledger Entry")
-			total_merged_cl = (
+
+			query = (
 				frappe.qb.from_(Ledger)
 				.select(Sum(Ledger.leaves).as_("total_leaves"))
 				.where(
 					(Ledger.employee == employee)
-					& (Ledger.leave_type == "Earned Leave")
-					& (Ledger.transaction_type == "Merge CL To EL")
-					& (Ledger.from_date <= end_date)
-					& (Ledger.to_date >= allocation.from_date)
+					& (Ledger.leave_type == 'Earned Leave')
+					& (Ledger.transaction_type == 'Merge CL To EL')
+					& (Ledger.from_date == allocation.from_date)
+					& (Ledger.to_date == end_date)
 				)
-			).run(as_dict=True)
+			)
 
-			total_merged_cl = total_merged_cl[0]['total_leaves'] if total_merged_cl else 0
-			remaining_leaves.leave_balance += flt(total_merged_cl)
+			result = query.run(as_dict=True)
+			total_leaves = result[0]['total_leaves'] if result else 0
+			#frappe.throw(str(total_leaves ))
+			remaining_leaves.leave_balance +=flt(total_leaves)
+		return remaining_leaves.get("leave_balance")
+
+# @frappe.whitelist()
+# def get_leave_balance_on(
+# 	employee: str,
+# 	leave_type: str,
+# 	date: datetime.date,
+# 	to_date: datetime.date | None = None,
+# 	consider_all_leaves_in_the_allocation_period: bool = False,
+# 	for_consumption: bool = False,
+# ):
+# 	"""
+# 	Returns the leave balance for an employee.
+	
+# 	:param employee: Employee ID
+# 	:param leave_type: Leave type (Casual Leave, Earned Leave, etc.)
+# 	:param date: Date to check balance on
+# 	:param to_date: Optional future date for allocation expiry consideration
+# 	:param consider_all_leaves_in_the_allocation_period: Whether to consider entire allocation period
+# 	:param for_consumption: Whether balance is for consumption (True) or display (False)
+# 	"""
+# 	if not to_date:
+# 		to_date = nowdate()
+
+# 	allocation_records = get_leave_allocation_records(employee, date, leave_type)
+# 	allocation = allocation_records.get(leave_type, frappe._dict())
+
+# 	if not allocation:
+# 		return 0 if not for_consumption else frappe._dict(leave_balance=0, leave_balance_for_consumption=0)
+
+# 	end_date = allocation.to_date if cint(consider_all_leaves_in_the_allocation_period) else date
+# 	cf_expiry = get_allocation_expiry_for_cf_leaves(employee, leave_type, to_date, allocation.from_date)
+
+# 	# Leaves already taken in this allocation period
+# 	leaves_taken = get_leaves_for_period(employee, leave_type, allocation.from_date, end_date)
+# 	remaining_leaves = get_remaining_leaves(allocation, leaves_taken, date, cf_expiry)
+	
+
+# 	if for_consumption:
+# 		return remaining_leaves
+# 	else:
+# 		# Special handling for Earned Leave to include merged Casual Leave
+# 		if leave_type == "Earned Leave":
+# 			Ledger = frappe.qb.DocType("Leave Ledger Entry")
+# 			total_merged_cl = (
+# 				frappe.qb.from_(Ledger)
+# 				.select(Sum(Ledger.leaves).as_("total_leaves"))
+# 				.where(
+# 					(Ledger.employee == employee)
+# 					& (Ledger.leave_type == "Earned Leave")
+# 					& (Ledger.transaction_type == "Merge CL To EL")
+# 					& (Ledger.from_date <= end_date)
+# 					& (Ledger.to_date >= allocation.from_date)
+# 				)
+# 			).run(as_dict=True)
+
+# 			total_merged_cl = total_merged_cl[0]['total_leaves'] if total_merged_cl else 0
+# 			remaining_leaves.leave_balance += flt(total_merged_cl)
 			
 		
-		return remaining_leaves.get("leave_balance")
+# 		return remaining_leaves.get("leave_balance")
 
 
 
