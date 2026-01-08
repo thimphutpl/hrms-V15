@@ -827,7 +827,12 @@ def get_number_of_leave_days(
 	"""Returns number of leave days between 2 dates after considering half day and holidays.
 	Holidays are included only for specific leave types: Casual Leave, Earn Leave, and Bereavement Leave.
 	For all other leave types, holidays are excluded."""
-	   
+	#Normalize all date-like inputs first
+	from_date = getdate(from_date)
+	to_date = getdate(to_date)
+	if half_day_date:
+		half_day_date = getdate(half_day_date)
+   
 	if from_date > to_date:
 		frappe.throw("From Date cannot be greater than To Date") 
 
@@ -851,46 +856,58 @@ def get_number_of_leave_days(
 		number_of_days = flt(number_of_days) - flt(holidays)
 	return number_of_days
 
+
 @frappe.whitelist()
-def get_leave_details(employee, date):
-	
+def get_leave_details(employee, date):	
 	allocation_records = get_leave_allocation_records(employee, date)
 	leave_allocation = {}
 	precision = cint(frappe.db.get_single_value("System Settings", "float_precision", cache=True))
-
 	for d in allocation_records:
-		allocation = allocation_records.get(d, frappe._dict())
-		
+		allocation = allocation_records.get(d, frappe._dict())		
+		# Current balance (already respects carry-forward logic)
 		remaining_leaves = get_leave_balance_on(
-			employee, d, date, consider_all_leaves_in_the_allocation_period=True
-		)		
-
+			employee,
+			d,
+			date,
+			consider_all_leaves_in_the_allocation_period=True,
+		)
 		end_date = allocation.to_date
-		leaves_taken = get_leaves_for_period(employee, d, allocation.from_date, end_date) * -1
-		leaves_pending = get_leaves_pending_approval_for_period(employee, d, allocation.from_date, end_date)
-		expired_leaves = allocation.total_leaves_allocated - (remaining_leaves + leaves_taken)
+		leaves_taken = (
+			get_leaves_for_period(employee, d, allocation.from_date, end_date) * -1
+		)
+		leaves_pending = get_leaves_pending_approval_for_period(
+			employee, d, allocation.from_date, end_date
+		)
+		# handle carry-forward leave types (like Earned Leave) differently
+		leave_type_doc = frappe.get_cached_doc("Leave Type", d)
+		can_carry_forward = cint(leave_type_doc.is_carry_forward)
+		if can_carry_forward:			
+			total_allocated = remaining_leaves + leaves_taken
+			expired_leaves = 0
+		else:
+			# Original behaviour for non–carry-forward leave types
+			total_allocated = allocation.total_leaves_allocated
+			expired_leaves = total_allocated - (remaining_leaves + leaves_taken)
 
 		leave_allocation[d] = {
-			"total_leaves": flt(allocation.total_leaves_allocated, precision),
+			"total_leaves": flt(total_allocated, precision),
 			"expired_leaves": flt(expired_leaves, precision) if expired_leaves > 0 else 0,
 			"leaves_taken": flt(leaves_taken, precision),
 			"leaves_pending_approval": flt(leaves_pending, precision),
 			"remaining_leaves": flt(remaining_leaves, precision),
 		}
-
 	# Remove 'GCE Casual Leave' from dashboard if employee is not GCE
 	employment_type = frappe.db.get_value("Employee", employee, "employment_type")
 	if employment_type != "GCE" and "GCE Casual Leave" in leave_allocation:
 		leave_allocation.pop("GCE Casual Leave")
-
 	# is used in set query
 	lwp = frappe.get_list("Leave Type", filters={"is_lwp": 1}, pluck="name")
-
 	return {
 		"leave_allocation": leave_allocation,
 		"leave_approver": get_leave_approver(employee),
 		"lwps": lwp,
 	}
+
 
 @frappe.whitelist()
 def get_leave_balance_on(
@@ -932,9 +949,9 @@ def get_leave_balance_on(
 		return remaining_leaves.get("leave_balance")
 
 
-
 def get_leave_allocation_records(employee, date, leave_type=None):
 	"""Returns the total allocated leaves and carry forwarded leaves based on ledger entries"""
+
 	Ledger = frappe.qb.DocType("Leave Ledger Entry")
 	LeaveAllocation = frappe.qb.DocType("Leave Allocation")
 
@@ -944,7 +961,7 @@ def get_leave_allocation_records(employee, date, leave_type=None):
 	new_leaves_case = frappe.qb.terms.Case().when(Ledger.is_carry_forward == "0", Ledger.leaves).else_(0)
 	sum_new_leaves = Sum(new_leaves_case).as_("new_leaves")
 
-	query = (
+	base_query = (
 		frappe.qb.from_(Ledger)
 		.inner_join(LeaveAllocation)
 		.on(Ledger.transaction_name == LeaveAllocation.name)
@@ -963,36 +980,38 @@ def get_leave_allocation_records(employee, date, leave_type=None):
 			& (Ledger.employee == employee)
 			& (Ledger.is_expired == 0)
 			& (Ledger.is_lwp == 0)
-			& (
-				# newly allocated leave's end date is same as the leave allocation's to date
+		)
+	)
+
+	can_carry_forward = None
+
+	if leave_type:
+		base_query = base_query.where(Ledger.leave_type == leave_type)
+		leave_type_doc = frappe.get_cached_doc("Leave Type", leave_type)
+		can_carry_forward = cint(leave_type_doc.is_carry_forward)
+
+	if can_carry_forward:		
+		query = base_query.where(
+			(LeaveAllocation.from_date <= date) & (date <= LeaveAllocation.to_date)
+		)
+	else:
+		query = base_query.where(
+			(
 				((Ledger.is_carry_forward == 0) & (Ledger.to_date >= date))
-				# carry forwarded leave's end date won't be same as the leave allocation's to dates
-				# it's between the leave allocation's from and to date
 				| (
 					(Ledger.is_carry_forward == 1)
 					& (Ledger.to_date.between(LeaveAllocation.from_date, LeaveAllocation.to_date))
-					# only consider cf leaves from current allocationn
 					& (LeaveAllocation.from_date <= date)
 					& (date <= LeaveAllocation.to_date)
 				)
 			)
 		)
-	)
-	
-	
 
-
-	if leave_type:
-		
-		query = query.where(Ledger.leave_type == leave_type)
 	query = query.groupby(Ledger.employee, Ledger.leave_type)
-	# frappe.msgprint(_("Query Result: {0}").format(query))
-	
+
 	allocation_details = query.run(as_dict=True)
-	
 
 	allocated_leaves = frappe._dict()
-	# frappe.throw(str(allocated_leaves))
 	for d in allocation_details:
 		allocated_leaves.setdefault(
 			d.leave_type,
@@ -1008,7 +1027,9 @@ def get_leave_allocation_records(employee, date, leave_type=None):
 				}
 			),
 		)
+
 	return allocated_leaves
+
 	
 def get_leaves_pending_approval_for_period(
 	employee: str, leave_type: str, from_date: datetime.date, to_date: datetime.date
