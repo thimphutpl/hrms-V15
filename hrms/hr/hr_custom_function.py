@@ -239,30 +239,36 @@ def get_date_diff(start_date, end_date):
 	else:	
 		return frappe.utils.data.date_diff(end_date, start_date) + 1
 
-@frappe.whitelist()
-def get_approver(employee):
-	# leave_approver, department = frappe.db.get_value("Employee", employee, ["leave_approver", "department"])
+# @frappe.whitelist()
+# def get_approver(employee):
+# 	deg=frappe.db.get_value("Employee", employee, "designation")
+# 	if not deg:
+# 		frappe.throw("Set designation in employee master")
+# 	if deg=='Chief Executive Officer':
 
-	# if not leave_approver and department:
-	# 	leave_approver = frappe.db.get_value(
-	# 		"Department Approver",
-	# 		{"parent": department, "parentfield": "leave_approvers", "idx": 1},
-	# 		"approver",
-	# 	)
-	# department = frappe.db.get_value("Employee", employee, "department")
-	# empid=frappe.db.get_value("Department", department, "approver")
-	# approver = frappe.db.get_value("Employee", empid, "user_id")
-	empid = frappe.db.get_value("Employee", employee, "reports_to")
-	approver = frappe.db.get_value("Employee", empid, "user_id")
+# 		approver = frappe.db.get_value("Employee", employee, "user_id")
+# 		frappe.throw(str(approver))
+# 	else:
+# 		empid = frappe.db.get_value("Employee", employee, "reports_to")
+# 		approver = frappe.db.get_value("Employee", empid, "user_id")
 
 
-	return approver
+# 	return approver
 
 
 @frappe.whitelist()
 def get_reports_to(employee):
-	empid = frappe.db.get_value("Employee", employee, "reports_to")
-	reports_to = frappe.db.get_value("Employee", empid, "user_id")
+	
+	deg=frappe.db.get_value("Employee", employee, "designation")
+	if not deg:
+		frappe.throw("Set designation in employee master")
+	if deg=='Chief Executive Officer':
+
+		reports_to = frappe.db.get_value("Employee", employee, "user_id")
+		#frappe.throw(str(approver))
+	else:
+		empid = frappe.db.get_value("Employee", employee, "reports_to")
+		reports_to = frappe.db.get_value("Employee", empid, "user_id")
 	
 	return reports_to
 

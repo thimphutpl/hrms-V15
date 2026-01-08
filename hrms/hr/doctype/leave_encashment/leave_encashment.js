@@ -61,22 +61,22 @@ frappe.ui.form.on("Leave Encashment", {
 			});
 		}
 	},
-	set_approver: function (frm) {
-		if (frm.doc.employee) {
-			console.log("hi")
-			return frappe.call({
-				method: "hrms.hr.hr_custom_function.get_approver",
-				args: {
-					employee: frm.doc.employee,
-				},
-				callback: function (r) {
-					if (r && r.message) {
-						frm.set_value("approver", r.message);
-					}
-				},
-			});
-		}
-	},
+	// set_approver: function (frm) {
+	// 	if (frm.doc.employee) {
+	// 		console.log("hi")
+	// 		return frappe.call({
+	// 			method: "hrms.hr.hr_custom_function.get_approver",
+	// 			args: {
+	// 				employee: frm.doc.employee,
+	// 			},
+	// 			callback: function (r) {
+	// 				if (r && r.message) {
+	// 					frm.set_value("approver", r.message);
+	// 				}
+	// 			},
+	// 		});
+	// 	}
+	// },
 
 	get_employee_currency: function (frm) {
 		frappe.call({
