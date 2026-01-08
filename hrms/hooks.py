@@ -208,13 +208,16 @@ doc_events = {
 
 # Scheduled Tasks
 scheduler_events = {
-	"cron": {
-		"0 6 * * *": [            
-			"hrms.hr.hr_custom_functions.post_earned_leaves",
-            "hrms.hr.hr_custom_functions.post_casual_leaves",
+	
+    "cron": {
+		"0 6 * * *": [
+			"hrms.hr.hr_custom_functions.post_earned_leaves"
 		],
+		"0 7 * * *": [
+			"hrms.hr.hr_custom_functions.post_casual_leaves"
+		]
+	},
 
-	},	
 	"all": [
 		"hrms.hr.doctype.interview.interview.send_interview_reminder",
 	],
@@ -259,6 +262,7 @@ accounting_dimension_doctypes = [
 	"Expense Claim Detail",
 	"Expense Taxes and Charges",
 	"Payroll Entry",
+	
 ]
 
 bank_reconciliation_doctypes = ["Expense Claim"]
