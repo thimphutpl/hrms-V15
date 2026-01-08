@@ -260,22 +260,7 @@ frappe.ui.form.on("Leave Application", {
 			});
 		}
 	},
-	// set_leave_approver: function (frm) {
-	// 	if (frm.doc.employee) {
-	// 		console.log("hi")
-	// 		return frappe.call({
-	// 			method: "hrms.hr.hr_custom_function.get_approver",
-	// 			args: {
-	// 				employee: frm.doc.employee,
-	// 			},
-	// 			callback: function (r) {
-	// 				if (r && r.message) {
-	// 					frm.set_value("leave_approver", r.message);
-	// 				}
-	// 			},
-	// 		});
-	// 	}
-	// },
+	
 
 	set_form_buttons: async function (frm) {
 		let self_approval_not_allowed = frm.doc.__onload

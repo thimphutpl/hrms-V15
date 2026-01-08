@@ -75,7 +75,7 @@ frappe.ui.form.on("Leave Encashment", {
 	// 				}
 	// 			},
 	// 		});
-	// 	}
+	// 	}jj
 	// },
 
 	get_employee_currency: function (frm) {
