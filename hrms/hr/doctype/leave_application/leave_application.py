@@ -948,9 +948,10 @@ def get_leave_balance_on(
 	else:
 		return remaining_leaves.get("leave_balance")
 
-
 def get_leave_allocation_records(employee, date, leave_type=None):
-	"""Returns the total allocated leaves and carry forwarded leaves based on ledger entries"""
+	"""Returns the total allocated leaves and carry forwarded leaves.
+	Customized to include ONLY the positive side of 'Merge CL To EL' (credit) into allocated leaves table.
+	"""
 
 	Ledger = frappe.qb.DocType("Leave Ledger Entry")
 	LeaveAllocation = frappe.qb.DocType("Leave Allocation")
@@ -961,7 +962,7 @@ def get_leave_allocation_records(employee, date, leave_type=None):
 	new_leaves_case = frappe.qb.terms.Case().when(Ledger.is_carry_forward == "0", Ledger.leaves).else_(0)
 	sum_new_leaves = Sum(new_leaves_case).as_("new_leaves")
 
-	base_query = (
+	base_alloc = (
 		frappe.qb.from_(Ledger)
 		.inner_join(LeaveAllocation)
 		.on(Ledger.transaction_name == LeaveAllocation.name)
@@ -984,18 +985,15 @@ def get_leave_allocation_records(employee, date, leave_type=None):
 	)
 
 	can_carry_forward = None
-
 	if leave_type:
-		base_query = base_query.where(Ledger.leave_type == leave_type)
+		base_alloc = base_alloc.where(Ledger.leave_type == leave_type)
 		leave_type_doc = frappe.get_cached_doc("Leave Type", leave_type)
 		can_carry_forward = cint(leave_type_doc.is_carry_forward)
 
-	if can_carry_forward:		
-		query = base_query.where(
-			(LeaveAllocation.from_date <= date) & (date <= LeaveAllocation.to_date)
-		)
+	if can_carry_forward:
+		alloc_q = base_alloc.where((LeaveAllocation.from_date <= date) & (date <= LeaveAllocation.to_date))
 	else:
-		query = base_query.where(
+		alloc_q = base_alloc.where(
 			(
 				((Ledger.is_carry_forward == 0) & (Ledger.to_date >= date))
 				| (
@@ -1007,21 +1005,51 @@ def get_leave_allocation_records(employee, date, leave_type=None):
 			)
 		)
 
-	query = query.groupby(Ledger.employee, Ledger.leave_type)
+	alloc_q = alloc_q.groupby(Ledger.employee, Ledger.leave_type)
 
-	allocation_details = query.run(as_dict=True)
+	merge_q = (
+		frappe.qb.from_(Ledger)
+		.select(
+			Sum(Ledger.leaves).as_("merge_leaves"),
+			Min(Ledger.from_date).as_("merge_from_date"),
+			Max(Ledger.to_date).as_("merge_to_date"),
+			Ledger.leave_type,
+			Ledger.employee,
+		)
+		.where(
+			(Ledger.from_date <= date)
+			& (Ledger.to_date >= date)             
+			& (Ledger.docstatus == 1)
+			& (Ledger.transaction_type == "Merge CL To EL")
+			& (Ledger.employee == employee)
+			& (Ledger.is_expired == 0)
+			& (Ledger.is_lwp == 0)
+			& (Ledger.leaves > 0)                  #
+		)
+		.groupby(Ledger.employee, Ledger.leave_type)
+	)
+
+	if leave_type:
+		merge_q = merge_q.where(Ledger.leave_type == leave_type)
+
+	allocation_details = alloc_q.run(as_dict=True)
+	merge_details = merge_q.run(as_dict=True)
+
+	merge_map = {d.leave_type: d for d in merge_details}
 
 	allocated_leaves = frappe._dict()
 	for d in allocation_details:
+		merged = flt(merge_map[d.leave_type].merge_leaves) if d.leave_type in merge_map else 0
+
 		allocated_leaves.setdefault(
 			d.leave_type,
 			frappe._dict(
 				{
 					"from_date": d.from_date,
 					"to_date": d.to_date,
-					"total_leaves_allocated": flt(d.cf_leaves) + flt(d.new_leaves),
+					"total_leaves_allocated": flt(d.cf_leaves) + flt(d.new_leaves) + merged,
 					"unused_leaves": d.cf_leaves,
-					"new_leaves_allocated": d.new_leaves,
+					"new_leaves_allocated": flt(d.new_leaves) + merged,
 					"leave_type": d.leave_type,
 					"employee": d.employee,
 				}
@@ -1029,6 +1057,7 @@ def get_leave_allocation_records(employee, date, leave_type=None):
 		)
 
 	return allocated_leaves
+
 
 	
 def get_leaves_pending_approval_for_period(
