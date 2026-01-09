@@ -27,12 +27,7 @@ frappe.ui.form.on('Leave Encashment', {
 
 			if (company) {
 				filters.company = company;
-			}
-
-			if (dt) {
-				filters.from_date = ["<=", dt];
-				filters.to_date = [">=", dt];
-			}
+			}			
 
 			return { filters };
 		});

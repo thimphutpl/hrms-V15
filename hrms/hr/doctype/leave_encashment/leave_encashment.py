@@ -394,11 +394,17 @@ class LeaveEncashment(Document):
 				employee = %(employee)s
 				and leave_type = %(leave_type)s
 				and docstatus = 1
-				and from_date <= %(as_of)s
+				and from_date between %(from_date)s and %(as_of)s
 			""",
-			{"employee": self.employee, "leave_type": self.leave_type, "as_of": as_of},
+			{
+				"employee": self.employee,
+				"leave_type": self.leave_type,
+				"from_date": allocation.from_date,
+				"as_of": as_of,                     
+			},
 			as_dict=True,
 		)
+
 
 		if ledger_row and ledger_row[0]:
 			row = ledger_row[0]
