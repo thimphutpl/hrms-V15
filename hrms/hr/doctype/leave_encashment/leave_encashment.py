@@ -282,7 +282,7 @@ class LeaveEncashment(Document):
 		if not frappe.db.get_value("Leave Type", self.leave_type, "allow_encashment"):
 			frappe.throw(_("Leave Type {0} is not encashable").format(self.leave_type))
 		allocation = self.get_leave_allocation()
-		leave_bal_mr_cl=self.get_laave_bal_mr()
+		# leave_bal_mr_cl=self.get_laave_bal_mr()
 		
 		if not allocation:
 			frappe.throw(
@@ -310,13 +310,9 @@ class LeaveEncashment(Document):
 
 		employee_group = frappe.db.get_value("Employee", self.employee, "employee_group")
 		encashment_min = frappe.db.get_value("Employee Group", employee_group, "encashment_min")
-		encashable_days = frappe.db.get_value("Employee Group", employee_group, "max_encashment_days")
+		encashable_days = frappe.db.get_value("Employee Group", employee_group, "max_encashment_days")		
 		
-		if leave_bal_mr_cl is None:			
-			self.balance_before=self.leave_balance
-		else:			
-			self.balance_before=self.leave_balance+leave_bal_mr_cl.leaves
-		
+		self.balance_before = flt(self.leave_balance)		
 		self.balance_after=self.balance_before-encashable_days
 		# need to chnage this 
 		# flt(encashment_min)
@@ -417,30 +413,30 @@ class LeaveEncashment(Document):
 		return allocation
 
 
-	def get_laave_bal_mr(self):		
-		date = self.encashment_date or getdate()
+	# def get_laave_bal_mr(self):		
+	# 	date = self.encashment_date or getdate()
 
-		Leavebal = frappe.qb.DocType("Leave Ledger Entry")
+	# 	Leavebal = frappe.qb.DocType("Leave Ledger Entry")
 		
-		leave_bal = (
-			frappe.qb.from_(Leavebal)
-			.select(
-				Leavebal.name,
-				Leavebal.from_date,
-				Leavebal.to_date,
+	# 	leave_bal = (
+	# 		frappe.qb.from_(Leavebal)
+	# 		.select(
+	# 			Leavebal.name,
+	# 			Leavebal.from_date,
+	# 			Leavebal.to_date,
 				
-				Leavebal.leaves
-			)
-			.where(
-				((Leavebal.from_date <= date) & (date <= Leavebal.to_date))
-				& (Leavebal.docstatus == 1)
-				& (Leavebal.leave_type == self.leave_type)
-				& (Leavebal.employee == self.employee)
-				& (Leavebal.transaction_type == 'Merge CL To EL')
-			)
-		).run(as_dict=True)	
+	# 			Leavebal.leaves
+	# 		)
+	# 		.where(
+	# 			((Leavebal.from_date <= date) & (date <= Leavebal.to_date))
+	# 			& (Leavebal.docstatus == 1)
+	# 			& (Leavebal.leave_type == self.leave_type)
+	# 			& (Leavebal.employee == self.employee)
+	# 			& (Leavebal.transaction_type == 'Merge CL To EL')
+	# 		)
+	# 	).run(as_dict=True)	
 
-		return leave_bal[0] if leave_bal else None
+	# 	return leave_bal[0] if leave_bal else None
 
 	def create_leave_ledger_entry(self, submit=True):
 		args = frappe._dict(
