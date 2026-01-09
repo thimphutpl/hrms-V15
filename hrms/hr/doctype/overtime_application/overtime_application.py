@@ -20,6 +20,7 @@ class OvertimeApplication(Document):
 		# self.check_status()
 		# self.validate_submitter()
 		self.post_journal_entry()
+		self.validate_employee_grade()
 
 	def on_cancel(self):
 		self.check_journal()
@@ -63,6 +64,11 @@ class OvertimeApplication(Document):
 	##
 	# Post journal entry
 	##
+
+	def validate_employee_grade(self):
+		if self.grade not in ('F11', 'F12', 'F12 (Contract)', 'F13', 'F14', 'F15', 'F16', 'F17', 'F18', 'F19'):
+			frappe.throw("Selected employee cannot apply for Overtime Application")
+
 	def post_journal_entry(self):	
 		cost_center, ba = frappe.db.get_value("Employee", self.employee, ["cost_center", "business_activity"])
 		ot_account = frappe.db.get_single_value("HR Accounts Settings", "overtime_account")
