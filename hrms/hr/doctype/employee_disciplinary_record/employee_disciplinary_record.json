@@ -1,0 +1,188 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-01-09 13:03:38.822603",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "employee_disciplinary_record_section",
+  "posting_date",
+  "employee",
+  "column_break_jzow",
+  "employee_name",
+  "designation",
+  "branch",
+  "disciplinary_record_section",
+  "from_date",
+  "to_date",
+  "salary_increment",
+  "dont_allow_promotion",
+  "dont_allocate_earned_leave",
+  "not_guilty_or_acquitted",
+  "attachment",
+  "increment_month",
+  "promotion_month",
+  "amended_from",
+  "disciplinary_issues",
+  "action_taken",
+  "current_status",
+  "year_of_disciplinary",
+  "remarks"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee_disciplinary_record_section",
+   "fieldtype": "Section Break",
+   "label": "Employee Disciplinary Record"
+  },
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "column_break_jzow",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name"
+  },
+  {
+   "fetch_from": "employee.designation",
+   "fieldname": "designation",
+   "fieldtype": "Data",
+   "label": "Designation"
+  },
+  {
+   "fetch_from": "employee.branch",
+   "fieldname": "branch",
+   "fieldtype": "Data",
+   "label": "Branch"
+  },
+  {
+   "fieldname": "disciplinary_record_section",
+   "fieldtype": "Section Break",
+   "label": "Disciplinary Record"
+  },
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "label": "From Date"
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "label": "To Date"
+  },
+  {
+   "default": "0",
+   "fieldname": "salary_increment",
+   "fieldtype": "Check",
+   "label": "Don't Allow Increment"
+  },
+  {
+   "default": "0",
+   "fieldname": "dont_allow_promotion",
+   "fieldtype": "Check",
+   "label": "Don't Allow Promotion"
+  },
+  {
+   "default": "0",
+   "fieldname": "dont_allocate_earned_leave",
+   "fieldtype": "Check",
+   "label": "Don't Allocate Earned Leave",
+   "options": "earned_leave"
+  },
+  {
+   "default": "0",
+   "fieldname": "not_guilty_or_acquitted",
+   "fieldtype": "Check",
+   "label": "Not Guilty or Acquitted",
+   "options": "earned_leave"
+  },
+  {
+   "fieldname": "attachment",
+   "fieldtype": "Attach",
+   "label": "Attachment"
+  },
+  {
+   "fieldname": "increment_month",
+   "fieldtype": "Data",
+   "label": "Increment Month"
+  },
+  {
+   "fieldname": "promotion_month",
+   "fieldtype": "Data",
+   "label": "Promotion Month"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "options": "Employee Disciplinary Record"
+  },
+  {
+   "fieldname": "disciplinary_issues",
+   "fieldtype": "Small Text",
+   "label": "Disciplinary Issues OR lapses"
+  },
+  {
+   "fieldname": "action_taken",
+   "fieldtype": "Small Text",
+   "label": "Action Taken"
+  },
+  {
+   "fieldname": "current_status",
+   "fieldtype": "Small Text",
+   "label": "Current Status"
+  },
+  {
+   "fieldname": "year_of_disciplinary",
+   "fieldtype": "Date",
+   "label": "Year of Disciplinary"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-01-09 16:49:43.974210",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Employee Disciplinary Record",
+ "owner": "sonam.zangmo@thimphutechpark.bt",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
