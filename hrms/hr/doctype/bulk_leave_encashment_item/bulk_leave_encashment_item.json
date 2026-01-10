@@ -54,9 +54,9 @@
   {
    "fieldname": "leave_balance",
    "fieldtype": "Float",
+   "in_list_view": 1,
    "label": "Leave Balance",
    "precision": "2",
-   "read_only": 1,
    "reqd": 1
   },
   {
@@ -86,7 +86,6 @@
    "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Encashable Days",
-   "read_only": 1,
    "reqd": 1
   },
   {
@@ -141,8 +140,7 @@
    "fieldname": "encashment_amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Encashment Amount",
-   "read_only": 1
+   "label": "Encashment Amount"
   },
   {
    "fieldname": "column_break_15",
@@ -152,15 +150,13 @@
    "fieldname": "payable_amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Payable Amount",
-   "read_only": 1
+   "label": "Payable Amount"
   },
   {
    "fieldname": "encashment_tax",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Encashment Tax",
-   "read_only": 1
+   "label": "Encashment Tax"
   },
   {
    "fieldname": "current_basic_pay",
@@ -171,7 +167,7 @@
  ],
  "istable": 1,
  "links": [],
- "modified": "2026-01-02 19:47:30.352504",
+ "modified": "2026-01-11 00:11:01.663995",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Bulk Leave Encashment Item",
