@@ -20,21 +20,25 @@
   {
    "fieldname": "from_date",
    "fieldtype": "Date",
+   "in_list_view": 1,
    "label": "From Date"
   },
   {
    "fieldname": "to_date",
    "fieldtype": "Date",
+   "in_list_view": 1,
    "label": "To Date"
   },
   {
    "fieldname": "reference",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Reference"
   },
   {
    "fieldname": "remarks",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Remarks"
   }
  ],
@@ -42,7 +46,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-01-09 16:50:51.834637",
+ "modified": "2026-01-12 11:35:23.002832",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Disciplinary Summary",

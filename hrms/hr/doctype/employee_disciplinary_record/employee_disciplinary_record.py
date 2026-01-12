@@ -17,7 +17,7 @@ class EmployeeDisciplinaryRecord(Document):
 		self.restore_on_guilty()
 
 	def on_cancel(self):
-		frappe.db.sql("delete from `tabDisciplinary Summary` where reference = %s", (self.name))
+		frappe.db.sql("delete from `tabEmployee Disciplinary Summary` where reference = %s", (self.name))
 		if today() <= self.to_date:
 			emp = frappe.get_doc("Employee", self.employee)
 			emp.employment_status = "In Service"
