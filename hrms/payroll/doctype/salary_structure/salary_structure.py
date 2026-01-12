@@ -170,7 +170,7 @@ class SalaryStructure(Document):
 						total_earning += round(amount)
 					else:
 						if flt(ed_item.total_deductible_amount) == 0:
-							total_deduction += amount
+							total_deduction += round(amount)
 						else:
 							if flt(ed_item.total_deductible_amount) != flt(ed_item.total_deducted_amount):
 								total_deduction += round(amount)
@@ -201,63 +201,63 @@ class SalaryStructure(Document):
 					if self.get(m['field_name']):
 						if self.get(m["field_method"]) == 'Percent':
 							if m['based_on'] == 'Pay Scale Lower Limit':
-								calc_amt = flt(payscale_lower_limit)*flt(self.get(m['field_value']))*0.01
+								calc_amt = round(flt(payscale_lower_limit)*flt(self.get(m['field_value']))*0.01)
 							else:
-								calc_amt = flt(basic_pay)*flt(self.get(m['field_value']))*0.01
+								calc_amt = round(flt(basic_pay)*flt(self.get(m['field_value']))*0.01)
 						else:
-							calc_amt = flt(self.get(m['field_value']))
+							calc_amt = round(flt(self.get(m['field_value'])))
 				
 						if m["field_name"] == "eligible_for_fixed_allowance":
-							calc_amt = frappe.db.get_value("Employee Grade", self.employee_grade, "fixed_allowance")
+							calc_amt = round(frappe.db.get_value("Employee Grade", self.employee_grade, "fixed_allowance"))
 						if m["field_name"] == "eligible_for_hra":
 							payment_method = frappe.db.get_value("Salary Component", "HRA", "payment_method")
 							cal_based = frappe.db.get_value("Salary Component", "HRA", "based_on")
-							amount = frappe.db.get_value("Salary Component", "HRA", "amount")
+							amount = round(frappe.db.get_value("Salary Component", "HRA", "amount"))
 							if not payment_method or not cal_based or not amount:
 								frappe.throw('Add Payment Method, Calculation Based, Amount in salary component in HRA')
 							if payment_method == 'Percent' and cal_based == 'Basic Pay' and amount:
-								calc_amt = (flt(basic_pay) * flt(amount) / 100)
+								calc_amt = round(flt(basic_pay) * flt(amount) / 100)
 							if payment_method == 'Lumpsum' and amount:
 								# frappe.throw(str(amount))
-								calc_amt = (flt(amount))
+								calc_amt = round(flt(amount))
 						if m["field_name"] == "eligible_for_conveyance_allowance":
 							payment_method = frappe.db.get_value("Salary Component", "Conveyance Allowance", "payment_method")
-							amount = frappe.db.get_value("Salary Component", "Conveyance Allowance", "amount")
+							amount = round(frappe.db.get_value("Salary Component", "Conveyance Allowance", "amount"))
 							if payment_method == 'Lumpsum' and amount:
 								# frappe.throw(str(amount))
 
-								calc_amt = (flt(amount))
+								calc_amt = round(flt(amount))
 							# calc_amt = roundoff(hra_amount)
 							# frappe.throw(str(calc_amt))
 							# calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
 						
 						# calc_amt = roundoff(calc_amt)
-						calc_amt = flt(calc_amt)
-						comm_allowance += flt(calc_amt) if m['name'] == 'Communication Allowance' else 0
-						total_earning += calc_amt
+						calc_amt = round(flt(calc_amt))
+						comm_allowance += round(flt(calc_amt)) if m['name'] == 'Communication Allowance' else 0
+						total_earning += round(calc_amt)
 						calc_map.append({'salary_component': m['name'], 'amount': calc_amt})
 				else:
 					# frappe.throw('hello')
 					if self.get(m['field_name']) and m['name'] == 'SWS':
-						sws_amt = flt(settings.get('sws'))
+						sws_amt = round(flt(settings.get('sws')))
 						# calc_amt = roundoff(sws_amt)
 						calc_amt = flt(sws_amt)
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
 
 					elif self.get(m['field_name']) and m['name'] == 'GIS':
-						gis_amt = flt(settings.get("gis"))
+						gis_amt = round(flt(settings.get("gis")))
 						# calc_amt = roundoff(gis_amt)
 						calc_amt = flt(gis_amt)
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
 
 					elif self.get(m['field_name']) and m['name'] == 'PF':
-						pf_amt = (flt(basic_pay)+flt(basic_pay_arrears))*flt(settings.get("employee_pf"))*0.01
+						pf_amt = round((flt(basic_pay)+flt(basic_pay_arrears))*flt(settings.get("employee_pf"))*0.01)
 						# calc_amt = roundoff(pf_amt)
 						calc_amt = flt(pf_amt)
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
 
 					elif self.get(m['field_name']) and m['name'] == 'Health Contribution':
-						health_cont_amt = flt(total_earning)*flt(settings.get("health_contribution"))*0.01
+						health_cont_amt = round(flt(total_earning)*flt(settings.get("health_contribution"))*0.01)
 						# calc_amt = roundoff(health_cont_amt)
 						calc_amt = flt(health_cont_amt)
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
@@ -266,11 +266,11 @@ class SalaryStructure(Document):
 						# health_cont_amt = flt(total_earning)*flt(settings.get("health_contribution"))*0.01
 						payment_method = frappe.db.get_value("Salary Component", "HRA", "payment_method")
 						cal_based = frappe.db.get_value("Salary Component", "HRA", "based_on")
-						amount = frappe.db.get_value("Salary Component", "HRA", "amount")
+						amount = round(frappe.db.get_value("Salary Component", "HRA", "amount"))
 						if not payment_method or not cal_based or not amount:
 							frappe.throw('Add Payment Method, Calculation Based, Amount in salary component in HRA')
 						if payment_method == 'Percent' and cal_based == 'Basic Pay' and amount:
-							hra_amount = (flt(basic_pay) * flt(amount) / 100)
+							hra_amount = round(flt(basic_pay) * flt(amount) / 100)
 						# calc_amt = roundoff(hra_amount)
 						calc_amt = flt(hra_amount)
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
@@ -281,10 +281,10 @@ class SalaryStructure(Document):
 
 			# Calculating Salary Tax
 			if ed == 'deductions':
-				calc_amt = get_salary_tax(math.floor(flt(total_earning)-flt(pf_amt)-flt(gis_amt)-(comm_allowance*0.5)))
+				calc_amt = round(get_salary_tax(math.floor(flt(total_earning)-flt(pf_amt)-flt(gis_amt)-(comm_allowance*0.5))))
 				# calc_amt = roundoff(calc_amt)
 				calc_amt = flt(calc_amt)
-				total_deduction += calc_amt
+				total_deduction += round(calc_amt)
 				calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(calc_amt)})
 
 			# Updating existing Earnings and Deductions tables
@@ -302,9 +302,9 @@ class SalaryStructure(Document):
 
 			[self.append(ed, i) for i in add_list]
 			
-		self.total_earning   = sum([self.get_active_amount(rec) for rec in self.get("earnings")])
-		self.total_deduction = sum([self.get_active_amount(rec) for rec in self.get("deductions")])
-		self.net_pay = flt(self.total_earning) - flt(self.total_deduction)
+		self.total_earning   = round(sum([self.get_active_amount(rec) for rec in self.get("earnings")]))
+		self.total_deduction = round(sum([self.get_active_amount(rec) for rec in self.get("deductions")]))
+		self.net_pay = round(flt(self.total_earning) - flt(self.total_deduction))
 
 		if flt(self.total_earning)-flt(self.total_deduction) < 0 and not self.get('__unsaved'):
 			frappe.throw(_("Total deduction cannot be more than total earning"), title="Invalid Data")
