@@ -197,7 +197,8 @@ class LeaveEncashment(Document):
                 self.employee,
                 self.leave_type,
                 allocation.from_date,
-                self.encashment_date,
+                allocation.to_date,
+                #self.encashment_date,
             )
         )
         # frappe.throw(str(self.leave_balance))
@@ -450,11 +451,11 @@ def create_leave_encashment(leave_allocation):
 
 
 def get_permission_query_conditions(user):
+   
     if not user:
         user = frappe.session.user
 
-    user_roles = frappe.get_roles(user)
-    
+    user_roles = frappe.get_roles(user)  
     if user == "Administrator" or "HR User" in user_roles:
         return
     
