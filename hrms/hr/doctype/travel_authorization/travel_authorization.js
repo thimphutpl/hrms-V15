@@ -7,8 +7,17 @@ frappe.ui.form.on("Travel Authorization", {
 				},
 			};
 		});
+		frappe.call({
+			method: "check_role",
+			doc: frm.doc,
+			callback: function(r){
+				if(r.message){
+					frm.toggle_enable("approver", r.message);
+					frm.refresh_field("approver")
+				}
+			}
+		})
 	},
-
 	refresh(frm) {
 		frappe.call({
 			method: "hrms.hr.doctype.travel_authorization.travel_authorization.has_travel_claim",

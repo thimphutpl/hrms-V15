@@ -13,6 +13,7 @@ from erpnext.custom_workflow import validate_workflow_states, notify_workflow_st
 
 class TravelAuthorization(Document):
 	def validate(self):
+		validate_workflow_states(self)
 		validate_active_employee(self.employee)
 		self.validate_travel_dates()
 		self.validate_travel_last_day()
@@ -166,6 +167,14 @@ class TravelAuthorization(Document):
 			for item in items:
 				item.is_last_day = 0
 			items[-1].is_last_day = 1
+
+	@frappe.whitelist()
+	def check_role(self):
+		user_roles = frappe.get_roles(frappe.session.user)
+		if "System Manager" in user_roles or frappe.session.user == "Administrator":
+			return True
+		else:
+			return False
 
 	@frappe.whitelist()
 	def set_estimate_amount(self):
