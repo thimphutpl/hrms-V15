@@ -3,6 +3,13 @@
 
 frappe.query_reports["Leave Encashment Report"] = {
 	"filters": [
+
+		{
+			"fieldname": "fiscal_year",
+			"label": __("Year"),
+			"fieldtype": "Link",
+			"options": "Fiscal Year",
+		},
 		{
 			"fieldname": "employee",
 			"label": __("Employee"),
@@ -10,10 +17,10 @@ frappe.query_reports["Leave Encashment Report"] = {
 			"options": "Employee",
 		},
 		{
-			"fieldname": "cost_center",
-			"label": __("Cost Center"),
+			"fieldname": "branch",
+			"label": __("Branch"),
 			"fieldtype": "Link",
-			"options": "Cost Center",
+			"options": "Branch",
 		},
 		{
 			"fieldname": "company",
