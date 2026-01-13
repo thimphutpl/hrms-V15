@@ -145,8 +145,8 @@ def get_approver(employee):
 	# 		{"parent": department, "parentfield": "leave_approvers", "idx": 1},
 	# 		"approver",
 	# 	)
-	department = frappe.db.get_value("Employee", employee, "department")
-	empid=frappe.db.get_value("Department", department, "approver_hod")
+	# department = frappe.db.get_value("Employee", employee, "reports")
+	empid=frappe.db.get_value("Employee", employee, "reports_to")
 	approver = frappe.db.get_value("Employee", empid, "user_id")
 
 
