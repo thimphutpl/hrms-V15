@@ -1211,6 +1211,7 @@ def get_attendance_status_for_detailed_view(
 			if status == "Tour":
 				# Tour stays Tour even on holidays
 				status = "Tour"
+				
 			if status is None and holidays:
 				status = holiday_status
 
@@ -1336,7 +1337,8 @@ def get_chart_data(attendance_map: dict, filters: Filters) -> dict:
 					total_present_on_day += 0.5
 					total_leaves_on_day += 0.5
 				elif attendance_on_day == "Tour":
-					total_tour_on_day +=1	
+					total_tour_on_day +=1
+					break
 
 		absent.append(total_absent_on_day)
 		present.append(total_present_on_day)
