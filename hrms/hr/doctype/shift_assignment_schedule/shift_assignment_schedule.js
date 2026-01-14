@@ -46,8 +46,8 @@
 frappe.ui.form.on("Shift Assignment Schedule", {
     get_all_employee(frm) {
 
-        if (!frm.doc.branch) {
-            frappe.msgprint(__("Please select a Branch first."));
+        if (!frm.doc.attendance_branch) {
+            frappe.msgprint(__("Please select a attendance_branch first."));
             return;
         }
 
@@ -59,7 +59,7 @@ frappe.ui.form.on("Shift Assignment Schedule", {
             args: {
                 doctype: "Employee",
                 filters: {
-                    branch: frm.doc.branch,
+                    attendance_branch: frm.doc.attendance_branch,
                     status: "Active"
                 },
                 fields: ["name", "employee_name", "company"],
@@ -75,7 +75,7 @@ frappe.ui.form.on("Shift Assignment Schedule", {
 
                     frm.refresh_field("shift_assignment_schedule_employee");
                 } else {
-                    frappe.msgprint(__("No active employees found for this branch."));
+                    frappe.msgprint(__("No active employees found for this attendance_branch."));
                 }
             }
         });

@@ -149,13 +149,13 @@ class ShiftType(Document):
 
 		employees_in_branch = frappe.get_all(
 		"Employee",
-		filters={"branch": self.branch, "status": "Active"},
+		filters={"attendance_branch": self.attendance_branch, "status": "Active"},
 		pluck="name"
 		)
 		   
 		if not employees_in_branch:
 			frappe.throw(
-		_("No active employees found in branch '{0}' for shift '{1}'.").format(self.branch, self.name))
+		_("No active employees found in branch '{0}' for shift '{1}'.").format(self.attendance_branch, self.name))
 
 		return frappe.get_all(
 			"Employee Checkin",

@@ -8,7 +8,7 @@
  "field_order": [
   "start_time",
   "end_time",
-  "branch",
+  "attendance_branch",
   "column_break_3",
   "holiday_list",
   "color",
@@ -185,14 +185,14 @@
    "label": "Automatically update Last Sync of Checkin"
   },
   {
-   "fieldname": "branch",
+   "fieldname": "attendance_branch",
    "fieldtype": "Link",
-   "label": "Branch",
+   "label": "Attendance Branch",
    "options": "Branch"
   }
  ],
  "links": [],
- "modified": "2025-12-05 09:46:55.495427",
+ "modified": "2026-01-14 13:20:42.151904",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Shift Type",
