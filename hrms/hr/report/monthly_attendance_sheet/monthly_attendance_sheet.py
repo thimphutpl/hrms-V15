@@ -19,8 +19,10 @@ status_map = {
 	"Half Day": "HD",
 	"Work From Home": "WFH",
 	"On Leave": "L",
+	"Tour":"T",
 	"Holiday": "H",
 	"Weekly Off": "WO",
+	
 }
 
 day_abbr = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
@@ -60,7 +62,7 @@ def execute(filters: Filters | None = None) -> tuple:
 
 def get_message() -> str:
 	message = ""
-	colors = ["green", "red", "orange", "green", "#318AD8", "", ""]
+	colors = ["green", "red", "orange", "green", "#318AD8","yellow","", ""]
 
 	count = 0
 	for status, abbr in status_map.items():
@@ -618,10 +620,11 @@ def get_chart_data(attendance_map: dict, filters: Filters) -> dict:
 	absent = []
 	present = []
 	leave = []
+	tour = []
 
 	for day in days:
 		labels.append(day["label"])
-		total_absent_on_day = total_leaves_on_day = total_present_on_day = 0
+		total_absent_on_day = total_leaves_on_day = total_present_on_day = total_tour_on_day = 0
 
 		for __, attendance_dict in attendance_map.items():
 			for __, attendance in attendance_dict.items():
@@ -638,10 +641,13 @@ def get_chart_data(attendance_map: dict, filters: Filters) -> dict:
 				elif attendance_on_day == "Half Day":
 					total_present_on_day += 0.5
 					total_leaves_on_day += 0.5
+				elif attendance_on_day == "Tour":
+					total_tour_on_day +=1	
 
 		absent.append(total_absent_on_day)
 		present.append(total_present_on_day)
 		leave.append(total_leaves_on_day)
+		tour.append(total_tour_on_day)
 
 	return {
 		"data": {
@@ -650,8 +656,10 @@ def get_chart_data(attendance_map: dict, filters: Filters) -> dict:
 				{"name": "Absent", "values": absent},
 				{"name": "Present", "values": present},
 				{"name": "Leave", "values": leave},
+				{"name": "Tour", "values": tour},
+				
 			],
 		},
 		"type": "line",
-		"colors": ["red", "green", "blue"],
+		"colors": ["red", "green", "blue","yellow"],
 	}
