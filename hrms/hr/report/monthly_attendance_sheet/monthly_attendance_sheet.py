@@ -931,16 +931,30 @@ def get_attendance_map(filters: Filters) -> dict:
 			for day in days:
 				for shift in attendance_map[employee].keys():
 					attendance_map[employee][shift][day] = "On Leave"
-	for employee, tour_shifts in tour_map.items():
+	for employee, tour_days in tour_map.items():
+		# Get the assigned shift from Shift Assignment if not present
 		if employee not in attendance_map:
-			attendance_map[employee] = {"": {}}  # default empty shift
-		for assigned_shift, days in tour_shifts.items():
-			# Ensure at least one shift exists
-			if not attendance_map[employee]:
-				attendance_map[employee][""] = {}
+			assigned_shift = frappe.db.get_value(
+				"Shift Assignment",
+				{"employee": employee},
+				"shift_type",
+			) or ""
+			attendance_map[employee] = {assigned_shift: {}}
+
+		for assigned_shift, days in tour_days.items():
+			# Use assigned shift if empty
+			if not assigned_shift:
+				assigned_shift = frappe.db.get_value(
+					"Shift Assignment",
+					{"employee": employee},
+					"shift_type",
+				) or ""
+
+			# Make sure shift exists in map
+			attendance_map[employee].setdefault(assigned_shift, {})
+
 			for day in days:
-				for shift in attendance_map[employee].keys():
-					attendance_map[employee][shift][day] = "Tour"
+				attendance_map[employee][assigned_shift][day] = "Tour"
 
 	return attendance_map
 
