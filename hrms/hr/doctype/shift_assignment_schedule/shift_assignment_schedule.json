@@ -20,6 +20,7 @@
   "shift_status",
   "section_break_ijnn",
   "branch",
+  "shift_location",
   "get_all_employee",
   "shift_assignment_schedule_employee"
  ],
@@ -130,6 +131,12 @@
    "fieldname": "get_all_employee",
    "fieldtype": "Button",
    "label": "Get All Employee"
+  },
+  {
+   "fieldname": "shift_location",
+   "fieldtype": "Link",
+   "label": "Shift Location",
+   "options": "Shift Location"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -139,7 +146,7 @@
    "link_fieldname": "schedule"
   }
  ],
- "modified": "2026-01-05 10:43:59.749791",
+ "modified": "2026-01-06 18:51:33.273678",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Shift Assignment Schedule",

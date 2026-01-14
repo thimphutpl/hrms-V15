@@ -249,85 +249,102 @@ BATCH_SIZE = 50  # Number of employees per batch
 
 class ShiftAssignmentSchedule(Document):
 
-    def create_shifts(self, start_date: str, end_date: str | None = None):
-        if not start_date:
-            frappe.throw("Please set 'Create Shifts After'")
-        if not end_date:
-            frappe.throw("Please set 'End Date'")
+	def create_shifts(self, start_date: str, end_date: str | None = None):
+		if not start_date:
+			frappe.throw("Please set 'Create Shifts After'")
+		if not end_date:
+			frappe.throw("Please set 'End Date'")
 
-        start_date = getdate(start_date)
-        end_date = getdate(end_date)
+		start_date = getdate(start_date)
+		end_date = getdate(end_date)
 
-        repeat_on_days = [d.day.lower() for d in self.repeat_on_days or []]
-        if not repeat_on_days:
-            frappe.throw("Please select 'Repeat On Days'")
+		repeat_on_days = [d.day.lower() for d in self.repeat_on_days or []]
+		if not repeat_on_days:
+			frappe.throw("Please select 'Repeat On Days'")
 
-        employees = self.shift_assignment_schedule_employee or []
-        if not employees:
-            frappe.throw("No employees found in this schedule")
+		employees = self.shift_assignment_schedule_employee or []
+		if not employees:
+			frappe.throw("No employees found in this schedule")
 
-       
-        # Process day by day
-        date = start_date
-        while date <= end_date:
-            weekday_name = get_weekday(date).lower()
-            if weekday_name in repeat_on_days:
-                # Process in batches
-                total = len(employees)
-                for i in range(0, total, BATCH_SIZE):
-                    batch = employees[i:i+BATCH_SIZE]
-                    self.create_shift_batch(batch, date, date)
-            date = add_days(date, 1)
+	   
+		# Process day by day
+		date = start_date
+		while date <= end_date:
+			weekday_name = get_weekday(date).lower()
+			if weekday_name in repeat_on_days:
+				# Process in batches
+				total = len(employees)
+				for i in range(0, total, BATCH_SIZE):
+					batch = employees[i:i+BATCH_SIZE]
+					self.create_shift_batch(batch, date, date)
+			date = add_days(date, 1)
 
-    def create_shift_batch(self, batch, start_date, end_date):
-        skipped_employees = []
+	def create_shift_batch(self, batch, start_date, end_date):
+		skipped_employees = []
 
-        for row in batch:
-            employee = row.employee
+		for row in batch:
+			employee = row.employee
 
-            # Skip if shift already exists
-            exists = frappe.db.exists(
-                "Shift Assignment",
-                {
-                    "employee": employee,
-                    "start_date": start_date,
-                    "shift_type": self.shift_type,
-                    "docstatus": ["!=", 2],
-                }
-            )
-            if exists:
-                skipped_employees.append(employee)
-                continue
+			# Skip if shift already exists
+			exists = frappe.db.exists(
+				"Shift Assignment",
+				{
+					"employee": employee,
+					"start_date": start_date,
+					"shift_type": self.shift_type,
+					"docstatus": ["!=", 2],
+				}
+			)
+			if exists:
+				skipped_employees.append(employee)
+				continue
 
-            try:
-                create_shift_assignment(
-                    employee=employee,
-                    company=self.company,
-                    shift_type=self.shift_type,
-                    start_date=start_date,
-                    end_date=end_date,
-                    status=self.shift_status,
-					schedule=self.name
-                )
-            except OverlappingShiftError:
-                skipped_employees.append(employee)
-                continue
+			try:
+				create_shift_assignment(
+					employee=employee,
+					company=self.company,
+					shift_type=self.shift_type,
+					start_date=start_date,
+					end_date=end_date,
+					status=self.shift_status,
+					schedule=self.name,
+					shift_location=self.shift_location
+				)
+			except OverlappingShiftError:
+				skipped_employees.append(employee)
+				continue
 
-        if skipped_employees:
-            frappe.log_error(
-                f"Skipped employees on {start_date}: {', '.join(skipped_employees)}",
-                "Shift Creation Skipped"
-            )
+		# if skipped_employees:
+		#     frappe.log_error(
+		#         f"Skipped employees on {start_date}: {', '.join(skipped_employees)}",
+		#         "Shift Creation Skipped"
+		#     )
+		if skipped_employees:
+			# Short title
+			title = f"Shift Creation Skipped on {start_date}"
+
+			# Show only first 10 employees
+			display_employees = skipped_employees[:10]
+
+			# Prepare message
+			message = f"Skipped employees on {start_date}: {', '.join(display_employees)}"
+
+			# If more than 10, indicate remaining
+			if len(skipped_employees) > 10:
+				message += f", and {len(skipped_employees) - 10} more..."
+
+			# Log the error
+			frappe.log_error(message=message, title=title)
 
 
 # Daily cron job
 def process_auto_shift_creation():
-    schedules = frappe.get_all(
-        "Shift Assignment Schedule",
-        filters={"enabled": 1},
-        pluck="name",
-    )
+	schedules = frappe.get_all(
+		"Shift Assignment Schedule",
+		filters={"enabled": 1},
+		pluck="name",
+	)
 
-    for name in schedules:
-        doc = frappe.get_doc("Shift Assignment Schedule", name)
-        doc.create_shifts(doc.create_shifts_after, doc.end_date)
+	for name in schedules:
+		doc = frappe.get_doc("Shift Assignment Schedule", name)
+		doc.create_shifts(doc.create_shifts_after, doc.end_date)
