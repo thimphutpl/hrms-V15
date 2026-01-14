@@ -637,6 +637,9 @@ def get_chart_data(attendance_map: dict, filters: Filters) -> dict:
 					# leave should be counted only once for the entire day
 					total_leaves_on_day += 1
 					break
+				elif attendance_on_day == "Tour":
+					total_tour_on_day += 1
+					break	
 				elif attendance_on_day == "Absent":
 					total_absent_on_day += 1
 				elif attendance_on_day in ["Present", "Work From Home"]:
@@ -644,8 +647,7 @@ def get_chart_data(attendance_map: dict, filters: Filters) -> dict:
 				elif attendance_on_day == "Half Day":
 					total_present_on_day += 0.5
 					total_leaves_on_day += 0.5
-				elif attendance_on_day == "Tour":
-					total_tour_on_day +=1	
+				
 
 		absent.append(total_absent_on_day)
 		present.append(total_present_on_day)
