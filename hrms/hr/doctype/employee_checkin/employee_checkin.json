@@ -178,7 +178,7 @@
   {
    "fetch_from": "employee.attendance_branch",
    "fieldname": "attendance_branch",
-   "fieldtype": "Read Only",
+   "fieldtype": "Link",
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Attendance Branch",
@@ -186,7 +186,7 @@
   }
  ],
  "links": [],
- "modified": "2026-01-14 17:30:46.190107",
+ "modified": "2026-01-14 22:27:29.229905",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Checkin",
