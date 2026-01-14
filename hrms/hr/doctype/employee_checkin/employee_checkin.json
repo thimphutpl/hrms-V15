@@ -8,7 +8,7 @@
  "field_order": [
   "employee",
   "employee_name",
-  "branch",
+  "attendance_branch",
   "log_type",
   "shift",
   "column_break_4",
@@ -176,17 +176,17 @@
    "read_only": 1
   },
   {
-   "fetch_from": "employee.branch",
-   "fieldname": "branch",
-   "fieldtype": "Link",
+   "fetch_from": "employee.attendance_branch",
+   "fieldname": "attendance_branch",
+   "fieldtype": "Read Only",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Branch",
+   "label": "Attendance Branch",
    "options": "Branch"
   }
  ],
  "links": [],
- "modified": "2026-01-05 19:22:52.627262",
+ "modified": "2026-01-14 17:30:46.190107",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Checkin",

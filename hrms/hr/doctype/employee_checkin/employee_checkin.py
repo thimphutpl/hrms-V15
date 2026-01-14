@@ -119,7 +119,7 @@ class EmployeeCheckin(Document):
 			filters={
 				"employee": self.employee,
 				"shift_type": self.shift,
-				"branch": self.branch,
+				"attendance_branch": self.attendance_branch,
 				"start_date": ["<=", self.time],
 				"shift_location": ["is", "set"],
 				"docstatus": 1,

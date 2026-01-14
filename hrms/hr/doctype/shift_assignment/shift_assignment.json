@@ -10,7 +10,7 @@
   "employee_details_section",
   "employee",
   "employee_name",
-  "branch",
+  "attendance_branch",
   "column_break_3",
   "company",
   "department",
@@ -137,15 +137,15 @@
    "read_only": 1
   },
   {
-   "fetch_from": "employee.branch",
-   "fieldname": "branch",
+   "fetch_from": "employee.attendance_branch",
+   "fieldname": "attendance_branch",
    "fieldtype": "Read Only",
-   "label": "Branch"
+   "label": "Attendance Branch"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-05 18:23:15.536271",
+ "modified": "2026-01-14 17:32:48.774961",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Shift Assignment",
