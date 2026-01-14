@@ -1206,13 +1206,18 @@ def get_attendance_status_for_detailed_view(
 		for day in range(1, total_days + 1):
 			status = status_dict.get(day)
 			holiday_status = get_holiday_status(day, holidays)
+			tour_exists = any(status_dict.get(day) == "Tour" for status_dict in employee_attendance.values())
 			# if status == "Tour" and holiday_status in ["Holiday", "Weekly Off"]:
 			# 	status = "Tour"
-			if status == "Tour":
-				# Tour stays Tour even on holidays
-				status = "Tour"
+			# if status == "Tour":
+			# 	# Tour stays Tour even on holidays
+			# 	status = "Tour"
 				
-			if status is None and holidays:
+			# if status is None and holidays:
+			# 	status = holiday_status
+			if tour_exists:
+				status = "Tour"
+			elif status is None and holidays:
 				status = holiday_status
 
 			abbr = status_map.get(status, "")
