@@ -517,8 +517,11 @@ def get_attendance_status_for_detailed_view(
 
 		for day in range(1, total_days + 1):
 			status = status_dict.get(day)
+			holiday_status = get_holiday_status(day, holidays)
+			if status == "Tour" and holiday_status in ["Holiday", "Weekly Off"]:
+				status = "Tour"
 			if status is None and holidays:
-				status = get_holiday_status(day, holidays)
+				status = holiday_status
 
 			abbr = status_map.get(status, "")
 			row[cstr(day)] = abbr
