@@ -911,7 +911,7 @@ def get_attendance_map(filters: Filters) -> dict:
 		if d.status == "On Leave":
 			leave_map.setdefault(d.employee, {}).setdefault(d.shift, []).append(d.day_of_month)
 			continue
-		if d.status == "Tour":
+		elif d.status == "Tour":
 			tour_map.setdefault(d.employee, {}).setdefault(d.shift, []).append(d.day_of_month)
 			continue	
 
@@ -931,14 +931,16 @@ def get_attendance_map(filters: Filters) -> dict:
 			for day in days:
 				for shift in attendance_map[employee].keys():
 					attendance_map[employee][shift][day] = "On Leave"
-	for employee, tour_days in tour_map.items():
-		for day in tour_days:
-			for shift in attendance_map.get(employee, {}).keys():
-				attendance_map[employee][shift][day] = "Tour"
-			# If no shift exists yet, create default shift
-			if employee not in attendance_map or not attendance_map[employee]:
-				attendance_map.setdefault(employee, {}).setdefault("", {})
-				attendance_map[employee][""][day] = "Tour"			
+	for employee, tour_shifts in tour_map.items():
+		if employee not in attendance_map:
+			attendance_map[employee] = {"": {}}  # default empty shift
+		for assigned_shift, days in tour_shifts.items():
+			# Ensure at least one shift exists
+			if not attendance_map[employee]:
+				attendance_map[employee][""] = {}
+			for day in days:
+				for shift in attendance_map[employee].keys():
+					attendance_map[employee][shift][day] = "Tour"
 
 	return attendance_map
 
