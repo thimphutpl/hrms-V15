@@ -48,10 +48,19 @@ class ShiftAssignment(Document):
 			},
 			pluck="name",
 		)
-		if checkins:
+		# if checkins:
+		# 	frappe.throw(
+		# 		_("Cannot cancel Shift Assignment: {0} as it is linked to Employee Checkin: {1}").format(
+		# 			self.name, get_link_to_form("Employee Checkin", checkins[0])
+		# 		)
+		# 	)
+		for checkin in checkins:
+			checkin_date = checkin.time.date() if isinstance(checkin.time, datetime) else checkin.time
+			if not (self.start_date <= checkin_date <= (self.end_date or self.start_date)):
+				continue  # Skip check-ins outside shift assignment
 			frappe.throw(
 				_("Cannot cancel Shift Assignment: {0} as it is linked to Employee Checkin: {1}").format(
-					self.name, get_link_to_form("Employee Checkin", checkins[0])
+					self.name, get_link_to_form("Employee Checkin", checkin.name)
 				)
 			)
 
@@ -65,12 +74,22 @@ class ShiftAssignment(Document):
 			},
 			pluck="name",
 		)
-		if attendances:
+		
+		# if attendances:
+		# 	frappe.throw(
+		# 		_("Cannot cancel Shift Assignment: {0} as it is linked to Attendance: {1}").format(
+		# 			self.name, get_link_to_form("Attendance", attendances[0])
+		# 		)
+		# 	)
+		for attendance in attendances:
+			if not (self.start_date <= attendance.attendance_date <= (self.end_date or self.start_date)):
+				continue  # Skip attendance outside shift assignment
 			frappe.throw(
 				_("Cannot cancel Shift Assignment: {0} as it is linked to Attendance: {1}").format(
-					self.name, get_link_to_form("Attendance", attendances[0])
+					self.name, get_link_to_form("Attendance", attendance.name)
 				)
 			)
+
 
 	def validate_overlapping_shifts(self):
 		if self.status == "Inactive":
