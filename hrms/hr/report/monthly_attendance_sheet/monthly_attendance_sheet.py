@@ -310,28 +310,43 @@ def get_rows(employee_details: dict, filters: Filters, holiday_map: dict, attend
         emp_holiday_list = details.holiday_list or default_holiday_list
         holidays = holiday_map.get(emp_holiday_list)
 
-        row = {"employee": employee, "employee_name": details.employee_name}
+        row = {
+            "employee": employee,
+            "employee_name": details.employee_name,
+        }
 
-        # Merge all shifts into same row
-        employee_attendance = attendance_map.get(employee)
-        if employee_attendance:
+        employee_attendance = attendance_map.get(employee, {})
+
+        for day in range(1, total_days + 1):
+            status = None
+
+            # 1️⃣ Attendance (any shift)
             for shift, status_dict in employee_attendance.items():
-                for day in range(1, total_days + 1):
+                if day in status_dict:
                     status = status_dict.get(day)
-                    holiday_status = get_holiday_status(day, holidays)
-                    # If Tour falls on Holiday or Sunday, show "T"
-                    if status == "Tour" and holiday_status in ["Holiday", "Weekly Off"]:
-                        status = "T"
-                    elif status is None:
-                        status = holiday_status
+                    break
 
-                    abbr = status_map.get(status, "") if status else ""
-                    # key = day number (like "1", "2") for calendar
-                    row[f"{day}"] = abbr
+            # 2️⃣ Holiday / Weekly Off
+            holiday_status = get_holiday_status(day, holidays)
+
+            # 3️⃣ Tour overrides everything
+            if status == "Tour":
+                final_status = "Tour"
+
+            # 4️⃣ If no attendance → holiday applies
+            elif status is None:
+                final_status = holiday_status
+
+            else:
+                final_status = status
+
+            row[str(day)] = status_map.get(final_status, "") if final_status else ""
 
         records.append(row)
 
     return records
+
+
 
 
 
