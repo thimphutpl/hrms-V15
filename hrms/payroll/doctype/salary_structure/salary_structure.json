@@ -32,6 +32,9 @@
   "eligible_for_fixed_allowance",
   "fixed_allowance_method",
   "fixed_allowance",
+  "eligible_for_cash_handling_allowance",
+  "payment_method_cash_handling_allowance",
+  "value_cha",
   "column_break_mehf",
   "eligible_for_communication_allowance",
   "communication_allowance_method",
@@ -384,12 +387,31 @@
    "fieldname": "fixed_allowance",
    "fieldtype": "Float",
    "label": "Value (Fixed Allowance)"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_cash_handling_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Cash Handling Allowance"
+  },
+  {
+   "depends_on": "eval:doc.eligible_for_cash_handling_allowance==1",
+   "fieldname": "payment_method_cash_handling_allowance",
+   "fieldtype": "Select",
+   "label": "Payment method (Cash Handling Allowance)",
+   "options": "\nLumpsum\nPercent"
+  },
+  {
+   "depends_on": "eval:doc.eligible_for_cash_handling_allowance==1",
+   "fieldname": "value_cha",
+   "fieldtype": "Float",
+   "label": "Value (CHA)"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2025-12-04 14:11:18.597603",
+ "modified": "2026-01-15 12:19:25.129705",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
