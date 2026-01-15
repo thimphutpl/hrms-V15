@@ -12,28 +12,88 @@ def execute(filters=None):
 	# frappe.errprint(str(data))
 	return columns, data, filters
 
-def get_data( filters=None):
+#added by Kinzang.n 
+def get_data(filters=None):
 	data = []
-	# salary 
+
+	# collect all rows
 	data += get_salary_data(filters)
-	# frappe.msgprint(str(data))
-	#Leave Encashment 
 	data += get_leave_encashment(filters)
-	#Bonus
-	# data += get_bonus(filters)
-	#PVBA
 	data += get_pbva(filters)
-	#salary arrear
-	# data += get_salary_arrer(filters)
-	#bluk leave Encashment
 	data += get_bulk_leave_encashment(filters)
 
+	# -------------------------
+	# CALCULATE TOTALS
+	# -------------------------
+	total_basic = total_others = total_total = 0
+	total_pf = total_gis = total_taxable = 0
+	total_tds = total_health = 0
+
+	for d in data:
+		total_basic += flt(d.get("basic"))
+		total_others += flt(d.get("others"))
+		total_total += flt(d.get("total"))
+		total_pf += flt(d.get("pf"))
+		total_gis += flt(d.get("gis"))
+		total_taxable += flt(d.get("taxable"))
+		total_tds += flt(d.get("tds"))
+		total_health += flt(d.get("health"))
+
+	# -------------------------
+	# APPEND TOTAL ROW
+	# -------------------------
+	data.append({
+		"month_year": "<b>Total</b>",
+		"type": "",
+		"basic": flt(total_basic, 2),
+		"others": flt(total_others, 2),
+		"total": flt(total_total, 2),
+		"pf": flt(total_pf, 2),
+		"gis": flt(total_gis, 2),
+		"totalPfGis": flt(total_pf + total_gis, 2),
+		"taxable": flt(total_taxable, 2),
+		"tds": flt(total_tds, 2),
+		"health": flt(total_health, 2),
+		"receipt_number": "",
+		"receipt_date": "",
+		"posting_date": ""
+	})
+
 	return data
+
+#till here addded by kinzang.n
+
+
+#orginal their code
+# def get_data( filters=None):
+# 	data = []
+# 	# salary 
+# 	data += get_salary_data(filters)
+# 	# frappe.msgprint(str(data))
+# 	#Leave Encashment 
+# 	data += get_leave_encashment(filters)
+# 	#Bonus
+# 	# data += get_bonus(filters)
+# 	#PVBA
+# 	data += get_pbva(filters)
+# 	#salary arrear
+# 	# data += get_salary_arrer(filters)
+# 	#bluk leave Encashment
+# 	data += get_bulk_leave_encashment(filters)
+
+# 	return data
+
+#CONCAT(a.month,'-', a.fiscal_year) month_year, ##
 
 def get_salary_data(filters):
 	data = []
 	for d in frappe.db.sql('''SELECT 
-								CONCAT(a.month,'-', a.fiscal_year) month_year, 
+								DATE_FORMAT(
+									STR_TO_DATE(CONCAT(a.fiscal_year, '-', a.month, '-01'), '%Y-%m-%d'), 
+									'%M'
+						
+								) AS month_year,
+								
 								a.gross_pay, 
 								(SELECT b.amount FROM `tabSalary Detail` b WHERE b.parent = a.name AND b.salary_component = 'Basic Pay') AS basic_pay, 
 								(SELECT b.amount FROM `tabSalary Detail` b WHERE b.parent = a.name AND b.salary_component = 'Salary Tax') AS tds, 
@@ -93,9 +153,12 @@ def get_leave_encashment(filters):
 								AND a.encashment_date BETWEEN '{from_date}' AND '{to_date}'
 						""".format(employee=filters.employee,from_date = getdate(str(filters.fiscal_year) + "-01-01"),
 					  to_date = getdate(str(filters.fiscal_year) + "-12-31")), as_dict=True) 
+
+
 def get_bonus(filters):
 	return frappe.db.sql("""
-					SELECT CONCAT(MONTH(b.posting_date), '-', b.fiscal_year) AS month_year,
+					  SELECT CONCAT(MONTH(b.posting_date), '-', b.fiscal_year) AS month_year,
+					  				
 						r.receipt_number,
 						b.posting_date,
 						r.receipt_date,
@@ -120,35 +183,95 @@ def get_bonus(filters):
 					AND bd.amount > 0
 				""".format( fiscal_year = filters.fiscal_year, employee= filters.employee, from_date = getdate(str(filters.fiscal_year) + "-01-01"),
 					to_date = getdate(str(filters.fiscal_year) + "-12-31")), as_dict=1)
+
+#CONCAT(MONTH(b.posting_date),'-',
+#					b.fiscal_year) AS month_year,
+# def get_pbva(filters):
+# 	return frappe.db.sql("""SELECT 
+# 									ROUND(IFNULL(bd.amount,0),2) AS total, 
+# 									ROUND(IFNULL(bd.amount,0),2) AS taxable, 
+# 									ROUND(IFNULL(bd.tax_amount,0),2) as tds,
+					  
+# 					  				DATE_FORMAT(b.posting_date, '%M') AS month_year,
+					  
+# 									'PBVA' AS type, 
+# 									0 as basic, 
+# 									0 as others, 
+# 									0 AS pf, 
+# 									0 AS gis, 
+# 									0 AS totalPfGis, 
+# 									0 AS health,
+# 									r.receipt_date,	
+# 									r.receipt_number,
+# 									b.posting_date
+# 								FROM tabPBVA b
+# 								INNER JOIN `tabTDS Receipt Entry` r ON YEAR(b.posting_date) = r.fiscal_year AND r.purpose = 'PBVA'
+# 								LEFT JOIN `tabPBVA Details` bd ON b.name = bd.parent AND bd.employee = '{employee}'
+# 								WHERE b.docstatus = 1 AND bd.amount > 0 
+# 								AND b.posting_date BETWEEN '{from_date}' AND '{to_date}'
+# 				      """.format( employee = filters.employee, fiscal_year=filters.fiscal_year, from_date = getdate(str(filters.fiscal_year) + "-01-01"),
+# 					  to_date = getdate(str(filters.fiscal_year) + "-12-31")), as_dict=1)
+
+#added by kinzang.n
 def get_pbva(filters):
-	return frappe.db.sql("""SELECT 
-									ROUND(IFNULL(bd.amount,0),2) AS total, 
-									ROUND(IFNULL(bd.amount,0),2) AS taxable, 
-									ROUND(IFNULL(bd.tax_amount,0),2) as tds,
-									CONCAT(MONTH(b.posting_date),'-',
-									b.fiscal_year) AS month_year,
-									'PBVA' AS type, 
-									0 as basic, 
-									0 as others, 
-									0 AS pf, 
-									0 AS gis, 
-									0 AS totalPfGis, 
-									0 AS health,
-									r.receipt_date,	
-									r.receipt_number,
-									b.posting_date
-								FROM tabPBVA b
-								INNER JOIN `tabTDS Receipt Entry` r ON YEAR(b.posting_date) = r.fiscal_year AND r.purpose = 'PBVA'
-								LEFT JOIN `tabPBVA Details` bd ON b.name = bd.parent AND bd.employee = '{employee}'
-								WHERE b.docstatus = 1 AND bd.amount > 0 
-								AND b.posting_date BETWEEN '{from_date}' AND '{to_date}'
-				      """.format( employee = filters.employee, fiscal_year=filters.fiscal_year, from_date = getdate(str(filters.fiscal_year) + "-01-01"),
-					  to_date = getdate(str(filters.fiscal_year) + "-12-31")), as_dict=1)
- 
+	data = []
+	for d in frappe.db.sql("""
+		SELECT 
+			ROUND(IFNULL(bd.amount,0),2) AS total, 
+			ROUND(IFNULL(bd.amount,0),2) AS taxable, 
+			ROUND(IFNULL(bd.tax_amount,0),2) AS tds,
+			DATE_FORMAT(b.posting_date, '%%M') AS month_year,   -- note the double %%
+			'PBVA' AS type, 
+			0 AS basic, 
+			0 AS others, 
+			0 AS pf, 
+			0 AS gis, 
+			0 AS totalPfGis, 
+			0 AS health,
+			r.receipt_date,	
+			r.receipt_number,
+			b.posting_date
+		FROM `tabPBVA` b
+		INNER JOIN `tabTDS Receipt Entry` r 
+			ON r.fiscal_year = YEAR(b.posting_date) 
+			AND r.purpose = 'PBVA'
+		LEFT JOIN `tabPBVA Details` bd 
+			ON b.name = bd.parent AND bd.employee = %(employee)s
+		WHERE b.docstatus = 1 AND bd.amount > 0
+			AND b.posting_date BETWEEN %(from_date)s AND %(to_date)s
+		ORDER BY b.posting_date
+	""", {
+		"employee": filters.employee,
+		"from_date": getdate(f"{filters.fiscal_year}-01-01"),
+		"to_date": getdate(f"{filters.fiscal_year}-12-31")
+	}, as_dict=1):
+		data.append({
+			"month_year": d.month_year,
+			"type": d.type,
+			"basic": flt(d.basic, 2),
+			"others": flt(d.others, 2),
+			"total": flt(d.total, 2),
+			"pf": flt(d.pf, 2),
+			"gis": flt(d.gis, 2),
+			"totalPfGis": flt(d.totalPfGis, 2),
+			"taxable": flt(d.taxable, 2),
+			"tds": flt(d.tds, 2),
+			"health": flt(d.health, 2),
+			"receipt_number": d.receipt_number,
+			"receipt_date": d.receipt_date,
+			"posting_date": d.posting_date
+		})
+	return data
+
+#till here added br kinzang.n
+
+
 def get_salary_arrer(filters):
 	return frappe.db.sql("""
-				SELECT 
-					CONCAT(t5.month,'-', t5.fiscal_year) AS month_year, 
+					  SELECT 
+						CONCAT(t5.month,'-', t5.fiscal_year) AS month_year, 
+ 
+				
 					(
 						SELECT posting_date 
 						FROM `tabSalary Arrear Payment`  
@@ -184,9 +307,14 @@ def get_salary_arrer(filters):
 
 def get_bulk_leave_encashment(filters):
 	data = []
-	month_year="12-2023"
+
+	
+	#month_year="12-2023"
 	datas = frappe.db.sql("""
 			SELECT 
+			 DATE_FORMAT(ble.encashment_date, '%M') AS month_year,
+						
+			
 			ble.encashment_date as date,
 			blei.payable_amount,
 			blei.encashment_amount,
@@ -207,10 +335,10 @@ def get_bulk_leave_encashment(filters):
 	
 	for a in datas:
 		data.append({
-			"month_year":month_year, 
+			"month_year":a.month_year, 
 			"type":"Bulk Leave Encashemnt", 
 			"basic":0, 
-			"others":a.encashment_amount, 
+			"others":0, 
 			"total":a.encashment_amount,
 			"pf":0,
 			"gis":0,
@@ -236,7 +364,7 @@ def get_columns():
 	return [
 		{
 		  "fieldname": "month_year",
-		  "label": "Month-Year",
+		  "label": "Month",
 		  "fieldtype": "Data",
 		  "width": 100
 		},
@@ -319,3 +447,5 @@ def get_columns():
 		  "width": 130
 		},
 	]
+
+
