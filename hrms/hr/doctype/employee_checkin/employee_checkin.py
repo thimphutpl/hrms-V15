@@ -5,8 +5,9 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import cint, get_datetime,today,now_datetime
-
+from frappe.utils import cint, get_datetime,today,now_datetime,getdate
+from datetime import datetime, time, timedelta
+from frappe.utils import time_diff_in_seconds
 from hrms.hr.doctype.shift_assignment.shift_assignment import get_actual_start_end_datetime_of_shift
 from hrms.hr.utils import (
 	get_distance_between_coordinates,
@@ -22,12 +23,150 @@ class CheckinRadiusExceededError(frappe.ValidationError):
 class EmployeeCheckin(Document):
 	def validate(self):
 		validate_active_employee(self.employee)
+		self.set_shift_from_employee()
+		self.validate_late()
+
+	
 		self.validate_checkin_date()
 		self.validate_duplicate_log()
 		self.fetch_shift()
 		self.set_geolocation()
-		self.validate_distance_from_shift_location()	
+		self.validate_distance_from_shift_location()
+	def set_shift_from_employee(self):
+		"""
+		Employee → attendance_branch → Shift Type
+		"""
+		if not self.employee:
+			return
+
+		attendance_branch = frappe.db.get_value(
+			"Employee",
+			self.employee,
+			"attendance_branch"
+		)
+
+		if not attendance_branch:
+			return
+
+		self.attendance_branch = attendance_branch
+
+		shift = frappe.db.get_value(
+			"Shift Type",
+			{
+				"attendance_branch": attendance_branch
+			},
+			"name"
+		)
+
+		if not shift:
+			frappe.throw(
+				_("No Shift Type found for Attendance Branch: {0}")
+				.format(attendance_branch)
+			)
+
+		self.shift = shift
+
+	# ---------------------------------------------------------
+	# REAL SHIFT START TIME (09:00)
+	# ---------------------------------------------------------
+
+	def get_real_shift_start(self):
+		if not self.shift or not self.time:
+			return None
+
+		start_time = frappe.db.get_value(
+			"Shift Type",
+			self.shift,
+			"start_time"
+		)
+
 		
+		if not start_time:
+			return None
+
+		# 🔹 Convert timedelta → datetime.time
+		if isinstance(start_time, timedelta):
+			total_seconds = start_time.total_seconds()
+			hours = int(total_seconds // 3600)
+			minutes = int((total_seconds % 3600) // 60)
+			seconds = int(total_seconds % 60)
+			start_time = time(hour=hours, minute=minutes, second=seconds)
+
+		return get_datetime(
+			datetime.combine(getdate(self.time), start_time)
+		)
+	def get_real_shift_end(self):
+		if not self.shift or not self.time:
+			return None
+
+		end_time = frappe.db.get_value(
+			"Shift Type",
+			self.shift,
+			"end_time"
+		)
+
+		if not end_time:
+			return None
+
+		# Convert timedelta → datetime.time if needed
+		if isinstance(end_time, timedelta):
+			total_seconds = end_time.total_seconds()
+			hours = int(total_seconds // 3600)
+			minutes = int((total_seconds % 3600) // 60)
+			seconds = int(total_seconds % 60)
+			end_time = time(hour=hours, minute=minutes, second=seconds)
+
+		return get_datetime(datetime.combine(getdate(self.time), end_time))		
+		
+	def validate_late(self):
+		if not self.time:
+			return
+
+		# ✅ FORCE datetime conversion
+		checkin_time = get_datetime(self.time)
+		shift_start = self.get_real_shift_start()
+		shift_end = self.get_real_shift_end()
+
+		# -----------------------------
+		# Late Entry (for IN logs)
+		# -----------------------------
+		if self.log_type == "IN":
+			grace_minutes = frappe.db.get_value(
+				"Shift Type",
+				self.shift,
+				"late_entry_grace_period"
+			) or 0
+			grace_seconds = int(grace_minutes) * 60
+
+			if shift_start:
+				diff_seconds = (checkin_time - shift_start).total_seconds()
+				if diff_seconds > grace_seconds:
+					self.late_entry = 1
+					if not self.late_reason:
+						frappe.throw(
+							_("You are late. Please enter the reason for late check-in.")
+						)
+
+		# -----------------------------
+		# Early Exit (for OUT logs)
+		# -----------------------------
+		if self.log_type == "OUT":
+			early_grace_minutes = frappe.db.get_value(
+				"Shift Type",
+				self.shift,
+				"early_exit_grace_period"
+			) or 0
+			early_grace_seconds = int(early_grace_minutes) * 60
+
+			if shift_end:
+				diff_early_seconds = (shift_end - checkin_time).total_seconds()
+				if diff_early_seconds > early_grace_seconds:
+					self.early_exit = 1
+					if not getattr(self, "early_exit_reason", None):
+						frappe.throw(
+							_("You are leaving early. Please enter the reason for early exit.")
+						)
+
 	def validate_checkin_date(self):
 		# Convert check-in time to datetime object
 		checkin_time = get_datetime(self.time)
@@ -264,67 +403,7 @@ def mark_attendance_and_link_log(
 
 	else:
 		frappe.throw(_("{} is an invalid Attendance Status.").format(attendance_status))
-
-
-# def calculate_working_hours(logs, check_in_out_type, working_hours_calc_type):
-# 	"""Given a set of logs in chronological order calculates the total working hours based on the parameters.
-# 	Zero is returned for all invalid cases.
-
-# 	:param logs: The List of 'Employee Checkin'.
-# 	:param check_in_out_type: One of: 'Alternating entries as IN and OUT during the same shift', 'Strictly based on Log Type in Employee Checkin'
-# 	:param working_hours_calc_type: One of: 'First Check-in and Last Check-out', 'Every Valid Check-in and Check-out'
-# 	"""
-# 	total_hours = 0
-# 	in_time = out_time = None
-# 	if check_in_out_type == "Alternating entries as IN and OUT during the same shift":
-# 		in_time = logs[0].time
-# 		if len(logs) >= 2:
-# 			out_time = logs[-1].time
-# 		if working_hours_calc_type == "First Check-in and Last Check-out":
-# 			# assumption in this case: First log always taken as IN, Last log always taken as OUT
-# 			total_hours = time_diff_in_hours(in_time, logs[-1].time)
-# 		elif working_hours_calc_type == "Every Valid Check-in and Check-out":
-# 			logs = logs[:]
-# 			while len(logs) >= 2:
-# 				total_hours += time_diff_in_hours(logs[0].time, logs[1].time)
-# 				del logs[:2]
-
-# 	elif check_in_out_type == "Strictly based on Log Type in Employee Checkin":
-# 		if working_hours_calc_type == "First Check-in and Last Check-out":
-# 			first_in_log_index = find_index_in_dict(logs, "log_type", "IN")
-# 			first_in_log = logs[first_in_log_index] if first_in_log_index or first_in_log_index == 0 else None
-# 			last_out_log_index = find_index_in_dict(reversed(logs), "log_type", "OUT")
-# 			last_out_log = (
-# 				logs[len(logs) - 1 - last_out_log_index]
-# 				if last_out_log_index or last_out_log_index == 0
-# 				else None
-# 			)
-# 			in_time = getattr(first_in_log, "time", None)
-# 			out_time = getattr(last_out_log, "time", None)
-# 			if first_in_log and last_out_log:
-# 				total_hours = time_diff_in_hours(in_time, out_time)
-# 		elif working_hours_calc_type == "Every Valid Check-in and Check-out":
-# 			in_log = out_log = None
-# 			for log in logs:
-# 				if in_log and out_log:
-# 					if not in_time:
-# 						in_time = in_log.time
-# 					out_time = out_log.time
-# 					total_hours += time_diff_in_hours(in_log.time, out_log.time)
-# 					in_log = out_log = None
-# 				if not in_log:
-# 					in_log = log if log.log_type == "IN" else None
-# 					if in_log and not in_time:
-# 						in_time = in_log.time
-# 				elif not out_log:
-# 					out_log = log if log.log_type == "OUT" else None
-
-# 			if in_log and out_log:
-# 				out_time = out_log.time
-# 				total_hours += time_diff_in_hours(in_log.time, out_log.time)
-
-# 	return total_hours, in_time, out_time
-
+		
 def calculate_working_hours(logs, check_in_out_type, working_hours_calc_type):
 	"""Given a set of logs in chronological order calculates the total working hours based on the parameters.
 	Zero is returned for all invalid cases.

@@ -16,6 +16,9 @@
   "device_id",
   "skip_auto_attendance",
   "attendance",
+  "reason_section",
+  "late_reason",
+  "early_exit_reason",
   "location_section",
   "latitude",
   "column_break_yqpi",
@@ -183,10 +186,27 @@
    "in_standard_filter": 1,
    "label": "Attendance Branch",
    "options": "Branch"
+  },
+  {
+   "fieldname": "reason_section",
+   "fieldtype": "Section Break",
+   "label": "Reason"
+  },
+  {
+   "description": "Enter the reason only if you are late for your shift",
+   "fieldname": "late_reason",
+   "fieldtype": "Small Text",
+   "label": "Late Reason"
+  },
+  {
+   "description": "Enter the reason only if you are leaving early",
+   "fieldname": "early_exit_reason",
+   "fieldtype": "Small Text",
+   "label": "Early Exit Reason"
   }
  ],
  "links": [],
- "modified": "2026-01-14 22:27:29.229905",
+ "modified": "2026-01-15 21:39:39.127781",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Checkin",

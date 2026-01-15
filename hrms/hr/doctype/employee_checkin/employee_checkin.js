@@ -23,9 +23,14 @@ frappe.ui.form.on("Employee Checkin", {
 		if (!frm.is_new()) {
 			lock_fields(frm);
 		}
+		handle_log_type(frm);
+
 	},
 	on_submit(frm) {
 		lock_fields(frm);
+	},
+	log_type: function (frm) {
+		handle_log_type(frm);
 	},
 
 	onload_post_render(frm) {
@@ -69,4 +74,21 @@ function lock_fields(frm) {
 	frm.set_df_property("time", "read_only", 1);
 	frm.set_df_property("employee", "read_only", 1);
 	frm.set_df_property("fetch_geolocation", "hidden", 1);
+	frm.set_df_property("late_reason", "read_only", 1);
+	frm.set_df_property("early_exit_reason", "read_only", 1);
+}
+
+function handle_log_type(frm) {
+	const log_type = frm.doc.log_type;
+
+	if (log_type === "IN") {
+		frm.set_df_property('late_reason', 'hidden', 0);          // show late_reason
+		frm.set_df_property('early_exit_reason', 'hidden', 1);    // hide early_exit_reason
+	} else if (log_type === "OUT") {
+		frm.set_df_property('late_reason', 'hidden', 1);          // hide late_reason
+		frm.set_df_property('early_exit_reason', 'hidden', 0);    // show early_exit_reason
+	} else {
+		frm.set_df_property('late_reason', 'hidden', 1);
+		frm.set_df_property('early_exit_reason', 'hidden', 1);
+	}
 }
