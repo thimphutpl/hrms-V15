@@ -129,6 +129,7 @@ class EmployeeCheckin(Document):
 		)
 		if not assignment_locations:
 			return
+erp@AGRO2025
 
 		checkin_radius, latitude, longitude = frappe.db.get_value(
 			"Shift Location", assignment_locations[0], ["checkin_radius", "latitude", "longitude"]
