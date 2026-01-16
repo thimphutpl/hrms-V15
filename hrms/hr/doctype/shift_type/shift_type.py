@@ -119,6 +119,8 @@ class ShiftType(Document):
 				early_exit,
 				in_time,
 				out_time,
+				late_reason,
+				early_exit_reason,
 			) = self.get_attendance(single_shift_logs)
 
 			mark_attendance_and_link_log(
@@ -131,6 +133,8 @@ class ShiftType(Document):
 				in_time,
 				out_time,
 				self.name,
+				late_reason,
+				early_exit_reason,
 			)
 
 		# commit after processing checkin logs to avoid losing progress
@@ -167,6 +171,8 @@ class ShiftType(Document):
 				"shift",
 				"shift_start",
 				"shift_end",
+				"late_reason",
+				"early_exit_reason",
 				"shift_actual_start",
 				"shift_actual_end",
 				"device_id",
@@ -190,6 +196,7 @@ class ShiftType(Document):
 		2. Logs are in chronological order
 		"""
 		late_entry = early_exit = False
+		late_reason = early_exit_reason = None
 		total_working_hours, in_time, out_time = calculate_working_hours(
 			logs, self.determine_check_in_and_check_out, self.working_hours_calculation_based_on
 		)
@@ -212,15 +219,15 @@ class ShiftType(Document):
 			self.working_hours_threshold_for_absent
 			and total_working_hours < self.working_hours_threshold_for_absent
 		):
-			return "Absent", total_working_hours, late_entry, early_exit, in_time, out_time
+			return "Absent", total_working_hours, late_entry, early_exit, in_time, out_time,late_reason, early_exit_reason
 
 		if (
 			self.working_hours_threshold_for_half_day
 			and total_working_hours < self.working_hours_threshold_for_half_day
 		):
-			return "Half Day", total_working_hours, late_entry, early_exit, in_time, out_time
+			return "Half Day", total_working_hours, late_entry, early_exit, in_time, out_time, late_reason, early_exit_reason
 
-		return "Present", total_working_hours, late_entry, early_exit, in_time, out_time
+		return "Present", total_working_hours, late_entry, early_exit, in_time, out_time, late_reason, early_exit_reason
 
 	def mark_absent_for_dates_with_no_attendance(self, employee: str):
 		"""Marks Absents for the given employee on working days in this shift that have no attendance marked.
@@ -413,7 +420,7 @@ def get_actual_shift_end(shift, current_datetime):
 
 # def update_last_sync_of_checkin():
 #     """Automatically updates last_sync_of_checkin for all shifts with auto attendance enabled."""
-    
+	
 #     shifts = frappe.get_all(
 #         "Shift Type",
 #         filters={"enable_auto_attendance": 1, "auto_update_last_sync": 1},
@@ -436,7 +443,7 @@ def get_actual_shift_end(shift, current_datetime):
 
 # def get_actual_shift_end(shift, current_datetime):
 #     """Returns the actual end datetime of the shift based on today's date."""
-    
+	
 #     time_within_shift = datetime.combine(current_datetime.date(), get_time(shift.start_time))
 #     shift_details = get_shift_details(shift.name, time_within_shift)
 

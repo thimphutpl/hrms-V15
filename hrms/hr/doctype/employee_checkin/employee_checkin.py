@@ -289,6 +289,8 @@ def add_log_based_on_employee_field(
 	timestamp,
 	device_id=None,
 	log_type=None,
+	late_reason=None,
+	early_exit_reason=None,
 	skip_auto_attendance=0,
 	employee_fieldname="attendance_device_id",
 ):
@@ -326,6 +328,8 @@ def add_log_based_on_employee_field(
 	doc.time = timestamp
 	doc.device_id = device_id
 	doc.log_type = log_type
+	doc.late_reason=late_reason
+	doc.early_exit_reason=early_exit_reason
 	if cint(skip_auto_attendance) == 1:
 		doc.skip_auto_attendance = "1"
 	doc.insert()
@@ -354,6 +358,8 @@ def mark_attendance_and_link_log(
 	in_time=None,
 	out_time=None,
 	shift=None,
+	late_reason=None,
+	early_exit_reason=None
 ):
 	"""Creates an attendance and links the attendance to the Employee Checkin.
 	Note: If attendance is already present for the given date, the logs are marked as skipped and no exception is thrown.
@@ -365,6 +371,7 @@ def mark_attendance_and_link_log(
 	"""
 	log_names = [x.name for x in logs]
 	employee = logs[0].employee
+   
 
 	if attendance_status == "Skip":
 		skip_attendance_in_checkins(log_names)
@@ -372,6 +379,18 @@ def mark_attendance_and_link_log(
 
 	elif attendance_status in ("Present", "Absent", "Half Day"):
 		try:
+			if logs:
+				first_in_log = next((l for l in logs if l.log_type == "IN"), None)
+				last_out_log = next((l for l in reversed(logs) if l.log_type == "OUT"), None)
+
+				# # Reload the docs to make sure all fields are fetched
+				# if first_in_log:
+				# 	first_in_log = frappe.get_doc("Employee Checkin", first_in_log.name)
+				# if last_out_log:
+				# 	last_out_log = frappe.get_doc("Employee Checkin", last_out_log.name)
+				late_reason = first_in_log.late_reason if first_in_log and first_in_log.late_reason else ""
+				early_exit_reason = last_out_log.early_exit_reason if last_out_log and last_out_log.early_exit_reason else ""
+
 			frappe.db.savepoint("attendance_creation")
 			attendance = frappe.new_doc("Attendance")
 			attendance.update(
@@ -385,7 +404,9 @@ def mark_attendance_and_link_log(
 					"late_entry": late_entry,
 					"early_exit": early_exit,
 					"in_time": in_time,
-					"out_time": out_time
+					"out_time": out_time,
+					"late_reason":late_reason,
+					"early_exit_reason":early_exit_reason
 			
 				}
 			).submit()
