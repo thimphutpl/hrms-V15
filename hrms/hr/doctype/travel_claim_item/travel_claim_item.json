@@ -97,7 +97,6 @@
    "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "DSA",
-   "read_only": 1,
    "reqd": 1
   },
   {
@@ -119,7 +118,6 @@
    "in_list_view": 1,
    "label": "DSA (%)",
    "options": "100\n70\n50\n20\n0",
-   "read_only": 1,
    "reqd": 1
   },
   {
@@ -180,12 +178,13 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-03-04 16:24:44.768528",
+ "modified": "2026-01-16 16:12:31.421245",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim Item",
  "owner": "Administrator",
  "permissions": [],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []
