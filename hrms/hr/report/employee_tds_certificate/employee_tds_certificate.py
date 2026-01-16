@@ -50,7 +50,7 @@ def get_data(filters=None):
 		"total": flt(total_total, 2),
 		"pf": flt(total_pf, 2),
 		"gis": flt(total_gis, 2),
-		"totalPfGis": flt(total_pf + total_gis, 2),
+		# "totalPfGis": flt(total_pf + total_gis, 2),
 		"taxable": flt(total_taxable, 2),
 		"tds": flt(total_tds, 2),
 		"health": flt(total_health, 2),
@@ -119,7 +119,7 @@ def get_salary_data(filters):
 			"total":flt(flt(d.gross_pay)-(flt(d.comm_all) / 2),2), 
 			"pf":flt(d.nppf,2),
 			"gis":flt(d.gis,2),
-			"totalPfGis":flt(flt(d.nppf)+flt(d.gis),2), 
+			# "totalPfGis":flt(flt(d.nppf)+flt(d.gis),2), 
 			"taxable":flt(d.gross_pay) - flt(d.nppf) - flt(d.gis) - (flt(d.comm_all) / 2), 
 			"tds":flt(d.tds,2) if d.tds else 0, 
 			"health":flt(d.health,2),
@@ -143,7 +143,7 @@ def get_leave_encashment(filters):
 								0 AS other,
 								0 AS pf,
 								0 AS gis,
-								0 AS totalPfGis,
+								
 								0 AS others,
 								0 AS health
 								FROM `tabLeave Encashment` a
@@ -168,7 +168,7 @@ def get_bonus(filters):
 						ROUND(bd.amount,2) AS total,
 						0 AS pf,
 						0 AS gis,
-						0 AS totalPfGis,
+						
 						ROUND(bd.amount,2) AS taxable,
 						ROUND(ifnull(bd.tax_amount,0),2) as tds,
 						0 AS health
@@ -226,7 +226,7 @@ def get_pbva(filters):
 			0 AS others, 
 			0 AS pf, 
 			0 AS gis, 
-			0 AS totalPfGis, 
+			 
 			0 AS health,
 			r.receipt_date,	
 			r.receipt_number,
@@ -253,7 +253,7 @@ def get_pbva(filters):
 			"total": flt(d.total, 2),
 			"pf": flt(d.pf, 2),
 			"gis": flt(d.gis, 2),
-			"totalPfGis": flt(d.totalPfGis, 2),
+			# "totalPfGis": flt(d.totalPfGis, 2),
 			"taxable": flt(d.taxable, 2),
 			"tds": flt(d.tds, 2),
 			"health": flt(d.health, 2),
@@ -286,7 +286,7 @@ def get_salary_arrer(filters):
 					sum(t4.arrear_corporate_allowance+t4.arrear_contract_allowance+t4.arrear_officiating_allowance+t4.arrear_mpi+fixed_allowance),0)
 					AS others, 
 					0 AS gis, 
-					ifnull(t4.arrear_pf,0 ) AS totalPfGis, 
+					
 					t4.arrear_hc AS health,
 					ifnull(sum(t4.arrear_corporate_allowance+t4.arrear_contract_allowance+t4.arrear_officiating_allowance+t4.arrear_mpi+fixed_allowance ) +(t4.arrear_basic_pay)-(t4.arrear_pf),0) AS taxable,
 					ifnull(t4.arrear_salary_tax,0) AS tds,
@@ -342,7 +342,7 @@ def get_bulk_leave_encashment(filters):
 			"total":a.encashment_amount,
 			"pf":0,
 			"gis":0,
-			"totalPfGis":0, 
+			
 			"taxable":a.encashment_amount, 
 			"tds":a.encashment_tax, 
 			"health":0,
@@ -404,12 +404,12 @@ def get_columns():
 		  "fieldtype": "Currency",
 		  "width": 120
 		},
-		{
-		  "fieldname": "totalPfGis",
-		  "label": "Total of PF & GIS",
-		  "fieldtype": "Currency",
-		  "width": 120
-		},
+		# {
+		#   "fieldname": "totalPfGis",
+		#   "label": "Total of PF & GIS",
+		#   "fieldtype": "Currency",
+		#   "width": 120
+		# },
 		{
 		  "fieldname": "taxable",
 		  "label": "Taxable Income",
@@ -418,7 +418,7 @@ def get_columns():
 		},
 		{
 		  "fieldname": "tds",
-		  "label": "TDS Amount",
+		  "label": "TDS/PIT",
 		  "fieldtype": "Currency",
 		  "width": 120
 		},
