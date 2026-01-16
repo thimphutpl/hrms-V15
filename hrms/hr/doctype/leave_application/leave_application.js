@@ -114,6 +114,11 @@ frappe.ui.form.on("Leave Application", {
 		if (frm.doc.docstatus === 0) {
 			frm.trigger("make_dashboard");
 		}
+
+		let reason_editable = frm.doc.workflow_state === 'Draft' && frm.doc.docstatus === 0;
+		let remarks_editable = frm.doc.workflow_state === 'Waiting Supervisor Approval' && frm.doc.docstatus === 0;
+        frm.set_df_property('description', 'read_only', !reason_editable);
+        frm.set_df_property('remarks', 'read_only', !remarks_editable);
 	},
 
 	async set_employee(frm) {
