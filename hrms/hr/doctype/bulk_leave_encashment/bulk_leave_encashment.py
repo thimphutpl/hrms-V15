@@ -20,7 +20,7 @@ class BulkLeaveEncashment(Document):
 		# validate_workflow_states(self)
 		if not self.encashment_date:
 			self.encashment_date = getdate(nowdate())
-		self.get_leave_details_for_encashment()
+		# self.get_leave_details_for_encashment()
 		self.calculate_amount()
 		# notify_workflow_states(self)
 
@@ -30,10 +30,40 @@ class BulkLeaveEncashment(Document):
 		self.post_accounts_entry()
 		# notify_workflow_states(self)
 
+		# self.update_encashed_in_leave_allocation()
+		# self.expire_excess_earned_leave()
+		# self.create_leave_ledger_entry()
+		# frappe.enqueue(self.post_accounts_entry, queue="long", timeout=1200)
+
 	def on_cancel(self):
+		# Ignore system-generated ledgers safely
+		self.ignore_linked_doctypes = (
+			"Journal Entry",
+			"GL Entry",
+			"Payment Ledger Entry",
+			"Stock Ledger Entry",
+			"Repost Item Valuation",
+			"Serial and Batch Bundle",
+		)
 		self.update_encashed_in_leave_allocation(cancel=1)
 		self.create_leave_ledger_entry(submit=False)
 		# notify_workflow_states(self)
+
+	# def expire_excess_earned_leave(self):
+	# 	for emp in self.items:
+	# 		if emp.excess_days and emp.excess_days > 0:
+	# 			args = frappe._dict(
+	# 				employee=emp.employee,
+	# 				employee_name=emp.employee_name,
+	# 				leaves=-emp.excess_days,
+	# 				from_date=self.encashment_date,
+	# 				to_date=self.encashment_date,
+	# 				transaction_type="Leave Allocation",
+	# 				is_expired=1,
+	# 				remarks="Auto-expired excess Earned Leave beyond cap"
+	# 			)
+	# 			create_leave_ledger_entry(self, args, submit=True)
+	
 	
 	def calculate_amount(self):
 		total_encashment_amount = net_payable = 0
@@ -85,6 +115,8 @@ class BulkLeaveEncashment(Document):
 				to_date=allocation.to_date,
 				leave_type=self.leave_type, 
 				consider_all_leaves_in_the_allocation_period=True)
+			# if self.leave_type== "Earned Leave" and emp.employee == "CDCL9001004":
+			# 	frappe.throw(str(leave_balance))
 			
 			if not emp.employee_group:
 				emp.employee_group = frappe.db.get_value("Employee", emp.employee, "employee_group")
@@ -94,6 +126,8 @@ class BulkLeaveEncashment(Document):
 			emp.leave_balance = leave_balance if leave_balance <= max_encashable_days else max_encashable_days
 			emp.encashable_days = emp.leave_balance 
 			excess = leave_balance - max_encashable_days
+			emp.excess_days = max(leave_balance - max_encashable_days, 0)
+
 			if excess > 0 and self.leave_type == "Earned Leave":
 				from hrms.hr.doctype.leave_ledger_entry.leave_ledger_entry import create_leave_ledger_entry
 
@@ -107,6 +141,11 @@ class BulkLeaveEncashment(Document):
 					is_expired = 1,
 					remarks = "Auto-expired excess Earned Leave beyond cap"
 				)
+				# frappe.log_error(
+				# 	message=frappe.as_json(args, indent=2),
+				# 	title="Auto Expired Earned Leave Args"
+				# )
+
 				create_leave_ledger_entry(self, args, submit=True)
  
 
@@ -305,6 +344,7 @@ class BulkLeaveEncashment(Document):
 				"credit_in_account_currency": flt(net_payable,2),
 				"credit": flt(net_payable,2),
 			})
+		# frappe.throw(frappe.as_json(pb_je))	
 
 		pb_je.flags.ignore_permissions = 1 
 		pb_je.insert()

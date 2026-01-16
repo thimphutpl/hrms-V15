@@ -828,48 +828,108 @@ def get_allocation_expiry_for_cf_leaves(
 	return expiry[0][0] if expiry else ""
 
 
-@frappe.whitelist()
-def get_number_of_leave_days(
-	employee: str,
-	leave_type: str,
-	from_date: datetime.date,
-	to_date: datetime.date,
-	half_day: int | str | None = None,
-	half_day_date: datetime.date | str | None = None,
-	holiday_list: str | None = None,
-) -> float:
-	"""Returns number of leave days between 2 dates after considering half day and holidays
-	(Based on the include_holiday setting in Leave Type)"""
+# @frappe.whitelist()
+# def get_number_of_leave_days(
+# 	employee: str,
+# 	leave_type: str,
+# 	from_date: datetime.date,
+# 	to_date: datetime.date,
+# 	half_day: int | str | None = None,
+# 	half_day_date: datetime.date | str | None = None,
+# 	holiday_list: str | None = None,
+# ) -> float:
+# 	"""Returns number of leave days between 2 dates after considering half day and holidays
+# 	(Based on the include_holiday setting in Leave Type)"""
 	
   
-	no_days=date_diff(to_date, from_date)+1
+# 	no_days=date_diff(to_date, from_date)+1
+# 	# if leave_type == "Earned Leave":
+# 	# 	frappe.throw(str(from_date))
 	
-	final=float(no_days)
+# 	final=float(no_days)
 
-	if leave_type not in ("Earned Leave", "Casual Leave"):
-		return final 
+# 	if leave_type not in ("Earned Leave", "Casual Leave"):
+# 		return final 
 		
-	total_days=0
-	is_sat=frappe.db.get_value("Holiday List", get_holiday_list_for_employee(employee), "saturday_half")
-	cur_date=from_date
+# 	total_days=0
+# 	is_sat=frappe.db.get_value("Holiday List", get_holiday_list_for_employee(employee), "saturday_half")
+# 	cur_date=from_date
 		
-	for i in range(0, no_days):
-		for holiday in frappe.db.sql("select * from `tabHoliday` where parent='{}'".format(get_holiday_list_for_employee(employee)), as_dict=1):
-			hol_date=getdate(cur_date)
-			if holiday.holiday_date==hol_date:
-				if holiday.holiday_date.weekday()==5 and ("saturday" in holiday.description.lower()):
-					if is_sat==1:
-						final-=0.5  
-					else:
-						final-=1
-				else:
-					final-=1
-		cur_date=add_to_date(getdate(cur_date), days=1, as_string=True)
+# 	for i in range(0, no_days):
+# 		for holiday in frappe.db.sql("select * from `tabHoliday` where parent='{}'".format(get_holiday_list_for_employee(employee)), as_dict=1):
+# 			hol_date=getdate(cur_date)
+# 			if holiday.holiday_date==hol_date:
+# 				if holiday.holiday_date.weekday()==5 and ("saturday" in holiday.description.lower()):
+# 					if is_sat==1:
+# 						final-=0.5  
+# 					else:
+# 						final-=1
+# 				else:
+# 					final-=1
+# 		cur_date=add_to_date(getdate(cur_date), days=1, as_string=True)
 
-	if int(half_day)==1:
-		final-=0.5
+# 	if int(half_day)==1:
+# 		final-=0.5
 			
-	return final
+# 	return final
+
+# Add by sanga to remove holiday list between leave taken balance
+@frappe.whitelist()
+def get_number_of_leave_days(
+	employee,
+	leave_type,
+	from_date,
+	to_date,
+	half_day=None,
+	half_day_date=None,
+	holiday_list=None,
+):
+	no_days = date_diff(to_date, from_date) + 1
+	# if leave_type == "Casual Leave":
+	# 	frappe.throw(str(no_days))
+	final = float(no_days)
+
+	# Only EL & CL exclude holidays
+	if leave_type not in ("Earned Leave", "Casual Leave"):
+		if int(half_day or 0) == 1:
+			final -= 0.5
+		return final
+
+	holiday_list = holiday_list or get_holiday_list_for_employee(employee)
+	if not holiday_list:
+		return final
+
+	is_sat = frappe.db.get_value("Holiday List", holiday_list, "saturday_half")
+
+	holidays = frappe.db.get_all(
+		"Holiday",
+		filters={"parent": holiday_list},
+		fields=["holiday_date", "description"],
+	)
+	# if leave_type == "Casual Leave":
+	# 	frappe.throw(str(holidays))
+
+	holiday_map = {h.holiday_date: h for h in holidays}
+
+	cur_date = getdate(from_date)
+
+	for _ in range(no_days):
+		holiday = holiday_map.get(cur_date)
+		if holiday:
+			# Saturday logic
+			if cur_date.weekday() == 5 and "saturday" in (holiday.description or "").lower():
+				final -= 0.5 if is_sat else 1
+			else:
+				final -= 1
+		cur_date = add_to_date(cur_date, days=1)
+
+	# Half day adjustment
+	if int(half_day or 0) == 1:
+		final -= 0.5
+	# if leave_type== "Earned Leave" and employee == "CDCL0107004":
+	# 		frappe.msgprint(str(final))	
+	return max(final, 0)
+
 
 
 # @frappe.whitelist()
@@ -933,6 +993,11 @@ def get_leave_details(employee, date, for_salary_slip=False):
 		leaves_taken = (
 			get_leaves_for_period(employee, d, allocation.from_date, to_date) * -1
 		)
+		# if allocation.leave_type == "Earned Leave":
+		# 	frappe.throw(str(leaves_taken))
+		# if leave_type== "Earned Leave" and employee == "CDCL0107004":
+		# 	frappe.throw(str(remaining_leaves))
+
 
 		leaves_pending = get_leaves_pending_approval_for_period(
 			employee, d, allocation.from_date, to_date
@@ -976,6 +1041,10 @@ def get_leave_balance_on(
 
 	allocation_records = get_leave_allocation_records(employee, date, leave_type)
 	allocation = allocation_records.get(leave_type, frappe._dict())
+	# frappe.throw(frappe.as_json(allocation_records))
+	# if allocation.leave_type == "Earned Leave":
+	# 	frappe.throw(str(allocation))
+
 
 	end_date = (
 		allocation.to_date
@@ -991,13 +1060,16 @@ def get_leave_balance_on(
 	)
 	
 	remaining_leaves = get_remaining_leaves(allocation, leaves_taken, date, cf_expiry)
-	#frappe.msgprint(str(remaining_leaves))
+	# frappe.msgprint(str(leaves_taken))
+	# if leave_type== "Earned Leave" and employee == "CDCL0107004":
+	# 			frappe.throw(str(leaves_taken))
 
 	if for_consumption:
 		return remaining_leaves
 	else:
+		# frappe.msgprint(str(leave_type))
 		if leave_type=="Earned Leave":
-			#frappe.throw(str(end_date))
+			# frappe.throw(str(end_date))
 			total_leaves=0
 			Ledger = frappe.qb.DocType("Leave Ledger Entry")
 
@@ -1012,11 +1084,17 @@ def get_leave_balance_on(
 					& (Ledger.to_date == end_date)
 				)
 			)
+			# frappe.throw(str(query))
 
 			result = query.run(as_dict=True)
 			total_leaves = result[0]['total_leaves'] if result else 0
-			#frappe.throw(str(total_leaves ))
+			# frappe.throw(str(total_leaves ))
+			# if leave_type== "Earned Leave" and employee == "CDCL0107004":
+			# 	frappe.throw(str(total_leaves))
 			remaining_leaves.leave_balance +=flt(total_leaves)
+			# frappe.throw(str(remaining_leaves.leave_balance))
+			# if leave_type== "Earned Leave" and employee == "CDCL0107004":
+			# 	frappe.throw(str(remaining_leaves.leave_balance))
 		return remaining_leaves.get("leave_balance")
 
 # @frappe.whitelist()
@@ -1172,6 +1250,8 @@ def get_leaves_pending_approval_for_period(
 def get_remaining_leaves(
 	allocation: dict, leaves_taken: float, date: str, cf_expiry: str
 ) -> dict[str, float]:
+	# if allocation.leave_type == "Earned Leave":
+	# 	frappe.throw(str(leaves_taken))
 	"""Returns a dict of leave_balance and leave_balance_for_consumption
 	leave_balance returns the available leave balance
 	leave_balance_for_consumption returns the minimum leaves remaining after comparing with remaining days for allocation expiry
@@ -1207,8 +1287,13 @@ def get_remaining_leaves(
 		leave_balance = leave_balance_for_consumption = flt(allocation.total_leaves_allocated) + flt(
 			leaves_taken
 		)
+		# if allocation.leave_type == "Earned Leave":
+		# 	frappe.throw(str(leave_balance))
+
 
 	remaining_leaves = _get_remaining_leaves(leave_balance_for_consumption, allocation.to_date)
+	# if allocation.leave_type== "Earned Leave" and allocation.employee == "CDCL0107004":
+	# 	frappe.throw(str(leaves_taken))
 	return frappe._dict(leave_balance=leave_balance, leave_balance_for_consumption=remaining_leaves)
 
 
@@ -1238,18 +1323,23 @@ def get_leaves_for_period(
 	skip_expired_leaves: bool = True,
 ) -> float:
 	leave_entries = get_leave_entries(employee, leave_type, from_date, to_date)
+	# if leave_type == "Casual Leave":
+	# 	frappe.throw(str(leave_entries))
+	# if leave_type== "Earned Leave" and employee == "CDCL0107004":
+	# 			frappe.throw(str(leave_entries))
 	leave_days = 0
 
 	for leave_entry in leave_entries:
 		inclusive_period = leave_entry.from_date >= getdate(
 			from_date
 		) and leave_entry.to_date <= getdate(to_date)
+		# if leave_type== "Earned Leave" and employee == "CDCL0107004":
+		# 		frappe.throw(str(inclusive_period))
 
 		# if inclusive_period and leave_entry.transaction_type == "Leave Encashment":
 		# 	leave_days += leave_entry.leaves
 		if inclusive_period and leave_entry.transaction_type in ["Leave Encashment", "Bulk Leave Encashment"]:
 			leave_days += leave_entry.leaves
-	
 
 		elif (
 			inclusive_period
@@ -1258,6 +1348,8 @@ def get_leaves_for_period(
 			and not skip_expired_leaves
 		):
 			leave_days += leave_entry.leaves
+			# if leave_type== "Earned Leave" and employee == "CDCL0107004":
+			# 	frappe.throw(str(leave_days))
 
 		elif leave_entry.transaction_type == "Leave Application":
 			if leave_entry.from_date < getdate(from_date):
@@ -1273,6 +1365,8 @@ def get_leaves_for_period(
 				half_day_date = frappe.db.get_value(
 					"Leave Application", leave_entry.transaction_name, "half_day_date"
 				)
+				# if leave_type == "Casual Leave":
+				# 	frappe.msgprint(str(half_day_date))
 
 			leave_days += (
 				get_number_of_leave_days(
@@ -1286,11 +1380,16 @@ def get_leaves_for_period(
 				)
 				* -1
 			)
+			# if leave_type == "Casual Leave":
+			# 	frappe.msgprint(str(leave_days))
+			# if leave_type== "Earned Leave" and employee == "CDCL0107004":
+			# 	frappe.log_error(str(leave_days))
 
 		elif leave_entry.transaction_type == "Merge CL To EL" and leave_entry.leave_type=='Casual Leave':
 			leave_days +=leave_entry.leaves
 
-
+		# if leave_type== "Earned Leave" and employee == "CDCL0107004":
+		# 		frappe.throw(str(leave_days))
 	return leave_days
 
 
