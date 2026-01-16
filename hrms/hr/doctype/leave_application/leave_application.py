@@ -83,7 +83,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
     def validate(self):
         validate_active_employee(self.employee)
         set_employee_name(self)
-        # validate_workflow_states(self)
+        #validate_workflow_states(self)
         self.validate_dates()
         self.validate_balance_leaves()
         self.validate_leave_overlap()
@@ -100,23 +100,6 @@ class LeaveApplication(Document, PWANotificationsMixin):
         self.validate_applicable_after()
 
     def on_update(self):
-
-        # if self.status == "Open" and self.docstatus < 1:
-        #     user_id = frappe.session.user
-
-        #     # frappe.throw(empid)
-        #     if self.workflow_state == "Waiting Approval" and self.reports_to != user_id:
-        #         frappe.throw("Only {} can verify".format(self.reports_to))
-
-        #     # notify leave approver about creation
-        #     # if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-
-        #         # self.notify_leave_approver()
-
-        # share_doc_with_approver(self, self.leave_approver)
-        # if self.status == "Open" and self.docstatus < 1:
-        # 	if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-        # 		notify_workflow_states(self)
         self.publish_update()
         # self.notify_approval_status()
 
@@ -141,18 +124,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
         self.create_leave_ledger_entry()
         self.reload()
 
-        # self.validate_back_dated_application()
-
-        # self.validate_for_self_approval()
-        # self.db_set("status", "Approved")
-        # frappe.db.commit()
-        # self.update_attendance()
-        # # notify leave applier about approval
-        # if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-        #     self.notify_employee()
-
-        # self.create_leave_ledger_entry()
-        # self.reload()
+     
 
     def before_cancel(self):
         self.status = "Cancelled"
@@ -1634,7 +1606,6 @@ def on_doctype_update():
 
 
 def get_permission_query_conditions(user):
-
     if not user:
         user = frappe.session.user
     user_roles = frappe.get_roles(user)
@@ -1652,14 +1623,8 @@ def get_permission_query_conditions(user):
 			)
 
 			OR
-			(`tabLeave Application`.leave_approver = '{user}'
-			 AND `tabLeave Application`.workflow_state NOT IN ('Draft','Rejected','Cancelled','Waiting for Verification'))
-	"""
-    if "Verifier" in user_roles:
-        conditions += f"""
-			OR
 			(`tabLeave Application`.reports_to = '{user}'
-			 AND `tabLeave Application`.workflow_state = 'Waiting for Verification')
-		"""
+			 AND `tabLeave Application`.workflow_state NOT IN ('Draft'))
+	"""
     conditions += ")"
     return conditions
