@@ -48,6 +48,8 @@ class EmployeeAdvance(Document):
 		)
 
 	def validate(self):
+		if not self.advance_account:
+			self.advance_account = frappe.db.get_value("Company", self.company, "default_employee_advance_account")
 		validate_active_employee(self.employee)
 		self.validate_exchange_rate()
 		self.set_status()
