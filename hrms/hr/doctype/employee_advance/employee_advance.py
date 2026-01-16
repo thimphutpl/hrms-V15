@@ -59,7 +59,7 @@ class EmployeeAdvance(Document):
 
 	def on_submit(self):
 		self.post_journal_entry()
-		# self.update_salary_structure()
+		self.update_salary_structure()
 
 	def on_cancel(self):
 		self.ignore_linked_doctypes = ("GL Entry", "Payment Ledger Entry")
@@ -87,7 +87,7 @@ class EmployeeAdvance(Document):
 			if self.salary_structure:
 				doc = frappe.get_doc("Salary Structure", self.salary_structure)
 				for d in doc.get("deductions"):
-					if d.salary_component == "Salary Advance Deductions" and self.name in (
+					if d.salary_component == "Salary Advance" and self.name in (
 						d.reference_type,
 						d.reference_name,
 					):
@@ -103,7 +103,7 @@ class EmployeeAdvance(Document):
 					"Salary Structure", {"employee": self.employee, "is_active": "Yes"}
 				)
 				row = doc.append("deductions", {})
-				row.salary_component = "Salary Advance Deductions"
+				row.salary_component = "Salary Advance"
 				row.from_date = self.recovery_start_date
 				row.to_date = self.recovery_end_date
 				row.amount = flt(self.deduction_amount)

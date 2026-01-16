@@ -734,7 +734,7 @@ class SalarySlip(TransactionBase):
 		for struct_row in self._salary_structure_doc.get(component_type):
 			#self.add_structure_component(struct_row, component_type)
 			posting_date_obj = datetime.strptime(self.posting_date, "%Y-%m-%d").date()
-			if struct_row.salary_component == 'Salary Advance Deductions':
+			if struct_row.salary_component == 'Salary Advance':
         
 				if struct_row.to_date and struct_row.to_date > posting_date_obj:
 					self.add_structure_component(struct_row, component_type)
