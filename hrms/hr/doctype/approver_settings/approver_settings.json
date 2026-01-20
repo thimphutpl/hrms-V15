@@ -1,17 +1,18 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2026-01-20 22:30:39.547461",
+ "autoname": "AS.YY.MM.####",
+ "creation": "2026-01-21 01:43:34.798889",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "final_approver_detail_section",
   "employee",
-  "column_break_etrq",
+  "column_break_efok",
   "employee_name",
-  "column_break_maak",
+  "column_break_cqmc",
   "user_id",
-  "column_break_xvsp",
+  "column_break_bbza",
   "cost_center"
  ],
  "fields": [
@@ -27,15 +28,15 @@
    "options": "Employee"
   },
   {
-   "fieldname": "column_break_etrq",
+   "fieldname": "column_break_efok",
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "column_break_maak",
+   "fieldname": "column_break_cqmc",
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "column_break_xvsp",
+   "fieldname": "column_break_bbza",
    "fieldtype": "Column Break"
   },
   {
@@ -60,20 +61,22 @@
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
- "issingle": 1,
  "links": [],
- "modified": "2026-01-20 22:58:50.051209",
+ "modified": "2026-01-21 02:01:02.066371",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Approver Settings",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {
    "create": 1,
    "delete": 1,
    "email": 1,
+   "export": 1,
    "print": 1,
    "read": 1,
+   "report": 1,
    "role": "System Manager",
    "share": 1,
    "write": 1

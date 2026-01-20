@@ -5,7 +5,6 @@ import frappe
 from frappe.model.document import Document
 
 
-
 class ApproverSettings(Document):
 	pass
 
