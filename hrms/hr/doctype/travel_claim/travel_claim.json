@@ -31,6 +31,7 @@
   "net_amount",
   "column_break_ogjw",
   "advance_amount",
+  "extra_travel_allowance",
   "column_break_lbpf",
   "miscellaneous_amount",
   "miscellaneous_claim_reason",
@@ -320,12 +321,18 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "extra_travel_allowance",
+   "fieldtype": "Currency",
+   "label": "Incidental Claim",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-11-07 10:21:34.310638",
+ "modified": "2026-01-20 09:31:34.816018",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim",

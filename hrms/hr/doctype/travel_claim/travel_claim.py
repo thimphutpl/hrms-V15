@@ -32,8 +32,11 @@ class TravelClaim(Document):
 			notify_workflow_states(self)
 
 	def on_submit(self):
-		self.post_journal_entry()
-		notify_workflow_states(self)
+		if self.total_amount > self.advance_amount:
+			self.post_journal_entry()
+			notify_workflow_states(self)
+		else:
+			return
 
 	def before_cancel(self):
 		if self.journal_entry:
@@ -64,7 +67,7 @@ class TravelClaim(Document):
 			self.calculate_dsa_amount(d)
 			d.amount=d.amount+d.mileage_amount
 			total += flt(d.amount)
-		self.total_amount = flt(total)
+		self.total_amount = flt(total) + self.extra_travel_allowance
 
 		if self.miscellaneous_amount:
 			self.total_amount += flt(self.miscellaneous_amount)
@@ -143,6 +146,9 @@ class TravelClaim(Document):
 		self.set("advances", advances)
 
 	def post_journal_entry(self):
+		# if flt(self.advance_amount) > 0 and flt(self.net_amount == 0):
+		# 	frappe.throw("hiii")
+		# 	return
 		travel_expense_account = frappe.db.get_value(
 			"Travel Type", self.travel_type, "account"
 		)
@@ -195,6 +201,7 @@ class TravelClaim(Document):
 		)
 
 		if flt(self.advance_amount) > 0:
+			#frappe.throw("pl")
 			accounts.append(
 				{
 					"account": advance_account,
@@ -274,6 +281,7 @@ def get_travel_claim(dt, dn):
 	tc.advance_amount = doc.advance_amount
 	tc.mode_of_travel = doc.mode_of_travel
 	tc.branch = doc.branch
+	tc.extra_travel_allowance=doc.extra_travel_allowance
 	tc.cost_center = doc.cost_center
 	tc.approver=doc.approver
 	tc.approver_name=doc.approver_name
