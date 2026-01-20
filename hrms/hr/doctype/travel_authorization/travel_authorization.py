@@ -380,7 +380,7 @@ class TravelAuthorization(Document):
 		return_day_amount = (flt(return_day_dsa) / 100 * flt(base_dsa))
 		
 		
-		self.estimated_amount = flt(dsa_in) + flt(dsa_out) + flt(return_day_amount)
+		self.estimated_amount = flt(dsa_in) + flt(dsa_out) + flt(return_day_amount) + self.extra_travel_allowance
 	
 
 
