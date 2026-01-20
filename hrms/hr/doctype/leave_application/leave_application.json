@@ -11,6 +11,7 @@
   "naming_series",
   "employee",
   "employee_name",
+  "branch",
   "column_break_4",
   "leave_type",
   "company",
@@ -159,7 +160,8 @@
    "fieldname": "leave_approver",
    "fieldtype": "Link",
    "label": "Leave Approver",
-   "options": "User"
+   "options": "User",
+   "read_only": 1
   },
   {
    "fetch_from": "leave_approver.full_name",
@@ -255,13 +257,21 @@
   {
    "fieldname": "leave_approver_designation",
    "fieldtype": "Data",
-   "label": "Leave Approver Designation"
+   "label": "Leave Approver Designation",
+   "read_only": 1
   },
   {
    "fieldname": "workflow_state",
    "fieldtype": "Link",
    "label": "Workflow State",
    "options": "Workflow State"
+  },
+  {
+   "fetch_from": "employee.branch",
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch"
   }
  ],
  "icon": "fa fa-calendar",
@@ -269,7 +279,7 @@
  "is_submittable": 1,
  "links": [],
  "max_attachments": 3,
- "modified": "2025-12-09 12:55:48.564815",
+ "modified": "2026-01-21 01:13:51.193267",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Application",

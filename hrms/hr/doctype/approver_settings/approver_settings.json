@@ -1,0 +1,86 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-01-20 22:30:39.547461",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "final_approver_detail_section",
+  "employee",
+  "column_break_etrq",
+  "employee_name",
+  "column_break_maak",
+  "user_id",
+  "column_break_xvsp",
+  "cost_center"
+ ],
+ "fields": [
+  {
+   "fieldname": "final_approver_detail_section",
+   "fieldtype": "Section Break",
+   "label": "Final Approver Detail"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "column_break_etrq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_maak",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_xvsp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Read Only",
+   "label": "Employee Name"
+  },
+  {
+   "fetch_from": "employee.user_id",
+   "fieldname": "user_id",
+   "fieldtype": "Link",
+   "label": "User Id",
+   "options": "User"
+  },
+  {
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-01-20 22:58:50.051209",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Approver Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
