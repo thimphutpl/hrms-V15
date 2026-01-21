@@ -60,7 +60,9 @@ class TravelAuthorization(Document):
 
 	def validate_estimated_amount(self):
 		if flt(self.advance_amount) > flt(self.estimated_amount):
-			frappe.throw("your estimate amount is less than advance amount ")
+			frappe.throw("Your estimate amount is less than advance amount ")
+		if flt(self.advance_amount) > (flt(self.estimated_amount) * 0.75):
+			frappe.throw("Your estimate amount cannot be more than 75% of the estimated amount")
 
 	def post_journal_entry(self):
 		advance_account = frappe.db.get_value("Company", self.company, "travel_advance_account")
@@ -242,75 +244,81 @@ class TravelAuthorization(Document):
 		return {
 			"has_travel_claim": bool(travel_claim)
 		}
-
-
-	#@frappe.whitelist()
+	@frappe.whitelist()
 	def make_travel_advance(self):
 		"""
 		Creates a Travel Advance document linked to the given Travel Authorization.
 		"""
-		#frappe.throw(self.employee)
+		no_of_days_in = 0
+		no_of_days_out = 0
 		
-		#doc = frappe.get_doc(dt, dn)
-		no_of_days_in=0
-		no_of_days_out=0
-		# #frappe.throw(str(doc.items[0].country))
 		
 		for d in self.items:
-			
-			#frappe.msgprint("hi")
-			if d.is_last_day==1:
-				no_of_day=0
+			if d.is_last_day == 1:
+				no_of_day = 0
 			else:
-				#frappe.msgprint(d.country)
-				if d.country=='Bhutan':
-					no_of_day=date_diff(d.to_date, d.from_date) + 1
-					#frappe.msgprint(str(no_of_day1))
-					c=1
-					no_of_days_in+=no_of_day
+				no_of_day = date_diff(d.to_date, d.from_date) + 1
+				
+				if d.country == 'Bhutan':
+					no_of_days_in += no_of_day
 				else:
-					no_of_day=date_diff(d.to_date, d.from_date) + 1
-					no_of_days_out+=no_of_day
-				#no_of_day=date_diff(d.to_date, d.from_date) + 1
-				#no_of_days+=no_of_day1
-			c+=1
-			
-
-		#frappe.throw(str(no_of_days_out))
+					no_of_days_out += no_of_day
 		
-		if self.items:
-			from_date = self.items[0].from_date
-			to_date = self.items[-1].from_date if len(self.items) > 1 else from_date
-
+		
 		employee_grade = frappe.db.get_value("Employee", self.employee, "grade")
 		return_day_dsa = frappe.db.get_single_value("HR Settings", "return_day_dsa")
-		dsa = frappe.db.get_value("Employee Grade", employee_grade, "dsa")
-		dsa_in= dsa * no_of_days_in
-		#frappe.throw(str(dsa_in))
-
-		if self.travel_type=="International":
-			country=frappe.get_doc("DSA Out Country", self.items[0].country)
-			if not country:
-				frappe.throw("country in not set in DSA OUT Countery")
-			grade=False
-			for dsa_int in country.country_dsa_detail:
+		
+		
+		base_dsa = frappe.db.get_value("Employee Grade", employee_grade, "dsa")
+		
+		#frappe.throw(str(base_dsa))
+		dsa_in = base_dsa * no_of_days_in
+		
+		
+		dsa_out = 0
+		
+		
+		if self.travel_type == "International":
+			for ds in self.items:
+				if ds.country != "Bhutan" and ds.country:
+					
+					country_doc = frappe.get_doc("DSA Out Country", ds.country)
+					if not country_doc:
+						frappe.throw(f"DSA not set for country: {ds.country} in DSA Out Country")
+					
 				
-				if dsa_int.grade==employee_grade:
+					grade_found = False
+					for dsa_detail in country_doc.country_dsa_detail:
+						if dsa_detail.grade == employee_grade:
 							
-					dsa = 130 * self.exchange_rate
-					grade=True
-					break
+							daily_dsa_out = dsa_detail.dsa * self.exchange_rate
+							
+							
+							if ds.is_last_day == 1:
+								country_days = 0
+							else:
+								country_days = date_diff(ds.to_date, ds.from_date) + 1
+							
+							dsa_out += daily_dsa_out * country_days
+							grade_found = True
+							break
+					
+					if not grade_found:
+						frappe.throw(f"DSA not set for grade {employee_grade} in country {ds.country}")
+		else:
+			
+			dsa_out = base_dsa * no_of_days_out
+		
+		
+		return_day_amount = (flt(return_day_dsa) / 100 * flt(base_dsa))
+		
+		
+		self.estimated_amount = flt(dsa_in) + flt(dsa_out) + flt(return_day_amount)
 
-			if grade==False:
-				frappe.throw("DSa is not net grade")
-		
-		
-		
-		self.estimated_amount = flt(dsa_in)+flt(dsa) * flt(no_of_days_out) + (flt(return_day_dsa) /100 * flt(dsa))
-		#frappe.throw(str(self.estimated_amount))
-		#adv.travel_authorization = doc.name
 
-		#return estimated_amount
+		
+		
+		
 @frappe.whitelist()
 def get_approver(employee):
 	# leave_approver, department = frappe.db.get_value("Employee", employee, ["leave_approver", "department"])

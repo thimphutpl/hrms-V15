@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "DIS.YY.####",
  "creation": "2026-01-09 13:03:38.822603",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -164,10 +165,11 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-12 11:23:49.295523",
+ "modified": "2026-01-12 13:40:11.954607",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Disciplinary Record",
+ "naming_rule": "Expression (old style)",
  "owner": "sonam.zangmo@thimphutechpark.bt",
  "permissions": [
   {

@@ -281,7 +281,7 @@ class SalaryStructure(Document):
 
 			# Calculating Salary Tax
 			if ed == 'deductions':
-				calc_amt = round(get_salary_tax(math.floor(flt(total_earning)-flt(pf_amt)-flt(gis_amt)-(comm_allowance*0.5))))
+				calc_amt = round(get_salary_tax(math.floor(flt(total_earning)-(flt(total_earning*0.15)))))
 				# calc_amt = roundoff(calc_amt)
 				calc_amt = flt(calc_amt)
 				total_deduction += round(calc_amt)
