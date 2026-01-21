@@ -9,6 +9,7 @@
   "start_time",
   "end_time",
   "attendance_branch",
+  "ip",
   "column_break_3",
   "holiday_list",
   "color",
@@ -189,10 +190,15 @@
    "fieldtype": "Link",
    "label": "Attendance Branch",
    "options": "Branch"
+  },
+  {
+   "fieldname": "ip",
+   "fieldtype": "Data",
+   "label": "IP"
   }
  ],
  "links": [],
- "modified": "2026-01-14 13:20:42.151904",
+ "modified": "2026-01-21 09:39:28.876194",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Shift Type",

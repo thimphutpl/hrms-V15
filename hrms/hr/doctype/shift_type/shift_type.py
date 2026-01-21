@@ -115,6 +115,8 @@ class ShiftType(Document):
 			(
 				attendance_status,
 				working_hours,
+				morning_extra_hours,
+				overtime_hours,
 				late_entry,
 				early_exit,
 				in_time,
@@ -128,6 +130,8 @@ class ShiftType(Document):
 				attendance_status,
 				attendance_date,
 				working_hours,
+				morning_extra_hours,
+				overtime_hours,
 				late_entry,
 				early_exit,
 				in_time,
@@ -189,16 +193,10 @@ class ShiftType(Document):
 		)
 
 	def get_attendance(self, logs):
-		"""Return attendance_status, working_hours, late_entry, early_exit, in_time, out_time
-		for a set of logs belonging to a single shift.
-		Assumptions:
-		1. These logs belongs to a single shift, single employee and it's not in a holiday date.
-		2. Logs are in chronological order
-		"""
 		late_entry = early_exit = False
 		late_reason = early_exit_reason = None
-		total_working_hours, in_time, out_time = calculate_working_hours(
-			logs, self.determine_check_in_and_check_out, self.working_hours_calculation_based_on
+		total_working_hours,overtime_hours,morning_extra_hours, in_time, out_time = calculate_working_hours(
+			logs, self.determine_check_in_and_check_out, self.working_hours_calculation_based_on,shift_start=self.start_time, shift_end=self.end_time
 		)
 	
 		if (
@@ -219,15 +217,15 @@ class ShiftType(Document):
 			self.working_hours_threshold_for_absent
 			and total_working_hours < self.working_hours_threshold_for_absent
 		):
-			return "Absent", total_working_hours, late_entry, early_exit, in_time, out_time,late_reason, early_exit_reason
+			return "Absent", total_working_hours,overtime_hours,morning_extra_hours, late_entry, early_exit, in_time, out_time,late_reason, early_exit_reason
 
 		if (
 			self.working_hours_threshold_for_half_day
 			and total_working_hours < self.working_hours_threshold_for_half_day
 		):
-			return "Half Day", total_working_hours, late_entry, early_exit, in_time, out_time, late_reason, early_exit_reason
+			return "Half Day", total_working_hours,overtime_hours,morning_extra_hours, late_entry, early_exit, in_time, out_time, late_reason, early_exit_reason
 
-		return "Present", total_working_hours, late_entry, early_exit, in_time, out_time, late_reason, early_exit_reason
+		return "Present", total_working_hours,overtime_hours,morning_extra_hours, late_entry, early_exit, in_time, out_time, late_reason, early_exit_reason
 
 	def mark_absent_for_dates_with_no_attendance(self, employee: str):
 		"""Marks Absents for the given employee on working days in this shift that have no attendance marked.
@@ -418,43 +416,7 @@ def get_actual_shift_end(shift, current_datetime):
 		actual_shift_end = add_days(actual_shift_end, -1)
 	return actual_shift_end
 
-# def update_last_sync_of_checkin():
-#     """Automatically updates last_sync_of_checkin for all shifts with auto attendance enabled."""
-	
-#     shifts = frappe.get_all(
-#         "Shift Type",
-#         filters={"enable_auto_attendance": 1, "auto_update_last_sync": 1},
-#         fields=["name", "last_sync_of_checkin", "start_time", "end_time"],
-#     )
 
-#     current_datetime = frappe.flags.current_datetime or get_datetime()
-
-#     for shift in shifts:
-#         last_sync = get_datetime(shift.last_sync_of_checkin) if shift.last_sync_of_checkin else None
-
-#         # Get the actual shift end for today (or last known shift)
-#         shift_end = get_actual_shift_end(shift, current_datetime)
-
-#         # If last_sync is missing or behind current datetime, update it
-#         if not last_sync or last_sync < current_datetime:
-#             new_sync = min(shift_end + timedelta(minutes=1), current_datetime)
-#             frappe.db.set_value("Shift Type", shift.name, "last_sync_of_checkin", new_sync)
-
-
-# def get_actual_shift_end(shift, current_datetime):
-#     """Returns the actual end datetime of the shift based on today's date."""
-	
-#     time_within_shift = datetime.combine(current_datetime.date(), get_time(shift.start_time))
-#     shift_details = get_shift_details(shift.name, time_within_shift)
-
-#     actual_shift_start = shift_details["actual_start"]
-#     actual_shift_end = shift_details["actual_end"]
-
-#     # Adjust if shift crosses midnight or current time is before shift start
-#     if (actual_shift_start.date() < actual_shift_end.date()) or (current_datetime < actual_shift_start):
-#         actual_shift_end = add_days(actual_shift_end, -1)
-
-#     return actual_shift_end
 	
 
 def process_auto_attendance_for_all_shifts():
