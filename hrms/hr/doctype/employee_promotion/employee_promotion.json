@@ -6,141 +6,199 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "employee",
-  "employee_name",
-  "department",
-  "salary_currency",
-  "column_break_3",
-  "promotion_date",
-  "company",
-  "fiscal_year",
-  "month",
-  "details_section",
-  "promotion_details",
-  "promotion_entry",
-  "salary_details_section",
-  "current_ctc",
-  "column_break_12",
-  "revised_ctc",
-  "amended_from"
- ],
- "fields": [
-  {
-   "fieldname": "employee",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Employee",
-   "options": "Employee",
-   "reqd": 1
-  },
-  {
-   "fetch_from": "employee.employee_name",
-   "fieldname": "employee_name",
-   "fieldtype": "Data",
-   "label": "Employee Name",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "employee.department",
-   "fieldname": "department",
-   "fieldtype": "Link",
-   "label": "Department",
-   "options": "Department",
-   "read_only": 1
-  },
-  {
-   "fieldname": "column_break_3",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "promotion_date",
-   "fieldtype": "Date",
-   "label": "Promotion Date",
-   "reqd": 1
-  },
-  {
-   "fetch_from": "employee.company",
-   "fieldname": "company",
-   "fieldtype": "Link",
-   "label": "Company",
-   "options": "Company"
-  },
-  {
-   "description": "Set the properties that should be updated in the Employee master on promotion submission",
-   "fieldname": "details_section",
-   "fieldtype": "Section Break",
-   "label": "Employee Promotion Details"
-  },
-  {
-   "fieldname": "promotion_details",
-   "fieldtype": "Table",
-   "options": "Employee Property History"
-  },
-  {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Employee Promotion",
-   "print_hide": 1,
-   "read_only": 1
-  },
-  {
-   "fieldname": "salary_details_section",
-   "fieldtype": "Section Break",
-   "label": "Salary Details"
-  },
-  {
-   "fieldname": "column_break_12",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fetch_from": "employee.salary_currency",
-   "fieldname": "salary_currency",
-   "fieldtype": "Link",
-   "label": "Salary Currency",
-   "options": "Currency",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "employee.ctc",
-   "fetch_if_empty": 1,
-   "fieldname": "current_ctc",
-   "fieldtype": "Currency",
-   "label": "Current CTC",
-   "mandatory_depends_on": "revised_ctc",
-   "options": "salary_currency"
-  },
-  {
-   "depends_on": "current_ctc",
-   "fieldname": "revised_ctc",
-   "fieldtype": "Currency",
-   "label": "Revised CTC",
-   "options": "salary_currency"
-  },
-  {
-   "fieldname": "fiscal_year",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Fiscal Year",
-   "options": "Fiscal Year",
-   "reqd": 1
-  },
-  {
-   "fieldname": "month",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "label": "Month",
-   "options": "January\nJuly",
-   "reqd": 1
-  },
-  {
-   "fieldname": "promotion_entry",
-   "fieldtype": "Link",
-   "label": "Promotion Entry",
-   "options": "Promotion Entry"
-  }
- ],
+    "employee",
+    "employee_name",
+    "column_break_3",
+    "promotion_date",
+    "company",
+    "fiscal_year",
+    "month",
+    "sb_salary_details",
+    "current_lower_limit",
+    "new_lower_limit",
+    "cb_increment",
+    "current_increment",
+    "new_increment",
+    "cb_ul",
+    "current_upper_limit",
+    "new_upper_limit",
+    "cb_basic_pay",
+    "current_basic_pay",
+    "new_basic_pay",
+    "details_section",
+    "get_details",
+    "current_grade",
+    "promote_to_grade",
+    "promotion_details",
+    "promotion_entry",
+    "amended_from"
+   ],
+   "fields": [
+    {
+     "fetch_from": "employee.employee_name",
+     "fieldname": "employee_name",
+     "fieldtype": "Data",
+     "label": "Employee Name",
+     "read_only": 1
+    },
+    {
+     "fieldname": "column_break_3",
+     "fieldtype": "Column Break"
+    },
+    {
+     "fieldname": "promotion_date",
+     "fieldtype": "Date",
+     "in_list_view": 1,
+     "label": "Promotion Date",
+     "reqd": 1
+    },
+    {
+     "fetch_from": "employee.company",
+     "fieldname": "company",
+     "fieldtype": "Link",
+     "label": "Company",
+     "options": "Company"
+    },
+    {
+     "fieldname": "details_section",
+     "fieldtype": "Section Break",
+     "label": "Employee Promotion Details"
+    },
+    {
+     "fieldname": "promotion_details",
+     "fieldtype": "Table",
+     "label": "Employee Promotion Details",
+     "options": "Employee Property History"
+    },
+    {
+     "fieldname": "amended_from",
+     "fieldtype": "Link",
+     "label": "Amended From",
+     "no_copy": 1,
+     "options": "Employee Promotion",
+     "print_hide": 1,
+     "read_only": 1
+    },
+    {
+     "depends_on": "eval:doc.docstatus == 0;",
+     "fieldname": "get_details",
+     "fieldtype": "Button",
+     "label": "Get Details"
+    },
+    {
+     "fieldname": "employee",
+     "fieldtype": "Link",
+     "in_list_view": 1,
+     "label": "Employee",
+     "options": "Employee",
+     "reqd": 1
+    },
+    {
+     "fieldname": "promotion_entry",
+     "fieldtype": "Link",
+     "label": "Promotion Entry",
+     "options": "Promotion Entry",
+     "read_only": 1
+    },
+    {
+     "fieldname": "current_grade",
+     "fieldtype": "Link",
+     "label": "Current Grade",
+     "options": "Employee Grade"
+    },
+    {
+     "fieldname": "promote_to_grade",
+     "fieldtype": "Link",
+     "label": "Promote To Grade",
+     "options": "Employee Grade"
+    },
+    {
+     "fieldname": "fiscal_year",
+     "fieldtype": "Link",
+     "in_list_view": 1,
+     "label": "Year",
+     "options": "Fiscal Year",
+     "reqd": 1
+    },
+    {
+     "fieldname": "month",
+     "fieldtype": "Select",
+     "in_list_view": 1,
+     "label": "Month",
+     "options": "January\nJuly",
+     "reqd": 1
+    },
+    {
+     "fieldname": "sb_salary_details",
+     "fieldtype": "Section Break",
+     "label": "Salary Details"
+    },
+    {
+     "fieldname": "current_lower_limit",
+     "fieldtype": "Currency",
+     "label": "Current Lower Limit",
+     "precision": "2",
+     "read_only": 1
+    },
+    {
+     "fieldname": "new_lower_limit",
+     "fieldtype": "Currency",
+     "label": "New Lower Limit",
+     "precision": "2",
+     "read_only": 1
+    },
+    {
+     "fieldname": "cb_increment",
+     "fieldtype": "Column Break"
+    },
+    {
+     "fieldname": "cb_ul",
+     "fieldtype": "Column Break"
+    },
+    {
+     "fieldname": "current_upper_limit",
+     "fieldtype": "Currency",
+     "label": "Current Upper Limit",
+     "read_only": 1
+    },
+    {
+     "fieldname": "new_upper_limit",
+     "fieldtype": "Currency",
+     "label": "New Upper Limit",
+     "precision": "2",
+     "read_only": 1
+    },
+    {
+     "fieldname": "new_basic_pay",
+     "fieldtype": "Currency",
+     "label": "New Basic Pay",
+     "precision": "2",
+     "read_only": 1
+    },
+    {
+     "fieldname": "cb_basic_pay",
+     "fieldtype": "Column Break"
+    },
+    {
+     "fieldname": "current_increment",
+     "fieldtype": "Currency",
+     "label": "Current Increment Value",
+     "precision": "2",
+     "read_only": 1
+    },
+    {
+     "fieldname": "new_increment",
+     "fieldtype": "Currency",
+     "label": "New Increment Value"
+    },
+    {
+     "fieldname": "current_basic_pay",
+     "fieldtype": "Currency",
+     "label": "Current Basic Pay",
+     "precision": "2",
+     "read_only": 1
+    }
+   ],
  "is_submittable": 1,
  "links": [],
  "modified": "2025-02-06 15:33:00.493120",
