@@ -26,13 +26,13 @@ from frappe.utils import (
 from erpnext.custom_workflow import validate_workflow_states, notify_workflow_states
 
 class TravelAdvance(Document):
-	def validate(self):
-		self.validate_advance_amount()
+	# def validate(self):
+		# self.validate_advance_amount()
 		# validate_workflow_states(self)
 
-	def validate_advance_amount(self):
-		if flt(self.advance_amount) > flt(flt(self.estimated_amount) * 0.9):
-			frappe.throw("Advance Amount cannot be greater than 90% of Total Estimated Amount")
+	# def validate_advance_amount(self):
+	# 	if flt(self.advance_amount) > flt(flt(self.estimated_amount) * 0.9):
+	# 		frappe.throw("Advance Amount cannot be greater than 90% of Total Estimated Amount")
 
 	def on_submit(self):
 		self.post_journal_entry()
