@@ -12,6 +12,8 @@
   "employee",
   "employee_name",
   "working_hours",
+  "morning_extra_hours",
+  "overtime_hours",
   "status",
   "leave_type",
   "leave_application",
@@ -233,13 +235,23 @@
    "fieldtype": "Small Text",
    "label": "Early Exit Reason",
    "read_only": 1
+  },
+  {
+   "fieldname": "overtime_hours",
+   "fieldtype": "Data",
+   "label": "Evening Extra Work"
+  },
+  {
+   "fieldname": "morning_extra_hours",
+   "fieldtype": "Data",
+   "label": "Morning Extra Work"
   }
  ],
  "icon": "fa fa-ok",
  "idx": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-16 11:00:05.513780",
+ "modified": "2026-01-21 20:37:07.753755",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Attendance",
