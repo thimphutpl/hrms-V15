@@ -291,7 +291,7 @@ class EmployeeAdvance(Document):
 			frappe.throw("Employee Advance for employee {} has been already Clamed ".format(self.employee_name))
 
 	@frappe.whitelist()
-	def set_pay_details(self):
+	def set_pay_details(self, update=0):
 		earnings = get_basic_and_gross_pay(employee=self.employee, effective_date=nowdate())
 
 		if not earnings:
@@ -303,7 +303,8 @@ class EmployeeAdvance(Document):
 		self.gross_pay = flt(earnings.get("total_earning", 0))
 		self.basic_pay = flt(earnings.get("basic_pay", 0))
 		self.net_pay = flt(earnings.get("net_pay", 0))
-		self.advance_amount = self.net_pay
+		if update == 1:
+			self.advance_amount = self.net_pay
 
 	
 	@frappe.whitelist()
