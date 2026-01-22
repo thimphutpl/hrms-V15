@@ -114,6 +114,12 @@ frappe.ui.form.on("Employee Advance", {
 	},
 
 	employee: function (frm) {
+		frappe.db.get_value("Company", frm.doc.company, "default_employee_advance_account", (r)=>{
+			if(r.default_employee_advance_account){
+				frm.set_value("advance_account", r.default_employee_advance_account);
+				frm.refresh_field("advance_account");
+			}
+		})
 		if (frm.doc.employee) frm.trigger("get_employee_currency");
 		if (frm.doc.employee) {
 			frappe.call({
@@ -185,6 +191,7 @@ frappe.ui.form.on("Employee Advance", {
 		frappe.call({
 			method: "calculate_amount",
 			doc: frm.doc,
+			args:{'validate': 1},
 			callback: function (r) {
 				if (r.message) {
 					in_progress = true;
@@ -211,6 +218,7 @@ frappe.ui.form.on("Employee Advance", {
 		frappe.call({
 			method: "set_pay_details",
 			doc: frm.doc,
+			args: {"update": 1},
 			callback: function(r) {
 				frm.refresh_field("net_pay");
 				frm.refresh_field("gross_pay");
