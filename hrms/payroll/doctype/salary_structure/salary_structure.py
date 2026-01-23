@@ -334,10 +334,13 @@ class SalaryStructure(Document):
 
 			# Calculating Salary Tax
 			if ed == 'deductions':
-				calc_amt = get_salary_tax(math.floor(flt(total_earning)-flt(pf_amt)-flt(gis_amt)-(comm_allowance*0.5)))
-				calc_amt = roundoff(calc_amt)
-				total_deduction += calc_amt
-				calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(calc_amt)})
+				# calc_amt = get_salary_tax(math.floor(flt(total_earning)-flt(pf_amt)-flt(gis_amt)-(comm_allowance*0.5)))
+				# calc_amt = roundoff(calc_amt)
+				# total_deduction += calc_amt
+				# calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(calc_amt)})
+				tax_amount = round(get_salary_tax(flt(total_earning)-flt(total_earning)*0.15))
+				total_deduction += tax_amount
+				calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(tax_amount)})
 
 			# Updating existing Earnings and Deductions tables
 			for c in calc_map:
@@ -366,7 +369,7 @@ class SalaryStructure(Document):
 		return del_list_all
 
 def roundoff_two_dec(amount: Union[float, int, None]) -> float:
-    return round(amount, 2) if amount is not None else 0.00
+	return round(amount, 2) if amount is not None else 0.00
 
 def roundoff(amount):
 	if amount:
@@ -574,10 +577,16 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 			if not flt(gross_amt):
 				d['amount'] = 0
 			else:
+				# if d['salary_component'] == 'Salary Tax':
+				# 	if not tax_included:
+				# 		tax_amt = get_salary_tax(math.floor(flt(gross_amt) - flt(gis_amt) - flt(pf_amt) - (flt(comm_amt) * 0.5)))
+				# 		tax_amt = roundoff(tax_amt)
+				# 		d['amount'] = flt(tax_amt)
+				# 		tax_included = 1
 				if d['salary_component'] == 'Salary Tax':
 					if not tax_included:
-						tax_amt = get_salary_tax(math.floor(flt(gross_amt) - flt(gis_amt) - flt(pf_amt) - (flt(comm_amt) * 0.5)))
-						tax_amt = roundoff(tax_amt)
+						# tax_amt = get_salary_tax(flt(gross_amt) - flt(gis) - flt(pf) - (flt(comm_amt) * 0.5))
+						tax_amt = get_salary_tax(flt(gross_amt) - flt(gross_amt)*0.15)
 						d['amount'] = flt(tax_amt)
 						tax_included = 1
 		
