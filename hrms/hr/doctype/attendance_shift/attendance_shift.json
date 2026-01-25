@@ -1,0 +1,200 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "prompt",
+ "creation": "2026-01-23 21:23:52.559924",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "start_time",
+  "end_time",
+  "attendance_branch",
+  "ip",
+  "column_break_3",
+  "holiday_list",
+  "color",
+  "is_active",
+  "valid_from",
+  "valid_to",
+  "section_break_xjtw",
+  "week",
+  "auto_attendance_settings_section",
+  "determine_check_in_and_check_out",
+  "working_hours_calculation_based_on",
+  "column_break_10",
+  "working_hours_threshold_for_half_day",
+  "working_hours_threshold_for_absent",
+  "grace_period_settings_auto_attendance_section",
+  "enable_late_entry_marking",
+  "late_entry_grace_period",
+  "column_break_18",
+  "enable_early_exit_marking",
+  "early_exit_grace_period"
+ ],
+ "fields": [
+  {
+   "fieldname": "start_time",
+   "fieldtype": "Time",
+   "in_list_view": 1,
+   "label": "Start Time",
+   "reqd": 1
+  },
+  {
+   "fieldname": "end_time",
+   "fieldtype": "Time",
+   "in_list_view": 1,
+   "label": "End Time",
+   "reqd": 1
+  },
+  {
+   "fieldname": "holiday_list",
+   "fieldtype": "Link",
+   "label": "Holiday List",
+   "options": "Holiday List"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_10",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "determine_check_in_and_check_out",
+   "fieldtype": "Select",
+   "label": "Determine Check-in and Check-out",
+   "options": "Alternating entries as IN and OUT during the same shift\nStrictly based on Log Type in Employee Checkin"
+  },
+  {
+   "fieldname": "working_hours_calculation_based_on",
+   "fieldtype": "Select",
+   "label": "Working Hours Calculation Based On",
+   "options": "First Check-in and Last Check-out\nEvery Valid Check-in and Check-out"
+  },
+  {
+   "description": "Working hours below which Half Day is marked. (Zero to disable)",
+   "fieldname": "working_hours_threshold_for_half_day",
+   "fieldtype": "Float",
+   "label": "Working Hours Threshold for Half Day",
+   "precision": "1"
+  },
+  {
+   "description": "Working hours below which Absent is marked. (Zero to disable)",
+   "fieldname": "working_hours_threshold_for_absent",
+   "fieldtype": "Float",
+   "label": "Working Hours Threshold for Absent",
+   "precision": "1"
+  },
+  {
+   "depends_on": "enable_late_entry_marking",
+   "description": "The time after the shift start time when check-in is considered as late (in minutes).",
+   "fieldname": "late_entry_grace_period",
+   "fieldtype": "Int",
+   "label": "Late Entry Grace Period"
+  },
+  {
+   "fieldname": "column_break_18",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "enable_early_exit_marking",
+   "description": "The time before the shift end time when check-out is considered as early (in minutes).",
+   "fieldname": "early_exit_grace_period",
+   "fieldtype": "Int",
+   "label": "Early Exit Grace Period"
+  },
+  {
+   "fieldname": "auto_attendance_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Attendance Settings"
+  },
+  {
+   "fieldname": "grace_period_settings_auto_attendance_section",
+   "fieldtype": "Section Break",
+   "label": "Late Entry & Early Exit Settings for Auto Attendance"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_late_entry_marking",
+   "fieldtype": "Check",
+   "label": "Enable Late Entry Marking"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_early_exit_marking",
+   "fieldtype": "Check",
+   "label": "Enable Early Exit Marking"
+  },
+  {
+   "default": "Blue",
+   "fieldname": "color",
+   "fieldtype": "Select",
+   "label": "Roster Color",
+   "options": "Blue\nCyan\nFuchsia\nGreen\nLime\nOrange\nPink\nRed\nViolet\nYellow"
+  },
+  {
+   "fieldname": "attendance_branch",
+   "fieldtype": "Link",
+   "label": "Attendance Branch",
+   "options": "Branch"
+  },
+  {
+   "fieldname": "ip",
+   "fieldtype": "Data",
+   "label": "IP"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "label": "Is Active"
+  },
+  {
+   "fieldname": "valid_from",
+   "fieldtype": "Date",
+   "label": "Valid From"
+  },
+  {
+   "fieldname": "valid_to",
+   "fieldtype": "Date",
+   "label": "Valid To"
+  },
+  {
+   "fieldname": "week",
+   "fieldtype": "Table",
+   "label": "Week",
+   "options": "Assignment Rule Day"
+  },
+  {
+   "fieldname": "section_break_xjtw",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-01-24 22:16:15.770169",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Attendance Shift",
+ "naming_rule": "Set by user",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
