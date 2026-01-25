@@ -29,8 +29,7 @@ def get_columns():
 			"fieldname": "employee_name",
 			"fieldtype": "Data",
 			"label": _("Employee Name"),
-			"width": 0,
-			"hidden": 1,
+			"width": 120,
 		},
 		{
 			"label": _("Shift"),
@@ -53,13 +52,13 @@ def get_columns():
 		},
 		{
 			"label": _("Shift Start Time"),
-			"fieldname": "shift_start",
+			"fieldname": "start_time",
 			"fieldtype": "Data",
 			"width": 125,
 		},
 		{
 			"label": _("Shift End Time"),
-			"fieldname": "shift_end",
+			"fieldname": "end_time",
 			"fieldtype": "Data",
 			"width": 125,
 		},
@@ -83,13 +82,25 @@ def get_columns():
 		},
 		{
 			"label": _("Late Entry By"),
-			"fieldname": "late_entry_hrs",
+			"fieldname": "late_hours",
 			"fieldtype": "Data",
 			"width": 120,
 		},
 		{
 			"label": _("Early Exit By"),
 			"fieldname": "early_exit_hrs",
+			"fieldtype": "Data",
+			"width": 120,
+		},
+		{
+			"label": _("Morning Extra Works"),
+			"fieldname": "morning_extra_hours",
+			"fieldtype": "Data",
+			"width": 150,
+		},
+		{
+			"label": _("Evening Extra Works"),
+			"fieldname": "overtime_hours",
 			"fieldtype": "Data",
 			"width": 120,
 		},
@@ -106,18 +117,6 @@ def get_columns():
 			"fieldtype": "Link",
 			"options": "Company",
 			"width": 150,
-		},
-		{
-			"label": _("Shift Actual Start Time"),
-			"fieldname": "shift_actual_start",
-			"fieldtype": "Data",
-			"width": 165,
-		},
-		{
-			"label": _("Shift Actual End Time"),
-			"fieldname": "shift_actual_end",
-			"fieldtype": "Data",
-			"width": 165,
 		},
 		{
 			"label": _("Attendance ID"),
@@ -211,8 +210,8 @@ def get_chart_data(data):
 
 def get_query(filters):
 	attendance = frappe.qb.DocType("Attendance")
-	checkin = frappe.qb.DocType("Employee Checkin")
-	shift_type = frappe.qb.DocType("Shift Type")
+	checkin = frappe.qb.DocType("Employee Attendance")
+	shift_type = frappe.qb.DocType("Attendance Shift")
 
 	query = (
 		frappe.qb.from_(attendance)
@@ -230,18 +229,16 @@ def get_query(filters):
 			attendance.in_time,
 			attendance.out_time,
 			attendance.working_hours,
-			attendance.late_entry,
-			attendance.early_exit,
+			attendance.late_hours,
+			attendance.early_exit_hours,
+			attendance.morning_extra_hours,
+			attendance.overtime_hours,
 			attendance.department,
 			attendance.company,
-			checkin.shift_start,
-			checkin.shift_end,
-			checkin.shift_actual_start,
-			checkin.shift_actual_end,
-			shift_type.enable_late_entry_marking,
-			shift_type.late_entry_grace_period,
-			shift_type.enable_early_exit_marking,
-			shift_type.early_exit_grace_period,
+			attendance.late_entry,
+			attendance.early_exit,
+			shift_type.start_time,
+			shift_type.end_time,
 		)
 		.where(attendance.docstatus == 1)
 		.groupby(attendance.name)
@@ -255,9 +252,9 @@ def get_query(filters):
 		elif filter == "consider_grace_period":
 			continue
 		elif filter == "late_entry" and not filters.consider_grace_period:
-			query = query.where(attendance.in_time > checkin.shift_start)
+			query = query.where(attendance.in_time > checkin.start_time)
 		elif filter == "early_exit" and not filters.consider_grace_period:
-			query = query.where(attendance.out_time < checkin.shift_end)
+			query = query.where(attendance.out_time < checkin.end_time)
 		else:
 			query = query.where(attendance[filter] == filters[filter])
 
@@ -265,17 +262,38 @@ def get_query(filters):
 
 
 def update_data(data, filters):
-	for d in data:
-		update_late_entry(d, filters.consider_grace_period)
-		update_early_exit(d, filters.consider_grace_period)
+    for d in data:
+        # Only update late/early if shift_start / shift_end exists
+        if getattr(d, "shift_start", None):
+            update_late_entry(d, filters.consider_grace_period)
+        else:
+            frappe.log_error(
+                f"Missing shift_start for {d.employee} on {d.attendance_date}",
+                "Shift Attendance Report"
+            )
 
-		d.working_hours = format_float_precision(d.working_hours)
-		d.in_time, d.out_time = format_in_out_time(d.in_time, d.out_time, d.attendance_date)
-		d.shift_start, d.shift_end = convert_datetime_to_time_for_same_date(d.shift_start, d.shift_end)
-		d.shift_actual_start, d.shift_actual_end = convert_datetime_to_time_for_same_date(
-			d.shift_actual_start, d.shift_actual_end
-		)
-	return data
+        if getattr(d, "shift_end", None):
+            update_early_exit(d, filters.consider_grace_period)
+        else:
+            frappe.log_error(
+                f"Missing shift_end for {d.employee} on {d.attendance_date}",
+                "Shift Attendance Report"
+            )
+
+        # Format working hours and in/out times
+        d.working_hours = format_float_precision(d.working_hours)
+        d.in_time, d.out_time = format_in_out_time(d.in_time, d.out_time, d.attendance_date)
+
+        # Convert shift times only if they exist
+        if getattr(d, "shift_start", None) and getattr(d, "shift_end", None):
+            d.shift_start, d.shift_end = convert_datetime_to_time_for_same_date(d.shift_start, d.shift_end)
+
+        if getattr(d, "shift_actual_start", None) and getattr(d, "shift_actual_end", None):
+            d.shift_actual_start, d.shift_actual_end = convert_datetime_to_time_for_same_date(
+                d.shift_actual_start, d.shift_actual_end
+            )
+
+    return data
 
 
 def format_float_precision(value):
