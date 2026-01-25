@@ -77,8 +77,8 @@ frappe.ui.form.on("Travel Authorization", {
 		if (frm.doc.employee) 
 		{
 			frm.trigger("get_employee_currency");
-			frm.trigger("set_verifier");
-			frm.trigger("set_approver")
+			// frm.trigger("set_verifier");
+			// frm.trigger("set_approver")
 
 		}
 		

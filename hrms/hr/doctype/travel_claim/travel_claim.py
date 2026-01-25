@@ -29,7 +29,7 @@ class TravelClaim(Document):
 	def validate(self):
 		self.get_advance()
 		self.calculate_amount()
-		# validate_workflow_states(self)
+		validate_workflow_states(self)
 
 	def on_submit(self):
 		self.post_journal_entry()
@@ -54,19 +54,77 @@ class TravelClaim(Document):
 			# 		title=_("Not Allowed"),
 			# 	)
 
+	# def calculate_amount(self):
+	# 	total, advance_amount = 0.0, 0.0
+	# 	for d in self.get("items"):
+	# 		total += flt(d.amount)
+	# 	self.total_amount = flt(total)
+
+	# 	if self.miscellaneous_amount:
+	# 		self.total_amount += flt(self.miscellaneous_amount)
+
+	# 	# for adv in self.get("advances"):
+	# 	# 	advance_amount += flt(adv.advance_amount)
+	# 	# self.advance_amount = flt(advance_amount)
+	# 	self.net_amount = flt(self.total_amount) - flt(self.advance_amount)
 	def calculate_amount(self):
-		total, advance_amount = 0.0, 0.0
+		total,base_total,advance_amount = 0.0, 0.0,0.0
 		for d in self.get("items"):
+			#frappe.msgprint(str(d.mileage_rate))
+			# Recalculate DSA amount based on percentage
+			self.calculate_dsa_amount(d)
+			d.amount=d.amount+d.mileage_amount
 			total += flt(d.amount)
 		self.total_amount = flt(total)
 
 		if self.miscellaneous_amount:
 			self.total_amount += flt(self.miscellaneous_amount)
 
-		# for adv in self.get("advances"):
-		# 	advance_amount += flt(adv.advance_amount)
-		# self.advance_amount = flt(advance_amount)
 		self.net_amount = flt(self.total_amount) - flt(self.advance_amount)
+
+	def calculate_dsa_amount(self, item):
+		"""Calculate DSA amount based on percentage and base DSA rate"""
+		if not item.dsa_percent:
+			item.dsa_percent = 100
+
+		# Get base DSA rate from employee grade
+		employee_grade = frappe.db.get_value("Employee", self.employee, "grade")
+		base_dsa = frappe.db.get_value("Employee Grade", employee_grade, "dsa")
+
+		if not base_dsa:
+			frappe.throw(
+		        "Daily Subsistence Allowance (DSA) is not set for Employee Grade: {}. Please update it.".format(
+		            frappe.get_desk_link("Employee Grade", employee_grade)
+				),
+				title="Missing DSA Configuration",
+		)
+
+		# Calculate actual DSA amount based on percentage
+		if self.travel_type == "International" and item.country and item.country!='Bhutan':
+			# For international travel, get DSA from DSA Out Country
+			dsa_international = frappe.get_doc("DSA Out Country", item.country)
+			if not dsa_international:
+				frappe.throw(f"DSA rates not set for country: {item.country}")
+
+			grade_found = False
+			for dsa_int in dsa_international.country_dsa_detail:
+				if dsa_int.grade == employee_grade:
+					base_dsa_amount = flt(dsa_int.dsa) * self.exchange_rate
+					item.dsa = base_dsa_amount * flt(item.dsa_percent) / 100
+					grade_found = True
+					break
+
+			if not grade_found:
+				frappe.throw(
+					f"DSA rates not set for grade {employee_grade} in country {item.country}"
+				)
+		else:
+			# For domestic travel, use employee grade DSA
+			item.dsa = base_dsa * flt(item.dsa_percent) / 100
+
+		# Recalculate amount based on updated DSA and number of days
+		item.amount = flt(item.no_of_days) * flt(item.dsa)
+	
 			
 	def get_advance(self):
 		self.set("advances", [])
@@ -221,7 +279,7 @@ def get_travel_claim(dt, dn):
 			item["dsa"] = flt(dsa) * flt(item["dsa_percent"])/100
 		else:
 			item["dsa_percent"] = 100
-			if doc.travel_type=="International":
+			if doc.travel_type=="International" and d.country and d.country!='Bhutan':
 				
 				dsa_international=frappe.get_doc("DSA Out Country",d.country)
 				if not dsa_international:

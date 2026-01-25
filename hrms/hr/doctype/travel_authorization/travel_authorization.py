@@ -36,7 +36,7 @@ class TravelAuthorization(Document):
 		self.set_status()
 		self.make_travel_advance()
 		self.validate_estimated_amount()
-		#validate_workflow_states(self)
+		validate_workflow_states(self)
 
 	def on_update(self):
 		self.check_date_overlap()
