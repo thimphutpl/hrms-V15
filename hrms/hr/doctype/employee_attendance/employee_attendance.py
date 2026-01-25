@@ -14,7 +14,7 @@ from hrms.hr.utils import (
 class EmployeeAttendance(Document):
 	def validate(self):
 		self.validate_ip_address()
-		# self.validate_time_not_past()
+		self.validate_time_not_past()
 		self.validate_duplicate_logs()
 		self.validate_late()
 		self.set_geolocation()
@@ -284,55 +284,55 @@ class EmployeeAttendance(Document):
 			return datetime.combine(getdate(reference), datetime.min.time()) + value
 		else:
 			frappe.throw(f"Unsupported shift time format: {value}")
-	# def get_real_shift_start(self):
-	# 	start_time = frappe.db.get_value("Attendance Shift", self.shift, "start_time")
-	# 	if start_time:
-	# 		return self._to_datetime(start_time, get_datetime(self.time))
-	# 	return None
-
-	# def get_real_shift_end(self):
-	# 	end_time = frappe.db.get_value("Attendance Shift", self.shift, "end_time")
-	# 	shift_start = self.get_real_shift_start()
-	# 	if end_time and shift_start:
-	# 		shift_end = self._to_datetime(end_time, get_datetime(self.time))
-	# 		if shift_end <= shift_start:  
-	# 			shift_end += timedelta()
-	# 		return shift_end
-	# 	return None
 	def get_real_shift_start(self):
-		shift_data = self._get_employee_shift()
-		if shift_data:
-			return self._to_datetime(shift_data['start_time'], get_datetime(self.time))
+		start_time = frappe.db.get_value("Attendance Shift", self.shift, "start_time")
+		if start_time:
+			return self._to_datetime(start_time, get_datetime(self.time))
 		return None
 
 	def get_real_shift_end(self):
-		shift_data = self._get_employee_shift()
-		if shift_data:
-			shift_end = self._to_datetime(shift_data['end_time'], get_datetime(self.time))
-			shift_start = self._to_datetime(shift_data['start_time'], get_datetime(self.time))
-			if shift_end <= shift_start:
-				shift_end += timedelta(days=1)
+		end_time = frappe.db.get_value("Attendance Shift", self.shift, "end_time")
+		shift_start = self.get_real_shift_start()
+		if end_time and shift_start:
+			shift_end = self._to_datetime(end_time, get_datetime(self.time))
+			if shift_end <= shift_start:  
+				shift_end += timedelta()
 			return shift_end
 		return None
+	# def get_real_shift_start(self):
+	# 	shift_data = self._get_employee_shift()
+	# 	if shift_data:
+	# 		return self._to_datetime(shift_data['start_time'], get_datetime(self.time))
+	# 	return None
 
-	def _get_employee_shift(self):
-		"""Fetch the active shift for this employee today."""
-		emp_branch = frappe.db.get_value("Employee", self.employee, "attendance_branch")
-		shift = frappe.get_all(
-			"Attendance Shift",
-			filters={
-				"name": self.shift,
-				"attendance_branch": emp_branch,
-				"is_active": 1,
-				"valid_from": ["<=", getdate(self.time)],
-				"valid_to": [">=", getdate(self.time)]
-			},
-			fields=["start_time", "end_time"],
-			limit=1
-		)
-		if shift:
-			return shift[0]
-		frappe.throw(f"Could not find active shift '{self.shift}' for employee {self.employee} on {getdate(self.time)}")
+	# def get_real_shift_end(self):
+	# 	shift_data = self._get_employee_shift()
+	# 	if shift_data:
+	# 		shift_end = self._to_datetime(shift_data['end_time'], get_datetime(self.time))
+	# 		shift_start = self._to_datetime(shift_data['start_time'], get_datetime(self.time))
+	# 		if shift_end <= shift_start:
+	# 			shift_end += timedelta(days=1)
+	# 		return shift_end
+	# 	return None
+
+	# def _get_employee_shift(self):
+	# 	"""Fetch the active shift for this employee today."""
+	# 	emp_branch = frappe.db.get_value("Employee", self.employee, "attendance_branch")
+	# 	shift = frappe.get_all(
+	# 		"Attendance Shift",
+	# 		filters={
+	# 			"name": self.shift,
+	# 			"attendance_branch": emp_branch,
+	# 			"is_active": 1,
+	# 			"valid_from": ["<=", getdate(self.time)],
+	# 			"valid_to": [">=", getdate(self.time)]
+	# 		},
+	# 		fields=["start_time", "end_time"],
+	# 		limit=1
+	# 	)
+	# 	if shift:
+	# 		return shift[0]
+	# 	frappe.throw(f"Could not find active shift '{self.shift}' for employee {self.employee} on {getdate(self.time)}")
 
 def mark_absent_daily(attendance_date=None):
 	"""
