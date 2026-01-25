@@ -14,6 +14,8 @@
   "time",
   "shift",
   "log_type",
+  "shift_start",
+  "shift_end",
   "reason_section",
   "late_reason",
   "early_exit_reason",
@@ -124,8 +126,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Attendance Branch",
-   "options": "Branch",
-   "read_only": 1
+   "options": "Branch"
   },
   {
    "fieldname": "reason_section",
@@ -150,11 +151,25 @@
    "label": "Attendance Marked",
    "options": "Attendance",
    "read_only": 1
+  },
+  {
+   "fetch_from": "shift.start_time",
+   "fieldname": "shift_start",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Shift Start"
+  },
+  {
+   "fetch_from": "shift.end_time",
+   "fieldname": "shift_end",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Shift End"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-01-24 23:03:07.625370",
+ "modified": "2026-01-25 19:00:25.388345",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Attendance",

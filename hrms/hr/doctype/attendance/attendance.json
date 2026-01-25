@@ -23,6 +23,8 @@
   "department",
   "attendance_request",
   "half_day_status",
+  "late_hours",
+  "early_exit_hours",
   "details_section",
   "shift",
   "in_time",
@@ -32,7 +34,6 @@
   "late_reason",
   "early_exit",
   "early_exit_reason",
-  "modify_half_day_status",
   "amended_from"
  ],
  "fields": [
@@ -76,12 +77,10 @@
    "read_only": 1
   },
   {
-   "depends_on": "working_hours",
    "fieldname": "working_hours",
    "fieldtype": "Float",
    "label": "Working Hours",
-   "precision": "1",
-   "read_only": 1
+   "precision": "1"
   },
   {
    "default": "Present",
@@ -153,7 +152,7 @@
   },
   {
    "fieldname": "shift",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "Shift",
    "options": "Shift Type"
   },
@@ -211,13 +210,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "0",
-   "fieldname": "modify_half_day_status",
-   "fieldtype": "Check",
-   "hidden": 1,
-   "label": "modify_half_day_status"
-  },
-  {
    "depends_on": "// eval:doc.status==\"Half Day\";",
    "fieldname": "half_day_status",
    "fieldtype": "Select",
@@ -245,13 +237,23 @@
    "fieldname": "morning_extra_hours",
    "fieldtype": "Data",
    "label": "Morning Extra Work"
+  },
+  {
+   "fieldname": "late_hours",
+   "fieldtype": "Data",
+   "label": "Late Entry Hours"
+  },
+  {
+   "fieldname": "early_exit_hours",
+   "fieldtype": "Data",
+   "label": "Early Exit Hours"
   }
  ],
  "icon": "fa fa-ok",
  "idx": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-21 20:37:07.753755",
+ "modified": "2026-01-24 11:44:01.469186",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Attendance",
