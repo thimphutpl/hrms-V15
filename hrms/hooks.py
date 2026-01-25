@@ -222,6 +222,9 @@ doc_events = {
     },
     
     "Task": {"on_update": "hrms.controllers.employee_boarding_controller.update_task"},
+    "Employee Attendance": {
+        "after_insert": "hrms.hr.doctype.employee_attendance.employee_attendance.schedule_auto_attendance"
+    },
 }
 
 # Scheduled Tasks
@@ -233,6 +236,7 @@ scheduler_events = {
             "hrms.hr.doctype.shift_type.shift_type.update_last_sync_of_checkin",
             "hrms.hr.doctype.shift_type.shift_type.process_auto_attendance_for_all_shifts",
             "hrms.hr.doctype.shift_assignment_schedule.shift_assignment_schedule.process_auto_shift_creation" 
+            "hrms.hr.doctype.employee_attendance.employee_attendance.auto_attendance_for_all_shifts"
         ]
     },
     "all": [
