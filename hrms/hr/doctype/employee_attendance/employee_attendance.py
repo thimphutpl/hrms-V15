@@ -24,12 +24,6 @@ class EmployeeAttendance(Document):
 		# Attendance date derived from check-in/out time
 		self.attendance_date = getdate(self.time)
 
-	# def after_insert(self):
-	# 	if self.log_type == "OUT":
-	# 		try:
-	# 			self.create_attendance_from_checkins()
-	# 		except Exception:
-	# 			frappe.log_error(frappe.get_traceback(), f"Failed to create attendance for {self.employee}")
 	def validate_ip_address(self):
 		if not self.shift:
 			return
@@ -296,7 +290,7 @@ class EmployeeAttendance(Document):
 		if end_time and shift_start:
 			shift_end = self._to_datetime(end_time, get_datetime(self.time))
 			if shift_end <= shift_start:  
-				shift_end += timedelta()
+				shift_end += timedelta(days=1)
 			return shift_end
 		return None
 	# def get_real_shift_start(self):
