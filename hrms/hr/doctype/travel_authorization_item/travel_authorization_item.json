@@ -6,6 +6,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "mode_of_travel",
   "from_date",
   "travel_from",
   "column_break_cwok",
@@ -13,8 +14,8 @@
   "return_today",
   "halt_at",
   "column_break_qqwh",
-  "travel_to",
   "to_date",
+  "travel_to",
   "is_last_day",
   "section_break_zwhn",
   "country"
@@ -105,17 +106,25 @@
    "fieldtype": "Link",
    "label": "Country",
    "options": "Country"
+  },
+  {
+   "fieldname": "mode_of_travel",
+   "fieldtype": "Select",
+   "label": "Mode of Travel",
+   "options": "\nPool Vehicle\nPersonal Car\nPublic Transport\nFlight",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-06-04 16:14:30.260579",
+ "modified": "2026-01-26 12:26:34.643399",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization Item",
  "owner": "Administrator",
  "permissions": [],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []
