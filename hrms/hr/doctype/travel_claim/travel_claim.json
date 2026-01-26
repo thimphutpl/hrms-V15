@@ -31,6 +31,7 @@
   "net_amount",
   "column_break_ogjw",
   "advance_amount",
+  "report_on_execution",
   "column_break_lbpf",
   "miscellaneous_amount",
   "miscellaneous_claim_reason",
@@ -292,6 +293,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "fetch_from": "approver.full_name",
    "fieldname": "approver_name",
    "fieldtype": "Data",
    "label": "Approver Name",
@@ -309,12 +311,17 @@
    "no_copy": 1,
    "options": "Designation",
    "read_only": 1
+  },
+  {
+   "fieldname": "report_on_execution",
+   "fieldtype": "Small Text",
+   "label": "Report on execution or fulfilled of the purpose (Over view)"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-04 15:20:08.795749",
+ "modified": "2026-01-26 13:26:00.278934",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim",
@@ -370,6 +377,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []
