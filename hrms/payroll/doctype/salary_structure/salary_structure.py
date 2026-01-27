@@ -343,7 +343,7 @@ class SalaryStructure(Document):
 
 			# Calculating Salary Tax
 			if ed == 'deductions':
-				calc_amt = get_salary_tax(math.floor(flt(total_earning)-flt(pf_amt)-flt(gis_amt)-(comm_allowance*0.5)))
+				calc_amt = get_salary_tax(math.floor(flt(total_earning)-flt(total_earning*0.15)))
 				calc_amt = roundoff(calc_amt)
 				total_deduction += calc_amt
 				calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(calc_amt)})
@@ -390,6 +390,7 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 		hra_amt = 0.00
 		gross_amt1 = 0.00
 		tax_amt1  = 0.00
+		psa_amount = 0.00
 		### Ver.2.0.191227 Begins, added by SHIV on 2019/12/27
 		# Following variables introduced
 		basic_pay_arrears = 0
@@ -523,6 +524,10 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 			#Deputation allowance
 			if e['salary_component'] == 'Deputation Allowance':
 				deput_amt = (flt(e['amount']))
+
+			#PAS allowance
+			if e['salary_component'] == 'PSA':
+				psa_amount = (flt(e['amount']))
 			# HRA
 			if e['salary_component'] == 'Housing Allowance':
 				hra_amt = (flt(e['amount']))
@@ -573,7 +578,6 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 
 					d['amount'] = health
 
-				
 		# Calculating Salary Tax
 		tax_included = 0
 		for d in calc_map['deductions']:
@@ -584,11 +588,11 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 					employee_grade = source.employee_grade
 					if not tax_included:
 						gis=frappe.db.get_value("Employee Grade",employee_grade,"gis")
-						tax_amt = get_salary_tax(flt(gross_amt) - flt(gis) - flt(pf) - (flt(comm_amt) * 0.5))
+						tax_amt = get_salary_tax(math.floor(flt(gross_amt)-flt(gross_amt*0.15)))
 						# frappe.throw("gross_amount "+str(gross_amt)+" GIS "+str(gis)+" pf "+str(pf)+ " And "+str(comm_amt))
 						if source.employment_type == 'Deputation':
-							gross_amt1 = gross_amt - deput_amt 
-							tax_amt1 = get_salary_tax(flt(gross_amt1) - flt(gis) - flt(pf) -(flt(comm_amt) * 0.5))  
+							gross_amt1 = flt(gross_amt) - flt(deput_amt) - flt(psa_amount)
+							tax_amt1 = get_salary_tax(math.floor(flt(gross_amt1)-flt(gross_amt1*0.15)))  
 							tax_amt = tax_amt - tax_amt1	
 							
 
