@@ -20,7 +20,7 @@ class TravelAuthorization(Document):
 		self.validate_exchange_rate()
 		self.set_status()
 		self.make_travel_advance()
-		self.calculate_advance_amount()
+		# self.calculate_advance_amount()
 		# self.validate_estimated_amount()
 
 	def on_update(self):
@@ -42,10 +42,10 @@ class TravelAuthorization(Document):
 		else:
 			self.status = status
 
-	def calculate_advance_amount(self):
-		self.advance_amount = rounded(
-			flt(self.estimated_amount) + flt(self.miscellenous_amount), 2
-		)
+	# def calculate_advance_amount(self):
+	# 	self.advance_amount = rounded(
+	# 		flt(self.estimated_amount) + flt(self.miscellenous_amount), 2
+	# 	)
 	# def validate_estimated_amount(self):
 	# 	if flt(self.advance_amount) > flt(self.estimated_amount):
 	# 		frappe.throw("Your estimated amount is less than the advance amount.")
@@ -73,11 +73,12 @@ class TravelAuthorization(Document):
 				title="Missing Expense Bank Account"
 			)
 		
+		total_amount = flt(self.advance_amount) + flt(self.miscellenous_amount)
 
 		accounts = [{
 			"account": advance_account,
-			"debit": flt(self.advance_amount),
-			"debit_in_account_currency": flt(self.advance_amount),
+			"debit": total_amount,
+			"debit_in_account_currency": total_amount,
 			"cost_center": self.cost_center,
 			"party_check": 1,
 			"party_type": "Employee",
@@ -87,8 +88,8 @@ class TravelAuthorization(Document):
 			"reference_name": self.name,
 		}, {
 			"account": bank_account,
-			"credit": flt(self.advance_amount),
-			"credit_in_account_currency": flt(self.advance_amount),
+			"credit": total_amount,
+			"credit_in_account_currency": total_amount,
 			"cost_center": self.cost_center,
 		}]
 
