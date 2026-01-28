@@ -80,7 +80,8 @@
    "fieldname": "working_hours",
    "fieldtype": "Float",
    "label": "Working Hours",
-   "precision": "1"
+   "precision": "2",
+   "read_only": 1
   },
   {
    "default": "Present",
@@ -231,29 +232,33 @@
   {
    "fieldname": "overtime_hours",
    "fieldtype": "Data",
-   "label": "Evening Extra Work"
+   "label": "Evening Extra Work",
+   "read_only": 1
   },
   {
    "fieldname": "morning_extra_hours",
    "fieldtype": "Data",
-   "label": "Morning Extra Work"
+   "label": "Morning Extra Work",
+   "read_only": 1
   },
   {
    "fieldname": "late_hours",
    "fieldtype": "Data",
-   "label": "Late Entry Hours"
+   "label": "Late Entry Hours",
+   "read_only": 1
   },
   {
    "fieldname": "early_exit_hours",
    "fieldtype": "Data",
-   "label": "Early Exit Hours"
+   "label": "Early Exit Hours",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-ok",
  "idx": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-24 11:44:01.469186",
+ "modified": "2026-01-28 18:08:47.629795",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Attendance",
