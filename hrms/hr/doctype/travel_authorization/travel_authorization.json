@@ -30,6 +30,7 @@
   "report_on_execution",
   "column_break_fnha",
   "estimated_amount",
+  "miscellenous_amount",
   "advance_amount",
   "approver_detial_section",
   "approver",
@@ -302,12 +303,17 @@
    "fieldname": "report_on_execution",
    "fieldtype": "Small Text",
    "label": "Report on execution or fulfilled of the purpose (Over view)"
+  },
+  {
+   "fieldname": "miscellenous_amount",
+   "fieldtype": "Currency",
+   "label": "Miscellenous amount"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-26 13:07:17.489162",
+ "modified": "2026-01-28 11:23:42.872259",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization",

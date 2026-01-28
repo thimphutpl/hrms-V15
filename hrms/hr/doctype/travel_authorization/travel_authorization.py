@@ -13,17 +13,18 @@ from erpnext.custom_workflow import validate_workflow_states, notify_workflow_st
 
 class TravelAuthorization(Document):
 	def validate(self):
-		validate_workflow_states(self)
+		# validate_workflow_states(self)
 		validate_active_employee(self.employee)
 		self.validate_travel_dates()
 		self.validate_travel_last_day()
 		self.validate_exchange_rate()
 		self.set_status()
 		self.make_travel_advance()
-		self.validate_estimated_amount()
+		self.calculate_advance_amount()
+		# self.validate_estimated_amount()
 
 	def on_update(self):
-		self.check_date_overlap()
+		# self.check_date_overlap()
 		self.validate_duplicate_entry()
 
 	def on_submit(self):
@@ -41,11 +42,16 @@ class TravelAuthorization(Document):
 		else:
 			self.status = status
 
-	def validate_estimated_amount(self):
-		if flt(self.advance_amount) > flt(self.estimated_amount):
-			frappe.throw("Your estimated amount is less than the advance amount.")
-		if flt(self.advance_amount) > (flt(self.estimated_amount) * 0.90):
-			frappe.throw("Advance amount cannot be more than 90% of the estimated amount.")
+	def calculate_advance_amount(self):
+		self.advance_amount = rounded(
+			flt(self.estimated_amount) + flt(self.miscellenous_amount), 2
+		)
+	# def validate_estimated_amount(self):
+	# 	if flt(self.advance_amount) > flt(self.estimated_amount):
+	# 		frappe.throw("Your estimated amount is less than the advance amount.")
+	# 	if flt(self.advance_amount) > (flt(self.estimated_amount) * 0.90):
+	# 		frappe.throw("Advance amount cannot be more than 90% of the estimated amount.")
+	
 
 	def post_journal_entry(self):
 		advance_account = frappe.db.get_value("Company", self.company, "travel_advance_account")
@@ -66,6 +72,7 @@ class TravelAuthorization(Document):
 				),
 				title="Missing Expense Bank Account"
 			)
+		
 
 		accounts = [{
 			"account": advance_account,
@@ -122,21 +129,21 @@ class TravelAuthorization(Document):
 			frappe.throw(_("Row#{}: <b>Travel From</b> and <b>Travel To</b> are mandatory.").format(item.idx), title="Missing Travel Information")
 		item.to_date = item.from_date  # Ensure `to_date` for non-halt
 
-	def check_date_overlap(self):
-		overlap_query = """
-			SELECT t1.idx, t2.idx AS overlap_idx
-			FROM `tabTravel Authorization Item` t1
-			JOIN `tabTravel Authorization Item` t2
-			ON t1.parent = t2.parent
-			AND t1.name != t2.name
-			AND t1.from_date <= t2.to_date
-			AND t1.to_date >= t2.from_date
-			WHERE t1.parent = %s
-		"""
-		overlaps = frappe.db.sql(overlap_query, (self.name,), as_dict=True)
-		if overlaps:
-			first_overlap = overlaps[0]
-			frappe.throw(_("Row#{}: Dates overlap with Row#{}").format(first_overlap["idx"], first_overlap["overlap_idx"]), title="Date Overlap Detected")
+	# def check_date_overlap(self):
+	# 	overlap_query = """
+	# 		SELECT t1.idx, t2.idx AS overlap_idx
+	# 		FROM `tabTravel Authorization Item` t1
+	# 		JOIN `tabTravel Authorization Item` t2
+	# 		ON t1.parent = t2.parent
+	# 		AND t1.name != t2.name
+	# 		AND t1.from_date <= t2.to_date
+	# 		AND t1.to_date >= t2.from_date
+	# 		WHERE t1.parent = %s
+	# 	"""
+	# 	overlaps = frappe.db.sql(overlap_query, (self.name,), as_dict=True)
+	# 	if overlaps:
+	# 		first_overlap = overlaps[0]
+	# 		frappe.throw(_("Row#{}: Dates overlap with Row#{}").format(first_overlap["idx"], first_overlap["overlap_idx"]), title="Date Overlap Detected")
 
 	def validate_duplicate_entry(self):
 		duplicate_query = """
@@ -172,9 +179,9 @@ class TravelAuthorization(Document):
 	def check_role(self):
 		user_roles = frappe.get_roles(frappe.session.user)
 		if "System Manager" in user_roles or frappe.session.user == "Administrator":
-			return True
+			return 1
 		else:
-			return False
+			return 0
 
 	@frappe.whitelist()
 	def set_estimate_amount(self):
@@ -221,6 +228,8 @@ class TravelAuthorization(Document):
 
 	@frappe.whitelist()
 	def make_travel_advance(self):
+		if self.estimated_amount:
+			return self.estimated_amount
 		no_of_days_in = 0
 		no_of_days_out = 0
 		days_length = len(self.items)
