@@ -14,10 +14,12 @@ from hrms.hr.utils import (
 class EmployeeAttendance(Document):
 	def validate(self):
 		self.validate_ip_address()
-		# self.validate_time_not_past()
+		self.validate_time_not_past()
 		self.validate_duplicate_logs()
 		self.validate_late()
 		self.set_geolocation()
+
+	
 	def before_save(self):
 		if not hasattr(self, "time") or not self.time:
 			frappe.throw("Check-in / Check-out time (time) is required.")
@@ -119,22 +121,28 @@ class EmployeeAttendance(Document):
 				self.early_exit_hours = 0
 	
 	def create_attendance_from_checkins(self):
-		start_of_day = datetime.combine(getdate(self.time), datetime.min.time())
-		end_of_day = datetime.combine(getdate(self.time), datetime.max.time())
-		
-		
+
+
+		first_in = frappe.db.get_value(
+			"Employee Attendance",
+			{"employee":self.employee, "log_type": "IN"},
+			"time",
+			order_by="creation desc"
+		)
+		last_out =get_datetime(self.time)
+
 		checkins = frappe.get_all(
 			"Employee Attendance",
 			filters={
 				"employee": self.employee,
 				"name": ("!=", self.name),
-				"time": ["between", [start_of_day, end_of_day]],
+				"time": ["between", [first_in, last_out]],
 				"log_type": ["in", ["IN", "OUT"]],
 			},
 			fields=["name", "log_type", "time", "late_reason", "early_exit_reason"],
 			order_by="time asc"
 		)
-
+	
 		# Include current log
 		checkins.append({
 			"name": self.name,
@@ -144,16 +152,6 @@ class EmployeeAttendance(Document):
 			"early_exit_reason": getattr(self, "early_exit_reason", "")
 		})
 
-		in_times = [get_datetime(c["time"]) for c in checkins if c["log_type"] == "IN"]
-		out_times = [get_datetime(c["time"]) for c in checkins if c["log_type"] == "OUT"]
-
-		if not in_times or not out_times:
-			return
-
-		first_in = min(in_times)
-		last_out = max(out_times)
-
-		# Get shift details
 		shift_data = frappe.get_cached_value(
 			"Attendance Shift", self.shift,
 			["start_time", "end_time", "working_hours_threshold_for_half_day", "working_hours_threshold_for_absent"]
@@ -166,19 +164,14 @@ class EmployeeAttendance(Document):
 		shift_end = self._to_datetime(shift_end, last_out)
 		if shift_end <= shift_start:
 			shift_end += timedelta(days=1)
-			
 
-		# Calculate working hours within shift
 		shift_work_start = max(first_in, shift_start)
 		shift_work_end = min(last_out, shift_end)
 		worked_hours = round((shift_work_end - shift_work_start).total_seconds() / 3600, 2)
 
-		# Morning extra hours (before shift start)
 		morning_extra_hours = round(max(0, (shift_start - first_in).total_seconds()) / 3600, 2)
-		# Overtime (after shift end)
 		overtime_hours = round(max(0, (last_out - shift_end).total_seconds()) / 3600, 2)
 
-		# Determine attendance status
 		if worked_hours >= half_day_threshold:
 			attendance_status = "Present"
 		elif absent_threshold <= worked_hours < half_day_threshold:
@@ -186,14 +179,12 @@ class EmployeeAttendance(Document):
 		else:
 			attendance_status = "Absent"
 
-		# Late / Early flags
 		late_entry = first_in > shift_start
 		early_exit = last_out < shift_end
 
-		# Savepoint for safe insert
 		frappe.db.savepoint("attendance_creation")
 
-		# Create Attendance
+	
 		attendance = frappe.new_doc("Attendance")
 		attendance.update({
 			"employee": self.employee,

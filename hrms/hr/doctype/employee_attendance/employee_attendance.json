@@ -76,7 +76,6 @@
    "default": "Now",
    "fieldname": "time",
    "fieldtype": "Datetime",
-   "in_list_view": 1,
    "label": "Time",
    "read_only": 1,
    "reqd": 1
@@ -170,7 +169,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-01-27 20:27:11.215515",
+ "modified": "2026-01-28 13:25:09.517442",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Attendance",
