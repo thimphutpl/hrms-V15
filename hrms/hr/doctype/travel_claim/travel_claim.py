@@ -98,6 +98,7 @@ class TravelClaim(Document):
 		self.net_amount = flt(self.total_amount) - flt(self.advance_amount)
 
 
+
 	def calculate_dsa_amount(self, item):
 		"""Calculate DSA amount based on percentage and base DSA rate"""
 		if not item.dsa_percent:
