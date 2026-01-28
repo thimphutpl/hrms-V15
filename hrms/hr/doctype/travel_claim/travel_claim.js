@@ -66,6 +66,12 @@ frappe.ui.form.on("Travel Claim", {
 });
 
 frappe.ui.form.on("Travel Claim Item", {
+    onload(frm, cdt, cdn) {
+        let row = locals[cdt][cdn];
+        // Always enable field
+        frm.fields_dict["items"].grid.get_field("rate").df.read_only = 0;
+        frm.fields_dict["items"].grid.refresh_field("rate");
+    },
 	mileage_rate: function (frm, cdt, cdn) {
 		frm.trigger("calculate", cdt, cdn);
 	},

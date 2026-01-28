@@ -67,20 +67,36 @@ class TravelClaim(Document):
 	# 	# 	advance_amount += flt(adv.advance_amount)
 	# 	# self.advance_amount = flt(advance_amount)
 	# 	self.net_amount = flt(self.total_amount) - flt(self.advance_amount)
-	def calculate_amount(self):
-		total,base_total,advance_amount = 0.0, 0.0,0.0
-		for d in self.get("items"):
-			#frappe.msgprint(str(d.mileage_rate))
-			# Recalculate DSA amount based on percentage
-			self.calculate_dsa_amount(d)
-			d.amount=d.amount+d.mileage_amount
-			total += flt(d.amount)
-		self.total_amount = flt(total)
+	# def calculate_amount(self):
+	# 	total,base_total,advance_amount = 0.0, 0.0,0.0
+	# 	for d in self.get("items"):
+	# 		#frappe.msgprint(str(d.mileage_rate))
+	# 		# Recalculate DSA amount based on percentage
+	# 		self.calculate_dsa_amount(d)
+	# 		d.amount=d.amount+d.mileage_amount
+	# 		total += flt(d.amount)
+	# 	self.total_amount = flt(total)
 
+	# 	if self.miscellaneous_amount:
+	# 		self.total_amount += flt(self.miscellaneous_amount)
+
+	# 	self.net_amount = flt(self.total_amount) - flt(self.advance_amount)
+ 
+	def calculate_amount(self):
+		total = 0.0
+
+		for d in self.get("items"):
+			self.calculate_dsa_amount(d)
+			d.amount = flt(d.amount) + flt(d.mileage_amount)
+			row_total = flt(d.amount) + flt(d.fare_amounts)
+
+			total += row_total
+
+		self.total_amount = flt(total)
 		if self.miscellaneous_amount:
 			self.total_amount += flt(self.miscellaneous_amount)
-
 		self.net_amount = flt(self.total_amount) - flt(self.advance_amount)
+
 
 	def calculate_dsa_amount(self, item):
 		"""Calculate DSA amount based on percentage and base DSA rate"""

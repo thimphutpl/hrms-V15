@@ -9,7 +9,6 @@
   "employee",
   "employee_name",
   "column_break_dmom",
-  "posting_date",
   "branch",
   "cost_center",
   "currency_section",
@@ -24,15 +23,23 @@
   "mode_of_travel",
   "section_break_svpy",
   "items",
+  "travel_claim_details_section",
+  "travel_claim_date",
+  "total_amount",
+  "column_break_khtc",
+  "supervisor_name",
+  "supervisor",
+  "tour_advance_information_section",
+  "advance_amount",
+  "net_amount",
+  "column_break_xmjp",
+  "travel_authorization",
+  "posting_date",
   "section_break_bfou",
   "advances",
   "section_break_kzfj",
-  "total_amount",
-  "net_amount",
-  "column_break_ogjw",
-  "advance_amount",
+  "column_break_ajnq",
   "report_on_execution",
-  "column_break_lbpf",
   "miscellaneous_amount",
   "miscellaneous_claim_reason",
   "approver_detail_section",
@@ -48,7 +55,6 @@
   "journal_entry_status",
   "column_break_zzku",
   "company",
-  "travel_authorization",
   "amended_from"
  ],
  "fields": [
@@ -108,7 +114,8 @@
   {
    "fieldname": "posting_date",
    "fieldtype": "Date",
-   "label": "Posting Date"
+   "label": "Travel Authorization Date",
+   "read_only": 1
   },
   {
    "fieldname": "currency",
@@ -154,9 +161,9 @@
   {
    "fieldname": "mode_of_travel",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Mode of Travel",
-   "options": "\nOffice Car\nPersonal Car\nPublic Transport\nFlight",
-   "reqd": 1
+   "options": "\nOffice Car\nPersonal Car\nPublic Transport\nFlight"
   },
   {
    "columns": 2,
@@ -210,7 +217,7 @@
   {
    "fieldname": "total_amount",
    "fieldtype": "Currency",
-   "label": "Total Amount",
+   "label": "Total Claim Amount",
    "read_only": 1
   },
   {
@@ -220,13 +227,9 @@
    "read_only": 1
   },
   {
-   "fieldname": "column_break_ogjw",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "net_amount",
    "fieldtype": "Currency",
-   "label": "Net Amount",
+   "label": "Balance Amount",
    "read_only": 1
   },
   {
@@ -263,10 +266,6 @@
    "fieldname": "miscellaneous_amount",
    "fieldtype": "Currency",
    "label": "Miscellaneous Amount"
-  },
-  {
-   "fieldname": "column_break_lbpf",
-   "fieldtype": "Column Break"
   },
   {
    "depends_on": "eval:doc.miscellaneous_amount",
@@ -316,12 +315,52 @@
    "fieldname": "report_on_execution",
    "fieldtype": "Small Text",
    "label": "Report on execution or fulfilled of the purpose (Over view)"
+  },
+  {
+   "fieldname": "travel_claim_details_section",
+   "fieldtype": "Section Break",
+   "label": "Travel Claim Details"
+  },
+  {
+   "fieldname": "travel_claim_date",
+   "fieldtype": "Date",
+   "label": "Travel Claim Date"
+  },
+  {
+   "fieldname": "tour_advance_information_section",
+   "fieldtype": "Section Break",
+   "label": "Tour Advance Information"
+  },
+  {
+   "fieldname": "column_break_ajnq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_xmjp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_khtc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "supervisor_name",
+   "fieldtype": "Data",
+   "label": "Supervisor",
+   "read_only": 1
+  },
+  {
+   "fieldname": "supervisor",
+   "fieldtype": "Link",
+   "label": "Supervisor Email ID",
+   "options": "User",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-26 13:26:00.278934",
+ "modified": "2026-01-28 12:31:18.639938",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim",
