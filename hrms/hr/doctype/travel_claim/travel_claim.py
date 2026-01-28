@@ -84,17 +84,17 @@ class TravelClaim(Document):
  
 	def calculate_amount(self):
 		total = 0.0
-
 		for d in self.get("items"):
 			self.calculate_dsa_amount(d)
 			d.amount = flt(d.amount) + flt(d.mileage_amount)
-			row_total = flt(d.amount) + flt(d.fare_amounts)
-
+			fare = flt(d.fare_amount) if hasattr(d, "fare_amount") else 0
+			row_total = flt(d.amount) + fare
 			total += row_total
-
+   
 		self.total_amount = flt(total)
 		if self.miscellaneous_amount:
 			self.total_amount += flt(self.miscellaneous_amount)
+
 		self.net_amount = flt(self.total_amount) - flt(self.advance_amount)
 
 
