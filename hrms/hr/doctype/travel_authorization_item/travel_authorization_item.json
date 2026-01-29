@@ -112,14 +112,16 @@
    "fieldname": "mode_of_travel",
    "fieldtype": "Select",
    "label": "Mode of Travel",
-   "options": "\nPool Vehicle\nPersonal Car\nPublic Transport\nFlight",
+   "mandatory_depends_on": "eval:!doc.halt;",
+   "options": "\nPool Vehicle\nPersonal Car\nPublic Transport\nFlight\nBus\nTaxi",
+   "read_only_depends_on": "eval:!doc.halt;",
    "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-01-26 12:56:23.067083",
+ "modified": "2026-01-29 11:43:21.597352",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Authorization Item",
