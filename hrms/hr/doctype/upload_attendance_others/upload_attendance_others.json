@@ -1,0 +1,119 @@
+{
+ "actions": [],
+ "allow_copy": 1,
+ "creation": "2026-01-29 10:38:15.375237",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "download_template",
+  "branch",
+  "get_template",
+  "column_break_3",
+  "fiscal_year",
+  "column_break_5",
+  "month",
+  "upload_attendance_data",
+  "upload_html",
+  "import_log"
+ ],
+ "fields": [
+  {
+   "description": "Download the Template, fill appropriate data and attach the modified file.\nAll dates and employee combination in the selected period will come in the template, with existing attendance records",
+   "fieldname": "download_template",
+   "fieldtype": "Section Break",
+   "label": "Download Template"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Branch",
+   "options": "Branch",
+   "reqd": 1
+  },
+  {
+   "fieldname": "get_template",
+   "fieldtype": "Button",
+   "label": "Get Template",
+   "oldfieldtype": "Button"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "fiscal_year",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Fiscal Year",
+   "oldfieldname": "attenadnce_date",
+   "oldfieldtype": "Date",
+   "options": "Fiscal Year",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "month",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Month",
+   "options": "\nJan\nFeb\nMar\nApr\nMay\nJun\nJul\nAug\nSep\nOct\nNov\nDec",
+   "reqd": 1
+  },
+  {
+   "fieldname": "upload_attendance_data",
+   "fieldtype": "Section Break",
+   "label": "Import Attendance"
+  },
+  {
+   "fieldname": "upload_html",
+   "fieldtype": "HTML",
+   "label": "Upload HTML"
+  },
+  {
+   "fieldname": "import_log",
+   "fieldtype": "HTML",
+   "label": "Import Log"
+  }
+ ],
+ "grid_page_length": 50,
+ "hide_toolbar": 1,
+ "icon": "icon-upload-alt",
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "max_attachments": 1,
+ "modified": "2026-01-29 10:58:08.504741",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Upload Attendance Others",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "HR User",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
