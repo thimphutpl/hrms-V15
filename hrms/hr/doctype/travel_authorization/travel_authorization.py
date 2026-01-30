@@ -177,7 +177,7 @@ class TravelAuthorization(Document):
 				"doctype": "Journal Entry",
 				"voucher_type": voucher_type,
 				"naming_series": naming_series,
-				"title": "Travel Advance - " + self.employee,
+				"title": "Travel Advance - " + self.employee_name + "-" + self.employee,
 				"user_remark": "Travek Advance - " + self.employee,
 				"posting_date": nowdate(),
 				"company": self.company,

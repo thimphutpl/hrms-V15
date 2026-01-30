@@ -234,7 +234,7 @@ class TravelClaim(Document):
 				"doctype": "Journal Entry",
 				"voucher_type": voucher_type,
 				"naming_series": naming_series,
-				"title": "Travel Claim - " + self.employee,
+				"title": "Travel Claim -" + self.employee_name + "-" + self.employee,
 				"user_remark": "Travek Claim - " + self.employee,
 				"posting_date": nowdate(),
 				"company": self.company,

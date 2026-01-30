@@ -392,11 +392,11 @@ class LeaveEncashment(Document):
         jv_name, v_title = None, ""
         for i in posting:
             if i == "to_payables":
-                title = "To Payables"
+                title = "To Payables-"+self.employee_name + "-" + self.employee
                 voucher_type = "Journal Entry"
                 naming_series = "Journal Voucher"
             else:
-                title = "To Bank"
+                title = "To Bank-"+self.employee_name + "-" + self.employee
                 voucher_type = "Bank Entry"
                 naming_series = "Bank Payment Voucher"
 

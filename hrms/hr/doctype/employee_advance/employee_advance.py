@@ -242,7 +242,7 @@ class EmployeeAdvance(Document):
 				"doctype": "Journal Entry",
 				"voucher_type": voucher_type,
 				"naming_series": naming_series,
-				"title": "Employee Advance - "+self.employee,
+				"title": "Employee Advance - " + self.employee_name + "-" + self.employee,
 				"user_remark": "Employee Advance - "+self.employee,
 				"posting_date": nowdate(),
 				"company": self.company,
