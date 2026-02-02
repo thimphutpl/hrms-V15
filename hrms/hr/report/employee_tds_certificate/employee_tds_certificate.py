@@ -28,6 +28,8 @@ def get_data( filters=None):
 	#bluk leave Encashment
 	data += get_bulk_leave_encashment(filters)
 
+	data += get_employee_benifit(filters)
+
 	return data
 
 def get_salary_data(filters):
@@ -93,6 +95,35 @@ def get_leave_encashment(filters):
 								AND a.encashment_date BETWEEN '{from_date}' AND '{to_date}'
 						""".format(employee=filters.employee,from_date = getdate(str(filters.fiscal_year) + "-01-01"),
 					  to_date = getdate(str(filters.fiscal_year) + "-12-31")), as_dict=True) 
+
+def get_employee_benifit(filters):
+	return frappe.db.sql("""SELECT 
+			a.posting_date AS posting_date,
+			r.receipt_number,
+			'Encashment Of Leave Balance' as type,
+			CONCAT(MONTH(a.posting_date),'-', YEAR(a.posting_date)) AS month_year,
+			ROUND(ei.amount, 2) AS total,
+			ROUND(ei.amount, 2) AS taxable,
+			ROUND(ei.tax_amount, 2) AS tds,
+			r.receipt_number,
+			r.receipt_date,
+			0 AS basic,
+			0 AS other,
+			0 AS pf,
+			0 AS gis,
+			0 AS totalPfGis,
+			0 AS others,
+			0 AS health
+			FROM `tabEmployee Benefits` a
+			JOIN `tabTDS Receipt Entry` r ON a.name = r.invoice_no
+			INNER JOIN `tabSeparation Item` ei ON ei.parent= a.name
+			WHERE a.employee = '{employee}'
+			AND a.docstatus = 1
+			AND a.posting_date BETWEEN '{from_date}' AND '{to_date}'
+			AND ei.benefit_type='Leave Encashment'
+	""".format(employee=filters.employee,from_date = getdate(str(filters.fiscal_year) + "-01-01"),
+	to_date = getdate(str(filters.fiscal_year) + "-12-31")), as_dict=True) 
+
 def get_bonus(filters):
 	return frappe.db.sql("""
 					SELECT CONCAT(MONTH(b.posting_date), '-', b.fiscal_year) AS month_year,
