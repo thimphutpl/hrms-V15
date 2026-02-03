@@ -62,10 +62,12 @@
   "hr_manager",
   "hr_approver",
   "hrgm",
+  "ceo",
   "column_break_zguo",
   "hr_manager_name",
   "hr_approver_name",
   "hrgm_name",
+  "ceo_name",
   "separation_clearance_approver_section",
   "hr_division",
   "accounts_finance",
@@ -94,9 +96,11 @@
   "enote_status_notification",
   "enote_reviewer_notification",
   "sb_overtime",
-  "overtime_approval_notification_template",
+  "leave_application_approval_notification_template",
+  "employee_advance_approval_notification_template",
   "column_break_jhnx",
-  "overtime_status_notification_template"
+  "leave_application_status_notification_template",
+  "employee_advance_status_notification_template"
  ],
  "fields": [
   {
@@ -622,13 +626,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "overtime_approval_notification_template",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Overtime Approval Notification Template",
-   "options": "Email Template"
-  },
-  {
    "fieldname": "sb_overtime",
    "fieldtype": "Section Break",
    "label": "Overtime Notification Settings"
@@ -638,18 +635,51 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "overtime_status_notification_template",
+   "fieldname": "leave_application_status_notification_template",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Overtime Status Notification Template",
+   "label": "Leave Application Status Notification Template",
    "options": "Email Template"
+  },
+  {
+   "fieldname": "leave_application_approval_notification_template",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Leave Application Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "employee_advance_approval_notification_template",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Employee Advance Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "employee_advance_status_notification_template",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Employee Advance Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "ceo",
+   "fieldtype": "Link",
+   "label": "CEO",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "ceo.employee_name",
+   "fieldname": "ceo_name",
+   "fieldtype": "Data",
+   "label": "CEO Name"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-12-25 11:26:29.046521",
+ "modified": "2026-02-03 16:38:19.098408",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",
