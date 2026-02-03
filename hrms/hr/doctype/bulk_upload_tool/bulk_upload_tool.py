@@ -401,8 +401,8 @@ def get_mr_data(branch, month, fiscal_year):
 
 def get_template(branch, month, fiscal_year):
 
-	if not frappe.has_permission("Overtime Entry", "create"):
-		raise frappe.PermissionError
+	# if not frappe.has_permission("Overtime Entry", "create"):
+	# 	raise frappe.PermissionError
 	month_in_number = frappe._dict({
 									"Jan":1,
 									"Feb":2,
@@ -444,8 +444,8 @@ def get_template(branch, month, fiscal_year):
 
 def get_template_overtime(branch, month, fiscal_year):
 
-	if not frappe.has_permission("Overtime Entry", "create"):
-		raise frappe.PermissionError
+	# if not frappe.has_permission("Overtime Entry", "create"):
+	# 	raise frappe.PermissionError
 	month_in_number = frappe._dict({
 									"Jan":1,
 									"Feb":2,
