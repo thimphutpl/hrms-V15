@@ -559,6 +559,18 @@ def get_permission_query_conditions(user):
 
 	if "HR User" in user_roles or "HR Manager" in user_roles:
 		return
+	if "HR Support" in user_roles:
+		return """(
+			exists(select 1
+				from `tabEmployee` as e
+				where e.name = `tabSalary Slip`.employee
+				and e.user_id = '{user}')
+			or
+			exists(select 1
+				from `tabEmployee`
+				where `tabEmployee`.user_id = '{user}'
+				and `tabEmployee`.branch = `tabSalary Slip`.branch)
+		)""".format(user=user)
 
 	else:
 		return """(
@@ -566,6 +578,7 @@ def get_permission_query_conditions(user):
 				from `tabEmployee` as e
 				where e.name = `tabSalary Slip`.employee
 				and e.user_id = '{user}')
+		or
 		)""".format(user=user)
 
 # Following code added by SHIV on 2020/09/21
