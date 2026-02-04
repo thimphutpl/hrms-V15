@@ -13,6 +13,7 @@
   "designation",
   "devision",
   "section",
+  "employee_grade",
   "column_break_obdl",
   "company",
   "department",
@@ -717,13 +718,20 @@
    "fieldtype": "Data",
    "label": "GIS Policy Number",
    "read_only": 1
+  },
+  {
+   "fetch_from": "employee.grade",
+   "fieldname": "employee_grade",
+   "fieldtype": "Data",
+   "label": "Employee Grade",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 9,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-03-04 10:13:18.723218",
+ "modified": "2026-02-04 16:59:29.942956",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Slip",
