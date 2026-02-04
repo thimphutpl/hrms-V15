@@ -83,7 +83,7 @@ frappe.ui.form.on("Travel Claim Item", {
 	calculate: function (frm, cdt, cdn) {
         let row = frappe.get_doc(cdt, cdn);
         frappe.model.set_value(cdt, cdn, "mileage_amount", flt(row.mileage_rate) * flt(row.distance));
-        frappe.model.set_value(cdt, cdn, "amount", flt(row.mileage_amount) + flt(row.amount));
+        frappe.model.set_value(cdt, cdn, "amount", flt(row.mileage_amount) + flt(row.amount) + flt(row.fare_amounts));
     },
 });
 
