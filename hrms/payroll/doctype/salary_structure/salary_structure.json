@@ -48,6 +48,9 @@
   "eligible_for_shift",
   "shift_method",
   "shift",
+  "eligible_for_driving_allowance",
+  "driving_method",
+  "driving",
   "cb_10",
   "eligible_for_difficulty",
   "difficulty_method",
@@ -64,6 +67,12 @@
   "eligible_for_deputation",
   "deputation_method",
   "deputation",
+  "eligible_for_website_allowance",
+  "website_method",
+  "website",
+  "eligible_for_technical_allowance",
+  "technical_method",
+  "technical",
   "cb_12",
   "eligible_for_officiating_allowance",
   "officiating_allowance_method",
@@ -863,12 +872,69 @@
    "fieldname": "fixed_allowance",
    "fieldtype": "Currency",
    "label": "Value"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_technical_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible For Technical Allowance"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_driving_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible Driving Allowance"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_website_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible For Website Allowance"
+  },
+  {
+   "depends_on": "eligible_for_driving_allowance",
+   "fieldname": "driving_method",
+   "fieldtype": "Select",
+   "label": "Eligible for Driving Allowance",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eval:doc.eligible_for_driving_allowance==1",
+   "fieldname": "driving",
+   "fieldtype": "Int",
+   "label": "Value(Driving Allowance)"
+  },
+  {
+   "depends_on": "eligible_for_website_allowance",
+   "fieldname": "website_method",
+   "fieldtype": "Select",
+   "label": "Eligible for Website Allowance",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eval:doc.eligible_for_website_allowance==1",
+   "fieldname": "website",
+   "fieldtype": "Int",
+   "label": "Value(Website Allowance)"
+  },
+  {
+   "depends_on": "eligible_for_technical_allowance",
+   "fieldname": "technical_method",
+   "fieldtype": "Select",
+   "label": "Eligible For Technical Allowance"
+  },
+  {
+   "depends_on": "eval:doc.eligible_for_technical_allowance==1",
+   "fieldname": "technical",
+   "fieldtype": "Int",
+   "label": "Value(Technical Allowance)",
+   "options": "Percent\nLumpsum"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2025-07-09 18:00:12.162765",
+ "modified": "2026-02-05 11:14:44.769339",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",

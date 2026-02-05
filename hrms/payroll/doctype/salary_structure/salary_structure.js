@@ -173,6 +173,15 @@ frappe.ui.form.on('Salary Structure', {
 	eligible_for_house_rent_deduction: function(frm){
 		calculate_others(frm);
 	},
+	eligible_for_driving_allowance:function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_website_allowance:function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_technical_allowance:function(frm){
+		calculate_others(frm);
+	},
 	ca: function(frm){
 		calculate_others(frm);
 	},
@@ -267,6 +276,18 @@ frappe.ui.form.on('Salary Structure', {
 	contract_allowance_method: function(frm){
 		calculate_others(frm);
 	},
+	driving_method:function(frm){
+		calculate_others(frm);
+
+	},
+	website_method:function(frm){
+		calculate_others(frm);
+
+	},
+	technical_method:function(frm){
+		calculate_others(frm);
+
+	},
 	communication_allowance_method: function(frm){
 		calculate_others(frm);
 	},
@@ -360,6 +381,7 @@ frappe.ui.form.on('Salary Structure', {
 	eligible_for_one_off_fixed_payment: function(frm){
 		calculate_others(frm);
 	},
+
 })
 
 // dynamically display checkboxes based on Salary Component's status
