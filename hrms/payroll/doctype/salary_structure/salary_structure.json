@@ -51,6 +51,7 @@
   "eligible_for_driving_allowance",
   "driving_method",
   "driving",
+  "not_eligible_for_salary_tax",
   "cb_10",
   "eligible_for_difficulty",
   "difficulty_method",
@@ -929,12 +930,18 @@
    "fieldname": "technical",
    "fieldtype": "Int",
    "label": "Value(Technical Allowance)"
+  },
+  {
+   "default": "0",
+   "fieldname": "not_eligible_for_salary_tax",
+   "fieldtype": "Check",
+   "label": "Not Eligible For Salary Tax"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2026-02-05 12:18:25.646127",
+ "modified": "2026-02-05 12:44:12.689957",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
