@@ -6,7 +6,8 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "approver"
+  "approver",
+  "approver_name"
  ],
  "fields": [
   {
@@ -18,14 +19,22 @@
    "options": "User",
    "print_hide": 1,
    "width": "200"
+  },
+  {
+   "fetch_from": "approver.full_name",
+   "fieldname": "approver_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Approver Name"
   }
  ],
  "istable": 1,
  "links": [],
- "modified": "2025-09-05 12:26:15.544930",
+ "modified": "2026-02-04 20:33:20.721090",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Department Approver",
+ "naming_rule": "Random",
  "owner": "Administrator",
  "permissions": [],
  "row_format": "Dynamic",
