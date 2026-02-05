@@ -22,15 +22,15 @@ def execute(filters=None):
 	ss_ded_map = get_ss_ded_map(salary_slips)
 	
 	for ss in salary_slips:
-		status = ""
-		if ss.docstatus == 1:
-				status = "Submitted"
-		elif ss.docstatus == 0:
-				status = "Un-Submitted"
+		status = "Submitted"
+		# if ss.docstatus == 1:
+		# 	status = "Submitted"
+		if ss.docstatus == 0:
+			status = "Un-Submitted"
 		elif ss.docstatus == 2:
-				status = "Cancelled"
-		else:
-				status = str(ss.docstatus)
+			status = "Cancelled"
+		# else:
+		# 	status = str(ss.docstatus)
 		
 		cid, joining_date = frappe.db.get_value("Employee", ss.employee, ["passport_number","date_of_joining"])
 						
