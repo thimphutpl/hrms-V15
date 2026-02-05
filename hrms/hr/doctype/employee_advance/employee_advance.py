@@ -26,7 +26,7 @@ from erpnext.accounts.doctype.journal_entry.journal_entry import get_default_ban
 
 import hrms
 from hrms.hr.utils import validate_active_employee
-from erpnext.custom_workflow import validate_workflow_states
+from erpnext.custom_workflow import validate_workflow_states, notify_workflow_states
 
 from hrms.hr.hr_custom_function import (
 	get_basic_and_gross_pay
@@ -55,11 +55,16 @@ class EmployeeAdvance(Document):
 		self.validate_dates()
 		self.set_pay_details()
 		self.calculate_amount(validate=1)
-		# validate_workflow_states(self)
+		validate_workflow_states(self)
+		# if self.docstatus != 1:
+		# 	notify_workflow_states(self)
+		if self.workflow_state != "Approved":
+			notify_workflow_states(self)
 
 	def on_submit(self):
 		self.post_journal_entry()
 		self.update_salary_structure()
+		notify_workflow_states(self)
 
 	def on_cancel(self):
 		self.ignore_linked_doctypes = ("GL Entry", "Payment Ledger Entry")
@@ -666,3 +671,4 @@ def get_voucher_type(mode_of_payment=None):
 			voucher_type = "Bank Entry"
 
 	return voucher_type
+	
