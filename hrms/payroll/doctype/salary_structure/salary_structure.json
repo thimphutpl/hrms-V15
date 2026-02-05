@@ -877,7 +877,8 @@
    "default": "0",
    "fieldname": "eligible_for_technical_allowance",
    "fieldtype": "Check",
-   "label": "Eligible For Technical Allowance"
+   "label": "Eligible For Technical Allowance",
+   "options": "Percent\nLumpsum"
   },
   {
    "default": "0",
@@ -927,14 +928,13 @@
    "depends_on": "eval:doc.eligible_for_technical_allowance==1",
    "fieldname": "technical",
    "fieldtype": "Int",
-   "label": "Value(Technical Allowance)",
-   "options": "Percent\nLumpsum"
+   "label": "Value(Technical Allowance)"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2026-02-05 11:14:44.769339",
+ "modified": "2026-02-05 12:16:12.920466",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
