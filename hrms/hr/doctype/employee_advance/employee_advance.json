@@ -41,6 +41,8 @@
   "follow_via_email",
   "column_break_ymya",
   "approver_name",
+  "column_break_sjus",
+  "approver_designation",
   "more_info_section",
   "advance_account",
   "status",
@@ -345,8 +347,9 @@
    "fetch_from": "approver.full_name",
    "fieldname": "approver_name",
    "fieldtype": "Data",
-   "label": "Approver",
-   "no_copy": 1
+   "label": "Approver Name",
+   "no_copy": 1,
+   "read_only": 1
   },
   {
    "allow_on_submit": 1,
@@ -356,16 +359,26 @@
    "label": "Follow via Email"
   },
   {
+   "fieldname": "column_break_sjus",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approver_designation",
+   "fieldtype": "Data",
+   "label": "Approver Designation",
+   "read_only": 1
+  },
+  {
    "fieldname": "approver",
    "fieldtype": "Link",
-   "label": "Approver Name",
-   "no_copy": 1,
-   "options": "User"
+   "label": "Approver",
+   "options": "User",
+   "read_only": 1
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-04 22:32:10.050864",
+ "modified": "2026-02-06 10:38:10.519535",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Advance",
