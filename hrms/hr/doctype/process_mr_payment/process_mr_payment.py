@@ -99,7 +99,7 @@ class ProcessMRPayment(Document):
 						a.total_wage = flt(salary)
 
 				a.total_wage = round(a.total_wage)
-				a.total_ot_amount = round(a.total_ot_amount)
+				a.total_ot_amount = a.total_ot_amount
 				a.gratuity_amount = round(a.gratuity_amount)
 
 				if a.employee_type == "Open Air Prisoner":
