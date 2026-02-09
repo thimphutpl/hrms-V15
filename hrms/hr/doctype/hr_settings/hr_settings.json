@@ -98,9 +98,11 @@
   "sb_overtime",
   "leave_application_approval_notification_template",
   "employee_advance_approval_notification_template",
+  "travel_authorization_approval_notification_template",
   "column_break_jhnx",
   "leave_application_status_notification_template",
-  "employee_advance_status_notification_template"
+  "employee_advance_status_notification_template",
+  "travel_authorization_status_notification_template"
  ],
  "fields": [
   {
@@ -673,13 +675,27 @@
    "fieldname": "ceo_name",
    "fieldtype": "Data",
    "label": "CEO Name"
+  },
+  {
+   "fieldname": "travel_authorization_approval_notification_template",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Travel Authorization Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "travel_authorization_status_notification_template",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Travel Authorization Status Notification Template",
+   "options": "Email Template"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-02-03 16:38:19.098408",
+ "modified": "2026-02-09 11:14:28.686541",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",
