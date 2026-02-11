@@ -74,6 +74,7 @@
    "fieldname": "employee_name",
    "fieldtype": "Data",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Employee Name",
    "read_only": 1
   },
@@ -279,6 +280,7 @@
   {
    "fieldname": "verifier",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Verifier",
    "options": "User"
   },
@@ -286,6 +288,7 @@
    "fetch_from": "verifier.full_name",
    "fieldname": "verifier_name",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": " Verifier Name"
   },
   {
@@ -297,6 +300,7 @@
   {
    "fieldname": "verifier_designation",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Verifier Designation"
   },
   {
@@ -313,8 +317,8 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-28 11:23:42.872259",
- "modified_by": "Administrator",
+ "modified": "2026-02-11 12:51:44.780047",
+ "modified_by": "sonam.zangmo@thimphutechpark.bt",
  "module": "HR",
  "name": "Travel Authorization",
  "naming_rule": "Expression (old style)",
