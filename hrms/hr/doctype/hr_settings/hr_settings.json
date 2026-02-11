@@ -99,10 +99,12 @@
   "leave_application_approval_notification_template",
   "employee_advance_approval_notification_template",
   "travel_authorization_approval_notification_template",
+  "overtime_application_approval_notification_template",
   "column_break_jhnx",
   "leave_application_status_notification_template",
   "employee_advance_status_notification_template",
-  "travel_authorization_status_notification_template"
+  "travel_authorization_status_notification_template",
+  "overtime_application_status_notification_template"
  ],
  "fields": [
   {
@@ -689,14 +691,26 @@
    "in_list_view": 1,
    "label": "Travel Authorization Status Notification Template",
    "options": "Email Template"
+  },
+  {
+   "fieldname": "overtime_application_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Overtime Application Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "overtime_application_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Overtime Application Status Notification Template",
+   "options": "Email Template"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-02-09 11:14:28.686541",
- "modified_by": "Administrator",
+ "modified": "2026-02-11 09:47:19.141320",
+ "modified_by": "sonam.zangmo@thimphutechpark.bt",
  "module": "HR",
  "name": "HR Settings",
  "owner": "Administrator",
