@@ -128,7 +128,7 @@ def construct_query(filters):
 			select t1.employee as employee, t3.employee_name as employee_name, t1.designation as designation,t3.passport_number as passport_number, t3.pf_number as pf_number,
 				sum(case when t2.salary_component = 'Basic Pay' then ifnull(t2.amount,0) else 0 end) as basicpay,
 				sum(case when t2.salary_component = 'PF' then ifnull(t2.amount,0) else 0 end) as employeepf,
-				sum(case when t2.salary_component = 'PF' then ifnull(t2.amount,0) else 0 end) as employerpf,
+				sum(case when t2.salary_component = 'PF' then ifnull(t1.employer_pf_contribution,0) else 0 end) as employerpf,
 				sum(case when t2.salary_component = 'PF' then ifnull(t2.amount,0)*2 else 0 end) as total,
 				t1.company as company, t1.branch as branch, t1.cost_center as cost_center, t1.department as department,t1.section as section,
 				t1.fiscal_year as fiscal_year, t1.month as month
