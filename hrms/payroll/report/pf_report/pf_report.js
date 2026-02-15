@@ -14,7 +14,7 @@ frappe.query_reports["PF Report"] = {
 			"fieldname": "month",
 			"label": __("Month"),
 			"fieldtype": "Select",
-			"options": "01\n02\n03\n04\n05\n06\n07\n08\n09\n10\n11\n12",
+			"options": "January\nFebruary\nMarch\nApril\nMay\nJune\nJuly\nAugust\nSeptember\nOctober\nNovember\nDecember",
 		},
 		{
 			"fieldname": "employee",
@@ -41,5 +41,16 @@ frappe.query_reports["PF Report"] = {
 			"options": "Company",
 			"default": frappe.defaults.get_user_default("Company")
 		},
-	]
+	],
+	onload: function (report) {
+		report.page.add_inner_button(__('Clear Filters'), function () {
+			frappe.query_report.set_filter_value("fiscal_year", "");
+			frappe.query_report.set_filter_value("month", "");
+			frappe.query_report.set_filter_value("employee", "");
+			frappe.query_report.set_filter_value("employment_type", "");
+			frappe.query_report.set_filter_value("cost_center", "");
+		});
+	}
+
+
 };

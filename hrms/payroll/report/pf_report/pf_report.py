@@ -181,7 +181,7 @@ def get_conditions(filters):
 	if filters.get("employee"): 
 		conditions += """and t1.employee ='{}'""".format(filters.get("employee"))
 	if filters.get("employment_type"): 
-		conditions += """and t1.employment_type = '{}'""".format(filters.get("employment_type"))
+		conditions += """and t3.employment_type = '{}'""".format(filters.get("employment_type"))
 	if filters.get("cost_center"): 
 		conditions += """and exists(select 1 from `tabCost Center` cc where t1.cost_center = cc.name and (cc.parent_cost_center = '{0}' or cc.name = '{0}'))""".format(filters.cost_center)
 	if filters.get("company"): 
