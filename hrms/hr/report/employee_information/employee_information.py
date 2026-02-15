@@ -3,6 +3,7 @@
 
 
 import frappe
+from datetime import date
 from frappe import _
 
 
@@ -20,11 +21,13 @@ def get_columns():
 	return [
 		_("Employee") + ":Link/Employee:120",
 		_("Name") + ":Data:200",
+		_("Date of Joining")+ ":Date:100",
 		_("Date of Birth") + ":Date:100",
 		_("Branch") + ":Link/Branch:120",
 		_("Department") + ":Link/Department:120",
 		_("Designation") + ":Link/Designation:120",
 		_("Status")+":Data:50",
+		_("No. Of years in service")+":Data:150",
 		_("Blood Ground")+":Data:50",
 		_("Gender") + "::60",
 		_("School/University")+":Data:100",
@@ -39,16 +42,17 @@ def get_columns():
 
 def get_employees(filters):
 	conditions = get_conditions(filters)
-	return frappe.db.sql(
+	employees = frappe.db.sql(
 		"""
 		SELECT
 			e.name,
 			e.employee_name,
+			e.date_of_joining,
 			e.date_of_birth,
 			e.branch,
 			e.department,
-			e.status,
 			e.designation,
+		    e.status,
 			e.blood_group,
 			e.gender,
 			ed.school_univ,
@@ -70,7 +74,23 @@ def get_employees(filters):
 		as_list=1,
 	)
 
+	today = date.today()
+	data_with_tenure = []
+	for emp in employees:
+		doj = emp[2]  # date_of_joining is the 3rd field
+		if doj:
+			delta = today - doj
+			years = delta.days // 365
+			months = (delta.days % 365) // 30
+			days = (delta.days % 365) % 30
+			tenure = f"{years} yrs, {months} m, {days} d"
+		else:
+			tenure = "-"
+		# Insert tenure after Status (Status is emp[6])
+		emp = emp[:8] + [tenure] + emp[8:]
+		data_with_tenure.append(emp)
 
+	return data_with_tenure
 
 def get_conditions(filters):
 	conditions = ""
