@@ -11,11 +11,15 @@ from erpnext.custom_workflow import validate_workflow_states, notify_workflow_st
 
 class SWSApplication(Document):
 	def validate(self):
-				validate_workflow_states(self)
-				# self.get_status()
-				# self.validate_save()
-				self.validate_dead()
-				self.validate_amount()
+		validate_workflow_states(self)
+		# self.get_status()
+		# self.validate_save()
+		self.validate_dead()
+		self.validate_amount()
+				
+		if self.workflow_state == "Approved":
+			self.docstatus = 1
+			self.approval_status = "Approved"
 
 
 	def validate_amount(self):
@@ -100,60 +104,73 @@ class SWSApplication(Document):
 
 @frappe.whitelist()
 def get_event_amount(sws_event, reference, employee):
-        if not reference:
-                frappe.throw("Please select Reference Document")
-        parent_document = frappe.db.get_value("SWS Membership Item", reference, "parent")
-        # relationship = frappe.db.get_value("SWS Membership Item", reference, "relationship")
-        # relationship_type = frappe.db.get_value("Relationship", relationship, "relationship_type")
-        # date_of_joining = frappe.db.get_value("Employee", employee, "date_of_joining")
-        registration_date = frappe.db.get_value("SWS Membership", parent_document, "registration_date")
-        # if relationship_type == "Immediate":
-        #       d1 = datetime.strptime(str(date_of_joining),'%Y-%m-%d')
-        # else:
-        d1 = datetime.strptime(str(registration_date),'%Y-%m-%d')
-        d2 = datetime.strptime(frappe.utils.nowdate(), '%Y-%m-%d')
-        date_diff = relativedelta(d2,d1).years
-        # frappe.msgprint(str(date_diff))
-        if date_diff <= 1:
-                event_amount = frappe.db.sql("""
-                    select amount from `tabSWS Event Item` where parent = '{0}' and noof_years = 'Within 1 year'
-                               """.format(sws_event), as_dict = True)
-        elif date_diff > 1 and date_diff <= 2:
-                event_amount = frappe.db.sql("""
-                    select amount from `tabSWS Event Item` where parent = '{0}' and noof_years = 'Within 2 years'
-                               """.format(sws_event), as_dict = True)
-        elif date_diff > 2 and date_diff <= 3:
-                event_amount = frappe.db.sql("""
-                    select amount from `tabSWS Event Item` where parent = '{0}' and noof_years = 'Within 3 years'
-                               """.format(sws_event), as_dict = True)
-        elif date_diff > 3 and date_diff <= 4:
-                event_amount = frappe.db.sql("""
-                    select amount from `tabSWS Event Item` where parent = '{0}' and noof_years = 'Within 4 years'
-                               """.format(sws_event), as_dict = True)
-        elif date_diff >= 5:
-                event_amount = frappe.db.sql("""
-                    select amount from `tabSWS Event Item` where parent = '{0}' and noof_years = '5 years and above'
-                               """.format(sws_event), as_dict = True)
+		if not reference:
+				frappe.throw("Please select Reference Document")
+		parent_document = frappe.db.get_value("SWS Membership Item", reference, "parent")
+		# relationship = frappe.db.get_value("SWS Membership Item", reference, "relationship")
+		# relationship_type = frappe.db.get_value("Relationship", relationship, "relationship_type")
+		# date_of_joining = frappe.db.get_value("Employee", employee, "date_of_joining")
+		registration_date = frappe.db.get_value("SWS Membership", parent_document, "registration_date")
+		# if relationship_type == "Immediate":
+		#       d1 = datetime.strptime(str(date_of_joining),'%Y-%m-%d')
+		# else:
+		d1 = datetime.strptime(str(registration_date),'%Y-%m-%d')
+		d2 = datetime.strptime(frappe.utils.nowdate(), '%Y-%m-%d')
+		date_diff = relativedelta(d2,d1).years
+		# frappe.msgprint(str(date_diff))
+		if date_diff <= 1:
+				event_amount = frappe.db.sql("""
+					select amount from `tabSWS Event Item` where parent = '{0}' and noof_years = 'Within 1 year'
+							   """.format(sws_event), as_dict = True)
+		elif date_diff > 1 and date_diff <= 2:
+				event_amount = frappe.db.sql("""
+					select amount from `tabSWS Event Item` where parent = '{0}' and noof_years = 'Within 2 years'
+							   """.format(sws_event), as_dict = True)
+		elif date_diff > 2 and date_diff <= 3:
+				event_amount = frappe.db.sql("""
+					select amount from `tabSWS Event Item` where parent = '{0}' and noof_years = 'Within 3 years'
+							   """.format(sws_event), as_dict = True)
+		elif date_diff > 3 and date_diff <= 4:
+				event_amount = frappe.db.sql("""
+					select amount from `tabSWS Event Item` where parent = '{0}' and noof_years = 'Within 4 years'
+							   """.format(sws_event), as_dict = True)
+		elif date_diff >= 5:
+				event_amount = frappe.db.sql("""
+					select amount from `tabSWS Event Item` where parent = '{0}' and noof_years = '5 years and above'
+							   """.format(sws_event), as_dict = True)
 
-        return event_amount
+		return event_amount
 
 # Following code added by SHIV on 2020/09/21
 def get_permission_query_conditions(user):
-        if not user: user = frappe.session.user
-        user_roles = frappe.get_roles(user)
+		if not user: user = frappe.session.user
+		user_roles = frappe.get_roles(user)
 
-        if user == "Administrator":
-                return
-        if "HR User" in user_roles or "HR Manager" in user_roles:
-                return
+		if user == "Administrator":
+				return
+		if "HR User" in user_roles or "HR Manager" in user_roles:
+				return
 
-        return """(
-                `tabSWS Application`.owner = '{user}'
-                or
-                exists(select 1
-                                from `tabEmployee`
-                                where `tabEmployee`.name = `tabSWS Application`.employee
-                                and `tabEmployee`.user_id = '{user}')
-                or
-                (`tabSWS Application`.supervisor = '{user}' and `tabSWS Application`.workflow_state != 'Draft')
-        )""".format(user=user)
+		return """(
+				`tabSWS Application`.owner = '{user}'
+				or
+				exists(select 1
+								from `tabEmployee`
+								where `tabEmployee`.name = `tabSWS Application`.employee
+								and `tabEmployee`.user_id = '{user}')
+				or
+				(`tabSWS Application`.supervisor = '{user}' and `tabSWS Application`.workflow_state != 'Draft')
+		)""".format(user=user)
+
+@frappe.whitelist()
+def get_membership_item(name):
+	data = frappe.db.get_value(
+		"SWS Membership Item",
+		name,
+		["relationship", "cid_no", "full_name",],
+		as_dict=True
+	)
+	if data:
+		return data
+	else:
+		frappe.throw("No details found")

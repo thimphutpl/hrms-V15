@@ -10,11 +10,11 @@ from frappe.utils import flt, getdate
 from frappe.model.rename_doc import rename_doc
 class SWSMembership(Document):
 	def validate(self):
-				for a in self.get("members"):
-						if a.employee == "" or a.employee == None:
-								a.employee = self.employee
-				self.validate_duplicate_members()
-				self.update_contribution()
+		for a in self.get("members"):
+			if a.employee == "" or a.employee == None:
+				a.employee = self.employee
+		self.validate_duplicate_members()
+		# self.update_contribution()
 
 	def update_contribution(self):
 			settings         = frappe.get_single("SWS Settings")
@@ -59,19 +59,19 @@ class SWSMembership(Document):
 							frappe.db.set_value("SWS Membership Item",row.name,"contribution",row.contribution)
 							# frappe.throw(str(row.contribution))
 	def on_submit(self):
-			self.update_employee_master_family()
-			self.update_salary_structure()
+		self.update_employee_master_family()
+		# self.update_salary_structure()
 
 	def on_cancel(self):
-			for a in self.members:
-					frappe.db.sql("delete from `tabSWS Membership Item` where parent = '{}'".format(self.name))
+		for a in self.members:
+			frappe.db.sql("delete from `tabSWS Membership Item` where parent = '{}'".format(self.name))
 
 	def on_update_after_submit(self):
 			for a in self.get("members"):
 					if a.employee == "" or a.employee == None:
 							a.employee = self.employee
 			self.validate_duplicate_members()
-			self.update_contribution_amount()
+			# self.update_contribution_amount()
 			if self.members:
 					for a in self.members:
 							new_name = a.full_name+"-"+a.relationship+"-"+str(self.employee)
@@ -80,7 +80,7 @@ class SWSMembership(Document):
 									sws.save(ignore_permissions=1)
 									rename_doc("SWS Membership Item", a.name, new_name, force=False, merge=False, ignore_permissions=True)
 			self.update_employee_master_family()
-			self.update_salary_structure()
+			# self.update_salary_structure()
 
 	# def update_contribution_refresh(self):
 	#       self.update_contribution()
@@ -133,7 +133,7 @@ class SWSMembership(Document):
 					row.district_name = a.district_name
 					row.city_name = a.city_name
 					row.village_name = a.village_name
-					row.cid_attach = a.cid_attach
+					# row.cid_attach = a.cid_attach
 					row.deceased = a.deceased
 			employee_doc.save(ignore_permissions=True)
 

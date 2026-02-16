@@ -3,10 +3,30 @@
  "allow_rename": 1,
  "creation": "2025-09-11 10:44:05.308739",
  "doctype": "DocType",
- "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "section_break_xb3x"
+  "relationship",
+  "full_name",
+  "gender",
+  "date_of_birth",
+  "c_brake",
+  "cid_no",
+  "district_name",
+  "city_name",
+  "village_name",
+  "column_break_10",
+  "f_remarks",
+  "cid_attach",
+  "sb_member_status",
+  "status",
+  "column_break_13",
+  "sws_application",
+  "claim_date",
+  "claim_amount",
+  "contribution",
+  "deceased",
+  "employee",
+  "mc_document"
  ],
  "fields": [
   {
@@ -17,7 +37,6 @@
    "in_list_view": 1,
    "label": "Relationship",
    "options": "Relationship",
-   "permlevel": 1,
    "reqd": 1
   },
   {
@@ -27,7 +46,6 @@
    "ignore_user_permissions": 1,
    "in_list_view": 1,
    "label": "Full Name",
-   "permlevel": 1,
    "reqd": 1
   },
   {
@@ -36,16 +54,14 @@
    "fieldtype": "Link",
    "ignore_user_permissions": 1,
    "label": "Gender",
-   "options": "Gender",
-   "permlevel": 1
+   "options": "Gender"
   },
   {
    "allow_on_submit": 1,
    "fieldname": "date_of_birth",
    "fieldtype": "Date",
    "ignore_user_permissions": 1,
-   "label": "Date of Birth",
-   "permlevel": 1
+   "label": "Date of Birth"
   },
   {
    "fieldname": "c_brake",
@@ -57,8 +73,7 @@
    "fieldtype": "Data",
    "ignore_user_permissions": 1,
    "in_list_view": 1,
-   "label": "CID/Passport /Work Permit No.",
-   "permlevel": 1
+   "label": "CID/Passport /Work Permit No."
   },
   {
    "fieldname": "district_name",
@@ -130,12 +145,14 @@
    "allow_on_submit": 1,
    "fieldname": "claim_amount",
    "fieldtype": "Currency",
+   "ignore_user_permissions": 1,
    "label": "Claim Amount",
    "read_only": 1
   },
   {
    "fieldname": "contribution",
    "fieldtype": "Currency",
+   "ignore_user_permissions": 1,
    "in_list_view": 1,
    "label": "Contribution/month",
    "read_only": 1
@@ -163,11 +180,10 @@
    "label": "Marriage Certificate"
   }
  ],
- "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-09-11 10:44:05.308739",
+ "modified": "2026-02-16 19:51:52.510966",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "SWS Membership Item",

@@ -6,36 +6,49 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "section_break_8fos"
+  "reference_document",
+  "relationship",
+  "cid_no",
+  "full_name",
+  "column_break_10",
+  "f_remarks",
+  "section_break_7",
+  "sws_event",
+  "column_break_9",
+  "claim_amount",
+  "column_break_11",
+  "amount",
+  "deceased"
  ],
  "fields": [
   {
    "description": "Should be maintained during Family Details in Employee Master",
    "fieldname": "reference_document",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Reference Document",
    "options": "SWS Membership Item",
    "reqd": 1
   },
   {
-   "fetch_from": "reference_document.relationship",
    "fieldname": "relationship",
    "fieldtype": "Read Only",
+   "ignore_user_permissions": 1,
    "in_list_view": 1,
    "label": "Relationship",
    "reqd": 1
   },
   {
-   "fetch_from": "reference_document.cid_no",
    "fieldname": "cid_no",
    "fieldtype": "Read Only",
+   "ignore_user_permissions": 1,
    "in_list_view": 1,
    "label": "CID No./Passport /Work Permit"
   },
   {
-   "fetch_from": "reference_document.full_name",
    "fieldname": "full_name",
    "fieldtype": "Read Only",
+   "ignore_user_permissions": 1,
    "in_list_view": 1,
    "label": "Full Name",
    "reqd": 1
@@ -93,7 +106,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-09-11 10:50:51.029847",
+ "modified": "2026-02-15 14:15:48.581156",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "SWS Application Item",

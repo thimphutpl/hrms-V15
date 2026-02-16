@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "format:SWS.YY.MM.###",
+ "autoname": "SWS.YY.MM.###",
  "creation": "2025-09-11 10:49:17.423626",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -36,17 +36,14 @@
    "default": "0",
    "fieldname": "verified",
    "fieldtype": "Check",
-   "hidden": 1,
    "label": "Verified By Supervisor",
-   "permlevel": 1,
    "read_only": 1
   },
   {
    "fieldname": "approval_status",
    "fieldtype": "Select",
    "label": "Approval Status",
-   "options": "\nApproved\nRejected",
-   "permlevel": 2
+   "options": "\nApproved\nRejected"
   },
   {
    "fieldname": "column_break_4",
@@ -180,8 +177,9 @@
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2025-09-11 11:54:33.651429",
+ "modified": "2026-02-16 20:34:31.299577",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "SWS Application",
@@ -197,6 +195,30 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "SWS User",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "SWS Manager",
+   "select": 1,
    "share": 1,
    "write": 1
   }

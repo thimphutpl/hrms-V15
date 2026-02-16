@@ -6,4 +6,6 @@ from frappe.model.document import Document
 
 
 class SWSMembershipItem(Document):
-	pass
+	def autoname(self):
+		# doc = frappe.get_doc("SWS Membership", self.parent)
+		self.name = self.full_name+"-"+self.relationship+"-"+str(self.employee)
