@@ -335,7 +335,7 @@ def get_permission_query_conditions(user):
 
 	# if user == "Administrator":
 	# 	return
-	if "Administrator" in user_roles or "System Manager" in user_roles:
+	if "Administrator" in user_roles or "System Manager" in user_roles or  "Auditor" in user_roles:
 		return	
 	# if "HR User" in user_roles or "HR Manager" in user_roles:
 	# 	return

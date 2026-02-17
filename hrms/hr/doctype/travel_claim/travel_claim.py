@@ -208,6 +208,7 @@ class TravelClaim(Document):
 			
 
 	def update_amounts(self):
+		#frappe.throw("hi")
 		exchange_rate=1
 		if self.place_type=='Out-Country':
 			#dsa_per_day=frappe.db.get_value("Employee Grade", self.grade, "dsa_per_day")
@@ -218,6 +219,7 @@ class TravelClaim(Document):
 		
 		total_claim_days = 0
 		for item in self.get("items"):
+
 			#item.total_dsa=dsa_per_day
 			item.dsa_cal=item.dsa
 			#frappe.msgprint(str(self.place_type))
@@ -531,7 +533,7 @@ def get_permission_query_conditions(user):
 	if user == "Administrator":
 		return
 
-	if "HR Master" in user_roles or "HR Manager" in user_roles or "Accounts User" in user_roles or "Accounts Master" in user_roles:
+	if "HR Master" in user_roles or "HR Manager" in user_roles or "Accounts User" in user_roles or "Accounts Master" in user_roles or "Auditor" in user_roles:
 		return
 
 	return """(

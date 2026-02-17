@@ -230,3 +230,25 @@ def get_mr_approvers(employee):
 	approver, approver_name= frappe.db.get_value("Employee", {"name":frappe.db.get_value("Employee", employee, "reports_to")}, ["user_id", "employee_name"])	
 	return approver, approver_name
 
+def get_permission_query_conditions(user):
+	if not user: user = frappe.session.user
+	user_roles = frappe.get_roles(user)
+
+	if user == "Administrator" or "System Manager" in user_roles or "Auditor" in user_roles: 
+		return
+
+	return """(
+		`tabMuster Roll Application`.owner = '{user}'
+		or
+		exists(select 1
+			from `tabEmployee` as e
+			where e.branch = `tabMuster Roll Application`.branch
+			and e.user_id = '{user}')
+		or
+		exists(select 1
+			from `tabEmployee` e, `tabAssign Branch` ab, `tabBranch Item` bi
+			where e.user_id = '{user}'
+			and ab.employee = e.name
+			and bi.parent = ab.name
+			and bi.branch = `tabMuster Roll Application`.branch)
+	)""".format(user=user)

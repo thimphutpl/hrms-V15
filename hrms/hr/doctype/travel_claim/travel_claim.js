@@ -92,6 +92,9 @@ frappe.ui.form.on('Travel Claim', {
 });
 
 frappe.ui.form.on("Travel Claim Item", { 
+    // onload:function(frm){
+	// 		frm.trigger("set_dsa")
+	// },	
 	calculate: function (frm, cdt, cdn) {
 		let row = frappe.get_doc(cdt, cdn);
 		frappe.model.set_value(cdt, cdn, "amount", flt(row.dsa) * flt(row.no_days) * flt(row.dsa_percent)/100);
@@ -107,4 +110,7 @@ frappe.ui.form.on("Travel Claim Item", {
 	amount: function (frm, cdt, cdn) {
 		frm.trigger("calculate", cdt, cdn);
 	},
+	// set_dsa:function(frm,cdt,cdn){
+	// 	let row=frappe.get_doc(cdt,cdn)
+	// }
 });

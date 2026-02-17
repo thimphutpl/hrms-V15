@@ -1633,7 +1633,7 @@ def on_doctype_update():
 def get_permission_query_conditions(user):
 	if not user: user = frappe.session.user
 	user_roles = frappe.get_roles(user)
-	if "HR User" in user_roles or "HR Manager" in user_roles or "CEO" in user_roles:
+	if "HR User" in user_roles or "HR Manager" in user_roles or "CEO" in user_roles or  "Auditor" in user_roles:
 		return
 	
 	if "HR Support" in user_roles:
