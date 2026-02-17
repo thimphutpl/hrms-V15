@@ -62,11 +62,7 @@ class OvertimeApplication(Document):
 			# i.amount = flt(i.rate) * flt(i.number_of_hours)
 			total_amount += i.amount
 		self.actual_hours = flt(total_hours)
-		# if flt(total_hours) > flt(overtime_limit):
-		# 	frappe.throw(_("Only {} hours accepted for payment").format(overtime_limit))
-		# 	self.total_hours = flt(overtime_limit)
-		# 	self.total_hours_lapsed = flt(total_hours) - flt(overtime_limit)
-		# else:
+	
 		self.total_hours = flt(self.actual_hours)
 		self.total_amount = round(total_amount,0)
 		self.actual_amount = round(total_amount,0)
