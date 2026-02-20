@@ -89,23 +89,23 @@ def make_separation_clearance(source_name, target_doc=None, skip_item_mapping=Fa
 @frappe.whitelist()
 def make_exit_interview(source_name, target_doc=None):
 
-    doc = get_mapped_doc(
-        "Employee Separation",
-        source_name,
-        {
-            "Employee Separation": {
-                "doctype": "Exit Interview",
-                "field_map": {
+	doc = get_mapped_doc(
+		"Employee Separation",
+		source_name,
+		{
+			"Employee Separation": {
+				"doctype": "Exit Interview",
+				"field_map": {
 					"name":"employee_separation",
-                    "employee": "employee",
+					"employee": "employee",
 					"reason_for_resignation": "resignation_type",
 					"expected_relieving_date": "date_of_separation"
-                },                
-            },
-        },
-        target_doc,
-    )
-    return doc
+				},                
+			},
+		},
+		target_doc,
+	)
+	return doc
 
 # Following code added by SHIV on 2020/09/21
 def get_permission_query_conditions(user):
@@ -114,7 +114,7 @@ def get_permission_query_conditions(user):
 
 	if user == "Administrator":
 		return
-	if "HR User" in user_roles or "HR Manager" in user_roles or "Approver" in user_roles:
+	if "HR User" in user_roles or "HR Manager" in user_roles or "Approver" in user_roles or "Auditor" in user_roles:
 		return
 
 	return """(
