@@ -24,6 +24,9 @@ class EmployeeSeparationClearance(Document):
 		action = frappe.request.form.get('action')
 		
 		if action == "Save":
+			
+			
+
 			if self.owner !=frappe.session.user and frappe.session.user not in self.iad and \
 				frappe.session.user not in self.afd and frappe.session.user not in self.ams and \
 				frappe.session.user not in self.ada and frappe.session.user not in self.icthr and frappe.session.user not in self.pc and frappe.session.user not in self.supervisor:
@@ -31,15 +34,27 @@ class EmployeeSeparationClearance(Document):
 				frappe.throw("Only the Owner and Verifier and Approver can edit.")
 	
 		if action == "Forward to Approver": 
-			self.verifyUpdate()           
-			if self.icthr_clearance + self.ada_clearance + self.afd_clearance + self.iad_clearance + self.ams_clearance + self.pc_clearance==6:
+			self.verifyUpdate()
+			if frappe.session.user==self.supervisor:
 				self.workflow_state = "Waiting Supervisor Approval"
-			else:
-				self.workflow_state = "Waiting for Verification"
+
+			
+
+			# if self.icthr_clearance + self.ada_clearance + self.afd_clearance + self.iad_clearance + self.ams_clearance + self.pc_clearance==4:
+			# 	self.workflow_state = "Waiting Supervisor Approval"
+			# else:
+				
+			# 	self.workflow_state = "Waiting for Verification"
 		
 		if action =="Forward":
 			self.verifyUpdate()
-		
+		# if self.workflow_state=="Waiting Supervisor Approval":
+		# 	if frappe.session.user==self.supervisor:
+		# 		if self.iad_clearance==1 &  self.icthr_clearance==1 & self.afd_clearance==1 & self.ams_clearance==1 & self.pc_clearance==1 & self.ada_clearance==1:
+		# 			self.verifyUpdate()
+		# 		else:
+		# 			frappe.throw("Supervisor clearance is the final step, to be completed only after all other employee clearances are obtained.")
+
 		if action == "Approve":
 			self.verifyUpdate()
 		
@@ -50,22 +65,33 @@ class EmployeeSeparationClearance(Document):
 			self.reApply()
 	
 	def verifyUpdate(self):
+		
+		
 		user = frappe.session.user
 		
 		if user== self.iad:
+			
 			self.iad_clearance=1
 		if user == self.icthr:
+			
 			self.icthr_clearance=1
+			
 		if user == self.afd:
+			
 			self.afd_clearance=1
 		if user == self.ams:
+			
 			self.ams_clearance=1
 		if user == self.pc:
+			
 			self.pc_clearance=1
 		if user == self.ada:
+			
 			self.ada_clearance=1
 		if user == self.supervisor:
+			
 			self.supervisor_clearance=1
+			
 
 	def reApply(self):
 		self.iad_clearance = 0
@@ -161,12 +187,13 @@ class EmployeeSeparationClearance(Document):
 			frappe.throw("Internal Audit Division has not granted clearance.")
 		if self.ada_clearance == 0:
 			frappe.throw("Asset Declaration Administrator has not granted clearance.")
-		if self.pc_clearance == 0:
-			frappe.throw("Procurement and Contracts Division has not granted clearance.")
+		# if self.pc_clearance == 0:
+		# 	frappe.throw("Procurement and Contracts Division has not granted clearance.")
 		# if self.sws_clearance == 0:
 		# 	frappe.throw("SWS Treasurer has not granted clearance.")
 
 	def update_reference(self):
+		
 		id = frappe.get_doc("Employee Separation",self.employee_separation_id)
 		id.clearance_acquired = 1 if self.docstatus == 1 else 0
 		id.save()
@@ -289,7 +316,7 @@ def get_permission_query_conditions(user):
 
 	if user == "Administrator":
 		return
-	if "HR User" in user_roles or "HR Manager" in user_roles:
+	if "HR User" in user_roles or "HR Manager" in user_roles or "Auditor" in user_roles:
 		return
 
 	return """(
