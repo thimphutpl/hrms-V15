@@ -3,7 +3,7 @@
 
 
 import frappe
-from datetime import date
+from datetime import date,datetime
 from frappe import _
 
 
@@ -52,7 +52,7 @@ def get_employees(filters):
 			e.branch,
 			e.department,
 			e.designation,
-		    e.status,
+			e.status,
 			e.blood_group,
 			e.gender,
 			ed.school_univ,
@@ -74,19 +74,29 @@ def get_employees(filters):
 		as_list=1,
 	)
 
-	today = date.today()
+	ref_date_str = filters.get("end_date") or filters.get("to_date")
+	if ref_date_str:
+		ref_date = datetime.strptime(ref_date_str, "%Y-%m-%d").date()
+	else:
+		ref_date = date.today()
+
 	data_with_tenure = []
 	for emp in employees:
-		doj = emp[2]  # date_of_joining is the 3rd field
+		doj = emp[2]  # date_of_joining
 		if doj:
-			delta = today - doj
-			years = delta.days // 365
-			months = (delta.days % 365) // 30
-			days = (delta.days % 365) % 30
-			tenure = f"{years} yrs, {months} m, {days} d"
+			if isinstance(doj, str):
+				doj = datetime.strptime(doj, "%Y-%m-%d").date()
+			delta = ref_date - doj
+			if delta.days >= 0:
+				years = delta.days // 365
+				months = (delta.days % 365) // 30
+				days = (delta.days % 365) % 30
+				tenure = f"{years} yrs, {months} m, {days} d"
+			else:
+				tenure = "0 yrs, 0 m, 0 d"  # DOJ after end_date
 		else:
 			tenure = "-"
-		# Insert tenure after Status (Status is emp[6])
+
 		emp = emp[:8] + [tenure] + emp[8:]
 		data_with_tenure.append(emp)
 

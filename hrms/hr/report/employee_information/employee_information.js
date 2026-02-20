@@ -24,12 +24,24 @@ frappe.query_reports["Employee Information"] = {
 			fieldtype: "Select",
 			options: "A+\nA -\nB +\nB -\nAB +\nAB -\nO +\nO -"
 
+		},
+		{
+			fieldname: "to_date",
+			label: __("To Date"),
+			fieldtype: "Date"
+		},
+		{
+			fieldname: "end_date",
+			label: __("End Date"),
+			fieldtype: "Date"
 		}
 	],
 	onload: function (report) {
 		report.page.add_inner_button("Clear Filters", function () {
 			report.set_filter_value("employee", null);
 			report.set_filter_value("blood_group", null);
+			report.set_filter_value("to_date", null);
+			report.set_filter_value("end_date", null);
 		});
 	},
 
