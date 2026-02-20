@@ -9,12 +9,12 @@ from erpnext.custom_workflow import validate_workflow_states, notify_workflow_st
 from datetime import datetime
 class OvertimeApplication(Document):
 	def validate(self):
-		# validate_workflow_states(self)
+		validate_workflow_states(self)
 		self.validate_dates()
 		self.calculate_totals()
 		self.validate_eligible_creteria()
-		# if self.workflow_state != "Approved":
-		# 	notify_workflow_states(self)
+		if self.workflow_state != "Approved":
+			notify_workflow_states(self)
 		self.processed = 0
 		self.validate_total_claim_amount()
 	
@@ -68,14 +68,14 @@ class OvertimeApplication(Document):
 		self.actual_amount = round(total_amount,0)
 
 	def on_cancel(self):
-		# notify_workflow_states(self)
+		notify_workflow_states(self)
 		self.check_journal()
 		# self.update_salary_structure(True)
 
 	def on_submit(self):
 		self.post_journal_entry()
 		
-		# notify_workflow_states(self)
+		notify_workflow_states(self)
 	def update_salary_structure(self, cancel=False):
 		if cancel:
 			rem_list = []
@@ -202,21 +202,20 @@ def get_overtime_rate(employee, posting_date ):
 		frappe.throw("No Salary Structure found for the employee")
 
 def get_permission_query_conditions(user):
-	if not user: user = frappe.session.user
-	user_roles = frappe.get_roles(user)
+    if not user:
+        user = frappe.session.user
 
-	if user == "Administrator":
-		return
-	if "HR User" in user_roles or "HR Manager" in user_roles:
-		return
+    user_roles = frappe.get_roles(user)
 
-	return """(
-		`tabOvertime Application`.owner = '{user}'
-		or
-		exists(select 1
-				from `tabEmployee`
-				where `tabEmployee`.name = `tabOvertime Application`.employee
-				and `tabEmployee`.user_id = '{user}')
-		or
-		(`tabOvertime Application`.approver = '{user}' and `tabOvertime Application`.workflow_state not in ('Draft','Approved','Rejected','Cancelled'))
-	)""".format(user=user)
+    if user == "Administrator":
+        return
+    if any(role in user_roles for role in ["HR User", "HR Manager"]):
+        return """(
+            `tabOvertime Application`.workflow_state IN 
+            ('Waiting For Approval', 'Approved', 'Rejected', 'Cancelled')
+        )"""
+    return f"""
+    `tabOvertime Application`.employee IN (
+        SELECT name FROM `tabEmployee` WHERE user_id = '{user}'
+    )
+    """
