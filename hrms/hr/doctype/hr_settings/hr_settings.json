@@ -104,7 +104,11 @@
   "employee_advance_section",
   "employee_advance_approval_notification_template",
   "column_break_citu",
-  "employee_advance_status_notification_template"
+  "employee_advance_status_notification_template",
+  "overtime_application_section",
+  "overtime_approval_notification_template",
+  "column_break_yjxz",
+  "overtime_status_notification_template"
  ],
  "fields": [
   {
@@ -633,6 +637,7 @@
    "options": "Employee"
   },
   {
+   "collapsible": 1,
    "fieldname": "leave_encashment_settings_section",
    "fieldtype": "Section Break",
    "label": "Leave Encashment Settings"
@@ -654,6 +659,7 @@
    "options": "Email Template"
   },
   {
+   "collapsible": 1,
    "fieldname": "employee_advance_section",
    "fieldtype": "Section Break",
    "label": "Employee Advance"
@@ -673,13 +679,35 @@
    "fieldtype": "Link",
    "label": "Employee Advance Status Notification Template",
    "options": "Email Template"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "overtime_application_section",
+   "fieldtype": "Section Break",
+   "label": "Overtime Application"
+  },
+  {
+   "fieldname": "overtime_status_notification_template",
+   "fieldtype": "Link",
+   "label": "Overtime Status Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "overtime_approval_notification_template",
+   "fieldtype": "Link",
+   "label": "Overtime Approval Notification Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "column_break_yjxz",
+   "fieldtype": "Column Break"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-01-01 15:13:03.987692",
+ "modified": "2026-02-19 14:58:44.865773",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",
