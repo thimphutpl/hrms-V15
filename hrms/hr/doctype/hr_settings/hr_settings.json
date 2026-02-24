@@ -88,6 +88,10 @@
   "planning_monitoring_name",
   "section_break_hafd",
   "clearance_approvers",
+  "sws_approver_section",
+  "sws_application_approver",
+  "column_break_rfrb",
+  "sws_application_approver_name",
   "notification_setting_tab",
   "enote_section",
   "enote_approval_notification",
@@ -703,14 +707,36 @@
    "fieldtype": "Link",
    "label": "Overtime Application Status Notification Template",
    "options": "Email Template"
+  },
+  {
+   "fieldname": "sws_approver_section",
+   "fieldtype": "Section Break",
+   "label": "SWS Approver"
+  },
+  {
+   "fieldname": "sws_application_approver",
+   "fieldtype": "Link",
+   "label": "SWS Application Approver",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "column_break_rfrb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "sws_application_approver.employee_name",
+   "fieldname": "sws_application_approver_name",
+   "fieldtype": "Data",
+   "label": "SWS Application Approver Name",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-02-11 09:47:19.141320",
- "modified_by": "sonam.zangmo@thimphutechpark.bt",
+ "modified": "2026-02-24 21:00:52.454310",
+ "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",
  "owner": "Administrator",
