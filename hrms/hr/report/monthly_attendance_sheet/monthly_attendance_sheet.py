@@ -125,7 +125,9 @@ def get_columns(filters: Filters) -> list[dict]:
 			]
 		)
 	else:
-		columns.append({"label": _("Shift"), "fieldname": "shift", "fieldtype": "Data", "width": 120})
+		columns.append({"label": _("Shift"), 
+		"fieldname": "shift", 
+		"fieldtype": "Data", "width": 120})
 		columns.extend(get_columns_for_days(filters))
 
 	return columns
@@ -310,42 +312,31 @@ def get_rows(employee_details: dict, filters: Filters, holiday_map: dict, attend
         emp_holiday_list = details.holiday_list or default_holiday_list
         holidays = holiday_map.get(emp_holiday_list)
 
-        row = {
-            "employee": employee,
-            "employee_name": details.employee_name,
-        }
-
         employee_attendance = attendance_map.get(employee, {})
 
-        for day in range(1, total_days + 1):
-            status = None
+        # loop over each shift for detailed view
+        for shift, status_dict in employee_attendance.items():
+            row = {
+                "employee": employee,
+                "employee_name": details.employee_name,
+                "shift": shift
+            }
 
-            # 1️⃣ Attendance (any shift)
-            for shift, status_dict in employee_attendance.items():
-                if day in status_dict:
-                    status = status_dict.get(day)
-                    break
+            for day in range(1, total_days + 1):
+                status = status_dict.get(day)
 
-            # 2️⃣ Holiday / Weekly Off
-            holiday_status = get_holiday_status(day, holidays)
+                # if no attendance → check holiday/weekly off
+                if status is None:
+                    status = get_holiday_status(day, holidays)
 
-            # 3️⃣ Tour overrides everything
-            if status == "Tour":
-                final_status = "Tour"
+                # Tour overrides everything
+                final_status = "Tour" if status == "Tour" else status
 
-            # 4️⃣ If no attendance → holiday applies
-            elif status is None:
-                final_status = holiday_status
+                row[str(day)] = status_map.get(final_status, "") if final_status else ""
 
-            else:
-                final_status = status
-
-            row[str(day)] = status_map.get(final_status, "") if final_status else ""
-
-        records.append(row)
+            records.append(row)
 
     return records
-
 
 
 
@@ -437,6 +428,7 @@ def get_attendance_status_for_detailed_view(
 
 	for shift, status_dict in employee_attendance.items():
 		row = {"shift": shift}
+		frappe.msgprint(f"Processing attendance for Employee: {employee}, Shift: {shift}", alert=True, indicator="blue")
 
 		for day in range(1, total_days + 1):
 			status = status_dict.get(day)
