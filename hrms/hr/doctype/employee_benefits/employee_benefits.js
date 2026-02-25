@@ -118,7 +118,7 @@ frappe.ui.form.on("Separation Item", {
 				}
 			});
 		}
-		else if(item.benefit_type == "TADA-Incountry"){
+		else if(item.benefit_type == "TADA"){
 			return frappe.call({
 				method: "hrms.hr.doctype.employee_benefits.employee_benefits.get_tada_amount",
 				args: {"employee": frm.doc.employee},

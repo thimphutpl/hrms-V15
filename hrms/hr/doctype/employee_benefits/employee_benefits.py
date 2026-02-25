@@ -287,7 +287,7 @@ def get_tada_amount(employee):
     # Query to fetch dsa_per_day for the given employee
     query = """
         SELECT 
-            eg.dsa_per_day 
+            eg.dsa 
         FROM 
             `tabEmployee` e 
         INNER JOIN 
@@ -302,7 +302,7 @@ def get_tada_amount(employee):
         frappe.throw("DSA per day is not assigned to the employee.")
     else:         
         for a in data:
-            dsa_per_day = float(a.get("dsa_per_day", 0))  # Convert to float
+            dsa_per_day = float(a.get("dsa", 0))  # Convert to float
             amount += dsa_per_day
 
     return amount
