@@ -41,9 +41,9 @@
   "payable_amount",
   "expense_claim",
   "sb_approver",
+  "approver",
   "approver_name",
   "column_break_15",
-  "approver",
   "approver_designation",
   "sb_remarks",
   "remarks",
@@ -283,8 +283,7 @@
   {
    "fieldname": "approver_name",
    "fieldtype": "Data",
-   "label": "Approver Name",
-   "read_only": 1
+   "label": "Approver Name"
   },
   {
    "fieldname": "approver_designation",
@@ -372,7 +371,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-02-13 16:19:07.005489",
+ "modified": "2026-02-26 11:32:53.451028",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Encashment",
