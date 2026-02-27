@@ -98,7 +98,8 @@ class PayrollEntry(Document):
 			)
 
 	def on_cancel(self):
-		self.ignore_linked_doctypes = ("GL Entry", "Salary Slip", "Journal Entry")
+		
+		self.ignore_linked_doctypes = ("GL Entry", "Salary Slip", "Journal Entry","Payment Ledger Entry")
 
 		self.delete_linked_salary_slips()
 		self.cancel_linked_journal_entries()
@@ -110,6 +111,8 @@ class PayrollEntry(Document):
 		self.db_set("error_message", "")
 
 	def cancel(self):
+		#frappe.throw("hjjj")
+		#self.ignore_linked_doctypes = ("GL Entry", "Salary Slip", "Journal Entry")
 		if len(self.get_linked_salary_slips()) > 50:
 			msg = _("Payroll Entry cancellation is queued. It may take a few minutes")
 			msg += "<br>"
