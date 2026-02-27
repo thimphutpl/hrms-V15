@@ -54,18 +54,18 @@ frappe.ui.form.on('Employee Benefits', {
 frappe.ui.form.on("Separation Item", {
 	form_render: function (frm, cdt, cdn) {
 		var item = locals[cdt][cdn];
-		var terrain_rate = frappe.meta.get_docfield("Separation Item", "terrain_rate", frm.doc.name);
-		var distance = frappe.meta.get_docfield("Separation Item", "distance", frm.doc.name);
-		var load_capacity = frappe.meta.get_docfield("Separation Item", "load_capacity", frm.doc.name);
+		// var terrain_rate = frappe.meta.get_docfield("Separation Item", "terrain_rate", frm.doc.name);
+		// var distance = frappe.meta.get_docfield("Separation Item", "distance", frm.doc.name);
+		// var load_capacity = frappe.meta.get_docfield("Separation Item", "load_capacity", frm.doc.name);
 	},
     "benefit_type": function(frm, cdt, cdn) {
 		
 		var row = locals[cdt][cdn];
 		frappe.model.set_value(cdt, cdn, "amount", null);
 		frappe.model.set_value(cdt, cdn, "earned_leave_balance", null);
-		frappe.model.set_value(cdt, cdn, "distance", null);
-		frappe.model.set_value(cdt, cdn, "terrain_rate", null);
-		frappe.model.set_value(cdt, cdn, "load_capacity", null);
+		// frappe.model.set_value(cdt, cdn, "distance", null);
+		// frappe.model.set_value(cdt, cdn, "terrain_rate", null);
+		// frappe.model.set_value(cdt, cdn, "load_capacity", null);
 		if(frm.doc.purpose != "Separation" && frm.doc.purpose != "Upgradation"){
 				
 			if(row.benefit_type == "Leave encashment"){
@@ -83,11 +83,11 @@ frappe.ui.form.on("Separation Item", {
 				frappe.throw("Gratuity cannot be claimed for Transfer.")
 			}
 		}
-		if(row.benefit_type != "Carriage Charges"){
-			frappe.model.set_value(cdt, cdn, "distance", null);
-			frappe.model.set_value(cdt, cdn, "terrain_rate", null);
-			frappe.model.set_value(cdt, cdn, "load_capacity", null);
-		}
+		// if(row.benefit_type != "Carriage Charges"){
+		// 	frappe.model.set_value(cdt, cdn, "distance", null);
+		// 	frappe.model.set_value(cdt, cdn, "terrain_rate", null);
+		// 	frappe.model.set_value(cdt, cdn, "load_capacity", null);
+		// }
 		else if(row.benefit_type != "Leave Encashment"){
 			frappe.model.set_value(cdt, cdn, "earned_leave_balance", null);
 		}
@@ -176,60 +176,60 @@ frappe.ui.form.on("Separation Item", {
 			}
 
 		}
-		else if(item.benefit_type == "Carriage Charges"){
-			if(item.terrain_rate && item.distance != 0 && item.load_capacity){
-				frappe.model.set_value(cdt, cdn, "amount",flt(item.terrain_rate)*flt(item.distance)*flt(item.load_capacity))
-			}
-		}
+		// else if(item.benefit_type == "Carriage Charges"){
+		// 	if(item.terrain_rate && item.distance != 0 && item.load_capacity){
+		// 		frappe.model.set_value(cdt, cdn, "amount",flt(item.terrain_rate)*flt(item.distance)*flt(item.load_capacity))
+		// 	}
+		// }
 	},
 
-	"distance": function(frm, cdt, cdn){
-		var item = locals[cdt][cdn];
-		if(item.benefit_type == "Carriage Charges"){
-			if(item.terrain_rate && item.distance != 0 && item.load_capacity){
-				frappe.model.set_value(cdt, cdn, "amount",flt(item.terrain_rate)*flt(item.distance)*flt(item.load_capacity))
-			}
-		}
-		else{
-			frappe.model.set_value(cdt, cdn, "distance", null);
-			frappe.model.set_value(cdt, cdn, "terrain_rate", null);
-			frappe.model.set_value(cdt, cdn, "load_capacity", null);
-		}
-	},
+	// "distance": function(frm, cdt, cdn){
+	// 	var item = locals[cdt][cdn];
+	// 	if(item.benefit_type == "Carriage Charges"){
+	// 		if(item.terrain_rate && item.distance != 0 && item.load_capacity){
+	// 			frappe.model.set_value(cdt, cdn, "amount",flt(item.terrain_rate)*flt(item.distance)*flt(item.load_capacity))
+	// 		}
+	// 	}
+	// 	else{
+	// 		frappe.model.set_value(cdt, cdn, "distance", null);
+	// 		frappe.model.set_value(cdt, cdn, "terrain_rate", null);
+	// 		frappe.model.set_value(cdt, cdn, "load_capacity", null);
+	// 	}
+	// },
 
-	"terrain_rate": function(frm, cdt, cdn){
-		var item = locals[cdt][cdn];
-		if(item.benefit_type == "Carriage Charges"){
-			if(item.terrain_rate && item.distance != 0 && item.load_capacity){
-				frappe.model.set_value(cdt, cdn, "amount",flt(item.terrain_rate)*flt(item.distance)*flt(item.load_capacity))
-			}
-			// else{
-			// 	frappe.throw("For calculation of carriage charges Terrain Rate, Distance and Load Capacity are mandatory")
-			// }
-		}
-		else{
-			frappe.model.set_value(cdt, cdn, "distance", null);
-			frappe.model.set_value(cdt, cdn, "terrain_rate", null);
-			frappe.model.set_value(cdt, cdn, "load_capacity", null);
-		}
-	},
+	// "terrain_rate": function(frm, cdt, cdn){
+	// 	var item = locals[cdt][cdn];
+	// 	if(item.benefit_type == "Carriage Charges"){
+	// 		if(item.terrain_rate && item.distance != 0 && item.load_capacity){
+	// 			frappe.model.set_value(cdt, cdn, "amount",flt(item.terrain_rate)*flt(item.distance)*flt(item.load_capacity))
+	// 		}
+	// 		// else{
+	// 		// 	frappe.throw("For calculation of carriage charges Terrain Rate, Distance and Load Capacity are mandatory")
+	// 		// }
+	// 	}
+	// 	else{
+	// 		frappe.model.set_value(cdt, cdn, "distance", null);
+	// 		frappe.model.set_value(cdt, cdn, "terrain_rate", null);
+	// 		frappe.model.set_value(cdt, cdn, "load_capacity", null);
+	// 	}
+	// },
 
-	"load_capacity": function(frm, cdt, cdn){
-		var item = locals[cdt][cdn];
-		if(item.benefit_type == "Carriage Charges"){
-			if(item.terrain_rate && item.distance != 0 && item.load_capacity){
-				frappe.model.set_value(cdt, cdn, "amount",flt(item.terrain_rate)*flt(item.distance)*flt(item.load_capacity))
-			}
-			// else{
-			// 	frappe.throw("For calculation of carriage charges Terrain Rate, Distance and Load Capacity are mandatory")
-			// }
-		}
-		else{
-			frappe.model.set_value(cdt, cdn, "distance", null);
-			frappe.model.set_value(cdt, cdn, "terrain_rate", null);
-			frappe.model.set_value(cdt, cdn, "load_capacity", null);
-		}
-	},
+	// "load_capacity": function(frm, cdt, cdn){
+	// 	var item = locals[cdt][cdn];
+	// 	if(item.benefit_type == "Carriage Charges"){
+	// 		if(item.terrain_rate && item.distance != 0 && item.load_capacity){
+	// 			frappe.model.set_value(cdt, cdn, "amount",flt(item.terrain_rate)*flt(item.distance)*flt(item.load_capacity))
+	// 		}
+	// 		// else{
+	// 		// 	frappe.throw("For calculation of carriage charges Terrain Rate, Distance and Load Capacity are mandatory")
+	// 		// }
+	// 	}
+	// 	else{
+	// 		frappe.model.set_value(cdt, cdn, "distance", null);
+	// 		frappe.model.set_value(cdt, cdn, "terrain_rate", null);
+	// 		frappe.model.set_value(cdt, cdn, "load_capacity", null);
+	// 	}
+	// },
 
 	// "amount": function(frm, cdt, cdn) {
 	// 	set_tax_amount(frm, cdt, cdn);
