@@ -86,17 +86,15 @@ class EmployeeBenefits(Document):
 				if self.purpose != "Separation" and self.purpose != "Upgradation":
 					frappe.throw("Leave Encashment cannot be claimed for {}".format(self.purpose))
 
+			
+
 			if a.benefit_type != "Carriage Charges":
+			
 				a.distance = None
 				a.terrain_rate = None
 				a.load_capacity = None
-			else:
-				if not a.distance:
-					frappe.throw(_("Row#{}: <b>Distance</b> for <b>Carriage Charges</b> cannot be 0").format(a.idx))
-				if not a.terrain_rate:
-					frappe.throw(_("Row#{}: <b>Terrain Rate</b> for <b>Carriage Charges</b> cannot be blank").format(a.idx))
-				if not a.load_capacity:
-					frappe.throw(_("Row#{}: <b>Load Capacity</b> for <b>Carriage Charges</b> cannot be blank").format(a.idx))
+			
+			
 
 	def update_reference(self):
 		if self.employee_separation_id:
@@ -153,8 +151,9 @@ class EmployeeBenefits(Document):
 		je.voucher_type = "Bank Entry"		
 		je.naming_series = "Journal Voucher"
 		je.remark = f"Benefit payment for {self.employee_name} ({self.employee})"		
+		#frappe.throw(str(self.company))
 		# Get Accounts
-		expense_bank_account = "Bank Account TESTING - BTF"
+		expense_bank_account = frappe.db.get_value("Company", self.company, "default_bank_account")
 		tax_account = frappe.db.get_single_value("HR Accounts Settings", "salary_tax_account")
 		payable_account = frappe.db.get_value("Company", self.company, "default_payroll_payable_account")
 		total_amount = 0
