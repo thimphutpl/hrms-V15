@@ -141,6 +141,7 @@ permission_query_conditions = {
     "Employee Benfits":"hrms.hr.doctype.employee_benfits.employee_benfits.get_permission_query_conditions",
     "Employee Separation":"hrms.hr.doctype.employee_separation.employee_separation.get_permission_query_conditions",
     "Employee Advance":"hrms.hr.doctype.employee_advance.employee_advance.get_permission_query_conditions",
+    "Overtime Application":"hrms.hr.doctype.overtime_application.overtime_application.get_permission_query_conditions",
 }
 #
 # has_permission = {
@@ -235,8 +236,7 @@ scheduler_events = {
         "* * * * *": [
             "hrms.hr.doctype.shift_type.shift_type.update_last_sync_of_checkin",
             "hrms.hr.doctype.shift_type.shift_type.process_auto_attendance_for_all_shifts",
-            "hrms.hr.doctype.shift_assignment_schedule.shift_assignment_schedule.process_auto_shift_creation" 
-            "hrms.hr.doctype.employee_attendance.employee_attendance.auto_attendance_for_all_shifts"
+            "hrms.hr.doctype.shift_assignment_schedule.shift_assignment_schedule.process_auto_shift_creation"
         ]
     },
     "all": [
@@ -256,6 +256,8 @@ scheduler_events = {
         # "hrms.hr.doctype.daily_work_summary_group.daily_work_summary_group.send_summary",
         # "hrms.hr.doctype.interview.interview.send_daily_feedback_reminder",
         "hrms.hr.doctype.job_opening.job_opening.close_expired_job_openings",
+        "hrms.hr.doctype.employee_attendance.employee_attendance.auto_mark_absent"
+     
     ],
     "daily_long": [
         "hrms.hr.doctype.leave_ledger_entry.leave_ledger_entry.process_expired_allocation",

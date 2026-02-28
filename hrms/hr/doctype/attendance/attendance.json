@@ -34,7 +34,9 @@
   "late_reason",
   "early_exit",
   "early_exit_reason",
-  "amended_from"
+  "amended_from",
+  "section_break_jqsx",
+  "remark"
  ],
  "fields": [
   {
@@ -252,13 +254,23 @@
    "fieldtype": "Data",
    "label": "Early Exit Hours",
    "read_only": 1
+  },
+  {
+   "fieldname": "section_break_jqsx",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "remark",
+   "fieldtype": "Small Text",
+   "label": "Remark",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-ok",
  "idx": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-28 18:08:47.629795",
+ "modified": "2026-02-27 17:15:43.405295",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Attendance",

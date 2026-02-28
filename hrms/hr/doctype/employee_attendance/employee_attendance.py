@@ -3,8 +3,8 @@
 
 import frappe
 from frappe.model.document import Document
-from frappe.utils import get_datetime, getdate, today
-from datetime import datetime, timedelta
+from frappe.utils import get_datetime, getdate, today, nowdate
+from datetime import datetime, timedelta,time
 from frappe import _
 from hrms.hr.utils import (
 	get_distance_between_coordinates,
@@ -252,4 +252,105 @@ class EmployeeAttendance(Document):
 def schedule_auto_attendance(doc, method):
 	if doc.log_type == "OUT":
 		doc.create_attendance_from_checkins()
-	  
+
+
+def auto_mark_absent():
+    today = getdate(nowdate())
+    weekday_name = today.strftime("%A")  # "Monday", "Tuesday", etc.
+
+    # Get all active employees
+    employees = frappe.get_all(
+        "Employee",
+        filters={"status": "Active"},
+        fields=["name", "company", "attendance_branch"]
+    )
+
+    for emp in employees:
+
+        if not emp.attendance_branch:
+            continue
+
+        # Get all active shifts for this employee's branch
+        shifts = frappe.get_all(
+            "Attendance Shift",
+            filters={
+                "attendance_branch": emp.attendance_branch,
+                "is_active": 1,
+            },
+            fields=["name"]
+        )
+
+        shift_for_today = None
+        for s in shifts:
+            doc = frappe.get_doc("Attendance Shift", s.name)
+
+            # Check valid_from / valid_to
+            if doc.valid_from and today < doc.valid_from:
+                continue
+            if doc.valid_to and today > doc.valid_to:
+                continue
+
+            # Check if today is a working day
+            working_days = [d.day for d in doc.week]  # list of strings like ["Monday", "Tuesday"]
+            if weekday_name not in working_days:
+                continue
+
+            # Check holiday
+            if doc.holiday_list and frappe.db.exists("Holiday", {
+                "parent": doc.holiday_list,
+                "holiday_date": today
+            }):
+                continue
+
+            # Found the shift that applies today
+            shift_for_today = doc
+            break
+
+        if not shift_for_today:
+            frappe.log_error(f"No shift applies today for branch {emp.attendance_branch}", "Auto Mark Absent")
+            continue
+
+        shift = shift_for_today
+
+        # Skip if attendance already exists
+        if frappe.db.exists("Attendance", {
+            "employee": emp.name,
+            "attendance_date": today
+        }):
+            continue
+
+        # Skip if approved leave exists
+        if frappe.db.exists("Leave Application", {
+            "employee": emp.name,
+            "from_date": ["<=", today],
+            "to_date": [">=", today],
+            "status": "Approved"
+        }):
+            continue
+
+        # Skip if Employee Checkin logs exist today
+        start = datetime.combine(today, time.min)
+        end = datetime.combine(today, time.max)
+
+        has_log = frappe.db.exists("Employee Attendance", {
+            "employee": emp.name,
+            "time": ["between", [start, end]]
+        })
+
+        if has_log:
+            continue
+
+        # Create Absent Attendance
+        attendance = frappe.get_doc({
+            "doctype": "Attendance",
+            "employee": emp.name,
+            "attendance_date": today,
+            "status": "Absent",
+            "company": emp.company,
+            "shift": shift.name,
+            "remark": "Marked Absent due to missing check-in and check-out."
+        })
+        attendance.insert(ignore_permissions=True)
+        attendance.submit()
+
+    frappe.db.commit()
