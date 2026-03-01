@@ -27,7 +27,10 @@ class LeaveEncashment(Document):
 		self.check_duplicate_entry()
 		if not self.encashment_date:
 		 	self.encashment_date = getdate(nowdate())
-		if self.workflow_state != "Approved":
+		
+		# Notify only if workflow_state changed
+		before = self.get_doc_before_save()
+		if before and before.workflow_state != self.workflow_state:
 			notify_workflow_states(self)
 
 	def before_submit(self):
