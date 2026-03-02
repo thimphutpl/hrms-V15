@@ -73,7 +73,7 @@ class TravelClaim(Document):
 			#frappe.msgprint(str(d.mileage_rate))
 			# Recalculate DSA amount based on percentage
 			self.calculate_dsa_amount(d)
-			d.amount=d.amount+d.mileage_amount
+			d.amount=flt(d.amount)+flt(d.mileage_amount)
 			total += flt(d.amount)
 		self.total_amount = flt(total)
 
@@ -93,8 +93,8 @@ class TravelClaim(Document):
 
 		if not base_dsa:
 			frappe.throw(
-		        "Daily Subsistence Allowance (DSA) is not set for Employee Grade: {}. Please update it.".format(
-		            frappe.get_desk_link("Employee Grade", employee_grade)
+				"Daily Subsistence Allowance (DSA) is not set for Employee Grade: {}. Please update it.".format(
+					frappe.get_desk_link("Employee Grade", employee_grade)
 				),
 				title="Missing DSA Configuration",
 		)
@@ -316,3 +316,42 @@ def get_travel_claim(dt, dn):
 
 	return tc.as_dict()
 
+
+@frappe.whitelist()
+def get_travel_detail(employee, start_date, end_date, travel_type, purpose_of_travel):
+	if employee and start_date and end_date and travel_type and purpose_of_travel:
+		dsa = frappe.db.get_value("Employee Grade", frappe.db.get_value("Employee", employee, "grade"), "dsa")
+		if not dsa:
+			frappe.throw(
+				"Daily Subsistence Allowance (DSA) is not set for Employee Grade: {}. Please update it.".format(
+					frappe.get_desk_link("Employee Grade", employee_grade)
+				),
+				title="Missing DSA Configuration"
+			)
+
+		data=[]
+		query1 = "select name, currency, advance_amount from `tabTravel Authorization`  \
+			where posting_date between \'"+ str(start_date) +"\' and \'"+ str(end_date) +"\' \
+			and employee = \'"+ str(employee) + "\' and travel_type = \'"+ str(travel_type) + "\' \
+			and purpose_of_travel = \'"+ str(purpose_of_travel) + "\' and docstatus = 1 and \
+			name not in(select travel_authorization from `tabTravel Claim` where posting_date between \'"+ str(start_date) +"\' and \'"+ str(end_date) +"\' \
+			and employee = \'"+ str(employee) + "\' and travel_type = \'"+ str(travel_type) + "\' \
+			and purpose_of_travel = \'"+ str(purpose_of_travel) + "\')"
+
+		for b in frappe.db.sql(query1, as_dict=True):
+			for a in frappe.db.sql("select halt, travel_from, travel_to, from_date, to_date, \
+				halt_at, return_today, country from `tabTravel Authorization Item` i \
+				where i.parent = %s order by `from_date`",b.name, as_dict=True):
+				if b.currency == "BTN":
+					exchange_rate = 1
+				else:
+					exchange_rate = frappe.db.get_value("Currency Exchange", {"from_currency": b.currency, "to_currency": "BTN"}, "exchange_rate")
+				no_of_days = date_diff(a.to_date, a.from_date) + 1
+				data.append({"name":b.name, "halt":a.halt, "travel_from":a.travel_from, "travel_to":a.travel_to, "from_date":a.from_date, "return_today":a.return_today, "to_date":a.to_date, "halt_at":a.halt_at, "dsa":dsa, "currency":b.currency, "exchange_rate":exchange_rate, "dsa_percent":100, "last_day":0, "advance_amount":0, "country":a.country, "no_of_days": no_of_days})
+					
+			data[len(data)-1]['last_day'] = 1
+			dsa_percent = frappe.db.get_single_value("HR Settings", "return_day_dsa")
+			data[len(data)-1]['dsa_percent'] = dsa_percent
+			data[len(data)-1]['advance_amount'] = b.advance_amount
+			
+		return data

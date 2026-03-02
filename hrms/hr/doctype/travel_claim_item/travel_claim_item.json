@@ -29,7 +29,9 @@
   "column_break_djke",
   "amount",
   "section_break_ppaq",
-  "country"
+  "country",
+  "column_break_ufzk",
+  "travel_authorization"
  ],
  "fields": [
   {
@@ -136,6 +138,7 @@
   },
   {
    "collapsible": 1,
+   "depends_on": "eval:parent.mode_of_travel=='Personal Car' && doc.halt==0",
    "fieldname": "mileage_details_section",
    "fieldtype": "Section Break",
    "label": "Mileage Details"
@@ -175,17 +178,29 @@
    "label": "Country",
    "options": "Country",
    "read_only": 1
+  },
+  {
+   "fieldname": "column_break_ufzk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "travel_authorization",
+   "fieldtype": "Link",
+   "label": "Travel Authorization",
+   "options": "Travel Authorization",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-03-04 16:24:44.768528",
+ "modified": "2026-02-27 09:52:26.985642",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim Item",
  "owner": "Administrator",
  "permissions": [],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []
