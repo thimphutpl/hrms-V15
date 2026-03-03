@@ -254,7 +254,7 @@ class EmployeeBenefits(Document):
 			doc.parenttype = "Employee"
 			doc.s_b_type = a.benefit_type
 			doc.s_b_currency = a.amount
-			doc.save()
+			doc.save(ignore_permissions=True)
 
 	def on_cancel(self):
 		self.check_journal()
