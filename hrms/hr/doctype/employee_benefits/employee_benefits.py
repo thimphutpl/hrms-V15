@@ -98,9 +98,9 @@ class EmployeeBenefits(Document):
 
 	def update_reference(self):
 		if self.employee_separation_id:
-			frappe.db.set_value("Employee Separation", self.employee_separation_id, "employee_benefits_status", "Claimed")
+			frappe.db.set_value("Employee Separation", self.employee_separation_id, "employee_benefit_claim_status", "Claimed")
 		elif self.employee_transfer_id:
-			frappe.db.set_value("Employee Transfer", self.employee_transfer_id, "employee_benefits_status", "Claimed")
+			frappe.db.set_value("Employee Transfer", self.employee_transfer_id, "employee_benefit_claim_status", "Claimed")
 
 	def validate_gratuity(self):
 		# self.total_amount = 0
