@@ -129,10 +129,12 @@ def make_travel_adjustment(source_name, target_doc=None):
             "Travel Authorization Item": {
                 "doctype": "Travel Adjustment Item",
                 "field_map": {
+                    "mode_of_travel": "mode_of_travel",
                     "from_date": "from_date",
                     "travel_from": "travel_from",
                     "to_date": "to_date",
                     "travel_to": "travel_to",
+                    "country": "country",
                 },
             },
         },
