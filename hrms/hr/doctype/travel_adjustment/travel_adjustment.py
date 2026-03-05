@@ -98,6 +98,8 @@ class TravelAdjustment(Document):
                 "travel_from": item.travel_from,
                 "travel_to": item.travel_to,
                 "is_last_day": item.is_last_day,
+                "mode_of_travel": item.mode_of_travel,
+                "counttry": item.counttry,
             }).insert(ignore_permissions=True)
 
 
