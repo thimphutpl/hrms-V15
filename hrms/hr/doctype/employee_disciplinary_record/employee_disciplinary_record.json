@@ -17,8 +17,8 @@
   "from_date",
   "to_date",
   "salary_increment",
-  "dont_allow_promotion",
-  "dont_allocate_earned_leave",
+  "promotion_cycle",
+  "earned_leave",
   "not_guilty_or_acquitted",
   "attachment",
   "increment_month",
@@ -96,19 +96,6 @@
   },
   {
    "default": "0",
-   "fieldname": "dont_allow_promotion",
-   "fieldtype": "Check",
-   "label": "Don't Allow Promotion"
-  },
-  {
-   "default": "0",
-   "fieldname": "dont_allocate_earned_leave",
-   "fieldtype": "Check",
-   "label": "Don't Allocate Earned Leave",
-   "options": "earned_leave"
-  },
-  {
-   "default": "0",
    "fieldname": "not_guilty_or_acquitted",
    "fieldtype": "Check",
    "label": "Not Guilty or Acquitted",
@@ -122,12 +109,16 @@
   {
    "fieldname": "increment_month",
    "fieldtype": "Data",
-   "label": "Increment Month"
+   "hidden": 1,
+   "label": "Increment Month",
+   "read_only": 1
   },
   {
    "fieldname": "promotion_month",
    "fieldtype": "Data",
-   "label": "Promotion Month"
+   "hidden": 1,
+   "label": "Promotion Month",
+   "read_only": 1
   },
   {
    "fieldname": "amended_from",
@@ -159,13 +150,26 @@
    "fieldname": "remarks",
    "fieldtype": "Small Text",
    "label": "Remarks"
+  },
+  {
+   "default": "0",
+   "fieldname": "promotion_cycle",
+   "fieldtype": "Check",
+   "label": "Don't Allow Promotion"
+  },
+  {
+   "default": "0",
+   "fieldname": "earned_leave",
+   "fieldtype": "Check",
+   "label": "Don't Allocate Earned Leave",
+   "options": "earned_leave"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-12 13:40:11.954607",
+ "modified": "2026-03-09 17:42:36.516777",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Disciplinary Record",
