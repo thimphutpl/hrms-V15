@@ -33,7 +33,6 @@
   "eligible_for_corporate_allowance",
   "ca_method",
   "ca",
-  "eligible_for_contract_allowance",
   "contract_allowance_method",
   "contract_allowance",
   "eligible_for_communication_allowance",
@@ -51,8 +50,6 @@
   "eligible_for_underground_allowance",
   "eligible_for_underground_allowance_payment_method",
   "valueunderground_allowance",
-  "eligible_for_hra",
-  "eligible_for_lumpsum_revision",
   "cb_10",
   "eligible_for_difficulty",
   "difficulty_method",
@@ -75,7 +72,6 @@
   "eligible_for_housing_allowance",
   "eligible_for_housing_allowance_payment_method",
   "valuehousing_allowance",
-  "eligible_for_vegetable_allowance",
   "cb_12",
   "eligible_for_officiating_allowance",
   "officiating_allowance_method",
@@ -96,21 +92,53 @@
   "eligible_for_fixed_allowance",
   "fixed_allowance_method",
   "fixed_allowance",
-  "eligible_for_afsa",
+  "section_break_oaxi",
+  "eligible_for_king_allowance",
+  "eligible_for_personal_pay",
+  "eligible_for_border_allowance",
+  "eligible_for_batman_allowance",
+  "eligible_for_high_altitude_allowance",
+  "eligible_for_hra",
+  "eligible_for_lumpsum_revision",
+  "column_break_obuh",
+  "eligible_for_trade_allowance",
+  "eligible_for_city_allowance",
+  "eligible_for_medal_allowance",
+  "eligible_for_cdo_allowance",
+  "eligible_for_attendant_allowance",
+  "eligible_for_vegetable_allowance",
   "eligible_for_orderly_allowance",
+  "column_break_fxgi",
+  "eligible_for_professional_dr",
+  "eligible_for_other_allowance",
+  "eligible_for_kma",
+  "eligible_for_entertainment_allowance",
+  "eligible_for_afsa",
+  "eligible_for_contract_allowance",
   "sb_other_benefits",
   "eligible_for_gis",
   "eligible_for_pf",
   "eligible_for_health_contribution",
   "eligible_for_tax",
+  "eligible_for_tv",
   "cb_16",
   "eligible_for_leave_encashment",
   "eligible_for_overtime_and_payment",
   "eligible_for_sws",
+  "eligible_for_relief_fund",
+  "eligible_for_child_alimony",
   "cb_17",
-  "eligible_for_ltc",
+  "eligible_for_tshechu",
+  "eligible_for_semso",
+  "eligible_for_spouse_semso",
+  "eligible_for_kanjur",
+  "eligible_for_medical",
+  "section_break_rovx",
   "eligible_for_pbva",
+  "column_break_opmp",
   "eligible_for_annual_bonus",
+  "column_break_ifnv",
+  "eligible_for_ltc",
   "earning_deduction",
   "earnings",
   "cb_18",
@@ -291,7 +319,6 @@
    "default": "0",
    "fieldname": "eligible_for_contract_allowance",
    "fieldtype": "Check",
-   "hidden": 1,
    "label": "Eligible for Contract allowance"
   },
   {
@@ -645,6 +672,7 @@
    "default": "1",
    "fieldname": "eligible_for_pbva",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Eligible for PBVA",
    "print_hide": 1
   },
@@ -659,6 +687,7 @@
    "default": "1",
    "fieldname": "eligible_for_ltc",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Eligible for LTC",
    "print_hide": 1
   },
@@ -666,6 +695,7 @@
    "default": "0",
    "fieldname": "eligible_for_overtime_and_payment",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Eligible for Overtime and Payment",
    "print_hide": 1
   },
@@ -694,6 +724,7 @@
    "default": "1",
    "fieldname": "eligible_for_annual_bonus",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Eligible for Annual Bonus",
    "print_hide": 1
   },
@@ -800,7 +831,8 @@
   },
   {
    "fieldname": "sb_eligibility",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "hidden": 1
   },
   {
    "fieldname": "cb_3",
@@ -831,6 +863,7 @@
    "default": "1",
    "fieldname": "eligible_for_sws",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Eligible for SWS",
    "print_hide": 1
   },
@@ -971,12 +1004,170 @@
    "fieldname": "eligible_for_orderly_allowance",
    "fieldtype": "Check",
    "label": "Eligible for Orderly Allowance"
+  },
+  {
+   "fieldname": "section_break_oaxi",
+   "fieldtype": "Section Break",
+   "label": "Allowances"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_king_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for King Allowance"
+  },
+  {
+   "fieldname": "column_break_obuh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_trade_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Trade Allowance"
+  },
+  {
+   "fieldname": "column_break_fxgi",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_professional_dr",
+   "fieldtype": "Check",
+   "label": "Eligible for Professional for (DR)"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_personal_pay",
+   "fieldtype": "Check",
+   "label": "Eligible for Personal Pay"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_border_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Border Allowance"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_batman_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Batman Allowance"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_city_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for City Allowance"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_medal_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Medal Allowance"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_other_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Other Allowance"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_kma",
+   "fieldtype": "Check",
+   "label": "Eligible for KMA"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_cdo_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for CDO Allowance"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_entertainment_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Entertainment Allowance"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_high_altitude_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for High Altitude Allowance"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_attendant_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Attendant Allowance"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_tshechu",
+   "fieldtype": "Check",
+   "label": "Eligible for Tshechu"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_semso",
+   "fieldtype": "Check",
+   "label": "Eligible for Semso"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_spouse_semso",
+   "fieldtype": "Check",
+   "label": "Eligible for Spouse Semso"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_kanjur",
+   "fieldtype": "Check",
+   "label": "Eligible for Kanjur"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_tv",
+   "fieldtype": "Check",
+   "label": "Eligible for TV"
+  },
+  {
+   "fieldname": "section_break_rovx",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "column_break_opmp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_ifnv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_child_alimony",
+   "fieldtype": "Check",
+   "label": "Eligible for Child Alimony"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_relief_fund",
+   "fieldtype": "Check",
+   "label": "Eligible for Relief Fund"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_medical",
+   "fieldtype": "Check",
+   "label": "Eligible for Medical"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2025-06-26 14:12:16.874606",
+ "modified": "2025-11-13 19:16:51.734388",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",

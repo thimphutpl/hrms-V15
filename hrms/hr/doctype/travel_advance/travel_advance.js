@@ -1,17 +1,12 @@
 // Copyright (c) 2025, Frappe Technologies Pvt. Ltd. and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.on("Travel Claim", {
-    onload: function (frm) {
-		let grid = frm.fields_dict['items'].grid;
-        grid.cannot_add_rows = true;
-	},
-    
+frappe.ui.form.on("Travel Advance", {
 	refresh(frm) {
 		refresh_html(frm);
 	},
 
-	employee: function (frm) {
+    employee: function (frm) {
 		if (frm.doc.employee) frm.trigger("get_employee_currency");
 	},
 
@@ -27,8 +22,23 @@ frappe.ui.form.on("Travel Claim", {
 			},
 		);
 	},
+	get_employee_currency: function (frm) {
+		frappe.call({
+			method: "hrms.hr.doctype.travel_authorization.travel_authorization.get_employee_currency",
+			args: {
+				employee: frm.doc.employee,
+				company: frm.doc.company
+			},
+			callback: function (r) {
+				if (r.message) {
+					frm.set_value("currency", r.message);
+					frm.refresh_fields();
+				}
+			}
+		});
+	},
 
-	currency: function (frm) {
+    currency: function (frm) {
 		if (frm.doc.currency) {
 			var from_currency = frm.doc.currency;
 			var company_currency;
@@ -66,22 +76,6 @@ frappe.ui.form.on("Travel Claim", {
 			},
 		});
 	},
-});
-
-frappe.ui.form.on("Travel Claim Item", {
-	mileage_rate: function (frm, cdt, cdn) {
-		frm.trigger("calculate", cdt, cdn);
-	},
-
-	distance: function (frm, cdt, cdn) {
-		frm.trigger("calculate", cdt, cdn);
-	},
-
-	calculate: function (frm, cdt, cdn) {
-        let row = frappe.get_doc(cdt, cdn);
-        frappe.model.set_value(cdt, cdn, "mileage_amount", flt(row.mileage_rate) * flt(row.distance));
-        frappe.model.set_value(cdt, cdn, "amount", flt(row.mileage_amount) + flt(row.amount));
-    },
 });
 
 var refresh_html = function(frm){

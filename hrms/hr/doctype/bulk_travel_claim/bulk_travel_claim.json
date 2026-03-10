@@ -40,6 +40,7 @@
   "bond_period_from_date",
   "bond_period_to_date",
   "section_break_s22dq",
+  "place_type",
   "items",
   "total_claim_days",
   "section_break_20",
@@ -73,8 +74,7 @@
   "company",
   "travel_claim",
   "travel_adjustment",
-  "amended_from",
-  "place_type"
+  "amended_from"
  ],
  "fields": [
   {
@@ -165,7 +165,7 @@
    "fieldtype": "Table",
    "ignore_user_permissions": 1,
    "label": "Travel Itinerary",
-   "options": "Bulk Travel Authorization Details",
+   "options": "Bulk Travel Claim Details",
    "reqd": 1
   },
   {
@@ -241,7 +241,7 @@
    "fieldtype": "Link",
    "label": "Amended From",
    "no_copy": 1,
-   "options": "Bulk Travel Authorization",
+   "options": "Bulk Travel Claim",
    "print_hide": 1,
    "read_only": 1
   },
@@ -250,7 +250,8 @@
    "fieldtype": "Link",
    "label": "Company",
    "options": "Company",
-   "read_only": 1
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fieldname": "training_event",
@@ -449,13 +450,14 @@
    "default": "0",
    "fieldname": "get_employee",
    "fieldtype": "Button",
+   "hidden": 1,
    "label": "Get employee"
   },
   {
    "allow_bulk_edit": 1,
    "fieldname": "employee_table",
    "fieldtype": "Table",
-   "options": "Bulk Travel Authorization Item"
+   "options": "Bulk Travel Claim Item"
   },
   {
    "fieldname": "amount_detail_section",
@@ -501,10 +503,10 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-16 14:06:20.970983",
+ "modified": "2025-11-26 16:12:12.665020",
  "modified_by": "Administrator",
  "module": "HR",
- "name": "Bulk Travel Authorization",
+ "name": "Bulk Travel Claim",
  "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
@@ -519,6 +521,30 @@
    "role": "System Manager",
    "share": 1,
    "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
+   "share": 1,
    "write": 1
   }
  ],

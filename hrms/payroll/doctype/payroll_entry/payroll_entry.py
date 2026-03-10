@@ -11,6 +11,7 @@ from erpnext.setup.doctype.employee.employee import get_holiday_list_for_employe
 from erpnext.budget.doctype.budget.budget import validate_expense_against_budget
 # from erpnext.accounts.doctype.business_activity.business_activity import get_default_ba
 # from erpnext.accounts.doctype.hr_accounts_settings.hr_accounts_settings import get_bank_account
+from datetime import date
 
 class PayrollEntry(Document):
 	def onload(self):
@@ -129,17 +130,31 @@ class PayrollEntry(Document):
 		""" % {"start_date": self.start_date, "end_date": self.end_date}
 		return cond
 
+	# # following method created by SHIV on 2020/10/20
+	# def set_month_dates(self):
+	# 	months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+	# 	month = str(int(months.index(self.month_name))+1).rjust(2,"0")
+
+	# 	month_start_date = "-".join([str(self.fiscal_year), month, "01"])
+	# 	month_end_date   = get_last_day(month_start_date)
+
+	# 	self.start_date = month_start_date
+	# 	self.end_date = month_end_date
+	# 	self.month = month
+
 	# following method created by SHIV on 2020/10/20
 	def set_month_dates(self):
 		months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 		month = str(int(months.index(self.month_name))+1).rjust(2,"0")
 
-		month_start_date = "-".join([str(self.fiscal_year), month, "01"])
+		month_start_date = "-".join([str(date.today().year), month, "01"])
 		month_end_date   = get_last_day(month_start_date)
 
 		self.start_date = month_start_date
 		self.end_date = month_end_date
 		self.month = month
+
+
 
 	def check_mandatory(self):
 		# following line is replaced by subsequent by SHIV on 2020/10/20
@@ -178,6 +193,21 @@ class PayrollEntry(Document):
 				# since this method is called via frm.call this doc needs to be updated manually
 				self.reload()
 
+	# def get_sal_slip_list(self, ss_status, as_dict=False):
+	# 	"""
+	# 		Returns list of salary slips based on selected criteria
+	# 	"""
+	# 	cond = self.get_filter_condition()
+
+	# 	ss_list = frappe.db.sql("""
+	# 		select t1.name, t1.salary_structure from `tabSalary Slip` t1
+	# 		where t1.docstatus = %s and t1.start_date >= %s and t1.end_date <= %s
+	# 		and (t1.journal_entry is null or t1.journal_entry = "") and ifnull(salary_slip_based_on_timesheet,0) = %s %s
+	# 		and t1.payroll_entry = %s
+	# 	""" % ('%s', '%s', '%s','%s', cond, '%s'), (ss_status, self.start_date, self.end_date, self.salary_slip_based_on_timesheet, self.name), as_dict=as_dict)
+	# 	frappe.throw(str(ss_list))
+	# 	return ss_list
+
 	def get_sal_slip_list(self, ss_status, as_dict=False):
 		"""
 			Returns list of salary slips based on selected criteria
@@ -186,10 +216,11 @@ class PayrollEntry(Document):
 
 		ss_list = frappe.db.sql("""
 			select t1.name, t1.salary_structure from `tabSalary Slip` t1
-			where t1.docstatus = %s and t1.start_date >= %s and t1.end_date <= %s
+			where t1.docstatus = %s
 			and (t1.journal_entry is null or t1.journal_entry = "") and ifnull(salary_slip_based_on_timesheet,0) = %s %s
 			and t1.payroll_entry = %s
-		""" % ('%s', '%s', '%s','%s', cond, '%s'), (ss_status, self.start_date, self.end_date, self.salary_slip_based_on_timesheet, self.name), as_dict=as_dict)
+		""" % ('%s','%s', cond, '%s'), (ss_status, self.salary_slip_based_on_timesheet, self.name), as_dict=as_dict)
+		# frappe.throw(str(ss_list))
 		return ss_list
 
 	def remove_salary_slips(self):
@@ -880,7 +911,7 @@ class PayrollEntry(Document):
 						# "user_remark": "Salary ["+str(self.fiscal_year)+str(self.month)+"] - "+str(v_title),
 						"posting_date": nowdate(),                     
 						"company": self.company,
-						"accounts": sorted(posting[i], key=lambda item: item['cost_center']),
+						"accounts": sorted(posting[i], key=lambda item: item['cost_center'] or ''),
 						"branch": self.processing_branch,
 						"reference_type": self.doctype,
 						"reference_name": self.name,
@@ -904,11 +935,12 @@ class PayrollEntry(Document):
 		budget_error = []
 		### Ver.2.0.200106 Begins, added by SHIV on 2019/01/06
 		# Budget check should happen on processing year and month not nowdate()
-		budget_date = "-".join([self.fiscal_year, self.month, '01'])
+		# budget_date = "-".join([self.fiscal_year, self.month, '01'])
+		budget_date = "-".join([str(self.posting_date).split('-')[0], self.month, '01'])
 		budget_date = budget_date if budget_date else nowdate()
 		### Ver.2.0.200106 Ends
 		def check_budget_voucher_wise(vouchertype):
-			for rec in sorted(posting[vouchertype], key=lambda item: item['cost_center']):
+			for rec in sorted(posting[vouchertype], key=lambda item: item['cost_center'] or ''):
 				if flt(rec.get("debit_in_account_currency")) > 0:
 					#frappe.msgprint(_("{0} {1}").format(vouchertype, rec))
 					if frappe.db.exists("Account", {"name": rec.get("account"), "root_type": "Expense"}):
@@ -1076,12 +1108,12 @@ def remove_salary_slips_for_employees(payroll_entry, salary_slips, publish_progr
 
 # following method is created by SHIV on 2020/10/20
 def create_salary_slips_for_employees(employees, args, title=None, publish_progress=True):
+	# frappe.throw(str(args))
 	salary_slips_exists_for = get_existing_salary_slips(employees, args)
 	count=0
 	successful = 0
 	failed = 0
 	payroll_entry = frappe.get_doc("Payroll Entry", args.payroll_entry)
-
 	payroll_entry.set('employees_failed', [])
 	refresh_interval = 25
 	total_count = len(set(employees))
@@ -1153,6 +1185,7 @@ def get_existing_salary_slips(employees, args):
 # following code is created by SHIV on 2020/10/21
 @frappe.whitelist()
 def submit_salary_slips_for_employees(payroll_entry, salary_slips, publish_progress=True):
+	# frappe.throw(str(salary_slips))
 	submitted_ss = []
 	not_submitted_ss = []
 	frappe.flags.via_payroll_entry = True

@@ -2,167 +2,142 @@
 # For license information, please see license.txt
 
 import frappe
-from frappe.model.document import Document
 from frappe import _
-from frappe.utils import cint, date_diff
+from frappe.model.document import Document
+from frappe.model.mapper import get_mapped_doc
+from hrms.hr.utils import validate_active_employee
 # from erpnext.custom_workflow import validate_workflow_states, notify_workflow_states
 
+
 class TravelAdjustment(Document):
-	def validate(self):
-		validate_workflow_states(self)
-		self.validate_travel_dates()
-		self.validate_travel_last_day()
+    def validate(self):
+        """Validate the document before saving."""
+        validate_active_employee(self.employee)
+        self._validate_travel_last_day()
+        # validate_workflow_states(self)
 
-	def on_submit(self):
-		self.update_travel_authorization()
-		self.update_authorizaiton_end_date()
+    def on_update(self):
+        """Check for date overlaps when the document is updated."""
+        self._check_date_overlap()
 
-	def on_cancel(self):
-		self.update_travel_authorization(cancel=True)
-		self.update_authorizaiton_end_date(cancel=True)
+    def on_submit(self):
+        """Update the linked Travel Authorization when the document is submitted."""
+        self._update_travel_authorization()
 
-	def validate_travel_last_day(self):
-		if len(self.get("items")) > 1:
-			self.items[-2].is_last_day = 0
-			self.items[-1].is_last_day = 1
+    def on_cancel(self):
+        """Update the linked Travel Authorization when the document is canceled."""
+        self._update_travel_authorization(cancel=True)
 
-	def validate_travel_dates(self):
-		for item in self.get("items"):
-			if cint(item.halt):
-				if not item.halt_at:
-					frappe.throw(_("Row#{}: <b>Halt at</b> is mandatory").format(item.idx))
-				elif not item.to_date:
-					frappe.throw(_("Row#{0}: <b>To Date</b> is mandatory").format(item.idx),title="Invalid Date")
-				elif item.from_date and item.to_date and (item.to_date < item.from_date):	
-					frappe.throw(_("Row#{0}: <b>To Date</b> cannot be earlier to <b>From Date</b>").format(item.idx),title="Invalid Date")
-			else:
-				if not (item.travel_from and item.travel_to):
-					frappe.throw(_("Row#{0}: <b>Travel From</b> and <b>Travel To</b> are mandatory").format(item.idx))
-				item.to_date = item.from_date
-			from_date = item.from_date
-			to_date   = item.from_date if not item.to_date else item.to_date
-			item.no_days   = date_diff(to_date, from_date) + 1
-			
-		if self.items:
-			# check if the travel dates are already used in other travel authorization
-			tas = frappe.db.sql("""select t3.idx, t1.name, t2.from_date, t2.to_date
-					from 
-						`tabTravel Authorization` t1, 
-						`tabTravel Authorization Item` t2,
-						`tabTravel Authorization Item` t3
-					where t1.employee = "{employee}"
-					and t1.docstatus != 2
-					and t1.workflow_state !="Rejected"
-					and t1.name != "{travel_authorization}"
-					and t2.parent = t1.name
-					and t3.parent = "{travel_authorization}"
-					and (
-						(t2.from_date <= t3.to_date and t2.to_date >= t3.from_date)
-						or
-						(t3.from_date <= t2.to_date and t3.to_date >= t2.from_date)
-					)
-			""".format(travel_authorization = self.name, employee = self.employee), as_dict=True)
-			for t in tas:
-				frappe.throw("Row#{}: The dates in your current Travel Authorization have already been claimed in {} between {} and {}"\
-					.format(t.idx, frappe.get_desk_link("Travel Authorization", t.name), t.from_date, t.to_date))
+    def _validate_travel_last_day(self):
+        """Ensure only the last item in the itinerary is marked as the last day."""
+        if self.get("items"):
+            for item in self.items:
+                item.is_last_day = 0
+            self.items[-1].is_last_day = 1
 
-	def update_travel_authorization(self, cancel=False):
-		frappe.db.sql(
-			"DELETE FROM `tabTravel Authorization Item` WHERE parent = %s", 
-			(self.travel_authorization,)
-		)
-		if cancel:
-			for item in self.travel_authorization_items:
-				frappe.get_doc({
-					"doctype": "Travel Authorization Item",
-					"parenttype": "Travel Authorization",
-					"parentfield": "items",
-					"idx": item.idx,
-					"parent": self.travel_authorization,
-					"from_date": item.from_date,
-					"to_date": item.to_date,
-					"halt": item.halt,
-					"halt_at": item.halt_at,
-					"no_days": item.no_days,
-					"travel_from": item.travel_from,
-					"travel_to": item.travel_to,
-					"is_last_day": item.is_last_day,
+    def _check_date_overlap(self):
+        """Check for overlapping dates in the itinerary items."""
+        overlap_query = """
+            SELECT t1.idx, t2.idx AS overlap_idx
+            FROM `tabTravel Adjustment Item` t1
+            JOIN `tabTravel Adjustment Item` t2
+            ON t1.parent = t2.parent
+            AND t1.name != t2.name
+            AND t1.from_date <= t2.to_date
+            AND t1.to_date >= t2.from_date
+            WHERE t1.parent = %s
+        """
+        overlaps = frappe.db.sql(overlap_query, (self.name,), as_dict=True)
 
-					"currency": item.currency,
-					"exchange_rate": item.exchange_rate,
-					"dsa": item.dsa,
-					"dsa_nu_per_day": item.dsa_nu_per_day,
-					"total_dsa": item.total_dsa,
-				}).insert(ignore_permissions=True)
-		else:
-			for item in self.items:
-				frappe.get_doc({
-					"doctype": "Travel Authorization Item",
-					"parenttype": "Travel Authorization",
-					"parentfield": "items",
-					"idx": item.idx,
-					"parent": self.travel_authorization,
-					"from_date": item.from_date,
-					"to_date": item.to_date,
-					"halt": item.halt,
-					"halt_at": item.halt_at,
-					"no_days": item.no_days,
-					"travel_from": item.travel_from,
-					"travel_to": item.travel_to,
-					"is_last_day": item.is_last_day,
+        if overlaps:
+            first_overlap = overlaps[0]
+            frappe.throw(_("Row#{}: Dates are overlapping with dates in Row#{}").format(
+                first_overlap["idx"], first_overlap["overlap_idx"]
+            ))
 
-					"currency": item.currency,
-					"exchange_rate": item.exchange_rate,
-					"dsa": item.dsa,
-					"dsa_nu_per_day": item.dsa_nu_per_day,
-					"total_dsa": item.total_dsa,
-				}).insert(ignore_permissions=True)
+    def _update_travel_authorization(self, cancel=False):
+        """
+        Update the linked Travel Authorization by deleting and re-inserting items.
+        If `cancel` is True, use `itinerary`; otherwise, use `items`.
+        """
+        try:
+            # Delete existing Travel Authorization Items
+            frappe.db.sql(
+                "DELETE FROM `tabTravel Authorization Item` WHERE parent = %s",
+                (self.travel_authorization,)
+            )
 
-	def update_authorizaiton_end_date(self, cancel=False):
-		doc = frappe.get_doc("Travel Authorization", self.travel_authorization)
-		if cancel:
-			# doc.end_date_auth = self.items[len(self.travel_authorization_items) - 1].from_date
-			doc.db_set("end_date_auth", self.travel_authorization_items[len(self.travel_authorization_items) - 1].from_date)
+            # Determine which items to insert based on the `cancel` flag
+            items_to_insert = self.itinerary if cancel else self.items
 
-			doc.db_set("travel_adjustment", "")
+            # Insert new Travel Authorization Items
+            self._insert_travel_authorization_items(items_to_insert)
 
-		else:
-			if self.items:
-				# doc.end_date_auth = self.items[len(self.items) - 1].from_date
-				doc.db_set("end_date_auth", self.items[len(self.items) - 1].from_date)
-				doc.db_set("travel_adjustment", self.name)
-				# frappe.throw(str(doc.end_date_auth))
-		# doc.save()
+            # Commit the transaction
+            frappe.db.commit()
 
-	@frappe.whitelist()
-	def get_employee_approver(self):
-		if self.employee:
-			reports_to = frappe.db.get_value("Employee", self.employee, "reports_to")
-			approver, approver_name, approver_designation = frappe.db.get_value("Employee", reports_to, ["user_id", "employee_name", "designation"])
-			return approver, approver_name, approver_designation
+        except Exception as e:
+            # Rollback in case of any error
+            frappe.db.rollback()
+            frappe.log_error(f"Error updating Travel Authorization: {e}")
+            raise e
+
+    def _insert_travel_authorization_items(self, items):
+        """Helper method to insert Travel Authorization Items."""
+        for item in items:
+            frappe.get_doc({
+                "doctype": "Travel Authorization Item",
+                "parenttype": "Travel Authorization",
+                "parentfield": "items",
+                "idx": item.idx,
+                "parent": self.travel_authorization,
+                "from_date": item.from_date,
+                "to_date": item.to_date,
+                "halt": item.halt,
+                "halt_at": item.halt_at,
+                "travel_from": item.travel_from,
+                "travel_to": item.travel_to,
+                "is_last_day": item.is_last_day,
+            }).insert(ignore_permissions=True)
+
 
 @frappe.whitelist()
-def get_approvers(doctype, txt, searchfield, start, page_len, filters):
+def make_travel_adjustment(source_name, target_doc=None):
     """
-    Returns the expense approver for the selected employee
+    Create a Travel Adjustment document from a Travel Authorization.
     """
-    if not filters.get("employee"):
-        frappe.throw(_("Please select an employee first"))
+    def set_missing_values(source, target):
+        """Copy itinerary items from the source Travel Authorization to the target Travel Adjustment."""
+        for item in source.get("items"):
+            target.append("itinerary", item.as_dict())
 
-    employee = filters.get("employee")
-    
-    # Get expense approver from Employee
-    expense_approver = frappe.db.get_value("Employee", employee, "reports_to")
-    
-    if not expense_approver:
-        return []
-    
-    # Return user details if active
-    return frappe.get_all("User",
-        filters={
-            "name": expense_approver,
-            "enabled": 1
+    doclist = get_mapped_doc(
+        "Travel Authorization",
+        source_name,
+        {
+            "Travel Authorization": {
+                "doctype": "Travel Adjustment",
+                
+                "field_map": {
+                    "name": "travel_authorization",
+                    "employee":"employee",
+                },
+                "validation": {
+                    "docstatus": ["=", 1],
+                }
+            },
+            "Travel Authorization Item": {
+                "doctype": "Travel Adjustment Item",
+                "field_map": {
+                    "from_date": "from_date",
+                    "travel_from": "travel_from",
+                    "to_date": "to_date",
+                    "travel_to": "travel_to",
+                },
+            },
         },
-        fields=["name as value", "full_name as description"],
-        as_list=1
-    )		
+        target_doc,
+        set_missing_values,
+    )
+
+    return doclist

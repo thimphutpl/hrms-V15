@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class BulkTravelAuthorizationItem(Document):
+class TravelClaimAdvance(Document):
 	pass

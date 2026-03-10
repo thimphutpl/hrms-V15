@@ -11,6 +11,7 @@
   "standard_working_hours",
   "column_break_9",
   "retirement_age",
+  "return_day_dsa",
   "reminders_section",
   "column_break_11",
   "send_work_anniversary_reminders",
@@ -316,13 +317,20 @@
    "fieldname": "attendance_settings_section",
    "fieldtype": "Section Break",
    "label": "Attendance Settings"
+  },
+  {
+   "fieldname": "return_day_dsa",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Return Day DSA (%)",
+   "options": "\n100\n70\n50\n20\n0"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-06-26 15:20:17.802079",
+ "modified": "2025-09-16 23:24:12.101106",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",

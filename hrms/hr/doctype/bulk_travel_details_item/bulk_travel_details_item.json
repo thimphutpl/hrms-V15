@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2025-06-17 11:55:02.742863",
+ "creation": "2025-08-28 22:15:35.593956",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
@@ -11,10 +11,7 @@
   "grade",
   "designation",
   "division",
-  "column_break_ngpk",
-  "dsa_per_day",
-  "amount",
-  "number_of_days"
+  "dsa_per_day"
  ],
  "fields": [
   {
@@ -25,12 +22,14 @@
    "options": "Employee"
   },
   {
+   "fetch_from": "employee.employee_name",
    "fieldname": "employee_name",
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Employee Name"
   },
   {
+   "fetch_from": "employee.grade",
    "fieldname": "grade",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -38,6 +37,7 @@
    "options": "Employee Grade"
   },
   {
+   "fetch_from": "employee.designation",
    "fieldname": "designation",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -45,42 +45,28 @@
    "options": "Designation"
   },
   {
+   "fetch_from": "employee.division",
    "fieldname": "division",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Division",
-   "options": "Division"
+   "options": "Department"
   },
   {
-   "fieldname": "column_break_ngpk",
-   "fieldtype": "Column Break"
-  },
-  {
+   "fetch_from": "grade.dsa_per_day",
    "fieldname": "dsa_per_day",
-   "fieldtype": "Currency",
+   "fieldtype": "Data",
    "in_list_view": 1,
    "label": "DSA Per Day"
-  },
-  {
-   "fieldname": "amount",
-   "fieldtype": "Currency",
-   "in_list_view": 1,
-   "label": "Amount"
-  },
-  {
-   "fieldname": "number_of_days",
-   "fieldtype": "Float",
-   "in_list_view": 1,
-   "label": "Number of Days"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-07-15 12:27:39.779662",
+ "modified": "2025-08-28 23:26:18.249467",
  "modified_by": "Administrator",
  "module": "HR",
- "name": "Bulk Travel Authorization Item",
+ "name": "Bulk Travel Details Item",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "creation",

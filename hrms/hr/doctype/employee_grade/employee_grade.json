@@ -15,6 +15,7 @@
   "government_grade",
   "maximum_grade",
   "column_break_vaoa",
+  "company",
   "sub_level",
   "gis",
   "dsa_per_day",
@@ -215,11 +216,18 @@
    "fieldname": "lumpsum_revision",
    "fieldtype": "Currency",
    "label": "Lumpsum Revision"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-06-05 11:57:03.688961",
+ "modified": "2025-11-20 16:31:02.970522",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Grade",

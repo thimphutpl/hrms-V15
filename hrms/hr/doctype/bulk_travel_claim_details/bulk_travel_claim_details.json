@@ -171,7 +171,7 @@
  "modified": "2025-07-15 12:31:45.412087",
  "modified_by": "Administrator",
  "module": "HR",
- "name": "Bulk Travel Authorization Details",
+ "name": "Bulk Travel Claim Details",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "creation",

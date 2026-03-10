@@ -258,7 +258,7 @@ class SalaryStructure(Document):
 
 				if ed_item.salary_component not in ed_map:
 					if ed == 'earnings':
-						if ed_item.salary_component == 'Basic':
+						if ed_item.salary_component == 'Basic Pay':
 							if flt(new_basic_pay) > 0 and flt(new_basic_pay) != flt(amount):
 								amount = flt(new_basic_pay)
 							basic_pay = roundoff(amount)
@@ -306,6 +306,234 @@ class SalaryStructure(Document):
 						if m["field_name"] == "eligible_for_hra":
 							calc_amt = frappe.db.get_value("Employee Grade", self.employee_grade, "hra")
 
+						# if m["field_name"] == "eligible_for_king_allowance":
+						# 	existing_king = next(
+						# 		(d for d in self.get("earnings") if d.salary_component == "King Allowance"),
+						# 		None
+						# 	)
+						# 	if existing_king:
+						# 		# Preserve manually entered value
+						# 		if existing_king.amount in (None, 0):
+						# 			# Only set default if nothing entered
+						# 			existing_king.amount = 0.0
+						# 		# Else: keep the manually entered value
+						# 	else:
+						# 		# Append new only if it doesn't exist
+						# 		self.append('earnings', {
+						# 			'salary_component': 'King Allowance',
+						# 			'amount': 0.0
+						# 		})
+
+						if m["field_name"] == "eligible_for_king_allowance":
+							existing_relief_fund = next(
+							(d for d in self.get("earnings") if d.salary_component == "King Allowance"),
+							None
+							)
+							if existing_relief_fund:
+								calc_amt = flt(existing_relief_fund.amount)
+							else:
+								calc_amt = 0.0  
+							# calc_map.append({
+							# 	'salary_component': m['name'],
+							# 	'amount': calc_amt
+							# })		
+
+						if m["field_name"] == "eligible_for_personal_pay":
+							existing_relief_fund = next(
+							(d for d in self.get("earnings") if d.salary_component == "Personal Pay"),
+							None
+							)
+							if existing_relief_fund:
+								calc_amt = flt(existing_relief_fund.amount)
+							else:
+								calc_amt = 0.0  
+							# calc_map.append({
+							# 	'salary_component': m['name'],
+							# 	'amount': calc_amt
+							# })
+
+						if m["field_name"] == "eligible_for_border_allowance":
+							existing_relief_fund = next(
+							(d for d in self.get("earnings") if d.salary_component == "Border Allowance"),
+							None
+							)
+							if existing_relief_fund:
+								calc_amt = flt(existing_relief_fund.amount)
+							else:
+								calc_amt = 0.0  
+							# calc_map.append({
+							# 	'salary_component': m['name'],
+							# 	'amount': calc_amt
+							# })
+
+						if m["field_name"] == "eligible_for_batman_allowance":
+							existing_relief_fund = next(
+							(d for d in self.get("earnings") if d.salary_component == "Batman Allowance"),
+							None
+							)
+							if existing_relief_fund:
+								calc_amt = flt(existing_relief_fund.amount)
+							else:
+								calc_amt = 0.0  
+							# calc_map.append({
+							# 	'salary_component': m['name'],
+							# 	'amount': calc_amt
+							# })
+
+						if m["field_name"] == "eligible_for_high_altitude_allowance":
+							existing_relief_fund = next(
+							(d for d in self.get("earnings") if d.salary_component == "High Altitude Allowance"),
+							None
+							)
+							if existing_relief_fund:
+								calc_amt = flt(existing_relief_fund.amount)
+							else:
+								calc_amt = 0.0  
+							# calc_map.append({
+							# 	'salary_component': m['name'],
+							# 	'amount': calc_amt
+							# })
+
+						if m["field_name"] == "eligible_for_trade_allowance":
+							existing_relief_fund = next(
+							(d for d in self.get("earnings") if d.salary_component == "Trade Allowance"),
+							None
+							)
+							if existing_relief_fund:
+								calc_amt = flt(existing_relief_fund.amount)
+							else:
+								calc_amt = 0.0  
+							# calc_map.append({
+							# 	'salary_component': m['name'],
+							# 	'amount': calc_amt
+							# })
+
+						if m["field_name"] == "eligible_for_city_allowance":
+							existing_relief_fund = next(
+							(d for d in self.get("earnings") if d.salary_component == "City Allowance"),
+							None
+							)
+							if existing_relief_fund:
+								calc_amt = flt(existing_relief_fund.amount)
+							else:
+								calc_amt = 0.0  
+							# calc_map.append({
+							# 	'salary_component': m['name'],
+							# 	'amount': calc_amt
+							# })
+
+						if m["field_name"] == "eligible_for_medal_allowance":
+							existing_relief_fund = next(
+							(d for d in self.get("earnings") if d.salary_component == "Medal Allowance"),
+							None
+							)
+							if existing_relief_fund:
+								calc_amt = flt(existing_relief_fund.amount)
+							else:
+								calc_amt = 0.0  
+							# calc_map.append({
+							# 	'salary_component': m['name'],
+							# 	'amount': calc_amt
+							# })
+
+						if m["field_name"] == "eligible_for_cdo_allowance":
+							existing_relief_fund = next(
+							(d for d in self.get("earnings") if d.salary_component == "CDO Allowance"),
+							None
+							)
+							if existing_relief_fund:
+								calc_amt = flt(existing_relief_fund.amount)
+							else:
+								calc_amt = 0.0  
+							# calc_map.append({
+							# 	'salary_component': m['name'],
+							# 	'amount': calc_amt
+							# })
+
+						if m["field_name"] == "eligible_for_attendant_allowance":
+							existing_relief_fund = next(
+							(d for d in self.get("earnings") if d.salary_component == "Attendant Allowance"),
+							None
+							)
+							if existing_relief_fund:
+								calc_amt = flt(existing_relief_fund.amount)
+							else:
+								calc_amt = 0.0  
+							# calc_map.append({
+							# 	'salary_component': m['name'],
+							# 	'amount': calc_amt
+							# })
+
+						if m["field_name"] == "eligible_for_professional_dr":
+							existing_relief_fund = next(
+							(d for d in self.get("earnings") if d.salary_component == "Professional for (Dr)"),
+							None
+							)
+							if existing_relief_fund:
+								calc_amt = flt(existing_relief_fund.amount)
+							else:
+								calc_amt = 0.0  
+							# calc_map.append({
+							# 	'salary_component': m['name'],
+							# 	'amount': calc_amt
+							# })
+
+						if m["field_name"] == "eligible_for_other_allowance":
+							existing_relief_fund = next(
+							(d for d in self.get("earnings") if d.salary_component == "Other Allowance"),
+							None
+							)
+							if existing_relief_fund:
+								calc_amt = flt(existing_relief_fund.amount)
+							else:
+								calc_amt = 0.0  
+							# calc_map.append({
+							# 	'salary_component': m['name'],
+							# 	'amount': calc_amt
+							# })
+
+						if m["field_name"] == "eligible_for_kma":
+							existing_relief_fund = next(
+							(d for d in self.get("earnings") if d.salary_component == "KMA"),
+							None
+							)
+							if existing_relief_fund:
+								calc_amt = flt(existing_relief_fund.amount)
+							else:
+								calc_amt = 0.0  
+							# calc_map.append({
+							# 	'salary_component': m['name'],
+							# 	'amount': calc_amt
+							# })
+
+						if m["field_name"] == "eligible_for_entertainment_allowance":
+							existing_relief_fund = next(
+							(d for d in self.get("earnings") if d.salary_component == "Entertainment Allowance"),
+							None
+							)
+							if existing_relief_fund:
+								calc_amt = flt(existing_relief_fund.amount)
+							else:
+								calc_amt = 0.0  
+							# calc_map.append({
+							# 	'salary_component': m['name'],
+							# 	'amount': calc_amt
+							# })
+
+						if m["field_name"] == "eligible_for_contract_allowance":
+							existing_relief_fund = next(
+							(d for d in self.get("earnings") if d.salary_component == "Contract Allowance"),
+							None
+							)
+							if existing_relief_fund:
+								calc_amt = flt(existing_relief_fund.amount)
+							else:
+								calc_amt = 0.0  
+							# calc_map.append({
+							# 	'salary_component': m['name'],
+							# 	'amount': calc_amt
+							# })																																								
+
 						if m["field_name"] == "eligible_for_afsa":
 							calc_amt = frappe.db.get_value("Employee Grade", self.employee_grade, "afsa")	
 
@@ -352,6 +580,123 @@ class SalaryStructure(Document):
 						health_cont_amt = flt(total_earning)*flt(settings.get("health_contribution"))*0.01
 						calc_amt = roundoff(health_cont_amt)
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
+					elif self.get(m['field_name']) and m['name'] == 'TV Deductions':
+						existing_tv_deduction = next(
+							(d for d in self.get("deductions") if d.salary_component == "TV Deductions"),
+							None
+						)
+						if existing_tv_deduction:
+							calc_amt = flt(existing_tv_deduction.amount)
+						else:
+							calc_amt = 0.0  
+						calc_map.append({
+							'salary_component': m['name'],
+							'amount': calc_amt
+						})
+					elif self.get(m['field_name']) and m['name'] == 'Relief Fund':
+						existing_relief_fund = next(
+							(d for d in self.get("deductions") if d.salary_component == "Relief Fund"),
+							None
+						)
+						if existing_relief_fund:
+							calc_amt = flt(existing_relief_fund.amount)
+						else:
+							calc_amt = 0.0  
+						calc_map.append({
+							'salary_component': m['name'],
+							'amount': calc_amt
+						})
+					elif self.get(m['field_name']) and m['name'] == 'Kanjur':
+						existing_kanjur = next(
+							(d for d in self.get("deductions") if d.salary_component == "Kanjur"),
+							None
+						)
+						if existing_kanjur:
+							calc_amt = flt(existing_kanjur.amount)
+						else:
+							calc_amt = 0.0  
+						calc_map.append({
+							'salary_component': m['name'],
+							'amount': calc_amt
+						})
+					elif self.get(m['field_name']) and m['name'] == 'Medical':
+						existing_medical = next(
+							(d for d in self.get("deductions") if d.salary_component == "Medical"),
+							None
+						)
+						if existing_medical:
+							calc_amt = flt(existing_medical.amount)
+						else:
+							calc_amt = 0.0  
+						calc_map.append({
+							'salary_component': m['name'],
+							'amount': calc_amt
+						})
+					elif self.get(m['field_name']) and m['name'] == 'Semso':
+						existing_semso = next(
+							(d for d in self.get("deductions") if d.salary_component == "Semso"),
+							None
+						)
+						if existing_semso:
+							calc_amt = flt(existing_semso.amount)
+						else:
+							calc_amt = 0.0  
+						calc_map.append({
+							'salary_component': m['name'],
+							'amount': calc_amt
+						})
+					elif self.get(m['field_name']) and m['name'] == 'Spouse Semso':
+						existing_spouse_semso = next(
+							(d for d in self.get("deductions") if d.salary_component == "Spouse Semso"),
+							None
+						)
+						if existing_spouse_semso:
+							calc_amt = flt(existing_spouse_semso.amount)
+						else:
+							calc_amt = 0.0  
+						calc_map.append({
+							'salary_component': m['name'],
+							'amount': calc_amt
+						})
+					elif self.get(m['field_name']) and m['name'] == 'Child Alimony Deductions':
+						existing_child_alimony_deductions = next(
+							(d for d in self.get("deductions") if d.salary_component == "Child Alimony Deductions"),
+							None
+						)
+						if existing_child_alimony_deductions:
+							calc_amt = flt(existing_child_alimony_deductions.amount)
+						else:
+							calc_amt = 0.0  
+						calc_map.append({
+							'salary_component': m['name'],
+							'amount': calc_amt
+						})
+					elif self.get(m['field_name']) and m['name'] == 'Tshechu':
+						existing_tshechu = next(
+							(d for d in self.get("deductions") if d.salary_component == "Tshechu"),
+							None
+						)
+						if existing_tshechu:
+							calc_amt = flt(existing_tshechu.amount)
+						else:
+							calc_amt = 0.0  
+						calc_map.append({
+							'salary_component': m['name'],
+							'amount': calc_amt
+						})
+					elif self.get(m['field_name']) and m['name'] == 'TDS':
+						existing_tds = next(
+							(d for d in self.get("deductions") if d.salary_component == "TDS"),
+							None
+						)
+						if existing_tds:
+							calc_amt = flt(existing_tds.amount)
+						else:
+							calc_amt = 0.0  
+						calc_map.append({
+							'salary_component': m['name'],
+							'amount': calc_amt
+						})
 					else:
 						calc_amt = 0
 
@@ -426,7 +771,6 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 		basic_pay_arrears = 0.00
 		settings = get_payroll_settings(source.employee)
 		m_details = get_month_details(target_doc.fiscal_year, target_doc.month)
-
 		target.gross_pay = 0
 		target.total_deduction = 0
 		target.net_pay = 0
@@ -625,7 +969,7 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 							d['amount'] = flt(0)
 							tax_included = 1
 						else:
-							tax_amt = get_salary_tax(math.floor(flt(basic_pay_arrears) - flt(gis_amt) - flt(pf_amt)))
+							tax_amt = get_salary_tax(math.floor(flt(basic_amt) - flt(gis_amt) - flt(pf_amt)))
 							tax_amt = roundoff(tax_amt)
 							d['amount'] = flt(tax_amt)
 							tax_included = 1				

@@ -9,6 +9,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "company",
   "salary_component",
   "salary_component_abbr",
   "description",
@@ -231,12 +232,20 @@
    "fieldname": "amount",
    "fieldtype": "Currency",
    "label": "Amount"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company"
   }
  ],
  "icon": "fa fa-flag",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-06-06 07:15:21.101729",
+ "modified": "2025-12-01 10:48:52.071542",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Component",

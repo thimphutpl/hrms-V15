@@ -39,7 +39,7 @@
    "hidden": 0,
    "is_query_report": 0,
    "label": "Quick Links",
-   "link_count": 3,
+   "link_count": 4,
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
@@ -73,10 +73,20 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Salary Component",
+   "link_count": 0,
+   "link_to": "Salary Component",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2024-12-23 10:32:03.328546",
- "modified_by": "kinzang.namgyal@cdcl.bt",
+ "modified": "2025-10-16 14:14:48.170555",
+ "modified_by": "sonam.choki@thimphutechpark.bt",
  "module": "Payroll",
  "name": "Payroll",
  "number_cards": [],

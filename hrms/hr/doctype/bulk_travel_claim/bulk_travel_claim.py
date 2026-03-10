@@ -14,7 +14,7 @@ from datetime import timedelta
 from erpnext.accounts.doctype.accounts_settings.accounts_settings import get_bank_account
 
 
-class BulkTravelAuthorization(Document):
+class BulkTravelClaim(Document):
 	def validate(self):
 		# validate_workflow_states(self)
 		# self.set_employee_supervisor()
@@ -31,6 +31,7 @@ class BulkTravelAuthorization(Document):
 		# if self.workflow_state != "Approved":
 		# 	notify_workflow_states(self)
 		self.update_amounts()
+		self.check_date_overlap()
 
 	def on_update(self):
 		self.check_date_overlap()
@@ -375,7 +376,7 @@ class BulkTravelAuthorization(Document):
 
 		je.append("accounts", {
 				"account": expense_account,
-				"reference_type": "Bulk Travel Authorization",
+				"reference_type": "Bulk Travel Claim",
 				"reference_name": self.name,
 				"cost_center": self.cost_center,
 				"debit_in_account_currency": flt(self.total_travel_amount),
@@ -405,25 +406,38 @@ class BulkTravelAuthorization(Document):
 					"party": self.employee, 
 				})
 
-		if self.total_travel_amount > 0:
-			je.append("accounts", {
-				"account": advance_account,
-				"party_type": "Employee",
-				"party": self.employee,
-				"reference_type": "Bulk Travel Authorization",
-				"reference_name": self.name,
-				"cost_center": cost_center,
-				"credit_in_account_currency": flt(self.advance_amount),
-				"credit": flt(self.advance_amount),
-			})
+		# if self.total_travel_amount > 0:
+		# 	je.append("accounts", {
+		# 		"account": advance_account,
+		# 		"party_type": "Employee",
+		# 		"party": self.employee,
+		# 		"reference_type": "Bulk Travel Claim",
+		# 		"reference_name": self.name,
+		# 		"cost_center": cost_center,
+		# 		"credit_in_account_currency": flt(self.advance_amount),
+		# 		"credit": flt(self.advance_amount),
+		# 	})
 		je.insert()
 		je.submit()
 
 	def post_payment_entry(self):
 		payable_account = frappe.db.get_single_value("HR Accounts Settings", 'travel_claim_payable')
-		expense_bank_account = get_bank_account(self.branch, self.company)
-		if not expense_bank_account:
-			frappe.throw("Setup Default Expense Bank Account in {}".format(frappe.get_desk_link("Branch", self.branch)))
+		# expense_bank_account = get_bank_account(self.branch, self.company)
+		bank_account = frappe.get_cached_value("Company", self.company, "default_bank_account")
+		expense_bank_account = frappe.get_cached_value("Branch", self.branch, "expense_bank_account")
+		account_to_use = bank_account or expense_bank_account
+		if not account_to_use:
+			frappe.throw(f"""
+				Please configure either:<br>
+				• Company Default Bank Account<br>
+				• Branch Expense Bank Account
+			""")
+
+		# if not expense_bank_account:
+		# 	frappe.throw("Setup Default Bank Account in {}".format(frappe.get_desk_link("Branch", self.branch)))
+
+		# if not bank_account:
+		# 	frappe.throw("Setup Default Bank Account in {}".format(frappe.get_desk_link("Branch", self.branch)))	
 
 		if flt(self.total_travel_amount) > 0:
 			je = frappe.new_doc("Journal Entry")
@@ -447,9 +461,9 @@ class BulkTravelAuthorization(Document):
 				})
 
 			je.append("accounts", {
-					"account": expense_bank_account,
+					"account": account_to_use,
 					"cost_center": self.cost_center,
-					"reference_type": "Bulk Travel Authorization",
+					"reference_type": "Bulk Travel Claim",
 					"reference_name": self.name,
 					"credit_in_account_currency": flt(self.total_travel_amount),
 					"credit": flt(self.total_travel_amount),
@@ -510,7 +524,7 @@ class BulkTravelAuthorization(Document):
 
 	def set_travel_period(self):
 		period = frappe.db.sql("""select min(`from_date`) as min_date, max(to_date) as max_date
-				from `tabTravel Authorization Item` where parent = '{}' """.format(self.name), as_dict=True)
+				from `tabBulk Travel Claim Details` where parent = '{}' """.format(self.name), as_dict=True)
 		if period:
 			self.from_date 	= period[0].min_date
 			self.to_date 	= period[0].max_date
@@ -656,12 +670,12 @@ class BulkTravelAuthorization(Document):
 	@frappe.whitelist()
 	def check_date_overlap(self):
 		overlap = frappe.db.sql("""select t1.idx, 
-				ifnull((select t2.idx from `tabTravel Authorization Item` t2
+				ifnull((select t2.idx from `tabBulk Travel Claim Details` t2
 					where t2.parent = t1.parent
 					and t2.name != t1.name
 					and t1.from_date <= t2.to_date and t1.to_date >= t2.from_date
 					limit 1),-1) overlap_idx
-			from `tabTravel Authorization Item` t1
+			from `tabBulk Travel Claim Details` t1
 			where t1.parent = "{parent}"
 			order by t1.from_date""".format(parent = self.name), as_dict=True)
 			
@@ -723,7 +737,7 @@ def make_travel_claim(source_name, target_doc=None):
 			if d.is_last_day == 1:
 				d.total_dsa = flt(d.total_dsa) * flt(dsa_percent)/100
 
-	doc = get_mapped_doc("Travel Authorization", source_name, {
+	doc = get_mapped_doc("Bulk Travel Claim", source_name, {
 			"Travel Authorization": {
 				"doctype": "Travel Claim",
 				"field_map": {
@@ -733,7 +747,7 @@ def make_travel_claim(source_name, target_doc=None):
 				"postprocess": update_date,
 				"validation": {"docstatus": ["=", 1]}
 			},
-			"Travel Authorization Item": {
+			"Bulk Travel Claim Details": {
 				"doctype": "Travel Claim Item",
 				"postprocess": transfer_currency,
 			},
@@ -742,7 +756,7 @@ def make_travel_claim(source_name, target_doc=None):
 
 @frappe.whitelist()
 def make_travel_adjustment(source_name, target_doc=None):
-	res = frappe.db.sql("""select * from `tabTravel Authorization Item` where parent=%s order by idx asc
+	res = frappe.db.sql("""select * from `tabBulk Travel Claim Details` where parent=%s order by idx asc
 		""", (source_name), as_dict=True
 	)
 

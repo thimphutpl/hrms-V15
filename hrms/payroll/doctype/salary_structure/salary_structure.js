@@ -146,7 +146,79 @@ frappe.ui.form.on('Salary Structure', {
 	eligible_for_hra: function(frm){
 		calculate_others(frm);
 	},
+	eligible_for_king_allowance: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_personal_pay: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_border_allowance: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_batman_allowance: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_high_altitude_allowance: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_trade_allowance: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_city_allowance: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_medal_allowance: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_cdo_allowance: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_attendant_allowance: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_professional_dr: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_other_allowance: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_kma: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_entertainment_allowance: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_tax: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_tv: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_relief_fund: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_child_alimony: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_tshechu: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_semso: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_spouse_semso: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_kanjur: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_medical: function(frm){
+		calculate_others(frm);
+	},
 	eligible_for_pf: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_tax: function(frm){
 		calculate_others(frm);
 	},
 	eligible_for_health_contribution: function(frm){
@@ -382,6 +454,12 @@ frappe.ui.form.on('Salary Structure', {
 		calculate_others(frm);
 	},
 	valuehousing_allowance:function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_relief_fund: function(frm){
+		calculate_others(frm);
+	},
+	eligible_for_kanjur:function(frm){
 		calculate_others(frm);
 	},
 })

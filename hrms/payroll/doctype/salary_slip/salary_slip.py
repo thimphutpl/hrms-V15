@@ -61,7 +61,8 @@ class SalarySlip(TransactionBase):
 			self.set("items", [])   #Added by SHIV on 2018/09/28
 			self.set_month_dates()
 			self.validate_dates()
-			self.yearmonth = str(self.fiscal_year)+str(self.month)
+			# self.yearmonth = str(self.fiscal_year)+str(self.month)
+			# self.yearmonth = str(self.fiscal_year).split('-')[0] + str(self.month)
 			joining_date, relieving_date = frappe.db.get_value("Employee", self.employee, ["date_of_joining", "relieving_date"])
 			struct = self.check_sal_struct(joining_date, relieving_date)
 

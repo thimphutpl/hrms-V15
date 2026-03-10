@@ -9,7 +9,7 @@ cur_frm.add_fetch("employee", "division", "division")
 cur_frm.add_fetch("employee", "branch", "branch")
 cur_frm.add_fetch("employee", "cost_center", "cost_center")
 
-frappe.ui.form.on("Bulk Travel Authorization", {
+frappe.ui.form.on("Bulk Travel Claim", {
 	setup: function(frm) {
         // Set query for employee field
         frm.set_query("employee", function() {
@@ -253,7 +253,7 @@ function update_total_amount(frm) {
     frm.set_value('total_travel_amount', total);
 }
 
-frappe.ui.form.on("Travel Authorization Item", {
+frappe.ui.form.on("Bulk Travel Claim Details", {
 	onload: function(frm, cdt, cdn) {
 		set_employee_dsa(frm, cdt, cdn);
 		calculate_total_dsa(frm, cdt, cdn);
@@ -268,8 +268,8 @@ frappe.ui.form.on("Travel Authorization Item", {
 		let item = locals[cdt][cdn];
 
 		// Get docfields for dynamic control
-		let halt = frappe.meta.get_docfield("Travel Authorization Item", "halt", cur_frm.doc.name);
-		let return_same_day = frappe.meta.get_docfield("Travel Authorization Item", "return_same_day", cur_frm.doc.name);
+		let halt = frappe.meta.get_docfield("Bulk Travel Claim Details", "halt", cur_frm.doc.name);
+		let return_same_day = frappe.meta.get_docfield("Bulk Travel Claim Details", "return_same_day", cur_frm.doc.name);
 
 		// Apply conditions based on item index
 		if (item.idx === 1) {
