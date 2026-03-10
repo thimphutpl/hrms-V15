@@ -125,10 +125,12 @@ frappe.ui.form.on("Leave Application", {
 		}
 	},
 
+	
 	employee: function (frm) {
 		frm.trigger("make_dashboard");
 		frm.trigger("get_leave_balance");
 		frm.trigger("set_leave_approver");
+		frm.trigger("calculate_total_days");
 	},
 
 	leave_approver: function (frm) {
@@ -137,8 +139,10 @@ frappe.ui.form.on("Leave Application", {
 		}
 	},
 
+
 	leave_type: function (frm) {
 		frm.trigger("get_leave_balance");
+		frm.trigger("calculate_total_days");
 	},
 
 	half_day: function (frm) {
@@ -215,11 +219,10 @@ frappe.ui.form.on("Leave Application", {
 				},
 			});
 		}
-	},
-
+	},	
+	
 	calculate_total_days: function (frm) {
 		if (frm.doc.from_date && frm.doc.to_date && frm.doc.employee && frm.doc.leave_type) {
-			// server call is done to include holidays in leave days calculations
 			return frappe.call({
 				method: "hrms.hr.doctype.leave_application.leave_application.get_number_of_leave_days",
 				args: {
@@ -231,12 +234,12 @@ frappe.ui.form.on("Leave Application", {
 					half_day_date: frm.doc.half_day_date,
 				},
 				callback: function (r) {
-					if (r && r.message) {
-						frm.set_value("total_leave_days", r.message);
-						frm.trigger("get_leave_balance");
-					}
+					frm.set_value("total_leave_days", Number(r.message || 0));
+					frm.trigger("get_leave_balance");
 				},
 			});
+		} else {
+			frm.set_value("total_leave_days", 0);
 		}
 	},
 

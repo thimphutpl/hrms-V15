@@ -367,7 +367,8 @@ class LeaveApplication(Document, PWANotificationsMixin):
 	def validate_balance_leaves(self):
 		# if self.leave_type == 'Casual Leave' and (getdate(self.to_date) - getdate(self.from_date)).days > 5:
 		# 	frappe.throw(_("Casual Leave cannot exceed 5 days."))
-		if self.leave_type == 'Casual Leave' and self.total_leave_days > 5:
+		# if self.leave_type == 'Casual Leave' and self.total_leave_days > 5:
+		if self.leave_type == "Casual Leave" and flt(self.total_leave_days) > 5:
 			frappe.throw(_("Casual Leave cannot exceed 5 days."))
 		if self.from_date and self.to_date:
 			self.total_leave_days = get_number_of_leave_days(
