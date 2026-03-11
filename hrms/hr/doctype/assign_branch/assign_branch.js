@@ -5,12 +5,12 @@ frappe.ui.form.on("Assign Branch", {
 	// refresh(frm) {
 
 	// },
-    get_all_branch: function(frm) {
+	get_all_branch: function (frm) {
 		//load_accounts(frm.doc.company)
 		return frappe.call({
 			method: "get_all_branches",
 			doc: frm.doc,
-			callback: function(r, rt) {
+			callback: function (r, rt) {
 				frm.refresh_field("items");
 				frm.refresh_fields();
 			}
@@ -18,8 +18,15 @@ frappe.ui.form.on("Assign Branch", {
 	}
 });
 
-cur_frm.fields_dict['employee'].get_query = function(doc, dt, dn) {
-	return {
-			filters:{"status": "Active"}
+cur_frm.fields_dict['employee'].get_query = function (doc, dt, dn) {
+	if (doc.employee_type && doc.employee_type === "User") {
+		// If employee_type is "User", ignore filters (show all employees)
+		return {
+			filters: { "enable": 1 }
+		};
+	} else {
+		return {
+			filters: { "status": "Active" }
+		}
 	}
 }

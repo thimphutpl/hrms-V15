@@ -21,18 +21,34 @@ class AssignBranch(Document):
 		# self.assign_branch()
 		pass
 	
+	# def assign_name(self):
+	# 	if self.employee:
+	# 		emp = frappe.get_doc(self.employee_type, self.employee)
+	# 		self.user = emp.user_id
+	# 		self.company = emp.company
+	# 		self.current_branch = emp.branch
+	# 		if self.employee_type == "Muster Roll Employee":
+	# 			self.employee_name = emp.person_name
+	# 		else:
+	# 			self.employee_name = emp.employee_name
+	# 	else:
+	# 		frappe.throw("Employee ID is Mandatory")
 	def assign_name(self):
-		if self.employee:
-			emp = frappe.get_doc(self.employee_type, self.employee)
-			self.user = emp.user_id
-			self.company = emp.company
-			self.current_branch = emp.branch
-			if self.employee_type == "Muster Roll Employee":
-				self.employee_name = emp.person_name
-			else:
-				self.employee_name = emp.employee_name
-		else:
-			frappe.throw("Employee ID is Mandatory")
+		if not self.employee:
+			frappe.throw(_("Employee ID is Mandatory"))
+
+		emp = frappe.get_doc(self.employee_type, self.employee)
+
+		if self.employee_type == "User":
+			self.user = emp.get("name")
+			self.employee_name = emp.get("full_name")
+		elif self.employee_type == "Muster Roll Employee":
+			self.employee_name = emp.get("person_name")
+		else:    
+			self.user = emp.get("user_id")
+			self.company = emp.get("company")
+			self.current_branch = emp.get("branch")
+			self.employee_name = emp.get("employee_name")
 
 	def check_employee_duplicate(self):
 		docs = frappe.db.sql("select name from `tabAssign Branch` where employee = %s and user = %s and name != %s", (self.employee, self.user, self.name), as_dict=True)
