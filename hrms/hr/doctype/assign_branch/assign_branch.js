@@ -22,7 +22,7 @@ cur_frm.fields_dict['employee'].get_query = function (doc, dt, dn) {
 	if (doc.employee_type && doc.employee_type === "User") {
 		// If employee_type is "User", ignore filters (show all employees)
 		return {
-			filters: { "enable": 1 }
+			filters: { "enabled": 1 }
 		};
 	} else {
 		return {
