@@ -42,6 +42,7 @@
   "section_break_kzfj",
   "column_break_ajnq",
   "report_on_execution",
+  "document_attachment",
   "approver_detail_section",
   "approver",
   "column_break_xaqc",
@@ -196,7 +197,7 @@
   {
    "fieldname": "section_break_kzfj",
    "fieldtype": "Section Break",
-   "label": "Amount Details"
+   "label": "Tour Report"
   },
   {
    "fieldname": "advances",
@@ -356,12 +357,17 @@
    "label": "Supervisor Email ID",
    "options": "User",
    "read_only": 1
+  },
+  {
+   "fieldname": "document_attachment",
+   "fieldtype": "Attach",
+   "label": "Document Attachment"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-04 15:07:04.391351",
+ "modified": "2026-03-12 12:12:42.731719",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim",
