@@ -225,8 +225,8 @@ class TravelClaim(Document):
 			#frappe.msgprint(str(self.place_type))
 			if self.place_type=="Out-Country":
 				item.dsa_cal=item.dsa_nu_per_day
-			else:
-				item.dsa_cal = 1
+			# else:
+			# 	item.dsa_cal = 1
 			#item.dsa = flt(item.dsa) * flt(exchange_rate)
 			#frappe.msgprint(str(flt(item.dsa1)))
 			if item.is_last_day or flt(item.days_allocated)==0.0:
