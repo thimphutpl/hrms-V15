@@ -374,6 +374,8 @@ def make_travel_claim(source_name, target_doc=None):
 		for d in target.items:
 			if d.is_last_day == 1:
 				d.total_dsa = flt(d.total_dsa) * flt(dsa_percent)/100
+			d.dsa = flt(d.total_dsa) / flt(d.no_days)
+	
 
 	doc = get_mapped_doc("Travel Authorization", source_name, {
 			"Travel Authorization": {
