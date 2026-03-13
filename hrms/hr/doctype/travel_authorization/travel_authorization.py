@@ -390,6 +390,9 @@ def make_travel_claim(source_name, target_doc=None):
 			"Travel Authorization Item": {
 				"doctype": "Travel Claim Item",
 				"postprocess": transfer_currency,
+				"field_map": {
+					"dsa": "dsa",
+				},
 			},
 		}, target_doc, adjust_last_date)
 	return doc
