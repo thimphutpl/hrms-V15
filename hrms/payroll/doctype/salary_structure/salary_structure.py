@@ -415,6 +415,7 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 		hra_amt = 0.00
 		gross_amt1 = 0.00
 		tax_amt1  = 0.00
+		salary_arrears = 0.00
 		### Ver.2.0.191227 Begins, added by SHIV on 2019/12/27
 		# Following variables introduced
 		basic_pay_arrears = 0
@@ -546,6 +547,8 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 			if e['salary_component'] == 'Communication Allowance':
 				comm_amt = (flt(e['amount']))
 			gross_amt += flt(e['amount'])
+			if e['salary_component'] == 'Salary Arrears':
+				salary_arrears =(flt(e['amount']))
 
 			#Deputation allowance
 			if e['salary_component'] == 'Deputation Allowance':
@@ -604,11 +607,12 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 						# health = round(gross_amt*flt(percent)*0.01)
 						health = roundoff(gross_amt*flt(percent)*0.01)
 
-						if source.employment_type == 'Deputation':	
+						if source.employment_type == 'Deputation':
+							
 							#gross_amt  =  gross_amt - deput_amt
 							# health = round(deput_amt*flt(percent)*0.01)
-							health = roundoff(deput_amt*flt(percent)*0.01)
-
+							health = roundoff((deput_amt+comm_amt+salary_arrears)*flt(percent)*0.01)
+					
 						d['amount'] = health
 
 					
