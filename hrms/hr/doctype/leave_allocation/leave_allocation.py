@@ -68,12 +68,13 @@ class LeaveAllocation(Document):
 				)
 			leave_allocated += flt(self.new_leaves_allocated)
 			if leave_allocated > max_leaves_allowed:
-				frappe.throw(
+				frappe.msgprint(
 					_(
 						"Total allocated leaves are more than maximum allocation allowed for {0} leave type for employee {1} in the period"
 					).format(self.leave_type, self.employee),
 					OverAllocationError,
 				)
+				return
 
 	def on_submit(self):
 		self.create_leave_ledger_entry()
