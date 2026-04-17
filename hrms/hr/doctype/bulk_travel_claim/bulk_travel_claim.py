@@ -51,7 +51,6 @@ class BulkTravelClaim(Document):
 			"Stock Ledger Entry",
 			"Repost Item Valuation",
 			"Serial and Batch Bundle",
-			"GL Entry",
 		)
 		# self.cancel_attendance()	
 		if self.training_event:

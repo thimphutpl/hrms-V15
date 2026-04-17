@@ -1,0 +1,33 @@
+{
+ "add_total_row": 1,
+ "columns": [],
+ "creation": "2026-04-01 12:08:09.483463",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": "RBA",
+ "letterhead": null,
+ "modified": "2026-04-01 12:08:09.483463",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Employee Advance Report",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Employee Advance",
+ "report_name": "Employee Advance Report",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "Employee"
+  },
+  {
+   "role": "Expense Approver"
+  }
+ ]
+}
+
+
+

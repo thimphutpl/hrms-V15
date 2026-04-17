@@ -94,13 +94,40 @@ class IncrementEntry(Document):
 		""" % {"start_date": self.start_date, "end_date": self.end_date}
 		return cond
 
+	# for the fiscal year format(2025)
 	# following method created by SHIV on 2020/10/20
-	def set_month_dates(self):
-		months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-		month = str(int(months.index(self.month_name))+1).rjust(2,"0")
+	# def set_month_dates(self):
+	# 	months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+	# 	month = str(int(months.index(self.month_name))+1).rjust(2,"0")
 
-		month_start_date = "-".join([str(self.fiscal_year), month, "01"])
-		month_end_date   = get_last_day(month_start_date)
+	# 	month_start_date = "-".join([str(self.fiscal_year), month, "01"])
+	# 	month_end_date   = get_last_day(month_start_date)
+
+	# 	self.start_date = month_start_date
+	# 	self.end_date = month_end_date
+	# 	self.month = month
+
+	# for the fiscal year format(2025-26)
+	def set_month_dates(self):
+		months = ['January', 'February', 'March', 'April', 'May', 'June',
+				'July', 'August', 'September', 'October', 'November', 'December']
+
+		month_index = months.index(self.month_name) + 1
+		month = str(month_index).rjust(2, "0")
+
+		start_year, end_year = str(self.fiscal_year).split("-")
+
+		# Convert to full year (e.g., 26 → 2026)
+		end_year = start_year[:2] + end_year
+
+		# Fiscal year logic (assuming July start)
+		if month_index >= 7:  # July–December
+			year = start_year
+		else:  # January–June
+			year = end_year
+
+		month_start_date = f"{year}-{month}-01"
+		month_end_date = get_last_day(month_start_date)
 
 		self.start_date = month_start_date
 		self.end_date = month_end_date

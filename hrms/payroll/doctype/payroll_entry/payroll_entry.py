@@ -75,11 +75,12 @@ class PayrollEntry(Document):
 		self.set_month_dates()
 
 		cond = self.get_filter_condition()
+		
 		cond += self.get_joining_relieving_condition()
 		emp_list = frappe.db.sql("""
 			select t1.name as employee, t1.employee_name, t1.department, t1.designation
 			from `tabEmployee` t1
-			where not exists(select 1
+			where t1.branch = '{}' and not exists(select 1
 					from `tabSalary Slip` as t3
 					where t3.employee = t1.name
 					and t3.docstatus != 2
@@ -88,7 +89,7 @@ class PayrollEntry(Document):
 			{}
 			and t1.status = '{}'
 			order by t1.branch, t1.name
-		""".format(self.fiscal_year, self.month, cond, self.status), as_dict=True)
+		""".format(self.processing_branch,self.fiscal_year, self.month, cond, self.status), as_dict=True)
 
 		if not emp_list:
 			frappe.msgprint(_("No employees found for processing or Salary Slips already created"))
@@ -106,12 +107,6 @@ class PayrollEntry(Document):
 
 		self.number_of_employees = len(employees)
 		return self.number_of_employees
-		# ver.2020.10.20 Begins, following code is commented by SHIV on 2020/10/20
-		'''
-		if self.validate_attendance:
-			return self.validate_employee_attendance()
-		'''
-		# ver.2020.10.20 Ends
 
 	def get_filter_condition(self):
 		self.check_mandatory()
@@ -193,21 +188,7 @@ class PayrollEntry(Document):
 				# since this method is called via frm.call this doc needs to be updated manually
 				self.reload()
 
-	# def get_sal_slip_list(self, ss_status, as_dict=False):
-	# 	"""
-	# 		Returns list of salary slips based on selected criteria
-	# 	"""
-	# 	cond = self.get_filter_condition()
-
-	# 	ss_list = frappe.db.sql("""
-	# 		select t1.name, t1.salary_structure from `tabSalary Slip` t1
-	# 		where t1.docstatus = %s and t1.start_date >= %s and t1.end_date <= %s
-	# 		and (t1.journal_entry is null or t1.journal_entry = "") and ifnull(salary_slip_based_on_timesheet,0) = %s %s
-	# 		and t1.payroll_entry = %s
-	# 	""" % ('%s', '%s', '%s','%s', cond, '%s'), (ss_status, self.start_date, self.end_date, self.salary_slip_based_on_timesheet, self.name), as_dict=as_dict)
-	# 	frappe.throw(str(ss_list))
-	# 	return ss_list
-
+	
 	def get_sal_slip_list(self, ss_status, as_dict=False):
 		"""
 			Returns list of salary slips based on selected criteria
@@ -627,16 +608,7 @@ class PayrollEntry(Document):
 	
 	@frappe.whitelist()
 	def make_accounting_entry(self):
-		"""
-			---------------------------------------------------------------------------------
-			type            Dr            Cr               voucher_type
-			------------    ------------  -------------    ----------------------------------
-			to payables     earnings      deductions       journal entry (journal voucher)
-							  net pay
-			to bank         net pay       bank             bank entry (bank payment voucher)
-			remittance      deductions    bank             bank entry (bank payment voucher)
-			---------------------------------------------------------------------------------
-		"""
+
 		if frappe.db.exists("Journal Entry", {"reference_type": self.doctype, "reference_name": self.name}):
 			frappe.msgprint(_("Accounting Entries already posted"))
 			return
@@ -646,7 +618,7 @@ class PayrollEntry(Document):
 		# default_bank_account = get_bank_account(self.processing_branch)
 		default_payable_account = company.get("default_payroll_payable_account")
 		company_cc              = company.get("cost_center")
-		default_gpf_account     = company.get("employer_contribution_to_pf")
+		default_gpf_account     = company.get("employee_contribution_pf")
 		salary_component_pf     = "PF"
 
 		if not default_bank_account:
@@ -659,10 +631,7 @@ class PayrollEntry(Document):
 		elif not default_gpf_account:
 			frappe.throw(_("Please set account for <b>Employer Contribution to PF</b> for the Company"))
 
-		# Filters
-		#cond = self.get_filter_condition()
-		
-		# Salary Details
+
 		cc = frappe.db.sql("""
 			select
 				(case
@@ -680,7 +649,7 @@ class PayrollEntry(Document):
 					when sc.type = 'Earning' then 0
 					else ifnull(sc.is_remittable,0)
 				end)                       as is_remittable,
-				sc.gl_head                 as gl_head,
+				sca.account                 as gl_head,
 				sum(ifnull(sd.amount,0))   as amount,
 				(case
 					when ifnull(sc.make_party_entry,0) = 1 then 'Payable'
@@ -698,6 +667,7 @@ class PayrollEntry(Document):
 				`tabSalary Slip` t1,
 				`tabSalary Detail` sd,
 				`tabSalary Component` sc,
+				`tabSalary Component Account` sca,
 				`tabCompany` c
 			where t1.fiscal_year = '{0}'
 			  and t1.month       = '{1}'
@@ -705,7 +675,9 @@ class PayrollEntry(Document):
 			  and sd.parent      = t1.name
 			  and sc.name        = sd.salary_component
 			  and c.name         = t1.company
+			  and t1.company = sca.company
 			  and t1.payroll_entry = '{2}'
+			  and t1.employee = '{3}' 
 			  and exists(select 1
 						from `tabPayroll Employee Detail` ped
 						where ped.parent = t1.payroll_entry
@@ -723,14 +695,8 @@ class PayrollEntry(Document):
 				(case when ifnull(sc.make_party_entry,0) = 1 then 'Employee' else 'Other' end),
 				(case when ifnull(sc.make_party_entry,0) = 1 then t1.employee else 'Other' end)
 			order by t1.cost_center, sc.type, sc.name
-		""".format(self.fiscal_year, self.month, self.name),as_dict=1)
-		# frappe.throw("<pre>{}</pre>".format(frappe.as_json(cc)))
-		# sd.institution_name,
+		""".format(self.fiscal_year, self.month, self.name,self.employee),as_dict=1)
 		
-		# (case
-		# 	when sc.type = 'Deduction' and ifnull(sc.group_by_institution_name,0) = 1 then sd.institution_name
-		# 	else t1.cost_center
-		# end),
 
 		posting        = frappe._dict()
 		cc_wise_totals = frappe._dict()
@@ -838,17 +804,7 @@ class PayrollEntry(Document):
 					"salary_component": rec.salary_component
 				})
 		
-		# posting.setdefault('Salary Tax',[]).append({
-		# 	"account"       : default_bank_account,
-		# 	"credit_in_account_currency" : flt(salary_tax_and_health_contri),
-		# 	"cost_center"   : salary_tax_cost_center,
-		# 	"party_check"   : 0,
-		# 	"reference_type": self.doctype,
-		# 	"reference_name": self.name,
-		# 	"salary_component": 'Salary Tax'
-		# })
-
-
+		
 		# To Bank
 		if posting.get("to_payables") and len(posting.get("to_payables")):
 			posting.setdefault("to_bank",[]).append({
@@ -900,7 +856,7 @@ class PayrollEntry(Document):
 					v_title = "SALARY "+str(self.fiscal_year)+str(self.month)+" - "+str(v_title)
 				else:
 					v_title = "SALARY "+str(self.fiscal_year)+str(self.month)
-     
+	 
 				doc = frappe.get_doc({
 						"doctype": "Journal Entry",
 						"voucher_type": v_voucher_type,
@@ -929,6 +885,7 @@ class PayrollEntry(Document):
 			frappe.msgprint(_("Salary posting to accounts is successful."),title="Posting Successful")
 		else:
 			frappe.throw(_("No data found"),title="Posting failed")
+		
 	##### Ver3.0.190304 Ends
 	# Ver 20190719.1 added by SHIV, JIGME on 2019/07/19
 	def check_budget(self, posting):
@@ -1149,7 +1106,7 @@ def create_salary_slips_for_employees(employees, args, title=None, publish_progr
 				})
 			else:
 				ped.db_set("status", "Success")
-    
+	
 			if publish_progress:
 				show_progress = 0
 				if count <= refresh_interval:

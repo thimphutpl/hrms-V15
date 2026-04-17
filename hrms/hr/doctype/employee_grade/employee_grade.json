@@ -37,6 +37,7 @@
   "fixed_allowance",
   "vegetable_allowance",
   "afsa",
+  "batman_allowance",
   "column_break_zzpy",
   "ltc",
   "hra",
@@ -54,6 +55,7 @@
    "depends_on": "default_salary_structure",
    "fieldname": "default_base_pay",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Default Base Pay",
    "options": "currency"
   },
@@ -162,6 +164,7 @@
   {
    "fieldname": "government_grade",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Government Grade"
   },
   {
@@ -220,14 +223,19 @@
   {
    "fieldname": "company",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Company",
-   "options": "Company",
-   "reqd": 1
+   "options": "Company"
+  },
+  {
+   "fieldname": "batman_allowance",
+   "fieldtype": "Currency",
+   "label": "Batman Allowance"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-20 16:31:02.970522",
+ "modified": "2026-04-07 11:17:46.604080",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Grade",

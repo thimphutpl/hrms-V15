@@ -94,25 +94,49 @@
   "fixed_allowance",
   "section_break_oaxi",
   "eligible_for_king_allowance",
+  "eligible_for_king_allowance_method",
+  "king_allowance",
   "eligible_for_personal_pay",
+  "eligible_for_personal_pay_method",
+  "personal_pay",
   "eligible_for_border_allowance",
+  "eligible_for_border_allowance_method",
+  "border_allowance",
   "eligible_for_batman_allowance",
+  "eligible_for_batman_allowance_method",
+  "batman_allowance",
   "eligible_for_high_altitude_allowance",
   "eligible_for_hra",
   "eligible_for_lumpsum_revision",
   "column_break_obuh",
   "eligible_for_trade_allowance",
+  "eligible_for_trade_allowance_method",
+  "trade_allowance",
   "eligible_for_city_allowance",
+  "eligible_for_city_allowance_method",
+  "city_allowance",
   "eligible_for_medal_allowance",
+  "eligible_for_medal_allowance_method",
+  "medal_allowance",
   "eligible_for_cdo_allowance",
+  "eligible_for_cdo_allowance_method",
+  "cdo_allowance",
   "eligible_for_attendant_allowance",
   "eligible_for_vegetable_allowance",
   "eligible_for_orderly_allowance",
   "column_break_fxgi",
   "eligible_for_professional_dr",
+  "eligible_for_professional_dr_method",
+  "professional_dr",
   "eligible_for_other_allowance",
+  "eligible_for_other_allowance_method",
+  "other_allowance",
   "eligible_for_kma",
+  "eligible_for_kma_method",
+  "kma",
   "eligible_for_entertainment_allowance",
+  "eligible_for_entertainment_allowance_method",
+  "entertainment_allowance",
   "eligible_for_afsa",
   "eligible_for_contract_allowance",
   "sb_other_benefits",
@@ -121,12 +145,15 @@
   "eligible_for_health_contribution",
   "eligible_for_tax",
   "eligible_for_tv",
+  "eligible_for_ration",
+  "eligible_for_mess",
   "cb_16",
   "eligible_for_leave_encashment",
   "eligible_for_overtime_and_payment",
   "eligible_for_sws",
   "eligible_for_relief_fund",
   "eligible_for_child_alimony",
+  "eligible_for_kidney",
   "cb_17",
   "eligible_for_tshechu",
   "eligible_for_semso",
@@ -680,6 +707,7 @@
    "default": "1",
    "fieldname": "eligible_for_leave_encashment",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Eligible for Leave Encashment",
    "print_hide": 1
   },
@@ -863,7 +891,6 @@
    "default": "1",
    "fieldname": "eligible_for_sws",
    "fieldtype": "Check",
-   "hidden": 1,
    "label": "Eligible for SWS",
    "print_hide": 1
   },
@@ -873,11 +900,13 @@
   },
   {
    "fieldname": "cb_16",
-   "fieldtype": "Column Break"
+   "fieldtype": "Column Break",
+   "hidden": 1
   },
   {
    "fieldname": "cb_17",
-   "fieldtype": "Column Break"
+   "fieldtype": "Column Break",
+   "hidden": 1
   },
   {
    "fetch_from": "branch.cost_center",
@@ -1106,30 +1135,35 @@
    "default": "0",
    "fieldname": "eligible_for_tshechu",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Eligible for Tshechu"
   },
   {
    "default": "0",
    "fieldname": "eligible_for_semso",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Eligible for Semso"
   },
   {
    "default": "0",
    "fieldname": "eligible_for_spouse_semso",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Eligible for Spouse Semso"
   },
   {
    "default": "0",
    "fieldname": "eligible_for_kanjur",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Eligible for Kanjur"
   },
   {
    "default": "0",
    "fieldname": "eligible_for_tv",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Eligible for TV"
   },
   {
@@ -1149,25 +1183,204 @@
    "default": "0",
    "fieldname": "eligible_for_child_alimony",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Eligible for Child Alimony"
   },
   {
    "default": "0",
    "fieldname": "eligible_for_relief_fund",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Eligible for Relief Fund"
   },
   {
    "default": "0",
    "fieldname": "eligible_for_medical",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Eligible for Medical"
+  },
+  {
+   "depends_on": "eligible_for_king_allowance",
+   "fieldname": "eligible_for_king_allowance_method",
+   "fieldtype": "Select",
+   "label": "Eligible for King Allowance Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_king_allowance",
+   "fieldname": "king_allowance",
+   "fieldtype": "Int",
+   "label": "Value(King Allowance)"
+  },
+  {
+   "depends_on": "eligible_for_trade_allowance",
+   "fieldname": "eligible_for_trade_allowance_method",
+   "fieldtype": "Select",
+   "label": "Eligible for Trade Allowance Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_trade_allowance",
+   "fieldname": "trade_allowance",
+   "fieldtype": "Int",
+   "label": "Value(Trade Allowance)"
+  },
+  {
+   "depends_on": "eligible_for_city_allowance",
+   "fieldname": "eligible_for_city_allowance_method",
+   "fieldtype": "Select",
+   "label": "Eligible for City Allowance Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_city_allowance",
+   "fieldname": "city_allowance",
+   "fieldtype": "Int",
+   "label": "Value(City Allowance)"
+  },
+  {
+   "depends_on": "eligible_for_medal_allowance",
+   "fieldname": "eligible_for_medal_allowance_method",
+   "fieldtype": "Select",
+   "label": "Eligible for Medal Allowance Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_medal_allowance",
+   "fieldname": "medal_allowance",
+   "fieldtype": "Int",
+   "label": "Medal Allowance"
+  },
+  {
+   "fieldname": "eligible_for_personal_pay_method",
+   "fieldtype": "Select",
+   "label": "Eligible for Personal Pay Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_personal_pay",
+   "fieldname": "personal_pay",
+   "fieldtype": "Int",
+   "label": "Value(Personal Pay)"
+  },
+  {
+   "depends_on": "eligible_for_border_allowance",
+   "fieldname": "eligible_for_border_allowance_method",
+   "fieldtype": "Select",
+   "label": "Eligible for Border Allowance Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_border_allowance",
+   "fieldname": "border_allowance",
+   "fieldtype": "Int",
+   "label": "Value(Border Allowance)"
+  },
+  {
+   "depends_on": "eligible_for_cdo_allowance",
+   "fieldname": "eligible_for_cdo_allowance_method",
+   "fieldtype": "Select",
+   "label": "Eligible for CDO Allowance Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_cdo_allowance",
+   "fieldname": "cdo_allowance",
+   "fieldtype": "Int",
+   "label": "Value(CDO Allowance)"
+  },
+  {
+   "depends_on": "eligible_for_professional_dr",
+   "fieldname": "eligible_for_professional_dr_method",
+   "fieldtype": "Select",
+   "label": "Eligible for Professional for (DR) Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_professional_dr",
+   "fieldname": "professional_dr",
+   "fieldtype": "Int",
+   "label": "Value(Professional DR)"
+  },
+  {
+   "depends_on": "eligible_for_kma",
+   "fieldname": "eligible_for_kma_method",
+   "fieldtype": "Select",
+   "label": "Eligible for KMA Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_kma",
+   "fieldname": "kma",
+   "fieldtype": "Int",
+   "label": "Value(KMA)"
+  },
+  {
+   "depends_on": "eligible_for_other_allowance",
+   "fieldname": "eligible_for_other_allowance_method",
+   "fieldtype": "Select",
+   "label": "Eligible for Other Allowance Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_other_allowance",
+   "fieldname": "other_allowance",
+   "fieldtype": "Int",
+   "label": "Value(Other Allowance)"
+  },
+  {
+   "depends_on": "eligible_for_entertainment_allowance",
+   "fieldname": "eligible_for_entertainment_allowance_method",
+   "fieldtype": "Select",
+   "label": "Eligible for Entertainment Allowance Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_entertainment_allowance",
+   "fieldname": "entertainment_allowance",
+   "fieldtype": "Int",
+   "label": "Value(Entertainment Allowance)"
+  },
+  {
+   "depends_on": "eligible_for_batman_allowance",
+   "fieldname": "eligible_for_batman_allowance_method",
+   "fieldtype": "Select",
+   "label": "Eligible for Batman Allowance Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_batman_allowance",
+   "fieldname": "batman_allowance",
+   "fieldtype": "Int",
+   "label": "Value(Batman Allowance)"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_ration",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Eligible for Ration"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_mess",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Eligible for Mess"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_kidney",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Eligible for kidney"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2025-11-13 19:16:51.734388",
+ "modified": "2026-04-15 10:10:59.027912",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",

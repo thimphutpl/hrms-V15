@@ -25,6 +25,13 @@ frappe.ui.form.on("Salary Slip", {
 	},
 
 	onload: function(frm){
+		frm.set_query("branch", function() {
+			return {
+				"filters": {
+					"company": frm.doc.company,
+				}
+			};
+		});
 		if((cint(frm.doc.__islocal) == 1) && !frm.doc.amended_from){
 			if(!frm.doc.month) {
 				// var today=new Date();

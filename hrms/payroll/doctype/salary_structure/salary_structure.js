@@ -6,7 +6,7 @@ cur_frm.add_fetch('company', 'default_letter_head', 'letter_head');
 cur_frm.add_fetch('employee', 'company', 'company');
 
 frappe.ui.form.on('Salary Structure', {
-	onload: function(frm, cdt, cdn){
+	onload: function (frm, cdt, cdn) {
 		// Following function is created as a replacement for the following commented block by SHIV on 2020/09/23
 		make_ed_table(frm);
 		/*
@@ -20,18 +20,32 @@ frappe.ui.form.on('Salary Structure', {
 			});
 		}
 		*/
+		frm.set_query("branch", function() {
+			return {
+				"filters": {
+					"company": frm.doc.company,
+				}
+			};
+		});
+		frm.set_query("cost_center", function() {
+			return {
+				"filters": {
+					"company": frm.doc.company,
+				}
+			};
+		});
 	},
-	onload_post_render: function(frm) {
+	onload_post_render: function (frm) {
 		highlight_expired_components(frm);
 	},
-	refresh: function(frm, cdt, cdn) {
+	refresh: function (frm, cdt, cdn) {
 		// Following code is commented by SHIV on 2020/09/23
 		/*
 		frm.trigger("toggle_fields")
 		frm.fields_dict['earnings'].grid.set_column_disp("default_amount", false);
 		frm.fields_dict['deductions'].grid.set_column_disp("default_amount", false);
 		frm.fields_dict['earnings'].grid.set_column_disp("sb_additional_info", false);
-		*/		
+		*/
 		// Commented till here by SHIV on 2020/09/23
 
 		/*
@@ -43,7 +57,7 @@ frappe.ui.form.on('Salary Structure', {
 		*/
 		hide_eligible_boxes(frm);
 	},
-	employee: function(frm, cdt, cdn){
+	employee: function (frm, cdt, cdn) {
 		if (frm.doc.employee) {
 			cur_frm.call({
 				method: "get_employee_details",
@@ -52,230 +66,239 @@ frappe.ui.form.on('Salary Structure', {
 		}
 		calculate_others(frm);
 	},
-	is_active: function(frm){
+	is_active: function (frm) {
 		frm.toggle_reqd("to_date", frm.doc.is_active == "No");
 	},
-	salary_slip_based_on_timesheet: function(frm) {
+	salary_slip_based_on_timesheet: function (frm) {
 		frm.trigger("toggle_fields")
 	},
-	toggle_fields: function(frm) {
+	toggle_fields: function (frm) {
 		frm.toggle_display(['salary_component', 'hour_rate'], frm.doc.salary_slip_based_on_timesheet);
 		frm.toggle_reqd(['salary_component', 'hour_rate'], frm.doc.salary_slip_based_on_timesheet);
 	},
-	eligible_for_corporate_allowance: function(frm){
+	eligible_for_corporate_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_contract_allowance: function(frm){
+	eligible_for_contract_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_communication_allowance: function(frm){
+	eligible_for_communication_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_fuel_allowances: function(frm){
+	eligible_for_fuel_allowances: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_underground: function(frm){
+	eligible_for_underground: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_shift: function(frm){
+	eligible_for_shift: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_difficulty: function(frm){
+	eligible_for_difficulty: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_high_altitude: function(frm){
+	eligible_for_high_altitude: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_psa: function(frm){
+	eligible_for_psa: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_pda: function(frm){
+	eligible_for_pda: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_deputation: function(frm){
+	eligible_for_deputation: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_officiating_allowance: function(frm){
+	eligible_for_officiating_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_temporary_transfer_allowance: function(frm){
+	eligible_for_temporary_transfer_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_scarcity: function(frm){
+	eligible_for_scarcity: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_cash_handling: function(frm){
+	eligible_for_cash_handling: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_honorarium: function(frm){
+	eligible_for_honorarium: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_fixed_allowance: function(frm){
+	eligible_for_fixed_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	fixed_allowance: function(frm){
+	fixed_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_talent_retention_allowance: function(frm){
+	eligible_for_talent_retention_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	talent_retention_allowance: function(frm){
+	talent_retention_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_mpi: function(frm){
+	eligible_for_mpi: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_security_deposit: function(frm){
+	eligible_for_security_deposit: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_afsa: function(frm){
+	eligible_for_afsa: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_vegetable_allowance: function(frm){
+	eligible_for_vegetable_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_lumpsum_revision: function(frm){
+	eligible_for_lumpsum_revision: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_orderly_allowance: function(frm){
+	eligible_for_orderly_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_gis: function(frm){
+	eligible_for_gis: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_hra: function(frm){
+	eligible_for_hra: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_king_allowance: function(frm){
+	eligible_for_king_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_personal_pay: function(frm){
+	eligible_for_personal_pay: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_border_allowance: function(frm){
+	eligible_for_border_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_batman_allowance: function(frm){
+	eligible_for_batman_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_high_altitude_allowance: function(frm){
+	eligible_for_high_altitude_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_trade_allowance: function(frm){
+	eligible_for_trade_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_city_allowance: function(frm){
+	eligible_for_city_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_medal_allowance: function(frm){
+	eligible_for_medal_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_cdo_allowance: function(frm){
+	eligible_for_cdo_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_attendant_allowance: function(frm){
+	eligible_for_attendant_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_professional_dr: function(frm){
+	eligible_for_professional_dr: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_other_allowance: function(frm){
+	eligible_for_other_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_kma: function(frm){
+	eligible_for_kma: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_entertainment_allowance: function(frm){
+	eligible_for_entertainment_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_tax: function(frm){
+	eligible_for_tax: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_tv: function(frm){
+	eligible_for_tv: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_relief_fund: function(frm){
+	eligible_for_relief_fund: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_child_alimony: function(frm){
+	eligible_for_mess: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_tshechu: function(frm){
+	eligible_for_ration: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_semso: function(frm){
+	eligible_for_kidney: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_spouse_semso: function(frm){
+	eligible_for_child_alimony: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_kanjur: function(frm){
+	eligible_for_tshechu: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_medical: function(frm){
+	eligible_for_semso: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_pf: function(frm){
+	eligible_for_spouse_semso: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_tax: function(frm){
+	eligible_for_kanjur: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_health_contribution: function(frm){
+	eligible_for_medical: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_banking_allowance: function(frm){
+	eligible_for_pf: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_atm_allowance: function(frm){
+	eligible_for_tax: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_driver_allowance: function(frm){
+	eligible_for_health_contribution: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_house_rent_allowance: function(frm){
+	eligible_for_banking_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_joint_custodian: function(frm){
+	eligible_for_atm_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_entertainment_allowance: function(frm){
+	eligible_for_driver_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_project_allowance: function(frm){
+	eligible_for_house_rent_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_special_allowance: function(frm){
+	eligible_for_joint_custodian: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_holiday_banking: function(frm){
+	eligible_for_entertainment_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_uniform_allowance: function(frm){
+	eligible_for_project_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_house_rent_deduction: function(frm){
+	eligible_for_special_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	ca: function(frm){
+	eligible_for_holiday_banking: function (frm) {
 		calculate_others(frm);
 	},
-	contract_allowance: function(frm){
+	eligible_for_uniform_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	communication_allowance: function(frm){
+	eligible_for_house_rent_deduction: function (frm) {
 		calculate_others(frm);
 	},
-	psa: function(frm){
+	ca: function (frm) {
 		calculate_others(frm);
 	},
-	mpi: function(frm){
+	contract_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	officiating_allowance: function(frm){
+	communication_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	temporary_transfer_allowance: function(frm){
+	psa: function (frm) {
+		calculate_others(frm);
+	},
+	mpi: function (frm) {
+		calculate_others(frm);
+	},
+	officiating_allowance: function (frm) {
+		calculate_others(frm);
+	},
+	temporary_transfer_allowance: function (frm) {
 		calculate_others(frm);
 	},
 	/*
@@ -284,199 +307,196 @@ frappe.ui.form.on('Salary Structure', {
 		calculate_totals(frm.doc);
 	},
 	*/
-	fuel_allowances: function(frm){
+	fuel_allowances: function (frm) {
 		calculate_others(frm);
 	},
-	pda: function(frm){
+	pda: function (frm) {
 		calculate_others(frm);
 	},
-	shift: function(frm){
+	shift: function (frm) {
 		calculate_others(frm);
 	},
-	deputation: function(frm){
+	deputation: function (frm) {
 		calculate_others(frm);
 	},
-	underground: function(frm){
+	underground: function (frm) {
 		calculate_others(frm);
 	},
-	difficulty: function(frm){
+	difficulty: function (frm) {
 		calculate_others(frm);
 	},
-	high_altitude: function(frm){
+	high_altitude: function (frm) {
 		calculate_others(frm);
 	},
-	scarcity: function(frm){
+	scarcity: function (frm) {
 		calculate_others(frm);
 	},
-	cash_handling: function(frm){
+	cash_handling: function (frm) {
 		calculate_others(frm);
 	},
-	honorarium: function(frm){
+	honorarium: function (frm) {
 		calculate_others(frm);
 	},
-	banking_allowance: function(frm){
+	banking_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	atm_allowance: function(frm){
+	atm_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	driver_allowance: function(frm){
+	driver_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	house_rent_allowance: function(frm){
+	house_rent_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	joint_custodian: function(frm){
+	joint_custodian: function (frm) {
 		calculate_others(frm);
 	},
-	entertainment_allowance: function(frm){
+	entertainment_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	project_allowance: function(frm){
+	project_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	special_allowance: function(frm){
+	special_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	holiday_banking: function(frm){
+	holiday_banking: function (frm) {
 		calculate_others(frm);
 	},
-	uniform_allowance: function(frm){
+	uniform_allowance: function (frm) {
 		calculate_others(frm);
 	},
 	// Payment Methods
-	ca_method: function(frm){
+	ca_method: function (frm) {
 		calculate_others(frm);
 	},
-	contract_allowance_method: function(frm){
+	contract_allowance_method: function (frm) {
 		calculate_others(frm);
 	},
-	communication_allowance_method: function(frm){
+	communication_allowance_method: function (frm) {
 		calculate_others(frm);
 	},
-	psa_method: function(frm){
+	psa_method: function (frm) {
 		calculate_others(frm);
 	},
-	mpi_method: function(frm){
+	mpi_method: function (frm) {
 		calculate_others(frm);
 	},
-	officiating_allowance_method: function(frm){
+	officiating_allowance_method: function (frm) {
 		calculate_others(frm);
 	},
-	temporary_transfer_allowance_method: function(frm){
+	temporary_transfer_allowance_method: function (frm) {
 		calculate_others(frm);
 	},
-	fuel_allowances_method: function(frm){
+	fuel_allowances_method: function (frm) {
 		calculate_others(frm);
 	},
-	pda_method: function(frm){
+	pda_method: function (frm) {
 		calculate_others(frm);
 	},
-	shift_method: function(frm){
+	shift_method: function (frm) {
 		calculate_others(frm);
 	},
-	deputation_method: function(frm){
+	deputation_method: function (frm) {
 		calculate_others(frm);
 	},
-	underground_method: function(frm){
+	underground_method: function (frm) {
 		calculate_others(frm);
 	},
-	difficulty_method: function(frm){
+	difficulty_method: function (frm) {
 		calculate_others(frm);
 	},
-	high_altitude_method: function(frm){
+	high_altitude_method: function (frm) {
 		calculate_others(frm);
 	},
-	scarcity_method: function(frm){
+	scarcity_method: function (frm) {
 		calculate_others(frm);
 	},
-	cash_handling_method: function(frm){
+	cash_handling_method: function (frm) {
 		calculate_others(frm);
 	},
-	honorarium_method: function(frm){
+	honorarium_method: function (frm) {
 		calculate_others(frm);
 	},
-	banking_allowance_method: function(frm){
+	banking_allowance_method: function (frm) {
 		calculate_others(frm);
 	},
-	atm_allowance_method: function(frm){
+	atm_allowance_method: function (frm) {
 		calculate_others(frm);
 	},
-	driver_allowance_method: function(frm){
+	driver_allowance_method: function (frm) {
 		calculate_others(frm);
 	},
-	house_rent_allowance_method: function(frm){
+	house_rent_allowance_method: function (frm) {
 		calculate_others(frm);
 	},
-	joint_custodian_method: function(frm){
+	joint_custodian_method: function (frm) {
 		calculate_others(frm);
 	},
-	entertainment_allowance_method: function(frm){
+	entertainment_allowance_method: function (frm) {
 		calculate_others(frm);
 	},
-	project_allowance_method: function(frm){
+	project_allowance_method: function (frm) {
 		calculate_others(frm);
 	},
-	special_allowance_method: function(frm){
+	special_allowance_method: function (frm) {
 		calculate_others(frm);
 	},
-	holiday_banking_method: function(frm){
+	holiday_banking_method: function (frm) {
 		calculate_others(frm);
 	},
-	uniform_allowance_method: function(frm){
+	uniform_allowance_method: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_tswf:function(frm){
+	eligible_for_tswf: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_underground_allowance: function(frm){
+	eligible_for_underground_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_project_deployment_allowance: function(frm){
+	eligible_for_project_deployment_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_project_deployment_allowance_payment_method: function(frm){
+	eligible_for_project_deployment_allowance_payment_method: function (frm) {
 		calculate_others(frm);
 	},
-	valueproject_deployment_allowance: function(frm){
+	valueproject_deployment_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_underground_allowance_payment_method: function(frm){
+	eligible_for_underground_allowance_payment_method: function (frm) {
 		calculate_others(frm);
 	},
-	valueunderground_allowance: function(frm){
+	valueunderground_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_housing_allowance:function(frm){
+	eligible_for_housing_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_housing_allowance_payment_method:function(frm){
+	eligible_for_housing_allowance_payment_method: function (frm) {
 		calculate_others(frm);
 	},
-	valuehousing_allowance:function(frm){
+	valuehousing_allowance: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_relief_fund: function(frm){
-		calculate_others(frm);
-	},
-	eligible_for_kanjur:function(frm){
+	eligible_for_kanjur: function (frm) {
 		calculate_others(frm);
 	},
 })
 
 // // dynamically display checkboxes based on Salary Component's status
-var hide_eligible_boxes = function(frm){
+var hide_eligible_boxes = function (frm) {
 	frappe.call({
 		method: 'frappe.client.get_list',
 		args: {
-				doctype: 'Salary Component',
-				fields: ['field_name', 'field_method', 'field_value', 'enabled'],
+			doctype: 'Salary Component',
+			fields: ['field_name', 'field_method', 'field_value', 'enabled'],
 		},
-		callback: function(r){
-			if(r.message){
-				r.message.forEach(function(row, i){
-					if(row.field_name){
-						if(frm.doc[row.field_name] == 1){
+		callback: function (r) {
+			if (r.message) {
+				r.message.forEach(function (row, i) {
+					if (row.field_name) {
+						if (frm.doc[row.field_name] == 1) {
 							// do nothing if the component is already checked
 						} else {
 							cur_frm.toggle_display(row.field_name, row.enabled);
@@ -490,11 +510,11 @@ var hide_eligible_boxes = function(frm){
 	});
 }
 
-var make_ed_table = function(frm){
+var make_ed_table = function (frm) {
 	var e_tbl = frm.doc.earnings || [];
 	var d_tbl = frm.doc.deductions || [];
-	
-	if (e_tbl.length == 0 && d_tbl.length == 0){
+
+	if (e_tbl.length == 0 && d_tbl.length == 0) {
 		cur_frm.call({
 			method: "make_earn_ded_table",
 			doc: frm.doc
@@ -503,58 +523,58 @@ var make_ed_table = function(frm){
 }
 
 
-var highlight_rows = function(frm, earn_ded_tbl){
+var highlight_rows = function (frm, earn_ded_tbl) {
 	let highlight = 0;
-	(frm.doc[earn_ded_tbl] || []).forEach(function(rec, i){
+	(frm.doc[earn_ded_tbl] || []).forEach(function (rec, i) {
 		highlight = 0;
-		if(rec.from_date || rec.to_date){
+		if (rec.from_date || rec.to_date) {
 			if (!((rec.to_date && rec.to_date >= frappe.datetime.month_start()) ||
 				(rec.from_date && rec.from_date <= frappe.datetime.month_end()))) {
 				highlight = 1;
 			}
 		}
 
-		if(rec.parentfield == "deductions" && flt(rec.total_deductible_amount) 
-				&& flt(rec.total_deductible_amount) == flt(rec.total_deducted_amount)){
+		if (rec.parentfield == "deductions" && flt(rec.total_deductible_amount)
+			&& flt(rec.total_deductible_amount) == flt(rec.total_deducted_amount)) {
 			highlight = 1;
 		}
 
-		if(highlight){
-			$(`div.grid-row[data-name='${rec.name}']`).find("div[data-fieldname='amount']").css({"color": "red"});
+		if (highlight) {
+			$(`div.grid-row[data-name='${rec.name}']`).find("div[data-fieldname='amount']").css({ "color": "red" });
 		} else {
-			$(`div.grid-row[data-name='${rec.name}']`).find("div[data-fieldname='amount']").css({"color": "#555"});
+			$(`div.grid-row[data-name='${rec.name}']`).find("div[data-fieldname='amount']").css({ "color": "#555" });
 		}
 	});
 }
 
-var highlight_expired_components = function(frm){
-	["earnings", "deductions"].forEach(function(tbl, i){highlight_rows(frm, tbl);})
+var highlight_expired_components = function (frm) {
+	["earnings", "deductions"].forEach(function (tbl, i) { highlight_rows(frm, tbl); })
 }
 
 frappe.ui.form.on('Salary Detail', {
-	amount: function(frm, cdt, cdn) {
+	amount: function (frm, cdt, cdn) {
 		calculate_others(frm);
 	},
-	
-	earnings_remove: function(frm) {
+
+	earnings_remove: function (frm) {
 		calculate_others(frm);
-	}, 
-	
+	},
+
 	// commented as the version 12 is giving issue 2021/04/06
 	// deductions_remove: function(frm) {
 	// 	calculate_others(frm);
 	// },
-	
-	total_deductible_amount: function(frm, cdt, cdn){
+
+	total_deductible_amount: function (frm, cdt, cdn) {
 		var d = locals[cdt][cdn];
-		frappe.model.set_value(cdt, cdn, "total_outstanding_amount", parseFloat(d.total_deductible_amount || 0.0)-parseFloat(d.total_deducted_amount || 0.0));
+		frappe.model.set_value(cdt, cdn, "total_outstanding_amount", parseFloat(d.total_deductible_amount || 0.0) - parseFloat(d.total_deducted_amount || 0.0));
 	},
 
-	from_date: function(frm){
+	from_date: function (frm) {
 		highlight_expired_components(frm);
 	},
 
-	to_date: function(frm){
+	to_date: function (frm) {
 		highlight_expired_components(frm);
 	},
 })
@@ -579,14 +599,14 @@ function calculate_others(frm) {
 	frappe.call({
 		method: "update_salary_structure",
 		doc: frm.doc,
-		args: {"remove_flag": 0},
+		args: { "remove_flag": 0 },
 		callback: function (r) {
-			if(r.message){
+			if (r.message) {
 				// earnings
-				if(frm.doc.earnings){
-					frm.doc.earnings.forEach(function(i,j){
-						r.message.forEach(function(k,l){
-							if(k.name==i.name){
+				if (frm.doc.earnings) {
+					frm.doc.earnings.forEach(function (i, j) {
+						r.message.forEach(function (k, l) {
+							if (k.name == i.name) {
 								cur_frm.get_field("earnings").grid.grid_rows[j].remove();
 							}
 						})
@@ -594,10 +614,10 @@ function calculate_others(frm) {
 				}
 
 				// deductions
-				if(frm.doc.deductions){
-					frm.doc.deductions.forEach(function(i,j){
-						r.message.forEach(function(k,l){
-							if(k.name==i.name){
+				if (frm.doc.deductions) {
+					frm.doc.deductions.forEach(function (i, j) {
+						r.message.forEach(function (k, l) {
+							if (k.name == i.name) {
 								cur_frm.get_field("deductions").grid.grid_rows[j].remove();
 							}
 						})
@@ -613,11 +633,11 @@ function calculate_others(frm) {
 	});
 }
 
-cur_frm.fields_dict.employee.get_query = function(doc,cdt,cdn) {
-			return{ query: "erpnext.controllers.queries.employee_query" }
+cur_frm.fields_dict.employee.get_query = function (doc, cdt, cdn) {
+	return { query: "erpnext.controllers.queries.employee_query" }
 }
 
-cur_frm.cscript['Make Salary Slip'] = function() {
+cur_frm.cscript['Make Salary Slip'] = function () {
 	frappe.model.open_mapped_doc({
 		method: "hrms.hr.hr_custom_functions.make_salary_slip",
 		frm: cur_frm
@@ -626,23 +646,23 @@ cur_frm.cscript['Make Salary Slip'] = function() {
 
 // ++++++++++++++++++++ Ver 2.0 BEGINS ++++++++++++++++++++
 // Following code added by SHIV on 2018/02/27
-frappe.ui.form.on("Salary Structure", "refresh", function(frm) {
-    frm.fields_dict['earnings'].grid.get_field('salary_component').get_query = function(doc, cdt, cdn) {
-        var doc = locals[cdt][cdn];
-        return {
-            "query": "hrms.payroll.doctype.salary_structure.salary_structure.salary_component_query",
-            filters: {'parentfield': 'earnings'}
-        }
-    };
+frappe.ui.form.on("Salary Structure", "refresh", function (frm) {
+	frm.fields_dict['earnings'].grid.get_field('salary_component').get_query = function (doc, cdt, cdn) {
+		var doc = locals[cdt][cdn];
+		return {
+			"query": "hrms.payroll.doctype.salary_structure.salary_structure.salary_component_query",
+			filters: { 'parentfield': 'earnings' }
+		}
+	};
 });
 
-frappe.ui.form.on("Salary Structure", "refresh", function(frm) {
-    frm.fields_dict['deductions'].grid.get_field('salary_component').get_query = function(doc, cdt, cdn) {
-        doc = locals[cdt][cdn]
-        return {
-            "query": "hrms.payroll.doctype.salary_structure.salary_structure.salary_component_query",
-            filters: {'parentfield': 'deductions'}
-        }
-    };
+frappe.ui.form.on("Salary Structure", "refresh", function (frm) {
+	frm.fields_dict['deductions'].grid.get_field('salary_component').get_query = function (doc, cdt, cdn) {
+		doc = locals[cdt][cdn]
+		return {
+			"query": "hrms.payroll.doctype.salary_structure.salary_structure.salary_component_query",
+			filters: { 'parentfield': 'deductions' }
+		}
+	};
 });
 // // +++++++++++++++++++++ Ver 2.0 ENDS +++++++++++++++++++++

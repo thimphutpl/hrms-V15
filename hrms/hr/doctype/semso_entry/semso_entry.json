@@ -1,0 +1,180 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "SE.YYYY.######",
+ "creation": "2026-04-16 15:34:27.178241",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_hlru",
+  "amended_from",
+  "section_break_lsgx",
+  "company",
+  "fiscal_year",
+  "column_break_hgaj",
+  "branch",
+  "month",
+  "section_break_bigd",
+  "semso_type",
+  "column_break_rfca",
+  "amount",
+  "section_break_rrzd",
+  "deceased",
+  "semso_contribution_section",
+  "troops",
+  "officers",
+  "section_break_jqrm",
+  "get_employee",
+  "section_break_gtil",
+  "semso_contribution",
+  "total_amount"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_hlru",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Semso Entry",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "section_break_lsgx",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "column_break_hgaj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch"
+  },
+  {
+   "fieldname": "fiscal_year",
+   "fieldtype": "Link",
+   "label": "Fiscal Year",
+   "options": "Fiscal Year"
+  },
+  {
+   "fieldname": "month",
+   "fieldtype": "Link",
+   "label": "Month",
+   "options": "Month"
+  },
+  {
+   "fieldname": "section_break_bigd",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "semso_type",
+   "fieldtype": "Link",
+   "label": "Semso Type",
+   "options": "Semso Deduction Group"
+  },
+  {
+   "fieldname": "column_break_rfca",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "semso_type.amount",
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "label": "Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_rrzd",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "deceased",
+   "fieldtype": "Table",
+   "label": "Deceased",
+   "options": "Deceased Item"
+  },
+  {
+   "fieldname": "semso_contribution_section",
+   "fieldtype": "Section Break",
+   "label": "Semso Contribution"
+  },
+  {
+   "default": "0",
+   "fieldname": "troops",
+   "fieldtype": "Check",
+   "label": "Troops"
+  },
+  {
+   "default": "0",
+   "fieldname": "officers",
+   "fieldtype": "Check",
+   "label": "Officers"
+  },
+  {
+   "fieldname": "section_break_jqrm",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "get_employee",
+   "fieldtype": "Button",
+   "label": "Get Employee"
+  },
+  {
+   "fieldname": "section_break_gtil",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "semso_contribution",
+   "fieldtype": "Table",
+   "label": "Semso Contribution",
+   "options": "Semso Contribution Item"
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "label": "Total Amount",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-04-16 19:51:02.280666",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Semso Entry",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}
