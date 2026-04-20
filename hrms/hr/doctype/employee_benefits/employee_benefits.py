@@ -326,7 +326,16 @@ def get_leave_encashment_amount(employee, date):
 		frappe.throw("Basic Salary has not been assigned to the employee.")
 
 	basic_pay = flt(data[0]["amount"])
-	leave_balance = get_leave_balance_on(employee, "Earned Leave", date)
+	leave_balance=0
+	leave_balance_mr=0
+	leave_balance_bal = get_leave_balance_on(employee, "Earned Leave", date)
+	mr_leave=frappe.db.sql(f"""select leaves from `tabLeave Ledger Entry` where employee=%s and leave_type='Earned Leave' and transaction_type='Merge CL To EL' and from_date < %s < to_date""",(employee,date),as_dict=1)
+	for mr in mr_leave:
+		leave_balance_mr+=mr.leaves
+		#frappe.msgprint(str(mr.leaves))
+
+	leave_balance=leave_balance_mr+leave_balance_bal	
+	#frappe.throw(str(leave_balance))
 	if flt(leave_balance) == 30:		
 		amount = flt(basic_pay)
 	else:		
