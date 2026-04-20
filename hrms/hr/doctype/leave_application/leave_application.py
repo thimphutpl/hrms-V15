@@ -83,7 +83,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
     def validate(self):
         validate_active_employee(self.employee)
         set_employee_name(self)
-        #validate_workflow_states(self)
+        validate_workflow_states(self)
         self.validate_dates()
         self.validate_balance_leaves()
         self.validate_leave_overlap()
@@ -448,6 +448,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
                 )
 
             if not is_lwp(self.leave_type):
+                #frappe.throw("hii")
                 leave_balance = get_leave_balance_on(
                     self.employee,
                     self.leave_type,
@@ -456,6 +457,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
                     consider_all_leaves_in_the_allocation_period=True,
                     for_consumption=True,
                 )
+                #frappe.throw(str(leave_balance))
                 leave_balance_for_consumption = flt(
                     leave_balance.get("leave_balance_for_consumption"), precision
                 )
@@ -1102,6 +1104,49 @@ def get_leave_balance_on(
     if for_consumption:
         return remaining_leaves
     else:
+        if leave_type=="Earned Leave":
+            #frappe.throw(str(end_date))
+            total_leaves=0
+            Ledger = frappe.qb.DocType("Leave Ledger Entry")
+
+            query = (
+                frappe.qb.from_(Ledger)
+                .select(Sum(Ledger.leaves).as_("total_leaves"))
+                .where(
+                    (Ledger.employee == employee)
+                    & (Ledger.leave_type == 'Earned leave')
+                    & (Ledger.transaction_type == 'Merge CL To EL')
+                    & (Ledger.from_date == allocation.from_date)
+                    & (Ledger.to_date == end_date)
+                )
+            )
+
+            result = query.run(as_dict=True)
+            total_leaves = result[0]['total_leaves'] if result else 0
+            #frappe.throw(str(total_leaves ))
+            remaining_leaves.leave_balance +=flt(total_leaves)
+        
+        # if leave_type=="Casual Leave":
+        #     #frappe.throw(str(end_date))
+        #     total_leaves=0
+        #     Ledger = frappe.qb.DocType("Leave Ledger Entry")
+
+        #     query = (
+        #         frappe.qb.from_(Ledger)
+        #         .select(Sum(Ledger.leaves).as_("total_leaves"))
+        #         .where(
+        #             (Ledger.employee == employee)
+        #             & (Ledger.leave_type == 'Casual Leave')
+        #             & (Ledger.transaction_type == 'Merge CL To EL')
+        #             & (Ledger.from_date == allocation.from_date)
+        #             & (Ledger.to_date == end_date)
+        #         )
+        #     )
+
+        #     result = query.run(as_dict=True)
+        #     total_leaves = result[0]['total_leaves'] if result else 0
+        #     #frappe.throw(str(total_leaves ))
+        #     remaining_leaves.leave_balance +=flt(total_leaves)
         return remaining_leaves.get("leave_balance")
 
 
@@ -1333,7 +1378,8 @@ def get_leaves_for_period(
                 )
                 * -1
             )
-
+        elif leave_entry.transaction_type == "Merge CL To EL" and leave_entry.leave_type=='Casual Leave':
+            leave_days +=leave_entry.leaves
     return leave_days
 
 
