@@ -102,7 +102,12 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		share_doc_with_approver(self, self.leave_approver)
 		self.publish_update()
 		self.notify_approval_status()
-
+	def before_save(self):
+		if has_waiting_approval_leave(self.employee):
+			frappe.throw(
+				_("You have waiting for approval. Please clear them first."),
+				title=_("Pending Leave Exists")
+			)
 	def on_submit(self):
 		
 		notify_workflow_states(self)
@@ -599,6 +604,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		if self.half_day == 0:
 			self.half_day_date = None
 
+
 	def notify_employee(self):
 		employee_email = get_employee_email(self.employee)
 
@@ -805,7 +811,17 @@ class LeaveApplication(Document, PWANotificationsMixin):
 				args.update(dict(from_date=start_date, to_date=self.to_date, leaves=leaves * -1))
 				create_leave_ledger_entry(self, args, submit)
 
-
+def has_waiting_approval_leave(employee):
+	"""
+	Check if the employee has any leave that is waiting approval
+	in the given date range.
+	"""
+	filters = {
+		"doctype": "Leave Application",
+		"employee": employee,
+		"workflow_state": "Waiting Approval"
+	}
+	return bool(frappe.db.exists(filters))		
 def get_allocation_expiry_for_cf_leaves(
 	employee: str, leave_type: str, to_date: datetime.date, from_date: datetime.date
 ) -> str:
@@ -827,53 +843,6 @@ def get_allocation_expiry_for_cf_leaves(
 
 	return expiry[0][0] if expiry else ""
 
-
-# @frappe.whitelist()
-# def get_number_of_leave_days(
-# 	employee: str,
-# 	leave_type: str,
-# 	from_date: datetime.date,
-# 	to_date: datetime.date,
-# 	half_day: int | str | None = None,
-# 	half_day_date: datetime.date | str | None = None,
-# 	holiday_list: str | None = None,
-# ) -> float:
-# 	"""Returns number of leave days between 2 dates after considering half day and holidays
-# 	(Based on the include_holiday setting in Leave Type)"""
-	
-  
-# 	no_days=date_diff(to_date, from_date)+1
-# 	# if leave_type == "Earned Leave":
-# 	# 	frappe.throw(str(from_date))
-	
-# 	final=float(no_days)
-
-# 	if leave_type not in ("Earned Leave", "Casual Leave"):
-# 		return final 
-		
-# 	total_days=0
-# 	is_sat=frappe.db.get_value("Holiday List", get_holiday_list_for_employee(employee), "saturday_half")
-# 	cur_date=from_date
-		
-# 	for i in range(0, no_days):
-# 		for holiday in frappe.db.sql("select * from `tabHoliday` where parent='{}'".format(get_holiday_list_for_employee(employee)), as_dict=1):
-# 			hol_date=getdate(cur_date)
-# 			if holiday.holiday_date==hol_date:
-# 				if holiday.holiday_date.weekday()==5 and ("saturday" in holiday.description.lower()):
-# 					if is_sat==1:
-# 						final-=0.5  
-# 					else:
-# 						final-=1
-# 				else:
-# 					final-=1
-# 		cur_date=add_to_date(getdate(cur_date), days=1, as_string=True)
-
-# 	if int(half_day)==1:
-# 		final-=0.5
-			
-# 	return final
-
-# Add by sanga to remove holiday list between leave taken balance
 @frappe.whitelist()
 def get_number_of_leave_days(
 	employee,
@@ -929,45 +898,6 @@ def get_number_of_leave_days(
 	# if leave_type== "Earned Leave" and employee == "CDCL0107004":
 	# 		frappe.msgprint(str(final))	
 	return max(final, 0)
-
-
-
-# @frappe.whitelist()
-# def get_leave_details(employee, date):
-# 	allocation_records = get_leave_allocation_records(employee, date)
-# 	leave_allocation = {}
-# 	precision = cint(frappe.db.get_single_value("System Settings", "float_precision", cache=True))
-
-# 	for d in allocation_records:
-# 		allocation = allocation_records.get(d, frappe._dict())
-# 		remaining_leaves = get_leave_balance_on(
-# 			employee, d, date, to_date=allocation.to_date, consider_all_leaves_in_the_allocation_period=True
-# 		)
-
-# 		end_date = allocation.to_date
-# 		leaves_taken = get_leaves_for_period(employee, d, allocation.from_date, end_date) * -1
-# 		leaves_pending = get_leaves_pending_approval_for_period(employee, d, allocation.from_date, end_date)
-# 		expired_leaves = allocation.total_leaves_allocated - (remaining_leaves + leaves_taken)
-# 		max_allowed = 30
-# 		if remaining_leaves > max_allowed:
-# 			remaining_leaves = max_allowed
-# 		leave_allocation[d] = {
-# 			"total_leaves": flt(allocation.total_leaves_allocated, precision),
-# 			"expired_leaves": flt(expired_leaves, precision) if expired_leaves > 0 else 0,
-# 			"leaves_taken": flt(leaves_taken, precision),
-# 			"leaves_pending_approval": flt(leaves_pending, precision),
-# 			"remaining_leaves": flt(remaining_leaves, precision),
-# 		}
-
-# 	# is used in set query
-# 	lwp = frappe.get_list("Leave Type", filters={"is_lwp": 1}, pluck="name")
-
-# 	return {
-# 		"leave_allocation": leave_allocation,
-# 		# "leave_approver": get_leave_approver(employee),
-# 		"lwps": lwp,
-# 	}
-
 
 @frappe.whitelist()
 def get_leave_details(employee, date, for_salary_slip=False):
@@ -1096,69 +1026,6 @@ def get_leave_balance_on(
 			# if leave_type== "Earned Leave" and employee == "CDCL0107004":
 			# 	frappe.throw(str(remaining_leaves.leave_balance))
 		return remaining_leaves.get("leave_balance")
-
-# @frappe.whitelist()
-# def get_leave_balance_on(
-# 	employee: str,
-# 	leave_type: str,
-# 	date: datetime.date,
-# 	to_date: datetime.date | None = None,
-# 	consider_all_leaves_in_the_allocation_period: bool = False,
-# 	for_consumption: bool = False,
-# ):
-# 	"""
-# 	Returns the leave balance for an employee.
-	
-# 	:param employee: Employee ID
-# 	:param leave_type: Leave type (Casual Leave, Earned Leave, etc.)
-# 	:param date: Date to check balance on
-# 	:param to_date: Optional future date for allocation expiry consideration
-# 	:param consider_all_leaves_in_the_allocation_period: Whether to consider entire allocation period
-# 	:param for_consumption: Whether balance is for consumption (True) or display (False)
-# 	"""
-# 	if not to_date:
-# 		to_date = nowdate()
-
-# 	allocation_records = get_leave_allocation_records(employee, date, leave_type)
-# 	allocation = allocation_records.get(leave_type, frappe._dict())
-
-# 	if not allocation:
-# 		return 0 if not for_consumption else frappe._dict(leave_balance=0, leave_balance_for_consumption=0)
-
-# 	end_date = allocation.to_date if cint(consider_all_leaves_in_the_allocation_period) else date
-# 	cf_expiry = get_allocation_expiry_for_cf_leaves(employee, leave_type, to_date, allocation.from_date)
-
-# 	# Leaves already taken in this allocation period
-# 	leaves_taken = get_leaves_for_period(employee, leave_type, allocation.from_date, end_date)
-# 	remaining_leaves = get_remaining_leaves(allocation, leaves_taken, date, cf_expiry)
-	
-
-# 	if for_consumption:
-# 		return remaining_leaves
-# 	else:
-# 		# Special handling for Earned Leave to include merged Casual Leave
-# 		if leave_type == "Earned Leave":
-# 			Ledger = frappe.qb.DocType("Leave Ledger Entry")
-# 			total_merged_cl = (
-# 				frappe.qb.from_(Ledger)
-# 				.select(Sum(Ledger.leaves).as_("total_leaves"))
-# 				.where(
-# 					(Ledger.employee == employee)
-# 					& (Ledger.leave_type == "Earned Leave")
-# 					& (Ledger.transaction_type == "Merge CL To EL")
-# 					& (Ledger.from_date <= end_date)
-# 					& (Ledger.to_date >= allocation.from_date)
-# 				)
-# 			).run(as_dict=True)
-
-# 			total_merged_cl = total_merged_cl[0]['total_leaves'] if total_merged_cl else 0
-# 			remaining_leaves.leave_balance += flt(total_merged_cl)
-			
-		
-# 		return remaining_leaves.get("leave_balance")
-
-
-
 
 def get_leave_allocation_records(employee, date, leave_type=None):
 	"""Returns the total allocated leaves and carry forwarded leaves based on ledger entries"""
