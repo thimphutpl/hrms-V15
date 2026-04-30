@@ -953,6 +953,7 @@ def get_leave_balance_on(
 
 def get_leave_allocation_records(employee, date, leave_type=None):
 	"""Returns the total allocated leaves and carry forwarded leaves based on ledger entries"""
+	# frappe.throw(date)
 	Ledger = frappe.qb.DocType("Leave Ledger Entry")
 	LeaveAllocation = frappe.qb.DocType("Leave Allocation")
 
@@ -1393,3 +1394,45 @@ def get_leave_approver(employee):
 
 def on_doctype_update():
 	frappe.db.add_index("Leave Application", ["employee", "from_date", "to_date"])
+
+
+@frappe.whitelist()
+def get_approvers(doctype=None, txt=None, searchfield=None, start=None, page_len=None, filters=None):
+	app_list = []
+	if not filters.get("employee"):
+		frappe.throw(_("Please select Employee Record first."))
+
+	employee_user = frappe.get_value("Employee", filters.get("employee"), "user_id")
+
+	approver = frappe.get_value("Employee", filters.get("employee"), "reports_to")
+	approver_id = frappe.get_value("Employee", approver, "user_id")
+	if not approver:
+		frappe.throw("Set Reports To Field in Employee")
+	app_list.append(str(approver_id))
+
+	"""d = frappe.db.get_value("DepartmentDirector", {"department": frappe.get_value("Employee", filters.get("employee"), "department")}, "director")
+	if d:
+		app_list.append(str(d))
+	ceo = frappe.db.get_value("Employee", {"employee_subgroup": "CEO", "status": "Active"}, "user_id")
+	if ceo:
+		app_list.append(str(ceo))
+	"""
+	#Check for Officiating Employeee, if so, replace
+	# for a, b in enumerate(app_list):
+	# 	off = get_officiating_employee(frappe.db.get_value("Employee", {"user_id": app_list[a]}, "name"))
+	# 	#off = frappe.db.sql("select officiate from `tabOfficiating Employee` where docstatus = 1 and revoked != 1 and %(today)s between from_date and to_date and employee = %(employee)s order by creation desc limit 1", {"today": nowdate(), "employee": frappe.db.get_value("Employee", {"user_id": app_list[a]}, "name")}, as_dict=True)
+	# 	if off:
+	# 		app_list[a] = str(frappe.db.get_value("Employee", off[0].officiate, "user_id"))
+	
+	approvers = ""
+	for a in app_list:
+		approvers += "\'"+str(a)+"\',"
+	approvers += "\'dshfghasfgqyegfheqkhjf\'"
+
+	query = "select emp.user_id, emp.employee_name, emp.designation from tabEmployee emp where emp.user_id in (" + str(approvers) + ")"
+	lists = frappe.db.sql(query)
+
+	if lists:
+		return lists
+	else:
+		frappe.throw("Set \'Reports To\' field for employee " + str(filters.get("employee")))

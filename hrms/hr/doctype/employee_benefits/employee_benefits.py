@@ -17,7 +17,7 @@ import math
 
 class EmployeeBenefits(Document):
 	def validate(self):
-		validate_workflow_states(self)
+		# validate_workflow_states(self)
 		'''
 		if not self.employee_separation_id  and not self.employee_transfer_id and self.purpose != "Upgradation":
 			frappe.throw("This document should be created through either Employee Separation or Employee Transfer")
@@ -54,7 +54,7 @@ class EmployeeBenefits(Document):
 								select u.name from `tabUser` u inner join  `tabHas Role` r
 								on u.name = r.parent
 								where r.role in ("Accounts User","Accounts Manager") 
-								and u.name like "%bdb.bt"
+								and u.name like "%nrdcl.bt"
 								and exists(
 									select 1 from `tabAssign Branch` b inner join `tabBranch Item` i 
 									on b.name = i.parent 
@@ -282,44 +282,49 @@ class EmployeeBenefits(Document):
 				# "business_activity": emp.business_activity,
 				"party_type": "Employee",
 				"party": self.employee,
-			})
-		je.insert()
-		je.submit()
-		je_references = str(je.name)
-
-		if flt(total_amount):
-			jeb = frappe.new_doc("Journal Entry")
-			jeb.flags.ignore_permissions = 1
-			jeb.title = self.purpose+" Employee Benefits Payment(" + self.employee_name + "  " + self.name + ")"
-			jeb.voucher_type = "Bank Entry"
-			jeb.naming_series = "Bank Payment Voucher"
-			jeb.remark = 'Benefit payment against : ' + self.name
-			jeb.posting_date = self.posting_date
-			jeb.branch = emp.branch
-			jeb.append("accounts", {
-				"account": payable_account,
-				"reference_type": "Journal Entry",
-				"reference_name": je.name,
-				"cost_center": self.cost_center,
-				"debit_in_account_currency": flt(total_amount),
-				"debit": flt(total_amount),
-				# "business_activity": emp.business_activity,
-				"party_type": "Employee",
-				"party": self.employee,
-			})
-
-			jeb.append("accounts", {
-				"account": expense_bank_account,
-				"cost_center": self.cost_center,
 				"reference_type": "Employee Benefits",
 				"reference_name": self.name,
-				"credit_in_account_currency": flt(total_amount),
-				"credit": flt(total_amount),
-				# "business_activity": emp.business_activity,
 			})
-			jeb.insert()
+		je.insert()
+		# je.submit()
+		je_references = str(je.name)
 
-			je_references = je_references + ", "+ str(jeb.name)
+		# if flt(total_amount):
+		# 	jeb = frappe.new_doc("Journal Entry")
+		# 	jeb.flags.ignore_permissions = 1
+		# 	jeb.title = self.purpose+" Employee Benefits Payment(" + self.employee_name + "  " + self.name + ")"
+		# 	jeb.voucher_type = "Bank Entry"
+		# 	jeb.naming_series = "Bank Payment Voucher"
+		# 	jeb.remark = 'Benefit payment against : ' + self.name
+		# 	jeb.posting_date = self.posting_date
+		# 	jeb.branch = emp.branch
+		# 	jeb.append("accounts", {
+		# 		"account": payable_account,
+		# 		"reference_type": "Journal Entry",
+		# 		"reference_name": je.name,
+		# 		"cost_center": self.cost_center,
+		# 		"debit_in_account_currency": flt(total_amount),
+		# 		"debit": flt(total_amount),
+		# 		# "business_activity": emp.business_activity,
+		# 		"party_type": "Employee",
+		# 		"party": self.employee,
+		# 	})
+
+		# 	if not expense_bank_account:
+		# 		frappe.throw("Setup Expense Bank Account in Processing Branch")
+
+		# 	jeb.append("accounts", {
+		# 		"account": expense_bank_account,
+		# 		"cost_center": self.cost_center,
+		# 		"reference_type": "Employee Benefits",
+		# 		"reference_name": self.name,
+		# 		"credit_in_account_currency": flt(total_amount),
+		# 		"credit": flt(total_amount),
+		# 		# "business_activity": emp.business_activity,
+		# 	})
+		# 	jeb.insert()
+
+		# 	je_references = je_references + ", "+ str(jeb.name)
 
 		self.db_set("journal", je_references)
 

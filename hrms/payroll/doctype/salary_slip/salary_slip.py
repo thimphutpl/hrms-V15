@@ -109,11 +109,14 @@ class SalarySlip(TransactionBase):
 
 	@property
 	def actual_start_date(self):
+		
 		if not hasattr(self, "__actual_start_date"):
 			self.__actual_start_date = self.start_date
+			# frappe.throw(str(self.__actual_start_date))
 
 			if self.joining_date and getdate(self.start_date) < self.joining_date <= getdate(self.end_date):
 				self.__actual_start_date = self.joining_date
+		# frappe.throw(str(self.__actual_start_date))
 
 		return self.__actual_start_date
 
@@ -300,6 +303,7 @@ class SalarySlip(TransactionBase):
 
 	def pull_sal_struct(self):
 		from hrms.payroll.doctype.salary_structure.salary_structure import make_salary_slip
+		# frappe.throw(frappe.as_json(self))
 
 		make_salary_slip(self._salary_structure_doc.name, self)
 
@@ -615,18 +619,36 @@ class SalarySlip(TransactionBase):
 		return lwp, absent
 
 	def set_salary_structure(self):
+		 # Ensure start_date exists
+		# if not self.start_date:
+		# 	frappe.throw("Start Date is required")
+
+		# Compute actual_start_date safely
+		actual_start_date = self.actual_start_date
 		
+
+		# Fallback to joining date if still missing
+		if not actual_start_date:
+			actual_start_date = frappe.get_value(
+				"Employee", self.employee, "date_of_joining"
+			)
+		# frappe.throw(str(actual_start_date))
+		
+		# frappe.throw(frappe.as_json(self.actual_start_date))
+		# if not self.actual_start_date:
+		# 	self.actual_start_date = frappe.get_value("Employee",self.employee,'date_of_joining')
 		self._salary_structure = frappe.db.get_value(
 			"Salary Structure",
 			{
 				"employee": self.employee,
-				"from_date": ("<=", self.actual_start_date),
+				"from_date": ("<=", actual_start_date),
 				"is_active": "Yes",
 			},
 			"*",
 			order_by="from_date desc",
 			as_dict=True,
 		)
+		# frappe.throw(frappe.as_json(self.actual_start_date))
 		if not self._salary_structure:
 			frappe.throw(
 				_(
@@ -687,6 +709,7 @@ class SalarySlip(TransactionBase):
 		self.add_structure_components(component_type)
 
 	def set_salary_structure_doc(self) -> None:
+		# frappe.throw(frappe.as_json((frappe.get_cached_doc("Salary Structure", self.salary_structure))))
 		self._salary_structure_doc = frappe.get_cached_doc("Salary Structure", self.salary_structure)
 
 	def add_structure_components(self, component_type):

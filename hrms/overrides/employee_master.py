@@ -144,10 +144,12 @@ def get_timeline_data(doctype, name):
 
 
 @frappe.whitelist()
-def get_retirement_date(date_of_birth=None):
+def get_retirement_date(date_of_birth=None, employee_group=None):
+	if not employee_group:
+		frappe.throw("Employee Group missing!")
 	if date_of_birth:
 		try:
-			retirement_age = cint(frappe.db.get_single_value("HR Settings", "retirement_age") or 60)
+			retirement_age = cint(frappe.db.get_value("Employee Group", employee_group, "retirement_age") or 60)
 			dt = add_years(getdate(date_of_birth), retirement_age)
 			return dt.strftime("%Y-%m-%d")
 		except ValueError:

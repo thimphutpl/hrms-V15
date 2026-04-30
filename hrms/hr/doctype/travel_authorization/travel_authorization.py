@@ -231,13 +231,26 @@ class TravelAuthorization(Document):
 	@frappe.whitelist()
 	def has_travel_claim(self) -> dict[str, bool]:
 		ta = frappe.qb.DocType("Travel Claim")
+		tac = frappe.qb.DocType("Travel Claim Item")
 
+		# travel_claim = (
+		# 	frappe.qb.from_(ta)
+		# 	.select(ta.name)
+		# 	.where(
+		# 		(ta.docstatus < 2)
+		# 		& (ta.travel_authorization == self.name)
+		# 	)
+		# ).run(as_dict=True)
 		travel_claim = (
 			frappe.qb.from_(ta)
-			.select(ta.name)
+			.left_join(tac).on(tac.parent == ta.name)
+			.select(ta.name).distinct()
 			.where(
 				(ta.docstatus < 2)
-				& (ta.travel_authorization == self.name)
+				& (
+					(ta.travel_authorization == self.name) |
+					(tac.travel_authorization == self.name)
+				)
 			)
 		).run(as_dict=True)
 

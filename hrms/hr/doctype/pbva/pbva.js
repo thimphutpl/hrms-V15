@@ -66,7 +66,7 @@ frappe.ui.form.on('PBVA', {
 
 function process_pbva(fiscal_year, frm) {
 	frappe.call({
-		method: "erpnext.hr.doctype.pbva.pbva.get_pbva_details",
+		method: "hrms.hr.doctype.pbva.pbva.get_pbva_details",
 		args: {"fiscal_year": fiscal_year},
 		callback: function(r) {
 			if(r.message) {
@@ -75,7 +75,7 @@ function process_pbva(fiscal_year, frm) {
 				cur_frm.clear_table("items");
 
 				r.message.forEach(function(pbva) {
-				        var row = frappe.model.add_child(cur_frm.doc, "PBVA Details", "items");
+				    var row = frappe.model.add_child(cur_frm.doc, "PBVA Details", "items");
 					row.employee = pbva['employee']
 					row.employee_name = pbva['employee_name']
 					row.branch = pbva['branch']
@@ -138,7 +138,7 @@ function calculate_total(frm, cdt, cdn) {
 function calculate_tax(gross_amt) {
 	var tds_amount = 0;
 	cur_frm.call({
-		method: "erpnext.hr.doctype.salary_structure.salary_structure.get_salary_tax",
+		method: "hrms.hr.hr_custom_function.get_salary_tax",
 		args: { "gross_amt": gross_amt, },
 		async: false,
 		callback: function(r) {
@@ -153,7 +153,7 @@ function calculate_tax(gross_amt) {
 function calculate_pbva_percent(employee) {
 	var percent = "";
 	cur_frm.call({
-		method: "erpnext.hr.doctype.pbva.pbva.get_pbva_percent",
+		method: "hrms.hr.doctype.pbva.pbva.get_pbva_percent",
 		args: { "employee": employee, },
 		async: false,
 		callback: function(r) {

@@ -170,6 +170,15 @@ frappe.ui.form.on("Leave Allocation", {
 			frm.set_value("total_leaves_allocated", flt(frm.doc.new_leaves_allocated));
 		}
 	},
+
+	from_date: function (frm) {
+		calculate_days(frm);
+	},
+
+	to_date: function (frm) {
+		calculate_days(frm);
+	},
+
 });
 
 frappe.tour["Leave Allocation"] = [
@@ -201,3 +210,10 @@ frappe.tour["Leave Allocation"] = [
 		description: __("Enter the number of leaves you want to allocate for the period."),
 	},
 ];
+
+function calculate_days(frm) {
+    if (frm.doc.from_date && frm.doc.to_date) {
+        let days = frappe.datetime.get_diff(frm.doc.to_date, frm.doc.from_date) + 1;
+        frm.set_value("new_leaves_allocated", days);
+    }
+}

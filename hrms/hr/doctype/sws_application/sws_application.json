@@ -7,9 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "verified",
-  "approval_status",
   "column_break_4",
-  "rejection_reason",
   "section_break_6",
   "posting_date",
   "branch",
@@ -25,6 +23,9 @@
   "section_break_20",
   "company",
   "workflow_state",
+  "column_break_cnch",
+  "approval_status",
+  "rejection_reason",
   "sb_supervisor_details",
   "supervisor_name",
   "supervisor_designation",
@@ -173,13 +174,17 @@
    "label": "Supervisor",
    "options": "User",
    "read_only": 1
+  },
+  {
+   "fieldname": "column_break_cnch",
+   "fieldtype": "Column Break"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-16 20:34:31.299577",
+ "modified": "2026-02-17 12:19:56.899523",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "SWS Application",

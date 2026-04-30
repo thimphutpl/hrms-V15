@@ -14,8 +14,8 @@ class UploadAttendanceOthers(Document):
 
 @frappe.whitelist()
 def get_template():
-	if not frappe.has_permission("Attendance Others", "create"):
-		raise frappe.PermissionError
+	# if not frappe.has_permission("Attendance Others", "create"):
+	# 	raise frappe.PermissionError
 
 	args = frappe.local.form_dict
 	w = UnicodeWriter()
@@ -53,12 +53,12 @@ def add_data(w, args):
 	end_date   = str(args.fiscal_year) + '-' + str(month) + '-' + str(total_days)
 		
 	employees = get_active_employees(args, start_date, end_date)
-	loaded     = get_loaded_records(args, start_date, end_date)
+	loaded = get_loaded_records(args, start_date, end_date)
 	
 	for e in employees:
 		status = ''
 		row = [
-			e.branch, e.cost_center, e.etype, "\'"+str(e.name)+"\'", e.person_name, args.fiscal_year, args.month
+			e.branch, e.cost_center, e.etype, "\'"+str(e.name)+"\'", e.employee_name, args.fiscal_year, args.month
 		]
 		
 		for day in range(cint(total_days)):
@@ -101,12 +101,12 @@ def get_active_employees(args, start_date, end_date):
 						"MR" as etype,
 						me.name,
 						me.employee_name,
-						iw.branch,
+						me.branch,
 						me.cost_center
 		from `tabMuster Roll Employee` as me, `tabMuster Roll Internal Work History` as iw
-				where me.docstatus < 2
+				where me.status = "Active"
 				and iw.parent = me.name
-				and iw.branch = '{0}'
+				and me.branch = '{0}'
 		and (
 						('{1}' between iw.from_date and ifnull(iw.to_date,now()))
 						or
@@ -123,8 +123,8 @@ def get_active_employees(args, start_date, end_date):
 
 @frappe.whitelist()
 def upload():
-	if not frappe.has_permission("Attendance Others", "create"):
-		raise frappe.PermissionError
+	# if not frappe.has_permission("Attendance Others", "create"):
+	# 	raise frappe.PermissionError
 
 	from frappe.utils.csvutils import read_csv_content_from_uploaded_file
 	from frappe.modules import scrub

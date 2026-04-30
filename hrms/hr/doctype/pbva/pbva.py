@@ -7,7 +7,8 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 from frappe.utils import flt, getdate, date_diff, cint
-from hrms.payroll.doctype.salary_structure.salary_structure import get_salary_tax
+from hrms.hr.hr_custom_function import get_salary_tax
+import math
 
 class PBVA(Document):
 	def validate(self):
@@ -18,6 +19,7 @@ class PBVA(Document):
 		cc_amount = {}
 		for a in self.items:
 			tax = get_salary_tax(a.amount)
+			
 			cost_center, ba = frappe.db.get_value("Employee", a.employee, ["cost_center", "business_activity"])
 			cc = str(str(cost_center) + ":" + str(ba))
 			if cc in cc_amount:
@@ -41,7 +43,9 @@ class PBVA(Document):
 			for a in self.items:
 				a.amount = flt(a.basic_pay) * flt(a.pbva_percent) * 0.01
 				if flt(a.amount) > 0:
-					a.tax_amount = get_salary_tax(a.amount)
+					# a.amount = math.ceil(get_salary_tax(a.amount))
+					# frappe.throw(str(a.tax_amount))
+					a.tax_amount = get_salary_tax(round(a.amount, 0))
 				a.balance_amount = flt(a.amount) - flt(a.tax_amount)
 				tot += flt(a.amount)
 				tax += flt(a.tax_amount)
@@ -59,7 +63,7 @@ class PBVA(Document):
 		je.title = "PBVA for " + self.branch + "(" + self.name + ")"
 		je.voucher_type = 'Bank Entry'
 		je.naming_series = 'Bank Payment Voucher'
-		je.remark = 'PBVA payment against : ' + self.name;
+		je.remark = 'PBVA payment against : ' + self.name
 		je.posting_date = self.posting_date
 		je.branch = self.branch
 
@@ -75,6 +79,7 @@ class PBVA(Document):
 		
 		for key in cc_amount.keys():
 			values = key.split(":")
+			
 			je.append("accounts", {
 					"account": pbva_account,
 					"reference_type": "PBVA",
@@ -92,14 +97,15 @@ class PBVA(Document):
 					"credit_in_account_currency": flt(cc_amount[key]['balance_amount']),
 					"credit": flt(cc_amount[key]['balance_amount']),
 				})
-			
-			je.append("accounts", {
-					"account": tax_account,
-					"cost_center": values[0],
-					"business_activity": values[1],
-					"credit_in_account_currency": flt(cc_amount[key]['tax']),
-					"credit": flt(cc_amount[key]['tax']),
-				})
+			if flt(cc_amount[key]['tax'])>0:
+				je.append("accounts", {
+						"account": tax_account,
+						"cost_center": values[0],
+						"business_activity": values[1],
+						"credit_in_account_currency": flt(cc_amount[key]['tax']),
+						"credit": flt(cc_amount[key]['tax']),
+					})
+		# frappe.throw(frappe.as_json(je))
 
 		je.insert()
 

@@ -183,6 +183,8 @@ class OtherContribution(Document):
 						row.payment_days            = 0
 						row.from_date = from_date
 						row.to_date = to_date 
+						# if not row.bank_branch:
+						# 	frappe.throw(f"Bank Branch missing in row {row.idx}")
 						doc.save(ignore_permissions=True)
 						i.db_set("salary_structure", doc.name, update_modified=False)
 					else:

@@ -17,7 +17,7 @@ frappe.ui.form.on('MusterRoll Application', {
 		}
 		frm.set_query("approver", function() {
 			return {
-				query: "erpnext.hr.doctype.leave_application.leave_application.get_approvers",
+				query: "hrms.hr.doctype.leave_application.leave_application.get_approvers",
 				filters: {
 					employee: frm.doc.requested_by
 				}

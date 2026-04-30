@@ -214,6 +214,7 @@ class PayrollEntry(Document):
 					"exchange_rate": self.exchange_rate,
 				}
 			)
+			
 			if len(employees) > 30 or frappe.flags.enqueue_payroll_entry:
 				self.db_set("status", "Queued")
 				frappe.enqueue(
@@ -891,6 +892,7 @@ class PayrollEntry(Document):
 
 				for rem in remittance_gl_list:
 					if rem == default_employer_pf_account:
+						# frappe.throw(frappe.as_json(self.get_cc_wise_entries(salary_component_pf)))
 						for d in self.get_cc_wise_entries(salary_component_pf):
 							remittance_amount += flt(d.amount)
 							posting.setdefault(salary_detail.salary_component, []).append({
@@ -1074,6 +1076,72 @@ class PayrollEntry(Document):
 		return result
 
 	def get_cc_wise_entries(self, salary_component_pf):
+		# frappe.throw(str("""
+		# 	select
+		# 		t1.cost_center             as cost_center,
+		# 		(case
+		# 			when sc.type = 'Earning' then sc.type
+		# 			else ifnull(sc.clubbed_component,sc.name)
+		# 		end)                       as salary_component,
+		# 		sc.type                    as component_type,
+		# 		sd.parentfield,
+		# 		(case
+		# 			when sc.type = 'Earning' then 0
+		# 			else ifnull(sc.is_remittable, 0)
+		# 		end)                       as is_remittable,
+		# 		sca.account                 as gl_head,
+		# 		SUM(
+		# 			CASE 
+		# 				WHEN sd.salary_component = 'PF'
+		# 				THEN IFNULL(sd.amount, 0)
+		# 				ELSE 0
+		# 			END
+		# 		) AS amount,
+		# 		(case
+		# 			when ifnull(sc.make_party_entry, 0) = 1 then 'Payable'
+		# 			else 'Other'
+		# 		end) as account_type,
+		# 		(case
+		# 			when ifnull(sc.make_party_entry, 0) = 1 then 'Employee'
+		# 			else 'Other'
+		# 		end) as party_type,
+		# 		(case
+		# 			when ifnull(sc.make_party_entry, 0) = 1 then t1.employee
+		# 			else 'Other'
+		# 		end) as party
+		# 	 from
+		# 		`tabSalary Slip` t1,
+		# 		`tabSalary Detail` sd,
+		# 		`tabSalary Component` sc,
+		# 		`tabSalary Component Account` sca,
+		# 		`tabCompany` c
+		# 	where t1.fiscal_year = '{0}'
+		# 	  and t1.month       = '{1}'
+		# 	  and t1.docstatus   = 1
+		# 	  and sd.parent      = t1.name
+		# 	  and sd.salary_component = '{2}'
+		# 	  and sca.parent = sc.name
+		# 	  and sca.company = t1.company
+		# 	  and sc.name        = sd.salary_component
+		# 	  and c.name         = t1.company
+		# 	  and t1.payroll_entry = '{3}'
+		# 	  and exists(select 1
+		# 				from `tabPayroll Employee Detail` ped
+		# 				where ped.parent = t1.payroll_entry
+		# 				and ped.employee = t1.employee)
+		# 	group by 
+		# 		t1.cost_center,
+		# 		t1.company,
+		# 		(case when sc.type = 'Earning' then sc.type else ifnull(sc.clubbed_component,sc.name) end),
+		# 		sc.type,
+		# 		(case when sc.type = 'Earning' then 0 else ifnull(sc.is_remittable,0) end),
+		# 		sca.account,
+		# 		sca.company,
+		# 		(case when ifnull(sc.make_party_entry,0) = 1 then 'Payable' else 'Other' end),
+		# 		(case when ifnull(sc.make_party_entry,0) = 1 then 'Employee' else 'Other' end),
+		# 		(case when ifnull(sc.make_party_entry,0) = 1 then t1.employee else 'Other' end)
+		# 	order by t1.cost_center, sc.type, sc.name
+		# """.format(self.fiscal_year, self.month, salary_component_pf, self.name)))
 		return frappe.db.sql("""
 			select
 				t1.cost_center             as cost_center,
@@ -1088,7 +1156,13 @@ class PayrollEntry(Document):
 					else ifnull(sc.is_remittable, 0)
 				end)                       as is_remittable,
 				sca.account                 as gl_head,
-				sum(ifnull(t1.employer_pf_contribution, 0))   as amount,
+				SUM(
+					CASE 
+						WHEN sd.salary_component = 'PF'
+						THEN IFNULL(sd.amount, 0)
+						ELSE 0
+					END
+				) AS amount,
 				(case
 					when ifnull(sc.make_party_entry, 0) = 1 then 'Payable'
 					else 'Other'
@@ -1356,7 +1430,7 @@ def get_filtered_employees(
 			& (Employee.status != "Inactive")
 			& (Employee.company == filters.company)
 			
-			& ((Employee.date_of_joining <= SalaryStructure.from_date) | (Employee.date_of_joining.isnull()))
+			# & ((Employee.date_of_joining <= SalaryStructure.from_date) | (Employee.date_of_joining.isnull()))
 			& ((Employee.relieving_date >= SalaryStructure.from_date) | (Employee.relieving_date.isnull()))
 		)
 	)
@@ -1364,7 +1438,7 @@ def get_filtered_employees(
 	query = set_fields_to_select(query, fields)
 	query = set_searchfield(query, searchfield, search_string, qb_object=Employee)
 	query = set_filter_conditions(query, filters, qb_object=Employee)
-
+	
 	if not ignore_match_conditions:
 		query = set_match_conditions(query=query, qb_object=Employee)
 
@@ -1379,7 +1453,6 @@ def get_filtered_employees(
 
 def set_fields_to_select(query, fields: list[str] | None = None):
 	default_fields = ["employee", "employee_name", "department", "designation"]
-
 	if fields:
 		query = query.select(*fields).distinct()
 	else:
@@ -1475,10 +1548,12 @@ def log_payroll_failure(process, payroll_entry, error):
 
 
 def create_salary_slips_for_employees(employees, args, publish_progress=True):
+
 	payroll_entry = frappe.get_cached_doc("Payroll Entry", args.payroll_entry)
 
 	try:
 		salary_slips_exist_for = get_existing_salary_slips(employees, args)
+		
 		count = 0
 
 		employees = list(set(employees) - set(salary_slips_exist_for))

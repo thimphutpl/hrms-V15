@@ -28,12 +28,12 @@ class EmployeeTransfer(Document):
 
 	def on_submit(self):
 		self.update_employee_master()
-		notify_workflow_states(self)
+		# notify_workflow_states(self)
 
 		
 	def on_cancel(self):
 		self.update_employee_master(cancel=True)
-		notify_workflow_states(self)
+		# notify_workflow_states(self)
   
 	def validate_transfer_date(self):
 		for t in frappe.db.get_all("Employee Transfer", {"employee": self.employee, "name": ("!=", self.name),

@@ -16,7 +16,10 @@ frappe.ui.form.on('Hall Booking', {
 		}
 
 	},
-	"rate": function(frm) {
+	no_of_days: function(frm) {
+		calculate_amount(frm);
+	},
+	rate: function(frm) {
 		calculate_amount(frm);
 	},
 	"from_date": function(frm) {
@@ -60,10 +63,10 @@ function calculate_amount(frm) {
 			frappe.msgprint("To date Cannot be before From Date ");
 		}
 	
-		var timeDiff = Math.abs(date2.getTime() - date1.getTime());
-		var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)); 
-		cur_frm.set_value("no_of_days", diffDays + 1);
-		if(frm.doc.rate){
+		// var timeDiff = Math.abs(date2.getTime() - date1.getTime());
+		// var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)); 
+		// cur_frm.set_value("no_of_days", diffDays + 1);
+		if(frm.doc.rate && frm.doc.no_of_days){
 			cur_frm.set_value("amount", frm.doc.no_of_days * frm.doc.rate);
 		}
 	}

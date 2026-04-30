@@ -5,7 +5,15 @@ frappe.ui.form.on("Travel Claim", {
 	},
     
 	refresh(frm) {
-		refresh_html(frm);
+	// 	refresh_html(frm);
+	// 	if (!(frm.doc.workflow_state == "Verified By Supervisor" || frm.doc.workflow_state == "Waiting Supervisor Approval")){
+	// 		frm.fields_dict["items"].grid.update_docfield_property("dsa", "read_only", 1);
+	// 		frm.fields_dict["items"].grid.update_docfield_property("dsa_percent", "read_only", 1);
+	// 	}
+	// 	else{
+	// 		frm.fields_dict["items"].grid.update_docfield_property("dsa", "read_only", 0);
+	// 		frm.fields_dict["items"].grid.update_docfield_property("dsa_percent", "read_only", 0);
+	// 	}
 	},
 
 	employee: function (frm) {

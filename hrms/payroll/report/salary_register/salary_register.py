@@ -73,6 +73,7 @@ def execute(filters=None):
 		else:
 			row.update(
 				{"gross_pay": ss.gross_pay, "total_deduction": ss.total_deduction, "net_pay": ss.net_pay}
+				
 			)
 
 		data.append(row)
@@ -204,6 +205,15 @@ def get_columns(earning_types, ded_types):
 		{
 			"label": _("Gross Pay"),
 			"fieldname": "gross_pay",
+			"fieldtype": "Currency",
+			"options": "currency",
+			"width": 120,
+		}
+	)
+	columns.append(
+		{
+			"label": _("Taxable Income"),
+			"fieldname": "taxable_income",
 			"fieldtype": "Currency",
 			"options": "currency",
 			"width": 120,

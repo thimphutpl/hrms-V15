@@ -314,6 +314,51 @@ def roundoff(amount):
 	return math.ceil(amount) if (amount - int(amount)) >= 0.5 else math.floor(amount)
 
 
+# @frappe.whitelist()
+# def make_salary_slip(
+# 	source_name,
+# 	target_doc=None,
+# 	employee=None,
+# 	posting_date=None,
+# 	as_print=False,
+# 	print_format=None,
+# 	for_preview=0,
+# 	ignore_permissions=False,
+# ):
+# 	def postprocess(source, target):
+# 		if employee:
+# 			target.employee = employee
+# 			if posting_date:
+# 				target.posting_date = posting_date
+
+# 		target.run_method("process_salary_structure", for_preview=for_preview)
+
+# 	# frappe.throw("jihjihhihhhh gg")
+
+# 	doc = get_mapped_doc(
+# 		"Salary Structure",
+# 		source_name,
+# 		{
+# 			"Salary Structure": {
+# 				"doctype": "Salary Slip",
+# 				"field_map": {
+# 					"total_earning": "gross_pay",
+# 					"name": "salary_structure",
+# 				},
+# 			}
+# 		},
+# 		target_doc,
+# 		postprocess,
+# 		ignore_child_tables=True,
+# 		ignore_permissions=ignore_permissions,
+# 		cached=True,
+# 	)
+
+# 	if cint(as_print):
+# 		doc.name = f"Preview for {employee}"
+# 		return frappe.get_print(doc.doctype, doc.name, doc=doc, print_format=print_format)
+# 	else:
+# 		return doc
 @frappe.whitelist()
 def make_salary_slip(
 	source_name,
@@ -328,10 +373,140 @@ def make_salary_slip(
 	def postprocess(source, target):
 		if employee:
 			target.employee = employee
-			if posting_date:
-				target.posting_date = posting_date
+		if posting_date:
+			target.posting_date = posting_date
 
+		# salary_details = frappe.get_all(
+		# 	"Salary Detail",
+		# 	filters={"parent": source.name},
+		# 	fields=["salary_component", "from_date", "to_date"]
+		# )
+		# frappe.throw(str(source.name))
+		salary_details = frappe.get_all(
+			"Salary Detail",
+			filters={"parent": source.name,},
+			fields=[
+				"salary_component",
+				"from_date",
+				"to_date",
+				"amount",
+				"default_amount",
+				"depends_on_payment_days",
+				"do_not_include_in_total",
+				"bank_name",
+				"bank_branch",
+				"bank_account_type",
+				"reference_type",
+				"reference_name",
+				"reference_number",
+				"abbr",
+				"total_deductible_amount",
+				"total_deducted_amount",
+				"total_outstanding_amount",
+			],
+			order_by="idx"
+		)
+
+		from collections import defaultdict
+
+		structure_lookup = defaultdict(list)
+
+		for d in salary_details:
+			key = (d["salary_component"], d["amount"])
+			structure_lookup[key].append(d)
+
+		# frappe.throw(frappe.as_json(salary_details))
+
+		if not salary_details:
+			frappe.throw("No Salary Details found in Salary Structure.")
+		# structure_from_date = min([d.from_date for d in salary_details if d.from_date])
+		# structure_to_date = max([d.to_date for d in salary_details if d.to_date])
+		# target.start_date = structure_from_date
+		# target.end_date = structure_to_date
+		# target.run_method("process_salary_structure", for_preview=for_preview)
+		valid_from_dates = [d.from_date for d in salary_details if d.from_date]
+		valid_to_dates = [d.to_date for d in salary_details if d.to_date]
+
+		structure_from_date = min(valid_from_dates) if valid_from_dates else None
+		structure_to_date = max(valid_to_dates) if valid_to_dates else None
+
+		# Clear existing deductions
+		target.set("deductions", [])
+
+		# Copy deduction rows exactly
+		# for d in salary_details:
+		# 	row = target.append("deductions")
+		# 	row.salary_component = d.salary_component
+		# 	row.amount = d.amount
+		# 	row.default_amount = d.get("default_amount")
+		# 	row.from_date = d.from_date or structure_from_date
+		# 	row.to_date = d.to_date or structure_to_date
+		# 	row.depends_on_payment_days = d.get("depends_on_payment_days")
+		# 	row.do_not_include_in_total = d.get("do_not_include_in_total")
+		# 	row.bank_name = d.get("bank_name")
+		# 	row.bank_branch = d.get("bank_branch")
+		# 	row.bank_account_type = d.get("bank_account_type")
+		# 	row.reference_type = d.get("reference_type")
+		# 	row.reference_name = d.get("reference_name")
+		# 	row.reference_number = d.get("reference_number")
+		# 	row.abbr = d.get("abbr")
+		# 	row.total_deductible_amount = d.get("total_deductible_amount")
+		# 	row.total_deducted_amount = d.get("total_deducted_amount")
+		# 	row.total_outstanding_amount = d.get("total_outstanding_amount")
+
+		target.start_date = structure_from_date
+		target.end_date = structure_to_date
 		target.run_method("process_salary_structure", for_preview=for_preview)
+
+		for row in target.get("deductions"):
+			key = (row.salary_component, row.amount)
+
+			if structure_lookup.get(key):
+				source_row = structure_lookup[key].pop(0)  # take first unused match
+
+				row.bank_name = source_row.get("bank_name")
+				row.bank_branch = source_row.get("bank_branch")
+				row.bank_account_type = source_row.get("bank_account_type")
+				row.reference_type = source_row.get("reference_type")
+				row.reference_name = source_row.get("reference_name")
+				row.reference_number = source_row.get("reference_number")
+				row.total_deductible_amount = source_row.get("total_deductible_amount")
+				row.total_deducted_amount = source_row.get("total_deducted_amount")
+				row.total_outstanding_amount = source_row.get("total_outstanding_amount")
+
+		# for row in target.get("deductions"):
+		# 	source_row = structure_lookup.get(row.salary_component)
+
+		# 	if source_row:
+		# 		row.bank_name = source_row.get("bank_name")
+		# 		row.bank_branch = source_row.get("bank_branch")
+		# 		row.bank_account_type = source_row.get("bank_account_type")
+		# 		row.reference_type = source_row.get("reference_type")
+		# 		row.reference_name = source_row.get("reference_name")
+		# 		row.reference_number = source_row.get("reference_number")
+		# 		row.total_deductible_amount = source_row.get("total_deductible_amount")
+		# 		row.total_deducted_amount = source_row.get("total_deducted_amount")
+		# 		row.total_outstanding_amount = source_row.get("total_outstanding_amount")
+
+		
+
+		def filter_rows(rows):
+			# frappe.throw(frappe.as_json(rows))
+			filtered = []
+			for row in rows:
+				if not row.from_date:
+					row.from_date = structure_from_date
+					
+				if not row.to_date:
+					row.to_date = structure_to_date
+		
+				filtered.append(row)
+			return filtered
+
+		target.set("deductions", filter_rows(target.get("deductions")))
+		target.set("earnings", filter_rows(target.get("earnings")))
+	
+		
 
 	doc = get_mapped_doc(
 		"Salary Structure",
@@ -343,7 +518,13 @@ def make_salary_slip(
 					"total_earning": "gross_pay",
 					"name": "salary_structure",
 				},
-			}
+			},
+			"Salary Detail": {
+            "doctype": "Salary Detail",
+            "field_map": {
+                "bank_name": "bank_name",
+            },
+        },
 		},
 		target_doc,
 		postprocess,
@@ -352,10 +533,12 @@ def make_salary_slip(
 		cached=True,
 	)
 
+	
 	if cint(as_print):
 		doc.name = f"Preview for {employee}"
 		return frappe.get_print(doc.doctype, doc.name, doc=doc, print_format=print_format)
 	else:
+		# frappe.throw(frappe.as_json(doc))
 		return doc
 
 def get_assigned_salary_structure(employee, on_date):
@@ -376,7 +559,7 @@ def get_assigned_salary_structure(employee, on_date):
 
 
 def get_basic_and_gross_pay(employee, effective_date=today()):
-    struc = frappe.db.sql(""" select sst.name,
+	struc = frappe.db.sql(""" select sst.name,
 			sum(case when sd.salary_component = "Basic Pay" then coalesce(sd.amount,0) else 0 end) basic_pay,
 			sum(case when (sc.type = 'Earning' and (sd.salary_component = "Basic Pay" or coalesce(sc.field_name,'') != '')) then ifnull(sd.amount,0) else 0 end) gross_pay
 		from `tabSalary Structure` sst, `tabSalary Detail` sd, `tabSalary Component` sc
@@ -388,10 +571,10 @@ def get_basic_and_gross_pay(employee, effective_date=today()):
 		limit 1
 	""".format(employee=employee, effective_date=effective_date), as_dict=True)
 
-    if not struc:
-        frappe.throw(_("Salary Structure not found"))
+	if not struc:
+		frappe.throw(_("Salary Structure not found"))
 
-    return struc[0]
+	return struc[0]
 
 @frappe.whitelist()
 def get_employee_currency(employee):

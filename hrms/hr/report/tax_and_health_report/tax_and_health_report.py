@@ -1,10 +1,11 @@
-# Copyright (c) 2025, Frappe Technologies Pvt. Ltd. and contributors
+ # Copyright (c) 2025, Frappe Technologies Pvt. Ltd. and contributors
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
 import frappe
 from frappe.utils import flt, cstr
 from frappe import msgprint, _
+import math
 
 
 def execute(filters=None):
@@ -76,19 +77,31 @@ def get_columns():
             "width": 120
         },
         {
-            "label": _("PF Amount(B)"), 
-            "fieldname": "pfamount", 
+            "label": _("15 percent of gross"), 
+            "fieldname": "15_percent", 
             "fieldtype": "Currency", 
             "width": 120
         },
+        # {
+        #     "label": _("PF Amount(B)"), 
+        #     "fieldname": "pfamount", 
+        #     "fieldtype": "Currency", 
+        #     "width": 120
+        # },
         {
             "label": _("GIS Amount(C)"), 
             "fieldname": "gisamount", 
             "fieldtype": "Currency", 
             "width": 120
         },
+        # {
+        #     "label": _("Net Salary(A-(B+C))"), 
+        #     "fieldname": "netpay", 
+        #     "fieldtype": "Currency", 
+        #     "width": 140
+        # },
         {
-            "label": _("Net Salary(A-(B+C))"), 
+            "label": _("Taxable Income"), 
             "fieldname": "netpay", 
             "fieldtype": "Currency", 
             "width": 140
@@ -180,11 +193,14 @@ def get_data(filters):
                 sum(case when t2.parentfield = 'earnings' then ifnull(t2.amount,0) else 0 end) as grosspay,
                 sum(case when t2.salary_component = 'PF' then ifnull(t2.amount,0) else 0 end) as pfamount,
                 sum(case when t2.salary_component = 'GIS' then ifnull(t2.amount,0) else 0 end) as gisamount,
-                sum(
-                   (case when t2.parentfield = 'earnings' then ifnull(t2.amount,0) else 0 end)
-                   - (case when t2.salary_component = 'PF' then ifnull(t2.amount,0) else 0 end)
-                   - (case when t2.salary_component = 'GIS' then ifnull(t2.amount,0) else 0 end)
-                ) as netpay,
+                
+                                SUM(
+                    CASE 
+                        WHEN t2.parentfield = 'earnings' 
+                        THEN IFNULL(t2.amount * 0.15, 0)
+                        ELSE 0 
+                    END
+                ) AS 15_percent,
                 sum(case when t2.salary_component = 'Salary Tax' then ifnull(t2.amount,0) else 0 end) as salarytax,
                 sum(case when t2.salary_component = 'Health Contribution' then ifnull(t2.amount,0) else 0 end) as healthcont,
                 sum(
@@ -215,6 +231,12 @@ def get_data(filters):
                 t1.fiscal_year, 
                 t1.month
             """ % conditions, filters, as_dict=1)
+
+        for i in data:
+            i["fifteen_percent"] = i["grosspay"] * 0.15
+            i["netpay"] = i["grosspay"] - i["fifteen_percent"]
+            i['gisamount'] = 0
+            i['15_percent'] = math.ceil(i['15_percent'])
             
         return data
         

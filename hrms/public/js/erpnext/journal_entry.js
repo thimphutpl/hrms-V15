@@ -20,7 +20,7 @@ frappe.ui.form.on("Journal Entry", {
 					filters: {
 						total_sanctioned_amount: [">", 0],
 						status: ["!=", "Paid"],
-						docstatus: 1,
+						// docstatus: 1,
 					},
 				};
 			}
@@ -51,8 +51,11 @@ frappe.ui.form.on("Journal Entry", {
 				};
 			}
 
+			// const out = {
+			// 	filters: [[jvd.reference_type, "docstatus", "=", 1]],
+			// };
 			const out = {
-				filters: [[jvd.reference_type, "docstatus", "=", 1]],
+				filters: [],
 			};
 
 			if (["Sales Invoice", "Purchase Invoice"].includes(jvd.reference_type)) {

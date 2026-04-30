@@ -52,6 +52,9 @@
   "deductions",
   "totals",
   "gross_pay",
+  "net_pay",
+  "bank_name",
+  "bank_account_no",
   "base_gross_pay",
   "gross_year_to_date",
   "base_gross_year_to_date",
@@ -60,7 +63,6 @@
   "total_deduction",
   "base_total_deduction",
   "net_pay_info",
-  "net_pay",
   "base_net_pay",
   "rounded_total",
   "base_rounded_total",
@@ -92,8 +94,6 @@
   "journal_entry",
   "amended_from",
   "column_break_ieob",
-  "bank_name",
-  "bank_account_no",
   "gis_number",
   "gis_policy_number",
   "leave_details_section",
@@ -315,6 +315,7 @@
   {
    "fieldname": "net_pay_info",
    "fieldtype": "Tab Break",
+   "hidden": 1,
    "label": "Net Pay Info"
   },
   {
@@ -398,6 +399,7 @@
   {
    "fieldname": "section_break_75",
    "fieldtype": "Tab Break",
+   "hidden": 1,
    "label": "Bank Details"
   },
   {
@@ -494,6 +496,7 @@
   {
    "fieldname": "gross_year_to_date",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Gross Year To Date",
    "options": "currency",
    "read_only": 1
@@ -723,7 +726,7 @@
  "idx": 9,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-03-04 10:13:18.723218",
+ "modified": "2026-01-27 17:30:44.790511",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Slip",
@@ -760,6 +763,7 @@
    "role": "Employee"
   }
  ],
+ "row_format": "Dynamic",
  "search_fields": "employee_name",
  "show_name_in_global_search": 1,
  "sort_field": "modified",

@@ -41,7 +41,7 @@ class SWSApplication(Document):
 
 	def on_submit(self):
 			if self.total_amount <= 0:
-					frappe.throw("Total Amount cannot be 0 or less")
+				frappe.throw("Total Amount cannot be 0 or less")
 			self.verify_approvals()
 			self.update_status()
 			self.post_sws_entry()
@@ -51,61 +51,61 @@ class SWSApplication(Document):
 
 	def verify_approvals(self):
 			if not self.verified:
-					frappe.throw("Cannot submit unverified application")
+				frappe.throw("Cannot submit unverified application")
 			if self.approval_status != "Approved":
-					frappe.throw("Can submit only Approved application")
+				frappe.throw("Can submit only Approved application")
 
 	def update_status(self):
-			for a in self.items:
-					if frappe.db.get_value("SWS Event", a.sws_event, "deceased"):
-							doc = frappe.get_doc("Employee Family Details", a.reference_document)
-							swsdoc = frappe.get_doc("SWS Membership Item", a.reference_document)
-							if self.docstatus == 1:
-									doc.db_set("deceased", 1)
-									swsdoc.db_set("deceased", 1)
-							if self.docstatus == 2:
-									doc.db_set("deceased", 0)
-									swsdoc.db_set("deceased", 0)
-					row = frappe.get_doc("SWS Membership Item", a.reference_document)
-					if self.docstatus == 1:
-							row.status = 'Claimed'
-							row.claim_amount = self.total_amount
-							row.sws_application = self.name
-					if self.docstatus == 2:
-							row.status = 'Active'
-							row.claim_amount = None
-							row.sws_application = None
-					row.save(ignore_permissions = True)
+		for a in self.items:
+			if frappe.db.get_value("SWS Event", a.sws_event, "deceased"):
+				doc = frappe.get_doc("Employee Family Details", a.reference_document)
+				swsdoc = frappe.get_doc("SWS Membership Item", a.reference_document)
+				if self.docstatus == 1:
+					doc.db_set("deceased", 1)
+					swsdoc.db_set("deceased", 1)
+				if self.docstatus == 2:
+					doc.db_set("deceased", 0)
+					swsdoc.db_set("deceased", 0)
+			row = frappe.get_doc("SWS Membership Item", a.reference_document)
+			if self.docstatus == 1:
+				row.status = 'Claimed'
+				row.claim_amount = self.total_amount
+				row.sws_application = self.name
+			if self.docstatus == 2:
+				row.status = 'Active'
+				row.claim_amount = None
+				row.sws_application = None
+			row.save(ignore_permissions = True)
 
 	def post_sws_entry(self):
-			doc = frappe.new_doc("SWS Entry")
-			doc.flags.ignore_permissions = 1
-			doc.posting_date = self.posting_date
-			doc.branch = self.branch
-			doc.ref_doc = self.name
-			doc.company = self.company
-			doc.employee = self.employee
-			doc.debit = self.total_amount
-			doc.submit()
+		doc = frappe.new_doc("SWS Entry")
+		doc.flags.ignore_permissions = 1
+		doc.posting_date = self.posting_date
+		doc.branch = self.branch
+		doc.ref_doc = self.name
+		doc.company = self.company
+		doc.employee = self.employee
+		doc.debit = self.total_amount
+		doc.submit()
 
 	def before_cancel(self):
-			self.reset_status()
+		self.reset_status()
 
 	def on_cancel(self):
-			self.update_status()
-			self.delete_sws_entry()
+		self.update_status()
+		self.delete_sws_entry()
 
 	def reset_status(self):
-			self.verified = 0
-			self.approval_status = None
+		self.verified = 0
+		self.approval_status = None
 
 	def delete_sws_entry(self):
-			frappe.db.sql("delete from `tabSWS Entry` where ref_doc = %s", self.name)
+		frappe.db.sql("delete from `tabSWS Entry` where ref_doc = %s", self.name)
 
 @frappe.whitelist()
 def get_event_amount(sws_event, reference, employee):
 		if not reference:
-				frappe.throw("Please select Reference Document")
+			frappe.throw("Please select Reference Document")
 		parent_document = frappe.db.get_value("SWS Membership Item", reference, "parent")
 		# relationship = frappe.db.get_value("SWS Membership Item", reference, "relationship")
 		# relationship_type = frappe.db.get_value("Relationship", relationship, "relationship_type")

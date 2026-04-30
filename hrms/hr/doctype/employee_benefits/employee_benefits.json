@@ -311,12 +311,13 @@
    "fieldname": "workflow_state",
    "fieldtype": "Link",
    "label": "Workflow State",
-   "options": "Workflow State"
+   "options": "Workflow State",
+   "read_only": 1
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2025-09-22 21:45:03.876258",
+ "modified": "2026-02-03 23:07:25.917985",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Benefits",

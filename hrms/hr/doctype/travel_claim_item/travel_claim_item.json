@@ -121,7 +121,6 @@
    "in_list_view": 1,
    "label": "DSA (%)",
    "options": "100\n70\n50\n20\n0",
-   "read_only": 1,
    "reqd": 1
   },
   {
@@ -194,7 +193,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-02-27 09:52:26.985642",
+ "modified": "2026-04-02 11:46:11.035904",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim Item",

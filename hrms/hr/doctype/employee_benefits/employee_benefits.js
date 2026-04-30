@@ -18,7 +18,11 @@ frappe.ui.form.on('Employee Benefits', {
 				frappe.set_route("List", "Journal Entry");
 			}, __("View"));
 		}
-
+		if(frm.doc.workflow_state == "Draft" || frm.doc.workflow_state == "Rejected"){
+			frm.set_df_property("benefit_approver", "hidden", 1);
+			frm.set_df_property("benefit_approver_name", "hidden",1);
+			frm.set_df_property("benefit_approver_designation", "hidden",1);
+		}
 
 		if(!frm.doc.__islocal && frm.doc.workflow_state != "Draft"){
 			frm.set_df_property("purpose", "read_only", 1);
@@ -34,6 +38,10 @@ frappe.ui.form.on('Employee Benefits', {
 			frm.set_value("posting_date", get_today())
 		}
 	},
+	employee: function (frm) {
+		frm.trigger("set_benefit_approver");
+	},
+
 	"total_amount": function(frm) {
 				var total_amount = 0;
 				for (var i in frm.doc.items) {

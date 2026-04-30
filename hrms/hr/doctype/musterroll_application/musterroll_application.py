@@ -118,6 +118,7 @@ class MusterRollApplication(Document):
 					doc.cid_number       = cid
 					doc.business_activity = a.business_activity
 					doc.muster_roll_group = "National"
+					doc.muster_roll_type = "National"
 					doc.payment_mode = "Bank"
 
 					if self.project:
