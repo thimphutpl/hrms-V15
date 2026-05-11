@@ -81,6 +81,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
         # notify_workflow_states(self)
 
     def validate(self):
+        self.set_reports_med_mat()
         validate_active_employee(self.employee)
         set_employee_name(self)
         validate_workflow_states(self)
@@ -949,6 +950,18 @@ class LeaveApplication(Document, PWANotificationsMixin):
             "self_leave_approval_not_allowed",
             frappe.db.get_single_value("HR Settings", "prevent_self_leave_approval"),
         )
+
+    def set_reports_med_mat(self):
+        if self.leave_type in ('Maternity leave','Medical Leave'):
+
+            ceo=frappe.db.get_single_value("HR Settings","ceo")
+            if not ceo:
+                frappe.throw("set CEO approver in HR Settings")
+            user_id,employee_name=frappe.get_value("Employee",ceo,["user_id","employee_name"])
+            self.reports_to=user_id
+            self.reports_to_name=employee_name
+        else:
+            return
 
 
 def get_allocation_expiry_for_cf_leaves(
