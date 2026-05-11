@@ -139,6 +139,7 @@ def get_conditions(filters):
 			conditions += " and docstatus = 0"
 	elif filters.get("process_status") == "Cancelled":
 			conditions += " and docstatus = 2"
+	if filters.get("branch"): conditions += " and branch = %(branch)s"		
 
 	
 	return conditions, filters
