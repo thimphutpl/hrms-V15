@@ -86,6 +86,13 @@ frappe.query_reports["Monthly Salary Register Summary"] = {
 			description: __("Optional. Select only if consultant payment is posted through Journal Entry.")
 		},
 		{
+			fieldname: "include_others",
+			label: __("Include Others"),
+			fieldtype: "Check",
+			default: 0,
+			description: __("Tick to include Musterroll/OAP/Operator/GFG/DFG from MR Payment and Consultant JE if account is selected.")
+		},
+		{
 			fieldname: "show_detail",
 			label: __("Show Detail Rows"),
 			fieldtype: "Check",

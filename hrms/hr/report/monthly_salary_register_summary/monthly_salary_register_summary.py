@@ -54,6 +54,49 @@ OT_SALARY_COMPONENTS = [
 ]
 
 
+# def execute(filters=None):
+# 	filters = frappe._dict(filters or {})
+# 	validate_filters(filters)
+
+# 	columns = get_columns()
+# 	data = []
+
+# 	show_detail = flt(filters.get("show_detail"))
+
+# 	# 1. Normal salary slipped employees
+# 	salary_rows = get_salary_slip_summary(filters)
+# 	if salary_rows:
+# 		data.extend(salary_rows)
+# 		data.append(get_section_total_row("Sub Total - Salary Slipped Employees", salary_rows))
+
+# 		if show_detail:
+# 			detail_rows = get_salary_slip_detail(filters)
+# 			if detail_rows:
+# 				data.extend(detail_rows)
+
+# 	# 2. Muster Roll / OAP / Operator / GFG / DFG
+# 	payable_rows = get_salary_payable_summary(filters)
+# 	if payable_rows:
+# 		data.extend(payable_rows)
+# 		data.append(get_section_total_row("Sub Total - Musterroll/OAP/Operator/GFG/DFG", payable_rows))
+
+# 		if show_detail:
+# 			payable_detail_rows = get_salary_payable_detail(filters)
+# 			if payable_detail_rows:
+# 				data.extend(payable_detail_rows)
+
+# 	# 3. Consultant payment through Journal Entry
+# 	consultant_rows = get_consultant_je_summary(filters)
+# 	if consultant_rows:
+# 		data.extend(consultant_rows)
+# 		data.append(get_section_total_row("Sub Total - Consultant JE", consultant_rows))
+
+# 	# 4. Grand Total
+# 	if data:
+# 		data.append(get_grand_total_row(data))
+
+# 	return columns, data
+
 def execute(filters=None):
 	filters = frappe._dict(filters or {})
 	validate_filters(filters)
@@ -62,8 +105,9 @@ def execute(filters=None):
 	data = []
 
 	show_detail = flt(filters.get("show_detail"))
+	include_others = flt(filters.get("include_others"))
 
-	# 1. Normal salary slipped employees
+	# 1. Always show normal salary slipped employees
 	salary_rows = get_salary_slip_summary(filters)
 	if salary_rows:
 		data.extend(salary_rows)
@@ -74,22 +118,23 @@ def execute(filters=None):
 			if detail_rows:
 				data.extend(detail_rows)
 
-	# 2. Muster Roll / OAP / Operator / GFG / DFG
-	payable_rows = get_salary_payable_summary(filters)
-	if payable_rows:
-		data.extend(payable_rows)
-		data.append(get_section_total_row("Sub Total - Musterroll/OAP/Operator/GFG/DFG", payable_rows))
+	# 2. Show MR Payment Others only when Include Others is checked
+	if include_others:
+		payable_rows = get_salary_payable_summary(filters)
+		if payable_rows:
+			data.extend(payable_rows)
+			data.append(get_section_total_row("Sub Total - Musterroll/OAP/Operator/GFG/DFG", payable_rows))
 
-		if show_detail:
-			payable_detail_rows = get_salary_payable_detail(filters)
-			if payable_detail_rows:
-				data.extend(payable_detail_rows)
+			if show_detail:
+				payable_detail_rows = get_salary_payable_detail(filters)
+				if payable_detail_rows:
+					data.extend(payable_detail_rows)
 
-	# 3. Consultant payment through Journal Entry
-	consultant_rows = get_consultant_je_summary(filters)
-	if consultant_rows:
-		data.extend(consultant_rows)
-		data.append(get_section_total_row("Sub Total - Consultant JE", consultant_rows))
+		# 3. Consultant JE also only when Include Others is checked
+		consultant_rows = get_consultant_je_summary(filters)
+		if consultant_rows:
+			data.extend(consultant_rows)
+			data.append(get_section_total_row("Sub Total - Consultant JE", consultant_rows))
 
 	# 4. Grand Total
 	if data:
