@@ -352,22 +352,52 @@ def get_salary_slip_detail(filters):
 
 
 def get_salary_payable_summary(filters):
-	values = {}
-	conditions = get_common_salary_conditions(filters, values)
+	month_no = MONTH_MAP[filters.month]
 
-	conditions.append("emp.employment_type IN %(payable_types)s")
-	values["payable_types"] = tuple(PAYABLE_EMPLOYMENT_TYPES)
+	payable_types = [
+		"DFG",
+		"Muster Roll Employee",
+		"Open Air Prisoner",
+		"Operator",
+		"GFG",
+	]
+
+	values = {
+		"company": filters.company,
+		"fiscal_year": filters.fiscal_year,
+		"month": month_no,
+		"payable_types": tuple(payable_types),
+	}
+
+	conditions = [
+		"ss.docstatus = 1",
+		"ss.company = %(company)s",
+		"ss.fiscal_year = %(fiscal_year)s",
+		"ss.month = %(month)s",
+		"emp.employment_type IN %(payable_types)s",
+	]
+
+	if filters.get("branch"):
+		conditions.append("ss.branch = %(branch)s")
+		values["branch"] = filters.branch
+
+	if filters.get("employment_type"):
+		conditions.append("emp.employment_type = %(employment_type)s")
+		values["employment_type"] = filters.employment_type
+
+	if filters.get("cost_center") and has_column("Salary Slip", "cost_center"):
+		conditions.append("ss.cost_center = %(cost_center)s")
+		values["cost_center"] = filters.cost_center
 
 	ot_join = get_ot_join(values, "payable_ot_components")
 
-	branch_expr = get_branch_expr("emp", "ss")
 	where_clause = " AND ".join(conditions)
 
 	return frappe.db.sql(
 		f"""
 		SELECT
 			'Musterroll/OAP/Operator/GFG/DFG' AS section,
-			{branch_expr} AS branch,
+			COALESCE(ss.branch, 'No Branch') AS branch,
 			COALESCE(emp.employment_type, 'No Employment Type') AS category,
 			NULL AS employee,
 			NULL AS employee_name,
@@ -385,31 +415,60 @@ def get_salary_payable_summary(filters):
 			ON emp.name = ss.employee
 		{ot_join}
 		WHERE {where_clause}
-		GROUP BY {branch_expr}, emp.employment_type
-		ORDER BY {branch_expr}, emp.employment_type
+		GROUP BY ss.branch, emp.employment_type
+		ORDER BY ss.branch, emp.employment_type
 		""",
 		values,
 		as_dict=True,
 	)
 
-
 def get_salary_payable_detail(filters):
-	values = {}
-	conditions = get_common_salary_conditions(filters, values)
+	month_no = MONTH_MAP[filters.month]
 
-	conditions.append("emp.employment_type IN %(payable_types)s")
-	values["payable_types"] = tuple(PAYABLE_EMPLOYMENT_TYPES)
+	payable_types = [
+		"DFG",
+		"Muster Roll Employee",
+		"Open Air Prisoner",
+		"Operator",
+		"GFG",
+	]
+
+	values = {
+		"company": filters.company,
+		"fiscal_year": filters.fiscal_year,
+		"month": month_no,
+		"payable_types": tuple(payable_types),
+	}
+
+	conditions = [
+		"ss.docstatus = 1",
+		"ss.company = %(company)s",
+		"ss.fiscal_year = %(fiscal_year)s",
+		"ss.month = %(month)s",
+		"emp.employment_type IN %(payable_types)s",
+	]
+
+	if filters.get("branch"):
+		conditions.append("ss.branch = %(branch)s")
+		values["branch"] = filters.branch
+
+	if filters.get("employment_type"):
+		conditions.append("emp.employment_type = %(employment_type)s")
+		values["employment_type"] = filters.employment_type
+
+	if filters.get("cost_center") and has_column("Salary Slip", "cost_center"):
+		conditions.append("ss.cost_center = %(cost_center)s")
+		values["cost_center"] = filters.cost_center
 
 	ot_join = get_ot_join(values, "payable_detail_ot_components")
 
-	branch_expr = get_branch_expr("emp", "ss")
 	where_clause = " AND ".join(conditions)
 
 	return frappe.db.sql(
 		f"""
 		SELECT
 			'  Musterroll/OAP/Operator/GFG/DFG Detail' AS section,
-			{branch_expr} AS branch,
+			COALESCE(ss.branch, 'No Branch') AS branch,
 			COALESCE(emp.employment_type, 'No Employment Type') AS category,
 			ss.employee AS employee,
 			ss.employee_name AS employee_name,
@@ -427,7 +486,7 @@ def get_salary_payable_detail(filters):
 			ON emp.name = ss.employee
 		{ot_join}
 		WHERE {where_clause}
-		ORDER BY {branch_expr}, emp.employment_type, ss.employee
+		ORDER BY ss.branch, emp.employment_type, ss.employee
 		""",
 		values,
 		as_dict=True,
