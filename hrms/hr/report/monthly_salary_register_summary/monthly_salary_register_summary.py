@@ -335,7 +335,6 @@ def get_ot_join(values, value_key="ot_components"):
 			ON ot.parent = ss.name
 	"""
 
-
 def get_salary_payable_summary(filters):
 	conditions = [
 		"p.docstatus = 1",
@@ -373,6 +372,8 @@ def get_salary_payable_summary(filters):
 		END
 	"""
 
+	gross_expr = "(IFNULL(i.total_wage, 0) + IFNULL(i.total_ot_amount, 0))"
+
 	return frappe.db.sql(
 		f"""
 		SELECT
@@ -383,14 +384,13 @@ def get_salary_payable_summary(filters):
 			NULL AS employee_name,
 			COUNT(DISTINCT i.employee) AS employee_count,
 
-			SUM(IFNULL(i.total_amount, 0)) AS net_pay,
+			SUM({gross_expr}) AS net_pay,
 			SUM(IFNULL(i.total_wage, 0)) AS total_wage,
 			SUM(IFNULL(i.total_ot_amount, 0)) AS ot_amount,
-
-			SUM(IFNULL(i.total_wage, 0) + IFNULL(i.total_ot_amount, 0)) AS gross_pay,
+			SUM({gross_expr}) AS gross_pay,
 
 			0 AS consultant_paid,
-			SUM(IFNULL(i.total_wage, 0) + IFNULL(i.total_ot_amount, 0)) AS total_amount
+			SUM({gross_expr}) AS total_amount
 
 		FROM `tabMR Payment Item` AS i
 		INNER JOIN `tabProcess MR Payment` AS p
@@ -402,7 +402,6 @@ def get_salary_payable_summary(filters):
 		values,
 		as_dict=True,
 	)
-
 
 def get_salary_payable_detail(filters):
 	conditions = [
@@ -441,233 +440,7 @@ def get_salary_payable_detail(filters):
 		END
 	"""
 
-	return frappe.db.sql(
-		f"""
-		SELECT
-			'  Musterroll/OAP/Operator/GFG/DFG Detail' AS section,
-			COALESCE(p.branch, 'No Branch') AS branch,
-			COALESCE({employee_type_expr}, 'No Employee Type') AS category,
-			i.employee AS employee,
-			i.person_name AS employee_name,
-			1 AS employee_count,
-
-			IFNULL(i.total_amount, 0) AS net_pay,
-			IFNULL(i.total_wage, 0) AS total_wage,
-			IFNULL(i.total_ot_amount, 0) AS ot_amount,
-
-			(IFNULL(i.total_wage, 0) + IFNULL(i.total_ot_amount, 0)) AS gross_pay,
-
-			0 AS consultant_paid,
-			(IFNULL(i.total_wage, 0) + IFNULL(i.total_ot_amount, 0)) AS total_amount
-
-		FROM `tabMR Payment Item` AS i
-		INNER JOIN `tabProcess MR Payment` AS p
-			ON i.parent = p.name
-		WHERE {where_clause}
-		ORDER BY p.branch, {employee_type_expr}, i.employee
-		""",
-		values,
-		as_dict=True,
-	)
-
-# def get_salary_payable_summary(filters):
-# 	conditions = [
-# 		"p.docstatus = 1",
-# 	]
-
-# 	values = {}
-
-# 	if filters.get("fiscal_year"):
-# 		conditions.append("i.fiscal_year = %(fiscal_year)s")
-# 		values["fiscal_year"] = filters.fiscal_year
-
-# 	if filters.get("month"):
-# 		conditions.append("i.month = %(month)s")
-# 		values["month"] = filters.month
-
-# 	if filters.get("branch"):
-# 		conditions.append("p.branch = %(branch)s")
-# 		values["branch"] = filters.branch
-
-# 	if filters.get("employment_type"):
-# 		conditions.append("p.employee_type = %(employment_type)s")
-# 		values["employment_type"] = filters.employment_type
-
-# 	where_clause = " AND ".join(conditions)
-
-# 	return frappe.db.sql(
-# 		f"""
-# 		SELECT
-# 			'Musterroll/OAP/Operator/GFG/DFG' AS section,
-# 			COALESCE(p.branch, 'No Branch') AS branch,
-# 			COALESCE(p.employee_type, 'No Employee Type') AS category,
-# 			NULL AS employee,
-# 			NULL AS employee_name,
-# 			COUNT(DISTINCT i.employee) AS employee_count,
-
-# 			SUM(IFNULL(i.total_amount, 0)) AS net_pay,
-# 			SUM(IFNULL(i.total_wage, 0)) AS total_wage,
-# 			SUM(IFNULL(i.total_ot_amount, 0)) AS ot_amount,
-# 			SUM(IFNULL(i.wage_payable, 0)) AS gross_pay,
-
-# 			0 AS consultant_paid,
-# 			SUM(IFNULL(i.wage_payable, 0)) AS total_amount
-
-# 		FROM `tabMR Payment Item` AS i
-# 		INNER JOIN `tabProcess MR Payment` AS p
-# 			ON i.parent = p.name
-# 		WHERE {where_clause}
-# 		GROUP BY p.branch, p.employee_type
-# 		ORDER BY p.branch, p.employee_type
-# 		""",
-# 		values,
-# 		as_dict=True,
-# 	)
-
-
-def get_salary_payable_summary(filters):
-	conditions = [
-		"p.docstatus = 1",
-	]
-
-	values = {}
-
-	if filters.get("fiscal_year"):
-		conditions.append("i.fiscal_year = %(fiscal_year)s")
-		values["fiscal_year"] = filters.fiscal_year
-
-	if filters.get("month"):
-		conditions.append("i.month = %(month)s")
-		values["month"] = filters.month
-
-	if filters.get("branch"):
-		conditions.append("p.branch = %(branch)s")
-		values["branch"] = filters.branch
-
-	if filters.get("employment_type"):
-		conditions.append("""
-			CASE
-				WHEN TRIM(p.employee_type) = 'DFG Trainer' THEN 'DFG'
-				ELSE TRIM(p.employee_type)
-			END = %(employment_type)s
-		""")
-		values["employment_type"] = filters.employment_type
-
-	where_clause = " AND ".join(conditions)
-	employee_type_expr = get_mr_employee_type_expr()
-
-	return frappe.db.sql(
-		f"""
-		SELECT
-			'Musterroll/OAP/Operator/GFG/DFG' AS section,
-			COALESCE(p.branch, 'No Branch') AS branch,
-			COALESCE({employee_type_expr}, 'No Employee Type') AS category,
-			NULL AS employee,
-			NULL AS employee_name,
-			COUNT(DISTINCT i.employee) AS employee_count,
-
-			SUM(IFNULL(i.total_amount, 0)) AS net_pay,
-			SUM(IFNULL(i.total_wage, 0)) AS total_wage,
-			SUM(IFNULL(i.total_ot_amount, 0)) AS ot_amount,
-			SUM(IFNULL(i.wage_payable, 0)) AS gross_pay,
-
-			0 AS consultant_paid,
-			SUM(IFNULL(i.wage_payable, 0)) AS total_amount
-
-		FROM `tabMR Payment Item` AS i
-		INNER JOIN `tabProcess MR Payment` AS p
-			ON i.parent = p.name
-		WHERE {where_clause}
-		GROUP BY p.branch, {employee_type_expr}
-		ORDER BY p.branch, {employee_type_expr}
-		""",
-		values,
-		as_dict=True,
-	)
-# def get_salary_payable_detail(filters):
-# 	conditions = [
-# 		"p.docstatus = 1",
-# 	]
-
-# 	values = {}
-
-# 	if filters.get("fiscal_year"):
-# 		conditions.append("i.fiscal_year = %(fiscal_year)s")
-# 		values["fiscal_year"] = filters.fiscal_year
-
-# 	if filters.get("month"):
-# 		conditions.append("i.month = %(month)s")
-# 		values["month"] = filters.month
-
-# 	if filters.get("branch"):
-# 		conditions.append("p.branch = %(branch)s")
-# 		values["branch"] = filters.branch
-
-# 	if filters.get("employment_type"):
-# 		conditions.append("p.employee_type = %(employment_type)s")
-# 		values["employment_type"] = filters.employment_type
-
-# 	where_clause = " AND ".join(conditions)
-
-# 	return frappe.db.sql(
-# 		f"""
-# 		SELECT
-# 			'  Musterroll/OAP/Operator/GFG/DFG Detail' AS section,
-# 			COALESCE(p.branch, 'No Branch') AS branch,
-# 			COALESCE(p.employee_type, 'No Employee Type') AS category,
-# 			i.employee AS employee,
-# 			i.person_name AS employee_name,
-# 			1 AS employee_count,
-
-# 			IFNULL(i.total_amount, 0) AS net_pay,
-# 			IFNULL(i.total_wage, 0) AS total_wage,
-# 			IFNULL(i.total_ot_amount, 0) AS ot_amount,
-# 			IFNULL(i.wage_payable, 0) AS gross_pay,
-
-# 			0 AS consultant_paid,
-# 			IFNULL(i.wage_payable, 0) AS total_amount
-
-# 		FROM `tabMR Payment Item` AS i
-# 		INNER JOIN `tabProcess MR Payment` AS p
-# 			ON i.parent = p.name
-# 		WHERE {where_clause}
-# 		ORDER BY p.branch, p.employee_type, i.employee
-# 		""",
-# 		values,
-# 		as_dict=True,
-# 	)
-
-
-def get_salary_payable_detail(filters):
-	conditions = [
-		"p.docstatus = 1",
-	]
-
-	values = {}
-
-	if filters.get("fiscal_year"):
-		conditions.append("i.fiscal_year = %(fiscal_year)s")
-		values["fiscal_year"] = filters.fiscal_year
-
-	if filters.get("month"):
-		conditions.append("i.month = %(month)s")
-		values["month"] = filters.month
-
-	if filters.get("branch"):
-		conditions.append("p.branch = %(branch)s")
-		values["branch"] = filters.branch
-
-	if filters.get("employment_type"):
-		conditions.append("""
-			CASE
-				WHEN TRIM(p.employee_type) = 'DFG Trainer' THEN 'DFG'
-				ELSE TRIM(p.employee_type)
-			END = %(employment_type)s
-		""")
-		values["employment_type"] = filters.employment_type
-
-	where_clause = " AND ".join(conditions)
-	employee_type_expr = get_mr_employee_type_expr()
+	gross_expr = "(IFNULL(i.total_wage, 0) + IFNULL(i.total_ot_amount, 0))"
 
 	return frappe.db.sql(
 		f"""
@@ -679,13 +452,13 @@ def get_salary_payable_detail(filters):
 			i.person_name AS employee_name,
 			1 AS employee_count,
 
-			IFNULL(i.total_amount, 0) AS net_pay,
+			{gross_expr} AS net_pay,
 			IFNULL(i.total_wage, 0) AS total_wage,
 			IFNULL(i.total_ot_amount, 0) AS ot_amount,
-			IFNULL(i.wage_payable, 0) AS gross_pay,
+			{gross_expr} AS gross_pay,
 
 			0 AS consultant_paid,
-			IFNULL(i.wage_payable, 0) AS total_amount
+			{gross_expr} AS total_amount
 
 		FROM `tabMR Payment Item` AS i
 		INNER JOIN `tabProcess MR Payment` AS p
