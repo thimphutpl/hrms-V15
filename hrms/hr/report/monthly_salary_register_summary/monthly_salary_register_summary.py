@@ -358,10 +358,6 @@ def get_salary_payable_summary(filters):
 
 	values = {}
 
-	if filters.get("company") and has_column("Process MR Payment", "company"):
-		conditions.append("p.company = %(company)s")
-		values["company"] = filters.company
-
 	if filters.get("fiscal_year"):
 		conditions.append("i.fiscal_year = %(fiscal_year)s")
 		values["fiscal_year"] = filters.fiscal_year
@@ -375,8 +371,8 @@ def get_salary_payable_summary(filters):
 		values["branch"] = filters.branch
 
 	if filters.get("employment_type"):
-		conditions.append("p.employee_type = %(employee_type)s")
-		values["employee_type"] = filters.employment_type
+		conditions.append("p.employee_type = %(employment_type)s")
+		values["employment_type"] = filters.employment_type
 
 	where_clause = " AND ".join(conditions)
 
@@ -390,13 +386,13 @@ def get_salary_payable_summary(filters):
 			NULL AS employee_name,
 			COUNT(DISTINCT i.employee) AS employee_count,
 
-			SUM(i.total_amount) AS net_pay,
-			SUM(i.total_wage) AS total_wage,
-			SUM(i.total_ot_amount) AS ot_amount,
-			SUM(i.wage_payable) AS gross_pay,
+			SUM(IFNULL(i.total_amount, 0)) AS net_pay,
+			SUM(IFNULL(i.total_wage, 0)) AS total_wage,
+			SUM(IFNULL(i.total_ot_amount, 0)) AS ot_amount,
+			SUM(IFNULL(i.wage_payable, 0)) AS gross_pay,
 
 			0 AS consultant_paid,
-			SUM(i.wage_payable) AS total_amount
+			SUM(IFNULL(i.wage_payable, 0)) AS total_amount
 
 		FROM `tabMR Payment Item` AS i
 		INNER JOIN `tabProcess MR Payment` AS p
@@ -415,10 +411,6 @@ def get_salary_payable_detail(filters):
 	]
 
 	values = {}
-
-	if filters.get("company") and has_column("Process MR Payment", "company"):
-		conditions.append("p.company = %(company)s")
-		values["company"] = filters.company
 
 	if filters.get("fiscal_year"):
 		conditions.append("i.fiscal_year = %(fiscal_year)s")
@@ -448,13 +440,13 @@ def get_salary_payable_detail(filters):
 			i.person_name AS employee_name,
 			1 AS employee_count,
 
-			i.total_amount AS net_pay,
-			i.total_wage AS total_wage,
-			i.total_ot_amount AS ot_amount,
-			i.wage_payable AS gross_pay,
+			IFNULL(i.total_amount, 0) AS net_pay,
+			IFNULL(i.total_wage, 0) AS total_wage,
+			IFNULL(i.total_ot_amount, 0) AS ot_amount,
+			IFNULL(i.wage_payable, 0) AS gross_pay,
 
 			0 AS consultant_paid,
-			i.wage_payable AS total_amount
+			IFNULL(i.wage_payable, 0) AS total_amount
 
 		FROM `tabMR Payment Item` AS i
 		INNER JOIN `tabProcess MR Payment` AS p
