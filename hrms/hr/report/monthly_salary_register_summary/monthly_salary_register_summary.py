@@ -105,21 +105,35 @@ def execute(filters=None):
 	data = []
 
 	show_detail = flt(filters.get("show_detail"))
-	include_others = flt(filters.get("include_others"))
+	only_slipped_employees = flt(filters.get("only_slipped_employees"))
+	only_others = flt(filters.get("only_others"))
 
-	# 1. Always show normal salary slipped employees
-	salary_rows = get_salary_slip_summary(filters)
-	if salary_rows:
-		data.extend(salary_rows)
-		data.append(get_section_total_row("Sub Total - Salary Slipped Employees", salary_rows))
+	if only_slipped_employees and only_others:
+		frappe.throw(_("Please select either Only Slipped Employees or Only Others, not both."))
 
-		if show_detail:
-			detail_rows = get_salary_slip_detail(filters)
-			if detail_rows:
-				data.extend(detail_rows)
+	show_slipped = True
+	show_others = True
 
-	# 2. Show MR Payment Others only when Include Others is checked
-	if include_others:
+	if only_slipped_employees:
+		show_others = False
+
+	if only_others:
+		show_slipped = False
+
+	# 1. Salary slipped employees
+	if show_slipped:
+		salary_rows = get_salary_slip_summary(filters)
+		if salary_rows:
+			data.extend(salary_rows)
+			data.append(get_section_total_row("Sub Total - Salary Slipped Employees", salary_rows))
+
+			if show_detail:
+				detail_rows = get_salary_slip_detail(filters)
+				if detail_rows:
+					data.extend(detail_rows)
+
+	# 2. Others from MR Payment
+	if show_others:
 		payable_rows = get_salary_payable_summary(filters)
 		if payable_rows:
 			data.extend(payable_rows)
@@ -130,7 +144,7 @@ def execute(filters=None):
 				if payable_detail_rows:
 					data.extend(payable_detail_rows)
 
-		# 3. Consultant JE also only when Include Others is checked
+		# 3. Consultant JE, only if consultant account selected
 		consultant_rows = get_consultant_je_summary(filters)
 		if consultant_rows:
 			data.extend(consultant_rows)
