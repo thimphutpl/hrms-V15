@@ -54,52 +54,12 @@ OT_SALARY_COMPONENTS = [
 ]
 
 
-# def execute(filters=None):
-# 	filters = frappe._dict(filters or {})
-# 	validate_filters(filters)
-
-# 	columns = get_columns()
-# 	data = []
-
-# 	show_detail = flt(filters.get("show_detail"))
-
-# 	# 1. Normal salary slipped employees
-# 	salary_rows = get_salary_slip_summary(filters)
-# 	if salary_rows:
-# 		data.extend(salary_rows)
-# 		data.append(get_section_total_row("Sub Total - Salary Slipped Employees", salary_rows))
-
-# 		if show_detail:
-# 			detail_rows = get_salary_slip_detail(filters)
-# 			if detail_rows:
-# 				data.extend(detail_rows)
-
-# 	# 2. Muster Roll / OAP / Operator / GFG / DFG
-# 	payable_rows = get_salary_payable_summary(filters)
-# 	if payable_rows:
-# 		data.extend(payable_rows)
-# 		data.append(get_section_total_row("Sub Total - Musterroll/OAP/Operator/GFG/DFG", payable_rows))
-
-# 		if show_detail:
-# 			payable_detail_rows = get_salary_payable_detail(filters)
-# 			if payable_detail_rows:
-# 				data.extend(payable_detail_rows)
-
-# 	# 3. Consultant payment through Journal Entry
-# 	consultant_rows = get_consultant_je_summary(filters)
-# 	if consultant_rows:
-# 		data.extend(consultant_rows)
-# 		data.append(get_section_total_row("Sub Total - Consultant JE", consultant_rows))
-
-# 	# 4. Grand Total
-# 	if data:
-# 		data.append(get_grand_total_row(data))
-
-# 	return columns, data
-
 def execute(filters=None):
 	filters = frappe._dict(filters or {})
 	validate_filters(filters)
+
+	if flt(filters.get("hr_cost_dashboard")):
+		return execute_hr_cost_dashboard(filters)
 
 	columns = get_columns()
 	data = []
@@ -120,7 +80,6 @@ def execute(filters=None):
 	if only_others:
 		show_slipped = False
 
-	# 1. Salary slipped employees
 	if show_slipped:
 		salary_rows = get_salary_slip_summary(filters)
 		if salary_rows:
@@ -132,7 +91,6 @@ def execute(filters=None):
 				if detail_rows:
 					data.extend(detail_rows)
 
-	# 2. Others from MR Payment
 	if show_others:
 		payable_rows = get_salary_payable_summary(filters)
 		if payable_rows:
@@ -144,13 +102,11 @@ def execute(filters=None):
 				if payable_detail_rows:
 					data.extend(payable_detail_rows)
 
-		# 3. Consultant JE, only if consultant account selected
 		consultant_rows = get_consultant_je_summary(filters)
 		if consultant_rows:
 			data.extend(consultant_rows)
 			data.append(get_section_total_row("Sub Total - Consultant JE", consultant_rows))
 
-	# 4. Grand Total
 	if data:
 		data.append(get_grand_total_row(data))
 
@@ -645,3 +601,205 @@ def get_mr_employee_type_expr():
 			ELSE TRIM(p.employee_type)
 		END
 	"""
+
+
+
+def execute_hr_cost_dashboard(filters):
+	columns = get_hr_cost_dashboard_columns()
+	data = get_hr_cost_dashboard_data(filters)
+	chart = get_hr_cost_dashboard_chart(data)
+
+	return columns, data, None, chart
+
+
+def get_hr_cost_dashboard_columns():
+	return [
+		{
+			"label": _("Si. No"),
+			"fieldname": "si_no",
+			"fieldtype": "Int",
+			"width": 80,
+		},
+		{
+			"label": _("Site / Head Office / LO"),
+			"fieldname": "branch",
+			"fieldtype": "Data",
+			"width": 260,
+		},
+		{
+			"label": _("Monthly HR Cost"),
+			"fieldname": "monthly_hr_cost",
+			"fieldtype": "Currency",
+			"width": 170,
+		},
+		{
+			"label": _("Daily HR Cost"),
+			"fieldname": "daily_hr_cost",
+			"fieldtype": "Currency",
+			"width": 170,
+		},
+		{
+			"label": _("Hourly HR Cost"),
+			"fieldname": "hourly_hr_cost",
+			"fieldtype": "Currency",
+			"width": 170,
+		},
+	]
+
+
+
+def get_hr_cost_dashboard_data(filters):
+	only_slipped_employees = flt(filters.get("only_slipped_employees"))
+	only_others = flt(filters.get("only_others"))
+
+	if only_slipped_employees and only_others:
+		frappe.throw(_("Please select either Only Slipped Employees or Only Others, not both."))
+
+	show_slipped = True
+	show_others = True
+
+	if only_slipped_employees:
+		show_others = False
+
+	if only_others:
+		show_slipped = False
+
+	site_order = [
+		"Head Office",
+		"Khotokha Site",
+		"Gyalpoishing Site",
+		"Pemathang Site",
+		"Tareythang Site",
+		"Jamtsholing Site",
+		"Phuentsholing LO",
+		"Samdrup Jongkhar LO",
+	]
+
+	branch_totals = {site: 0 for site in site_order}
+
+	if show_slipped:
+		for row in get_salary_slip_summary(filters):
+			site = normalize_branch_for_dashboard(row.get("branch"))
+			if site in branch_totals:
+				branch_totals[site] += flt(row.get("total_amount"))
+
+	if show_others:
+		for row in get_salary_payable_summary(filters):
+			site = normalize_branch_for_dashboard(row.get("branch"))
+			if site in branch_totals:
+				branch_totals[site] += flt(row.get("total_amount"))
+
+		for row in get_consultant_je_summary(filters):
+			site = normalize_branch_for_dashboard(row.get("branch"))
+			if site in branch_totals:
+				branch_totals[site] += flt(row.get("total_amount"))
+
+	rows = []
+	si_no = 1
+
+	for site in site_order:
+		monthly_cost = flt(branch_totals.get(site))
+
+		rows.append({
+			"si_no": si_no,
+			"branch": site,
+			"monthly_hr_cost": monthly_cost,
+			"daily_hr_cost": monthly_cost / 30,
+			"hourly_hr_cost": monthly_cost / 30 / 8,
+		})
+
+		si_no += 1
+
+	total_monthly = sum(flt(d.get("monthly_hr_cost")) for d in rows)
+
+	rows.append({
+		"si_no": "",
+		"branch": "Total Cost",
+		"monthly_hr_cost": total_monthly,
+		"daily_hr_cost": total_monthly / 30,
+		"hourly_hr_cost": total_monthly / 30 / 8,
+		"is_total_row": 1,
+	})
+
+	return rows
+
+
+def normalize_branch_for_dashboard(branch):
+	branch = cstr(branch).strip()
+
+	branch_map = {
+		# Head Office
+		"GI - Head Office": "Head Office",
+		"Head Office": "Head Office",
+
+		# Khotokha
+		"GI - Khotokha": "Khotokha Site",
+		"Khotokha": "Khotokha Site",
+		"Khotokha Site": "Khotokha Site",
+		"Gyalsup for Gyalsung (GI-K)": "Khotokha Site",
+
+		# Gyalpoishing / Gyalpozhing
+		"GI - Gyalpozhing": "Gyalpoishing Site",
+		"GI - Gyalpoishing": "Gyalpoishing Site",
+		"Gyalpozhing": "Gyalpoishing Site",
+		"Gyalpoishing": "Gyalpoishing Site",
+		"Gyalpoishing Site": "Gyalpoishing Site",
+		"Gyalsup for Gyalsung (GI-G)": "Gyalpoishing Site",
+
+		# Pemathang
+		"GI - Pemathang": "Pemathang Site",
+		"Pemathang": "Pemathang Site",
+		"Pemathang Site": "Pemathang Site",
+		"Gyalsup for Gyalsung (GI-P)": "Pemathang Site",
+
+		# Tareythang
+		"GI - Tareythang": "Tareythang Site",
+		"Tareythang": "Tareythang Site",
+		"Tareythang Site": "Tareythang Site",
+		"Gyalsup for Gyalsung (GI-T)": "Tareythang Site",
+
+		# Jamtsholing
+		"GI - Jamtsholing": "Jamtsholing Site",
+		"Jamtsholing": "Jamtsholing Site",
+		"Jamtsholing Site": "Jamtsholing Site",
+		"Gyalsup for Gyalsung (GI)-J": "Jamtsholing Site",
+		"Gyalsup for Gyalsung (GI-J)": "Jamtsholing Site",
+
+		# Phuentsholing LO
+		"GI - Liaision Office Pling": "Phuentsholing LO",
+		"GI - Liaison Office Pling": "Phuentsholing LO",
+		"Phuentsholing LO": "Phuentsholing LO",
+
+		# Samdrup Jongkhar LO
+		"GI - Samdrup Jongkhar LO": "Samdrup Jongkhar LO",
+		"GI - Samdrup Jongkhar": "Samdrup Jongkhar LO",
+		"Samdrup Jongkhar LO": "Samdrup Jongkhar LO",
+		"Samdrup Jongkhar": "Samdrup Jongkhar LO",
+		"SJ LO": "Samdrup Jongkhar LO",
+		"GI - SJ LO": "Samdrup Jongkhar LO",
+		"Samdrup Jongkhar Liaison Office": "Samdrup Jongkhar LO",
+		"GI - Samdrup Jongkhar Liaison Office": "Samdrup Jongkhar LO",
+		"GI - Liaison Office Sjongkhar": "Samdrup Jongkhar LO",
+	}
+
+	return branch_map.get(branch, branch or "No Branch")
+
+def get_hr_cost_dashboard_chart(data):
+	chart_rows = [
+		d for d in data
+		if d.get("branch") != "Total Cost"
+	]
+
+	return {
+		"data": {
+			"labels": [d.get("branch") for d in chart_rows],
+			"datasets": [
+				{
+					"name": "Monthly HR Cost",
+					"values": [flt(d.get("monthly_hr_cost")) for d in chart_rows],
+				}
+			],
+		},
+		"type": "bar",
+		"height": 300,
+	}

@@ -46,12 +46,7 @@ frappe.query_reports["Monthly Salary Register Summary"] = {
 			fieldtype: "Link",
 			options: "Branch"
 		},
-		{
-			fieldname: "employment_type",
-			label: __("Employment Type"),
-			fieldtype: "Link",
-			options: "Employment Type"
-		},
+		
 		{
 			fieldname: "cost_center",
 			label: __("Cost Center"),
@@ -98,6 +93,13 @@ frappe.query_reports["Monthly Salary Register Summary"] = {
 			fieldtype: "Check",
 			default: 0,
 			description: __("Show only Musterroll/OAP/Operator/GFG/DFG from MR Payment and Consultant JE if account is selected.")
+		},
+		{
+			fieldname: "hr_cost_dashboard",
+			label: __("HR Cost Dashboard"),
+			fieldtype: "Check",
+			default: 0,
+			description: __("Show branch-wise Monthly, Daily and Hourly HR Cost dashboard.")
 		},
 		{
 			fieldname: "show_detail",
