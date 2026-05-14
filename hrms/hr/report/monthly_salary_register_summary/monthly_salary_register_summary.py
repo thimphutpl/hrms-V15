@@ -352,44 +352,31 @@ def get_salary_slip_detail(filters):
 
 
 def get_salary_payable_summary(filters):
-	month_no = MONTH_MAP[filters.month]
-
-	payable_types = [
-		"DFG",
-		"Muster Roll Employee",
-		"Open Air Prisoner",
-		"Operator",
-		"GFG",
-	]
-
-	values = {
-		"company": filters.company,
-		"fiscal_year": filters.fiscal_year,
-		"month": month_no,
-		"payable_types": tuple(payable_types),
-	}
-
 	conditions = [
-		"ss.docstatus = 1",
-		"ss.company = %(company)s",
-		"ss.fiscal_year = %(fiscal_year)s",
-		"ss.month = %(month)s",
-		"emp.employment_type IN %(payable_types)s",
+		"p.docstatus = 1",
 	]
+
+	values = {}
+
+	if filters.get("company") and has_column("Process MR Payment", "company"):
+		conditions.append("p.company = %(company)s")
+		values["company"] = filters.company
+
+	if filters.get("fiscal_year"):
+		conditions.append("i.fiscal_year = %(fiscal_year)s")
+		values["fiscal_year"] = filters.fiscal_year
+
+	if filters.get("month"):
+		conditions.append("i.month = %(month)s")
+		values["month"] = filters.month
 
 	if filters.get("branch"):
-		conditions.append("ss.branch = %(branch)s")
+		conditions.append("p.branch = %(branch)s")
 		values["branch"] = filters.branch
 
 	if filters.get("employment_type"):
-		conditions.append("emp.employment_type = %(employment_type)s")
-		values["employment_type"] = filters.employment_type
-
-	if filters.get("cost_center") and has_column("Salary Slip", "cost_center"):
-		conditions.append("ss.cost_center = %(cost_center)s")
-		values["cost_center"] = filters.cost_center
-
-	ot_join = get_ot_join(values, "payable_ot_components")
+		conditions.append("p.employee_type = %(employee_type)s")
+		values["employee_type"] = filters.employment_type
 
 	where_clause = " AND ".join(conditions)
 
@@ -397,70 +384,57 @@ def get_salary_payable_summary(filters):
 		f"""
 		SELECT
 			'Musterroll/OAP/Operator/GFG/DFG' AS section,
-			COALESCE(ss.branch, 'No Branch') AS branch,
-			COALESCE(emp.employment_type, 'No Employment Type') AS category,
+			COALESCE(p.branch, 'No Branch') AS branch,
+			COALESCE(p.employee_type, 'No Employee Type') AS category,
 			NULL AS employee,
 			NULL AS employee_name,
-			COUNT(DISTINCT ss.employee) AS employee_count,
-			SUM(ss.net_pay) AS net_pay,
+			COUNT(DISTINCT i.employee) AS employee_count,
 
-			SUM(ss.gross_pay - IFNULL(ot.ot_amount, 0)) AS total_wage,
-			SUM(IFNULL(ot.ot_amount, 0)) AS ot_amount,
-			SUM(ss.gross_pay) AS gross_pay,
+			SUM(i.total_amount) AS net_pay,
+			SUM(i.total_wage) AS total_wage,
+			SUM(i.total_ot_amount) AS ot_amount,
+			SUM(i.wage_payable) AS gross_pay,
 
 			0 AS consultant_paid,
-			SUM(ss.gross_pay) AS total_amount
-		FROM `tabSalary Slip` ss
-		INNER JOIN `tabEmployee` emp
-			ON emp.name = ss.employee
-		{ot_join}
+			SUM(i.wage_payable) AS total_amount
+
+		FROM `tabMR Payment Item` AS i
+		INNER JOIN `tabProcess MR Payment` AS p
+			ON i.parent = p.name
 		WHERE {where_clause}
-		GROUP BY ss.branch, emp.employment_type
-		ORDER BY ss.branch, emp.employment_type
+		GROUP BY p.branch, p.employee_type
+		ORDER BY p.branch, p.employee_type
 		""",
 		values,
 		as_dict=True,
 	)
 
 def get_salary_payable_detail(filters):
-	month_no = MONTH_MAP[filters.month]
-
-	payable_types = [
-		"DFG",
-		"Muster Roll Employee",
-		"Open Air Prisoner",
-		"Operator",
-		"GFG",
-	]
-
-	values = {
-		"company": filters.company,
-		"fiscal_year": filters.fiscal_year,
-		"month": month_no,
-		"payable_types": tuple(payable_types),
-	}
-
 	conditions = [
-		"ss.docstatus = 1",
-		"ss.company = %(company)s",
-		"ss.fiscal_year = %(fiscal_year)s",
-		"ss.month = %(month)s",
-		"emp.employment_type IN %(payable_types)s",
+		"p.docstatus = 1",
 	]
+
+	values = {}
+
+	if filters.get("company") and has_column("Process MR Payment", "company"):
+		conditions.append("p.company = %(company)s")
+		values["company"] = filters.company
+
+	if filters.get("fiscal_year"):
+		conditions.append("i.fiscal_year = %(fiscal_year)s")
+		values["fiscal_year"] = filters.fiscal_year
+
+	if filters.get("month"):
+		conditions.append("i.month = %(month)s")
+		values["month"] = filters.month
 
 	if filters.get("branch"):
-		conditions.append("ss.branch = %(branch)s")
+		conditions.append("p.branch = %(branch)s")
 		values["branch"] = filters.branch
 
 	if filters.get("employment_type"):
-		conditions.append("emp.employment_type = %(employment_type)s")
+		conditions.append("p.employee_type = %(employment_type)s")
 		values["employment_type"] = filters.employment_type
-
-	if filters.get("cost_center") and has_column("Salary Slip", "cost_center"):
-		conditions.append("ss.cost_center = %(cost_center)s")
-		values["cost_center"] = filters.cost_center
-
-	ot_join = get_ot_join(values, "payable_detail_ot_components")
 
 	where_clause = " AND ".join(conditions)
 
@@ -468,25 +442,25 @@ def get_salary_payable_detail(filters):
 		f"""
 		SELECT
 			'  Musterroll/OAP/Operator/GFG/DFG Detail' AS section,
-			COALESCE(ss.branch, 'No Branch') AS branch,
-			COALESCE(emp.employment_type, 'No Employment Type') AS category,
-			ss.employee AS employee,
-			ss.employee_name AS employee_name,
+			COALESCE(p.branch, 'No Branch') AS branch,
+			COALESCE(p.employee_type, 'No Employee Type') AS category,
+			i.employee AS employee,
+			i.person_name AS employee_name,
 			1 AS employee_count,
-			ss.net_pay AS net_pay,
 
-			(ss.gross_pay - IFNULL(ot.ot_amount, 0)) AS total_wage,
-			IFNULL(ot.ot_amount, 0) AS ot_amount,
-			ss.gross_pay AS gross_pay,
+			i.total_amount AS net_pay,
+			i.total_wage AS total_wage,
+			i.total_ot_amount AS ot_amount,
+			i.wage_payable AS gross_pay,
 
 			0 AS consultant_paid,
-			ss.gross_pay AS total_amount
-		FROM `tabSalary Slip` ss
-		INNER JOIN `tabEmployee` emp
-			ON emp.name = ss.employee
-		{ot_join}
+			i.wage_payable AS total_amount
+
+		FROM `tabMR Payment Item` AS i
+		INNER JOIN `tabProcess MR Payment` AS p
+			ON i.parent = p.name
 		WHERE {where_clause}
-		ORDER BY ss.branch, emp.employment_type, ss.employee
+		ORDER BY p.branch, p.employee_type, i.employee
 		""",
 		values,
 		as_dict=True,
