@@ -335,6 +335,72 @@ def get_ot_join(values, value_key="ot_components"):
 			ON ot.parent = ss.name
 	"""
 
+def get_salary_slip_summary(filters):
+	values = {}
+	conditions = get_common_salary_conditions(filters, values)
+
+	branch_expr = get_branch_expr("emp", "ss")
+	where_clause = " AND ".join(conditions)
+
+	return frappe.db.sql(
+		f"""
+		SELECT
+			'Salary Slipped Employees' AS section,
+			{branch_expr} AS branch,
+			COALESCE(emp.employment_type, 'No Employment Type') AS category,
+			NULL AS employee,
+			NULL AS employee_name,
+			COUNT(DISTINCT ss.employee) AS employee_count,
+			SUM(IFNULL(ss.net_pay, 0)) AS net_pay,
+			0 AS total_wage,
+			0 AS ot_amount,
+			SUM(IFNULL(ss.gross_pay, 0)) AS gross_pay,
+			0 AS consultant_paid,
+			SUM(IFNULL(ss.gross_pay, 0)) AS total_amount
+		FROM `tabSalary Slip` ss
+		INNER JOIN `tabEmployee` emp
+			ON emp.name = ss.employee
+		WHERE {where_clause}
+		GROUP BY {branch_expr}, emp.employment_type
+		ORDER BY {branch_expr}, emp.employment_type
+		""",
+		values,
+		as_dict=True,
+	)
+
+
+def get_salary_slip_detail(filters):
+	values = {}
+	conditions = get_common_salary_conditions(filters, values)
+
+	branch_expr = get_branch_expr("emp", "ss")
+	where_clause = " AND ".join(conditions)
+
+	return frappe.db.sql(
+		f"""
+		SELECT
+			'  Salary Slip Detail' AS section,
+			{branch_expr} AS branch,
+			COALESCE(emp.employment_type, 'No Employment Type') AS category,
+			ss.employee AS employee,
+			ss.employee_name AS employee_name,
+			1 AS employee_count,
+			IFNULL(ss.net_pay, 0) AS net_pay,
+			0 AS total_wage,
+			0 AS ot_amount,
+			IFNULL(ss.gross_pay, 0) AS gross_pay,
+			0 AS consultant_paid,
+			IFNULL(ss.gross_pay, 0) AS total_amount
+		FROM `tabSalary Slip` ss
+		INNER JOIN `tabEmployee` emp
+			ON emp.name = ss.employee
+		WHERE {where_clause}
+		ORDER BY {branch_expr}, emp.employment_type, ss.employee
+		""",
+		values,
+		as_dict=True,
+	)
+
 def get_salary_payable_summary(filters):
 	conditions = [
 		"p.docstatus = 1",
