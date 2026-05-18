@@ -1,197 +1,482 @@
-# Copyright (c) 2026, Frappe Technologies Pvt. Ltd. and contributors
+# Copyright (c) 2023, Frappe Technologies Pvt. Ltd. and contributors
 # For license information, please see license.txt
-
 from __future__ import unicode_literals
 import frappe
+from frappe import msgprint
 from frappe.utils import cstr, add_days, date_diff, cint, flt, getdate, nowdate
 from frappe import _
 from frappe.utils.csvutils import UnicodeWriter
 from frappe.model.document import Document
 from calendar import monthrange
+import csv
+import os
+from functools import reduce
+from frappe import _
+from frappe.utils.xlsxutils import (
+	read_xls_file_from_attached_file,
+	read_xlsx_file_from_attached_file,
+)
 
 class UploadAttendanceOthers(Document):
 	pass
 
-@frappe.whitelist()
-def get_template():
-	# if not frappe.has_permission("Attendance Others", "create"):
-	# 	raise frappe.PermissionError
+	@frappe.whitelist()
+	def upload_data(self):
+		# from hrms.hr.doctype.process_mr_payment.process_mr_payment import get_pay_details
+		if self.upload_type == "Overtime":
+			
+			doctype = "Overtime Entry"
+		else:
+			doctype = "Attendance Others"
+		if not frappe.has_permission(doctype, "create"):
+			raise frappe.PermissionError
 
-	args = frappe.local.form_dict
-	w = UnicodeWriter()
-	w = add_header(w, args)
-	w = add_data(w, args)
+		from frappe.utils.csvutils import read_csv_content_from_attached_file
+		from frappe.modules import scrub
+		if frappe.safe_encode(self.import_file).lower().endswith("csv".encode("utf-8")):
+			from frappe.utils.csvutils import read_csv_content
+			file_name = frappe.get_doc("File", {"file_url": self.import_file})
+			fcontent = file_name.get_content()
+			rows = read_csv_content(fcontent)
 
-	# write out response as a type csv
-	frappe.response['result'] = cstr(w.getvalue())
-	frappe.response['type'] = 'csv'
-	frappe.response['doctype'] = "Attendance Others"
-
-def add_header(w, args):
-	status = ", ".join((frappe.get_meta("Attendance Others").get_field("status").options or "").strip().split("\n"))
-	w.writerow(["Notes:"])
-	w.writerow(["Please do not change the template headings"])
-	w.writerow(["Status should be P if Present, A if Absent"])
-	hd = ["Branch", "Cost Center", "Employee Type", "Employee ID", "Employee Name", "Year", "Month"]
-
-	month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov",
-		"Dec"].index(args.month) + 1
-
-	total_days = monthrange(cint(args.fiscal_year), month)[1]
-	for day in range(cint(total_days)):
-		hd.append(str(day + 1))	
-
-	w.writerow(hd)
-	return w
-
-def add_data(w, args):
-	month = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].index(args.month) + 1
-	month = str(month) if cint(month) > 9 else str("0" + str(month))
-
-	total_days = monthrange(cint(args.fiscal_year), cint(month))[1]
-	start_date = str(args.fiscal_year) + '-' + str(month) + '-' + str('01')
-	end_date   = str(args.fiscal_year) + '-' + str(month) + '-' + str(total_days)
-		
-	employees = get_active_employees(args, start_date, end_date)
-	loaded = get_loaded_records(args, start_date, end_date)
-	
-	for e in employees:
-		status = ''
-		row = [
-			e.branch, e.cost_center, e.etype, "\'"+str(e.name)+"\'", e.employee_name, args.fiscal_year, args.month
-		]
-		
-		for day in range(cint(total_days)):
-			status = loaded.get(e.etype, frappe._dict()).get(e.name, frappe._dict()).get(day+1,'')
-			row.append(status)
-						
-		w.writerow(row)
-	return w
-
-def get_loaded_records(args, start_date, end_date):
-	loaded_list= frappe._dict()
-
-	rl = frappe.db.sql("""
-		select
-			case 
-				when employee_type = 'Muster Roll Employee' then 'MR'
-				else employee_type
-			end as employee_type,
-			employee,
-			day(date) as day_of_date,
-			case
-				when status = 'Present' then 'P'
-				when status = 'Absent' then 'A'
-				else status
-			end as status
-		from `tabAttendance Others`
-		where branch = '{0}'
-		and date between %s and %s
-		and docstatus = 1
-	""".format(args.branch), (start_date, end_date), as_dict=1)
-
-	for r in rl:
-		loaded_list.setdefault(r.employee_type, frappe._dict()).setdefault(r.employee, frappe._dict()).setdefault(r.day_of_date,r.status)
-
-	return loaded_list
-
-def get_active_employees(args, start_date, end_date):        
-	employees = frappe.db.sql("""
-				select distinct
-						"MR" as etype,
-						me.name,
-						me.employee_name,
-						me.branch,
-						me.cost_center
-		from `tabMuster Roll Employee` as me, `tabMuster Roll Internal Work History` as iw
-				where me.status = "Active"
-				and iw.parent = me.name
-				and me.branch = '{0}'
-		and (
-						('{1}' between iw.from_date and ifnull(iw.to_date,now()))
-						or
-						('{2}' between iw.from_date and ifnull(iw.to_date,now()))
-						or
-						(iw.from_date between '{1}' and '{2}')
-						or
-						(ifnull(iw.to_date,now()) between '{1}' and '{2}')
+		elif frappe.safe_encode(self.import_file).lower().endswith("xlsx".encode("utf-8")):
+			try:
+				file_name = frappe.get_doc("File", {"file_url": self.import_file})
+				fcontent = file_name.get_content()
+				rows = read_xlsx_file_from_attached_file(fcontent=fcontent, filepath=self.import_file)
+			except Exception:
+				frappe.throw(
+					_("Unable to open attached file. Did you export it as excel?"), title=_("Invalid Excel Format")
 				)
-	
-		""".format(args.branch, start_date, end_date), {"branch": args.branch}, as_dict=1)
-
-	return employees
-
-@frappe.whitelist()
-def upload():
-	# if not frappe.has_permission("Attendance Others", "create"):
-	# 	raise frappe.PermissionError
-
-	from frappe.utils.csvutils import read_csv_content_from_uploaded_file
-	from frappe.modules import scrub
-
-	rows = read_csv_content_from_uploaded_file()
-	rows = filter(lambda x: x and any(x), rows)
-	if not rows:
-		msg = [_("Please select a csv file")]
-		return {"messages": msg, "error": msg}
-	columns = [scrub(f) for f in rows[3]]
-	ret = []
-	error = False
-
-	from frappe.utils.csvutils import check_record, import_doc
-
-	frappe.msgprint("Started Parsing")
-	for i, row in enumerate(rows[4:]):
-		if not row: continue
-		try:
-			row_idx = i + 4
-			for j in range(8, len(row) + 1):
-				month = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].index(row[6]) + 1	
-				month = str(month) if cint(month) > 9 else str("0" + str(month))
-				day = str(cint(j) - 7) if cint(j) > 9 else str("0" + str(cint(j) - 7))
-				status = ''
+		if not rows:
+			msg = [_("Please select a csv/excel file")]
+			return {"messages": msg, "error": msg}
+		ret = []
+		error = False
+		total_count = len(rows) - 1
+		count = successful = failed = 0
+		refresh_interval = 1
+		from frappe.utils.csvutils import check_record, import_doc
+		#error_msg=None
+		for i, row in enumerate(rows[1:]):
+			if not row:
+				continue
+			if row[6]=="Month":
+				continue
+			if row[5]=="Year":
+				continue
+			if row[3]==None:
+				continue
+			
+			count += 1
+			try:
+				row_idx = i + 6
+				year = row[5]
+				month = row[6]
+				name=row[4]
 				
-				if str(row[j -1]) in ("P","p"):
-					status = 'Present'
-				elif str(row[j -1]) in ("A","a"):
-					status = 'Absent'
-				else:
-					status = ''
-										
-				#frappe.msgprint(str(j))
-				old = frappe.db.get_value("Attendance Others", {"employee": row[3].strip('\''), "date": str(row[5]) + '-' + str(month) + '-' + str(day)}, ["status","name"], as_dict=1)
-				# Following IF condition enabled temporarily by SHIV on 2018/02/01
-				if old:
-					doc = frappe.get_doc("Attendance Others", old.name)
-					doc.db_set('status', status if status in ('Present','Absent') else doc.status)
-					doc.db_set('branch', row[0])
-					doc.db_set('cost_center', row[1])
-				#else:
-				if not old and status in ('Present','Absent'):
-					doc = frappe.new_doc("Attendance Others")
-					doc.status = status
-					doc.branch = row[0]
-					doc.cost_center = row[1]
-					doc.employee = str(row[3]).strip('\'')
-					doc.date = str(row[5]) + '-' + str(month) + '-' + str(day)
+				employee=str(row[3]).strip('\'')
+				
+				if self.branch!=row[0] or self.fiscal_year!=year or self.month!=month:
+					frappe.throw(f"Employee Id: {employee}, Name: {name}  not match with current Excel data")
 					
-					# if str(row[2]) == "MR":
-					doc.employee_type = "Muster Roll Employee"
-					# elif str(row[2]) == "DES":
-					# 		doc.employee_type = "DES Employee"
-									
-					#Prevent future dates creation
-					if not getdate(doc.date) > getdate(nowdate()):
-						doc.submit()
-		except Exception as e:
-			error = True
-			ret.append('Error for row (#%d) %s : %s' % (row_idx,
-				len(row)>1 and row[4] or "", cstr(e)))
-			frappe.errprint(frappe.get_traceback())
+				#frappe.throw(str(row[7]))
+				if self.upload_type == "Overtime":
+					
+					
+					rate_per_day, rate_per_hour, rate_per_hour_normal = 0, 0, 0	
+					#frappe.throw("pl")						
+															
+					for day_idx, day_value in enumerate(row[7:], start=1):
+						if not str(day_value).strip():
+							continue
+						
+						rh_hours = flt(day_value)
 
-	if error:
-		frappe.db.rollback()
+						if rh_hours <= 0:
+							continue
+					# for day_idx in range(1, (len(row) - 7) // 2 + 1):
+					# 	#day = str(day_idx).zfill(2)
+					# 	rh_hours = flt(row[7 + (day_idx - 1) * 2])
+					# 	sh_hours = flt(row[7 + (day_idx - 1) * 2 + 1])
+
+					# 	if sh_hours == 0 and rh_hours == 0:
+					# 		continue
+						#day = str(day_idx).zfill(2)
+						day = str(day_idx) if day_idx > 9 else "0" + str(day_idx)
+						# frappe.throw(str(month))
+						month_number = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].index(month) + 1
+						# frappe.throw(str(month_number))
+						date_str = f"{year}-{str(month_number).zfill(2)}-{day}"
+						month_str = str(month_number).zfill(2)
+						#frappe.throw(str(month_str))
+						# pay_details = get_pay_details(employee)
+						#frappe.throw(str(pay_details))
+						# if pay_details:
+							
+							
+						# 	rate_per_day 		 = flt(pay_details[employee]['rate_per_day'])
+						# 	#frappe.throw(str(rate_per_day))
+						# 	#rate_per_hour 		 = flt(pay_details[0].get("rate_per_hour"))
+						# 	rate_per_hour_normal = flt(pay_details[employee]['rate_per_hour_normal'])
+						#rh_hours = flt(row[7]) if len(row) > 7 else 0
+						#sh_hours = flt(row[8]) if len(row) > 8 else 0
+						old = frappe.db.get_value("Overtime Entry", {"number": str(row[3]).strip('\''), "date": date_str, "docstatus": 1}, ["docstatus", "name", "number_of_hours"], as_dict=1)
+						if old:
+							#
+							
+							#frappe.throw("hi123")
+							doc = frappe.get_doc("Overtime Entry", old.name)
+							doc.db_set('number_of_hours', rh_hours)
+							#doc.db_set('number_of_hours_special', sh_hours)
+							#doc.db_set('number_of_hours_regular', flt(day_value))
+						#if not old and flt(day_value) > 0:
+						#elif rh_hours > 0 :
+						else:
+							#frappe.throw("plham")
+							doc = frappe.new_doc("Overtime Entry")
+							doc.branch = row[0]
+							doc.cost_center = row[1]
+							doc.employee_type = row[2]
+							doc.number = str(row[3]).strip('\'')
+							doc.mr_employee_name = str(row[4]).strip('\'')
+							doc.date = date_str
+							#doc.number_of_hours_regular = flt(day_value)
+							doc.number_of_hours=rh_hours
+							#doc.number_of_hours_special=sh_hours
+							doc.rate_per_day=rate_per_day
+							doc.rate_per_hour=rate_per_hour_normal
+							#doc.rate_per_hour_normal=rate_per_hour_normal
+							doc.reference = self.name
+	
+							if not getdate(doc.date) > getdate(nowdate()):
+								doc.submit()
+							else:
+								frappe.throw("You cant upload over time entry  for the future month")
+					successful += 1
+				else:
+					
+					
+					for day_idx, day_value in enumerate(row[7:], start=1):
+						
+
+						if not str(day_value).strip():
+							
+							continue
+						
+                        
+						day = str(day_idx) if day_idx > 9 else "0" + str(day_idx)
+						month_number = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].index(row[6]) + 1
+						month_str = str(month_number).zfill(2)
+						#frappe.throw(str(month_str))
+						year = row[5]
+						date_str = f"{year}-{month_str}-{day}"
+						#frappe.throw(str(date_str))
+						#from hrms.hr.doctype.process_mr_payment.process_mr_payment import get_pay_details
+						# pay_details = get_pay_details(employee)
+						#frappe.throw(str(date_str))
+						# if not pay_details:
+						# 	frappe.throw("Wage Details is not defined")
+						status = ''
+						if str(day_value) in ("P", "p", "1"):
+							status = 'Present'
+						# elif str(day_value) in ("H", "h"):
+						# 	status = 'Half Day'
+
+						elif str(day_value) in ("A", "a", "0"):
+							status = 'Absent'
+						else:
+							status = ''
+						#frappe.throw(str(flt(pay_details[employee]['rate_per_hour_normal'])))
+						old = frappe.db.get_value("Attendance Others", {"employee": str(row[3]).strip('\''), "date": date_str, "docstatus": 1}, ["status", "name"], as_dict=1)
+						
+						if old:
+							#frappe.throw("kkk")
+							doc = frappe.get_doc("Attendance Others", old.name)
+							doc.db_set('status', status if status in ('Present', 'Absent') else doc.status)
+							doc.db_set('branch', row[0])
+							doc.db_set('cost_center', row[1])
+							doc.db_set('employee_type', row[2])
+						if not old and status in ('Present', 'Absent'):
+							
+							#frappe.throw(str(row[3]).strip('\''))
+							doc = frappe.new_doc("Attendance Others")
+							doc.status = status
+							doc.branch = row[0]
+							doc.cost_center = row[1]
+							doc.employee_type = row[2]
+							doc.employee = str(row[3]).strip('\'')
+							doc.mr_employee_name = str(row[4]).strip('\'')
+							doc.date = date_str
+							
+							# doc.db_set('rate_per_day', flt(pay_details[employee]['rate_per_day']))
+							doc.reference = self.name
+
+							# if not getdate(doc.date) > getdate(nowdate()):
+							doc.submit()
+					successful += 1
+		
+			except Exception as e:
+				failed += 1
+				error = True
+				ret.append('Error for row (#%d) %s : %s' % (row_idx, len(row) > 1 and row[5] or "", cstr(e)))
+				frappe.errprint(frappe.get_traceback())
+		
+		if error:
+			frappe.db.rollback()
+		else:
+			frappe.db.commit()
+
+		show_progress = 0
+		if count <= refresh_interval:
+			show_progress = 1
+		elif refresh_interval > total_count:
+			show_progress = 1
+		elif count % refresh_interval == 0:
+			show_progress = 1
+		elif count > total_count - refresh_interval:
+			show_progress = 1
+
+		if show_progress:
+			pass
+			# description = " Processing OT Of {}({}): ".format(frappe.bold(str(row[4]).strip('\'')), frappe.bold(row[3])) + "[" + str(count) + "/" + str(total_count) + "]"
+			# frappe.publish_progress(count * 100 / total_count,
+			# 						title=_("Posting Overtime Entry..."),
+			# 						description=description)
+			pass
+		return {"messages": ret, "error": error}
+
+# @frappe.whitelist()
+# def download_template(file_type, branch, month, fiscal_year, upload_type, unit):
+# 	#frappe.throw("pl")
+# 	data = frappe._dict(frappe.local.form_dict)
+# 	if upload_type == "Overtime":
+# 		writer = get_template_overtime(branch, month, fiscal_year)
+# 		doctype = "Muster Roll Overtime Entry"
+# 	else:
+# 		writer = get_template(branch, month, fiscal_year)
+# 		doctype = "Muster Roll Attendance"	
+	
+# 	for d in get_mr_data(branch, month, fiscal_year, unit):
+# 		row = []
+# 		row.append(d.branch)
+# 		row.append(d.cost_center)
+# 		row.append(d.unit)
+# 		row.append(d.name)
+# 		row.append(d.person_name)
+# 		row.append(d.fiscal_year)
+# 		row.append(d.month)
+
+# 		writer.writerow(row)
+	
+
+# 	if file_type == "CSV":
+# 		# download csv file
+# 		frappe.response["result"] = cstr(writer.getvalue())
+# 		frappe.response["type"] = "csv"
+# 		frappe.response["doctype"] = doctype
+# 	else:
+# 		build_response_as_excel(writer,doctype)
+@frappe.whitelist()
+def download_template(file_type, branch, month, fiscal_year, upload_type):
+	month_num = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].index(month) + 1
+	month_num_str = str(month_num) if cint(month_num) > 9 else str("0" + str(month_num))
+	total_days = monthrange(cint(fiscal_year), cint(month_num_str))[1]
+	start_date = str(fiscal_year) + '-' + str(month_num_str) + '-' + str('01')
+	end_date   = str(fiscal_year) + '-' + str(month_num_str) + '-' + str(total_days)
+	#frappe.throw(total_days)
+    #Retrieve the form data
+	data = frappe._dict(frappe.local.form_dict)
+
+    # Determine the upload type
+	# if upload_type == "Overtime":
+	# 	writer = get_template_overtime(branch, month, fiscal_year)
+	# 	doctype = "Overtime Entry"
+	# 	for d in get_mr_data(branch, month, fiscal_year):
+	# 		# frappe.throw(str(d))
+	# 		row = []
+	# 		row.append(d.branch)
+	# 		row.append(d.cost_center)
+	# 		# row.append(d.unit)
+	# 		row.append(d.employee_type)
+			
+	# 		row.append(d.name)
+	# 		row.append(d.person_name)
+	# 		row.append(d.fiscal_year)
+	# 		row.append(d.month)
+			
+	# 		attendance_query = """        SELECT number, employee_type, branch,
+    #            DAY(date) AS day_of_date,
+    #            SUM(IFNULL(number_of_hours, 0)) AS number_of_hours
+               
+    #            FROM `tabOvertime Entry` WHERE branch = %s AND number = %s AND date BETWEEN %s AND %s
+	# 		   group by number, day_of_date
+	# 		   """
+
+	# 		attendance_data = frappe.db.sql(
+    #         	attendance_query, (branch, d.name,start_date,end_date), as_dict=True
+	# 		)
+	# 		for att in attendance_data:
+	# 			row.extend([
+	# 			att.number_of_hours,  
+	# 			# att.employee_type,       # Regular hours
+	# 			# att.number_of_hours_special  # Special hours
+	# 		])
+
+	# 		writer.writerow(row)						   
+	# else:
+	writer = get_template(branch, month, fiscal_year)
+	doctype = "Attendance Others"
+	for d in get_mr_data(branch, month, fiscal_year):
+		row = []
+		row.append(d.branch)
+		row.append(d.cost_center)
+		# row.append(d.unit)
+		row.append(d.employee_type)
+		row.append(d.name)
+		row.append(d.employee_name)
+		row.append(d.fiscal_year)
+		row.append(d.month)
+
+	# Fetch additional attendance data for the employee in the given month
+		attendance_query = """
+			SELECT
+				employee, 
+				employee_type,
+				DAY(`date`) AS day_of_date,  -- Use backticks around `date`
+				CASE
+					WHEN status = 'Present' THEN 'P'
+					WHEN status = 'Absent' THEN 'A'
+					ELSE status
+				END AS status
+			FROM `tabAttendance Others`
+			WHERE branch = %s 
+			AND employee = %s 
+			AND `date` BETWEEN %s AND %s  -- Use backticks around `date`
+		"""
+		attendance_data = frappe.db.sql(
+			attendance_query, (branch, d.name,start_date,end_date), as_dict=True
+		)
+
+	# Add attendance statuses to the row
+		attendance_by_day = [att.status for att in attendance_data]
+		row.extend(attendance_by_day)
+		writer.writerow(row)
+
+    # File download logic
+	if file_type == "CSV":
+		frappe.response["result"] = cstr(writer.getvalue())
+		frappe.response["type"] = "csv"
+		frappe.response["doctype"] = doctype
 	else:
-		frappe.db.commit()
-		frappe.msgprint("DONE")
-	return {"messages": ret, "error": error}
+		build_response_as_excel(writer, doctype)
+
+
+def build_response_as_excel(writer, doctype):
+	filename = frappe.generate_hash("", 10)
+	with open(filename, "wb") as f:
+		f.write(cstr(writer.getvalue()).encode("utf-8"))
+	f = open(filename)
+	reader = csv.reader(f)
+
+	from frappe.utils.xlsxutils import make_xlsx
+
+	xlsx_file = make_xlsx(reader, doctype)
+
+	f.close()
+	os.remove(filename)
+
+	# write out response as a xlsx type
+	frappe.response["filename"] = str(doctype) + ".xlsx"
+	frappe.response["filecontent"] = xlsx_file.getvalue()
+	frappe.response["type"] = "binary"
+
+def get_mr_data(branch, month, fiscal_year):
+		return frappe.db.sql('''select branch, cost_center, name, employee_name, "Muster Roll Employee" as employee_type,
+				"{fiscal_year}" as fiscal_year, "{month}" as month
+				from `tabMuster Roll Employee`
+				where status ="Active" and branch = {branch}
+				'''.format(branch=frappe.db.escape(branch), month=month, fiscal_year=fiscal_year), as_dict=True)
+
+def get_template(branch, month, fiscal_year):
+
+	# if not frappe.has_permission("Overtime Entry", "create"):
+	# 	raise frappe.PermissionError
+	month_in_number = frappe._dict({
+									"Jan":1,
+									"Feb":2,
+									"Mar":3,
+									"Apr":4,
+									"May":5,
+									"Jun":6,
+									"Jul":7,
+									"Aug":8,
+									"Sep":9,
+									"Oct":10,
+									"Nov":11,
+									"Dec":12,
+								})
+	
+	fields = ["Branch", "Cost Center","Employee Type", "Employee ID", "Employee Name", "Year", "Month"]
+	total_days = monthrange(cint(fiscal_year), month_in_number[str(month)])[1]
+	##if upload_type=="Overtime":
+		##frappe.throw("hi")
+	##frappe.throw(upload_type)
+	for day in range(cint(total_days)):
+		##if doctype == "Muster Roll Attendance":
+        
+			fields.append(f"{month}_{day + 1}")
+        
+		#elif doctype == "Muster Roll Overtime Entry":
+       
+			#fields.append(f"{day + 1}_RH")
+			#fields.append(f"{day + 1}_SH")
+		
+		
+	writer = UnicodeWriter()
+	writer.writerow(["Notes:"])
+	writer.writerow(["Please do not change the template headings"])
+	# writer.writerow(["Status should be P if Present, A if Absent and H is Half Day"])
+	writer.writerow(fields)
+
+	return writer
+
+def get_template_overtime(branch, month, fiscal_year):
+
+	# if not frappe.has_permission("Overtime Entry", "create"):
+	# 	raise frappe.PermissionError
+	month_in_number = frappe._dict({
+									"Jan":1,
+									"Feb":2,
+									"Mar":3,
+									"Apr":4,
+									"May":5,
+									"Jun":6,
+									"Jul":7,
+									"Aug":8,
+									"Sep":9,
+									"Oct":10,
+									"Nov":11,
+									"Dec":12,
+								})
+	
+	fields = ["Branch", "Cost Center", "Employee Type", "Employee ID", "Employee Name", "Year", "Month"]
+	total_days = monthrange(cint(fiscal_year), month_in_number[str(month)])[1]
+	##if upload_type=="Overtime":
+		##frappe.throw("hi")
+	##frappe.throw(upload_type)
+	for day in range(cint(total_days)):
+		##if doctype == "Muster Roll Attendance":
+        
+			#fields.append(f"{month}_{day + 1}")
+        
+		#elif doctype == "Muster Roll Overtime Entry":
+       
+			fields.append(f"{day + 1} ")
+			#fields.append(f"{day + 1}_SH")
+		
+		
+	writer = UnicodeWriter()
+	writer.writerow(fields)
+
+	return writer
