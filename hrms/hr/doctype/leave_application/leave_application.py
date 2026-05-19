@@ -859,7 +859,8 @@ def get_number_of_leave_days(
 	final = float(no_days)
 
 	# Only EL & CL exclude holidays
-	if leave_type not in ("Earned Leave", "Casual Leave"):
+	# if leave_type not in ("Earned Leave", "Casual Leave"):
+	if leave_type not in ("Earned Leave", "Casual Leave","Bereavement Leave","Paternity Leave"):
 		if int(half_day or 0) == 1:
 			final -= 0.5
 		return final
