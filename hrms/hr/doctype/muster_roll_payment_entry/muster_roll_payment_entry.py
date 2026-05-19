@@ -344,9 +344,13 @@ class MusterRollPaymentEntry(Document):
 
 		company = frappe.db.get("Company", self.company)
 		company_cc 				= company.get("cost_center")
+		cost_center	= frappe.db.get_value("Branch", self.processing_branch, "cost_center")
 		default_bank_account	= frappe.db.get_value("Branch", self.processing_branch, "expense_bank_account")
 		default_payable_account	= company.get("default_payroll_payable_account")
-		expense_account 		= company.get("travel_advance_account")
+		expense_account 		= frappe.db.get_single_value("HR Accounts Settings", "muster_roll_expense_account")
+
+		if not expense_account:
+			frappe.throw("Please set the Muster Roll Expense Account in HR Accounts Settings")
 
 		pay_slip_total = 0
 		pay_details = self.get_pay_slip_details()
@@ -367,7 +371,7 @@ class MusterRollPaymentEntry(Document):
 			posting.setdefault("to_bank", []).append({
 				"account"       				: default_payable_account,
 				"debit_in_account_currency"		: flt(pay_slip_total),
-				"cost_center"   				: company_cc,
+				"cost_center"   				: cost_center,
 				"party_check"   				: 0,
 				"reference_type"				: self.doctype,
 				"reference_name"				: self.name,
@@ -375,7 +379,7 @@ class MusterRollPaymentEntry(Document):
 			posting.setdefault("to_bank", []).append({
 				"account"       				: default_bank_account,
 				"credit_in_account_currency"	: flt(pay_slip_total),
-				"cost_center"   				: company_cc,
+				"cost_center"   				: cost_center,
 				"party_check"   				: 0,
 				"reference_type"				: self.doctype,
 				"reference_name"				: self.name,
@@ -383,7 +387,7 @@ class MusterRollPaymentEntry(Document):
 			posting.setdefault("to_payables",[]).append({
 				"account"       				: default_payable_account,
 				"credit_in_account_currency" 	: flt(pay_slip_total),
-				"cost_center"  				 	: company_cc,
+				"cost_center"  				 	: cost_center,
 				"party_check"   				: 0,
 				"reference_type"				: self.doctype,
 				"reference_name"				: self.name,

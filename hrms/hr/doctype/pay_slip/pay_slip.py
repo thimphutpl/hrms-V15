@@ -89,16 +89,16 @@ class PaySlip(Document):
 		self.payment_days = present
 
 	def get_employee_attendance(self, start_date, end_date):
-		attendance = frappe.qb.DocType("Muster Roll Attendance")
+		attendance = frappe.qb.DocType("Attendance Others")
 
 		attendance_details = (
 			frappe.qb.from_(attendance)
-			.select(attendance.attendance_date, attendance.status)
+			.select(attendance.date, attendance.status)
 			.where(
-				(attendance.status.isin(["Absent", "Half Day", "Present"]))
+				(attendance.status.isin(["Absent", "Present"]))
 				& (attendance.employee == self.employee)
 				& (attendance.docstatus == 1)
-				& (attendance.attendance_date.between(start_date, end_date))
+				& (attendance.date.between(start_date, end_date))
 			)
 		).run(as_dict=True)
 
