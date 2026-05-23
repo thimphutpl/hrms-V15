@@ -472,11 +472,19 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 
 				# Leave without pay
 				calc_amount = flt(amount)
+				# if key == "earnings":
+				# 	if d.depends_on_lwp or source.depend_salary_on_attendance:
+				# 		calc_amount = round(flt(amount)*flt(payment_days)/flt(days_in_month))
+				# 	else:
+				# 		calc_amount = round(flt(amount)*(flt(working_days)/flt(days_in_month)))
 				if key == "earnings":
-					if d.depends_on_lwp or source.depend_salary_on_attendance:
-						calc_amount = round(flt(amount)*flt(payment_days)/flt(days_in_month))
+					non_prorated_components = ["PSA", "Communication Allowance"]
+					if d.salary_component in non_prorated_components:
+						calc_amount = flt(amount)
+					elif d.depends_on_lwp or source.depend_salary_on_attendance:
+						calc_amount = round(flt(amount) * flt(payment_days) / flt(days_in_month))
 					else:
-						calc_amount = round(flt(amount)*(flt(working_days)/flt(days_in_month)))
+						calc_amount = round(flt(amount) * flt(working_days) / flt(days_in_month))
 
 				
 				# following condition added by SHIV on 2021/05/28
