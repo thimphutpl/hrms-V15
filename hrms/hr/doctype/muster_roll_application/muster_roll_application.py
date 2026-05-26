@@ -163,8 +163,10 @@ class MusterRollApplication(Document):
 				frappe.throw(_('<span style="color: red;">Muster Roll Application Row#{0}: For Employee <b>{1}({2})</b></span>').format(a.idx, a.existing_cid, a.person_name), title="Validation Error")
 
 	def create_mr(self):
+		#frappe.throw("hii")
 		for a in self.items:
 			if a.approver_status == 'Approved':
+				
 				try:
 					common_update = {
 						"joining_date": a.joining_date,
@@ -205,6 +207,11 @@ class MusterRollApplication(Document):
 						common_update["id_card"] = a.citizenship_id
 
 					doc.update(common_update)
+					existing_employee = frappe.db.exists("Muster Roll Employee", {"id_card": a.citizenship_id})
+					if existing_employee:
+						frappe.db.set_value("Muster Roll Employee", existing_employee, "type", a.type)
+						continue
+
 
 					if self.project:
 						doc.project = self.project
