@@ -16,6 +16,7 @@
   "qualification",
   "mr_type",
   "mobile",
+  "type",
   "column_break_yhwd",
   "list_in_job_card",
   "mess_deduction",
@@ -392,11 +393,17 @@
    "fieldname": "account_no",
    "fieldtype": "Data",
    "label": "Bank A/C No."
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Data",
+   "label": "Type",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-28 20:15:41.909702",
+ "modified": "2026-05-13 20:59:40.706249",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Muster Roll Employee",

@@ -110,13 +110,17 @@ function get_records(employee_type, fiscal_year, month, from_date, to_date, cost
 				var ot_amount = 0; 
 				var wages_amount = 0;
 				var gratuity_amount = 0;
+				var gross_loading_amount=0;
+				var total_loading_wages_amount=0;
+				var total_loading_over_time=0;
 				//cur_frm.clear_table("items");
 				console.log(r.message);
 				r.message.forEach(function(mr) {
 					if(mr['number_of_days'] > 0 || mr['number_of_hours'] > 0) {
 						var row = frappe.model.add_child(cur_frm.doc, "MR Payment Item", "items");
+						//alert(mr['employee_type'])
 						
-						row.employee_type 	= mr['type'];
+						row.employee_type 	=  mr['employee_type'];
 						row.employee 		= mr['employee'];
 						row.person_name 	= mr['person_name'];
 						row.id_card 		= mr['id_card'];
@@ -127,94 +131,10 @@ function get_records(employee_type, fiscal_year, month, from_date, to_date, cost
 						row.bank = mr['bank'];
 						row.account_no = mr['account_no'];
 						row.designation = mr['designation'];
+						row.type=mr['type']
 						
-						if(mr['type'] == 'Operator'){
-							//alert(mr['noof_days_in_month'])
-							row.daily_rate 	= mr['rate_per_day'];
-							// frappe.throw(row.daily_rate)
-							row.hourly_rate 	= mr['rate_per_hour'];
-							
-							row.gratuity_amount = 0
-							row.total_ot_amount = parseFloat(mr['total_ot']);
-							//row.total_wage 		= parseFloat(mr['total_wage']);
-							//row.total_wage = parseFloat(mr['rate_per_day'])*parseFloat(mr['number_of_days'])
-							 row.daily_rate      = parseFloat(mr['salary'])/parseFloat(mr['noof_days_in_month']);
-							 //row.daily_rate  = mr['rate_per_day']
-							//  row.hourly_rate     = parseFloat(mr['salary']*1.0)/parseFloat(mr['noof_days_in_month']*8);
-							//  row.total_ot_amount = parseFloat(row.number_of_hours) * parseFloat(row.hourly_rate);
-							 row.total_wage      = parseFloat(row.daily_rate) * parseFloat(row.number_of_days);
-							 if((parseFloat(row.total_wage) > parseFloat(mr['salary']))||(parseFloat(mr['noof_days_in_month']) == parseFloat(mr['number_of_days']))){
-							 	row.total_wage = parseFloat(mr['salary']);
-							 	if(row.total_wage> 9000) {
-							 		row.total_wage = 9000
-							 	}
-							 }
-							// row.gratuity_amount = 0
-						}
-						else if(mr['type'] == 'DFG AND GFG'){
-							//alert(mr['noof_days_in_month'])
-							
-							
-							row.gratuity_amount = 0
-							row.total_ot_amount = parseFloat(mr['total_ot']);
-							//row.total_wage 		= parseFloat(mr['total_wage']);
-							//row.total_wage = parseFloat(mr['rate_per_day'])*parseFloat(mr['number_of_days'])
-							 row.daily_rate      = parseFloat(mr['salary'])/30;
-							 //row.daily_rate  = mr['rate_per_day']
-							//  row.hourly_rate     = parseFloat(mr['salary']*1.0)/parseFloat(mr['noof_days_in_month']*8);
-							//  row.total_ot_amount = parseFloat(row.number_of_hours) * parseFloat(row.hourly_rate);
-							 row.total_wage      = parseFloat(row.daily_rate) * parseFloat(row.number_of_days);
-							 if(parseFloat(parseFloat(mr['number_of_days'])) > 27 && parseFloat(mr['noof_days_in_month'])==31 || parseFloat(mr['noof_days_in_month'])==30 ){
-							 	row.total_wage = parseFloat(mr['salary']);
-							 }else if(parseFloat(parseFloat(mr['number_of_days'])) > 25 && parseFloat(mr['noof_days_in_month'])==28 || parseFloat(mr['noof_days_in_month'])==29 ){
-								row.total_wage = parseFloat(mr['salary']);
-							 }
-							// row.gratuity_amount = 0
-						}
-					
-						else if(mr['type'] == 'Open Air Prisoner') {	
-								//alert(mr["is_lifer"])
-								if(mr["is_lifer"]==1){
-									
-									//daily_rate      = parseFloat(mr['salary'])/parseFloat(mr['noof_days_in_month']);
-									row.daily_rate  = mr['rate_per_day'] ;
-									//alert(mr['salary'])
-									row.total_wage      = parseFloat(row.daily_rate) * parseFloat(row.number_of_days);
-									//alert(mr['salary'])
-									//total_wages = parseFloat(row.daily_rate) * parseFloat(row.number_of_days);
-									// if((parseFloat(row.total_wage) > parseFloat(mr['salary']))||(parseFloat(mr['noof_days_in_month']) == parseFloat(mr['number_of_days']))){
-									// 	row.total_wage = parseFloat(mr['salary']);
-									// 	if(row.total_wage> 9000) {
-									// 		total_wage = 9000
-									// 	}
-									// }
-									gratuity = 0.0;
-
-								}else{
-									
-									//daily_rate      = parseFloat(mr['salary'])/parseFloat(mr['noof_days_in_month']);
-									
-									row.daily_rate  = mr['rate_per_day'] ;
-									row.total_wage      = parseFloat(row.daily_rate) * parseFloat(row.number_of_days);
-									//alert(row.number_of_days)
-									//total_wages = parseFloat(row.daily_rate) * parseFloat(row.number_of_days);
-									// if((parseFloat(row.total_wage) > parseFloat(mr['salary']))||(parseFloat(mr['noof_days_in_month']) == parseFloat(mr['number_of_days']))){
-									// 	row.total_wage = parseFloat(mr['salary']);
-									// 	if(row.total_wage> 9000) {
-									// 		row.total_wage = 9000
-									// 	}
-									// }
-							 		gratuity = row.total_wage/2;
-
-								}						
-							
-							row.hourly_rate = mr['rate_per_hour']
-							row.total_ot_amount = parseFloat(row.number_of_hours) * parseFloat(row.hourly_rate);
-							row.total_wage = row.total_wage;
-							row.gratuity_amount = gratuity
-						}
-						 else {
-							// frappe.throw('hi')
+						
+						if(mr['type'] == 'muster roll') {
 							row.daily_rate 	= mr['rate_per_day'];
 							// frappe.throw(row.daily_rate)
 							row.hourly_rate 	= mr['rate_per_hour'];
@@ -223,27 +143,63 @@ function get_records(employee_type, fiscal_year, month, from_date, to_date, cost
 							row.total_ot_amount = parseFloat(mr['total_ot']);
 							//row.total_wage 		= parseFloat(mr['total_wage']);
 							row.total_wage = parseFloat(mr['rate_per_day'])*parseFloat(mr['number_of_days'])
+						//}
+							row.total_amount 	= parseFloat(row.total_ot_amount) + parseFloat(row.total_wage) - parseFloat(row.gratuity_amount);
+							refresh_field("items");
+
+							total_overall_amount += row.total_amount;
+							ot_amount 			 += row.total_ot_amount;
+							wages_amount 		 += row.total_wage;
+							gratuity_amount     += row.gratuity_amount
+						}
+						if(mr['type'] == 'Unloading and loading') {
+							//#alert(mr['type'])
+							//msgprint("hii"+mr['type'])
+							row.daily_rate 	= mr['rate_per_day'];
+							// frappe.throw(row.daily_rate)
+							row.hourly_rate 	= mr['rate_per_hour'];
+							
+							row.gratuity_amount = 0
+							row.total_ot_amount = parseFloat(mr['total_ot']);
+							//row.total_wage 		= parseFloat(mr['total_wage']);
+							row.total_wage = parseFloat(mr['rate_per_day'])*parseFloat(mr['number_of_days'])
+
+							row.total_amount 	= parseFloat(row.total_ot_amount) + parseFloat(row.total_wage) - parseFloat(row.gratuity_amount);
+							refresh_field("items");
+
+							gross_loading_amount += row.total_amount;
+							total_loading_wages_amount 			 += row.total_wage;
+							total_loading_over_time 		 += row.total_ot_amount
+							gratuity_amount     += row.gratuity_amount
+
 						}
 						
 						
-						row.total_amount 	= parseFloat(row.total_ot_amount) + parseFloat(row.total_wage) - parseFloat(row.gratuity_amount);
-						refresh_field("items");
-
-						total_overall_amount += row.total_amount;
-						ot_amount 			 += row.total_ot_amount;
-						wages_amount 		 += row.total_wage;
-						gratuity_amount     += row.gratuity_amount
 					}
 				});
 
 				cur_frm.set_value("total_overall_amount", total_overall_amount)				
 				cur_frm.set_value("wages_amount",flt(wages_amount))
 				cur_frm.set_value("ot_amount", flt(ot_amount))
+
+				cur_frm.set_value("gross_loading_amount", gross_loading_amount)				
+				cur_frm.set_value("total_loading_wages_amount",flt(total_loading_wages_amount))
+				cur_frm.set_value("total_loading_over_time", flt(total_loading_over_time))
+
+				cur_frm.set_value("total_amount", flt(total_overall_amount)+flt(gross_loading_amount))
+
 				cur_frm.set_value("gratuity_amount", flt(gratuity_amount))
+
 				cur_frm.refresh_field("total_overall_amount")
 				cur_frm.refresh_field("wages_amount")
 				cur_frm.refresh_field("ot_amount")
+
+				cur_frm.refresh_field("gross_loading_amount")
+				cur_frm.refresh_field("total_loading_wages_amount")
+				cur_frm.refresh_field("total_loading_over_time")
+
 				cur_frm.refresh_field("gratuity_amount")
+				cur_frm.refresh_field("total_amount")
 				cur_frm.refresh_field("items");				
 			}
 			else {

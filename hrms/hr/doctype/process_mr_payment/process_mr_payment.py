@@ -57,66 +57,66 @@ class ProcessMRPayment(Document):
 				a.fiscal_year = self.fiscal_year
 				a.month = self.month
 
-				if a.employee_type == "Operator":
-					#frappe.throw(str(a.employee))
-					salary = frappe.db.get_value("Operator", a.employee, "salary")
-					if salary:
-						if flt(a.total_wage) > flt(salary):
-							a.total_wage = flt(salary)
-						if flt(total_days) == round(flt(a.number_of_days), 2):
-							a.total_wage = flt(salary)
-				elif a.employee_type == 'DFG AND GFG':
-					#frappe.throw(a.employee_type)
-					salary = frappe.db.get_value("DFG AND GFG", {'id_card':a.id_card}, "salary")
-					#frappe.throw(str(salary))
-					if salary:
-						#frappe.throw(str(salary))
+				# if a.employee_type == "Operator":
+				# 	#frappe.throw(str(a.employee))
+				# 	salary = frappe.db.get_value("Operator", a.employee, "salary")
+				# 	if salary:
+				# 		if flt(a.total_wage) > flt(salary):
+				# 			a.total_wage = flt(salary)
+				# 		if flt(total_days) == round(flt(a.number_of_days), 2):
+				# 			a.total_wage = flt(salary)
+				# elif a.employee_type == 'DFG AND GFG':
+				# 	#frappe.throw(a.employee_type)
+				# 	salary = frappe.db.get_value("DFG AND GFG", {'id_card':a.id_card}, "salary")
+				# 	#frappe.throw(str(salary))
+				# 	if salary:
+				# 		#frappe.throw(str(salary))
 						
-						if flt(a.total_wage) > flt(salary):
+				# 		if flt(a.total_wage) > flt(salary):
 							
-							a.total_wage = flt(salary)
-							frappe.throw(a.total_wage)
-						if flt(total_days) == round(flt(a.number_of_days), 2):
+				# 			a.total_wage = flt(salary)
+				# 			frappe.throw(a.total_wage)
+				# 		if flt(total_days) == round(flt(a.number_of_days), 2):
 							
-							a.total_wage = flt(salary)
-						cond_days = total_days-2
+				# 			a.total_wage = flt(salary)
+				# 		cond_days = total_days-2
 
-						if cond_days > a.number_of_days:
-							a.total_wage = a.daily_rate * a.number_of_days 
-						if total_days == 31 and a.number_of_days >= 28:
-							a.total_wage = flt(salary)
+				# 		if cond_days > a.number_of_days:
+				# 			a.total_wage = a.daily_rate * a.number_of_days 
+				# 		if total_days == 31 and a.number_of_days >= 28:
+				# 			a.total_wage = flt(salary)
 
-				elif round(flt(a.number_of_days), 2) >= 28 and self.employee_type !="Muster Roll Employee":
-					pass
-					# salary = frappe.db.get_value("Employee", a.employee, "salary")
-					# if salary:
-					# 	a.total_wage = flt(salary)
-				elif a.employee_type == 'Open Air Prisoner':					
-					salary = flt(total_days) * flt(a.daily_rate)
-					if flt(a.total_wage) > flt(salary):
-						a.total_wage = flt(salary)
-					if flt(total_days) == round(flt(a.number_of_days), 2):
-						a.total_wage = flt(salary)
+				# elif round(flt(a.number_of_days), 2) >= 28 and self.employee_type !="Muster Roll Employee":
+				# 	pass
+				# 	# salary = frappe.db.get_value("Employee", a.employee, "salary")
+				# 	# if salary:
+				# 	# 	a.total_wage = flt(salary)
+				# elif a.employee_type == 'Open Air Prisoner':					
+				# 	salary = flt(total_days) * flt(a.daily_rate)
+				# 	if flt(a.total_wage) > flt(salary):
+				# 		a.total_wage = flt(salary)
+				# 	if flt(total_days) == round(flt(a.number_of_days), 2):
+				# 		a.total_wage = flt(salary)
 
-				a.total_wage = round(a.total_wage)
-				a.total_ot_amount = a.total_ot_amount
-				a.gratuity_amount = round(a.gratuity_amount)
+				# a.total_wage = round(a.total_wage)
+				# a.total_ot_amount = a.total_ot_amount
+				# a.gratuity_amount = round(a.gratuity_amount)
 
-				if a.employee_type == "Open Air Prisoner":
-					gratuity_percent = frappe.db.get_single_value("HR Settings", "gratuity_percent")
-					if gratuity_percent:
-						a.total_gratuity = flt(gratuity_percent) / 100 * flt(a.total_wage)
-						a.wage_payable = flt(a.total_wage) - flt(a.gratuity_amount)
-				a.total_amount = flt(a.total_ot_amount) + flt(a.total_wage)
+				# if a.employee_type == "Open Air Prisoner":
+				# 	gratuity_percent = frappe.db.get_single_value("HR Settings", "gratuity_percent")
+				# 	if gratuity_percent:
+				# 		a.total_gratuity = flt(gratuity_percent) / 100 * flt(a.total_wage)
+				# 		a.wage_payable = flt(a.total_wage) - flt(a.gratuity_amount)
+				# a.total_amount = flt(a.total_ot_amount) + flt(a.total_wage)
 
-			total_ot = sum(flt(a.total_ot_amount) for a in self.items)
-			total_wage = sum(flt(a.total_wage) for a in self.items)
-			total_gratuity = sum(flt(a.gratuity_amount) for a in self.items)
-			total = total_ot + total_wage
-			self.wages_amount = flt(total_wage)
-			self.ot_amount = flt(total_ot)
-			self.total_overall_amount = flt(total)
-			self.gratuity_amount = flt(total_gratuity)
+			# total_ot = sum(flt(a.total_ot_amount) for a in self.items)
+			# total_wage = sum(flt(a.total_wage) for a in self.items)
+			# total_gratuity = sum(flt(a.gratuity_amount) for a in self.items)
+			# total = total_ot + total_wage
+			# self.wages_amount = flt(total_wage)
+			# self.ot_amount = flt(total_ot)
+			# self.total_overall_amount = flt(total)
+			# self.gratuity_amount = flt(total_gratuity)
 
 		
 	def on_submit(self):
@@ -125,11 +125,13 @@ class ProcessMRPayment(Document):
 		self.post_journal_entry()
 
 	def before_cancel(self):
+		self.flags.ignore_links = True
 		cl_status = frappe.db.get_value("Journal Entry", self.payment_jv, "docstatus")
 		if cl_status and cl_status != 2:
 			frappe.throw("You need to cancel the journal entry related to this payment first!")
 		
 		self.db_set('payment_jv', "")
+		self.db_set('journal_entry',"")
 		
 	def check_budget(self):
 				
@@ -175,17 +177,18 @@ class ProcessMRPayment(Document):
 				
 	#Populate Budget Accounts with Expense and Fixed Asset Accounts
 	def load_employee(self):
-		if self.employee_type == "Operator":
-			query = "select 'Operator' as employee_type, name as employee, person_name, id_card, rate_per_day as daily_rate, rate_per_hour as hourly_rate from `tabOperator` where	status = 'Active'"
+		# if self.employee_type == "Operator":
+		# 	query = "select 'Operator' as employee_type, name as employee, person_name, id_card, rate_per_day as daily_rate, rate_per_hour as hourly_rate from `tabOperator` where	status = 'Active'"
 		
-		elif self.employee_type == "DFG":
-			query = "select 'DFG' as employee_type, name as employee, person_name, id_card, rate_per_day as daily_rate, rate_per_hour as hourly_rate from `tabDFG` where status = 'Active'"
+		# elif self.employee_type == "DFG":
+		# 	query = "select 'DFG' as employee_type, name as employee, person_name, id_card, rate_per_day as daily_rate, rate_per_hour as hourly_rate from `tabDFG` where status = 'Active'"
 
-		elif self.employee_type == "Open Air Prisoner":
-						query = "select 'Open Air Prisoner' as employee_type, name as employee, person_name, id_card, rate_per_day as daily_rate, rate_per_hour as hourly_rate, gratuity_fund as graduity from `tabOpen Air Prisoner` where status = 'Active'"
+		# elif self.employee_type == "Open Air Prisoner":
+		# 				query = "select 'Open Air Prisoner' as employee_type, name as employee, person_name, id_card, rate_per_day as daily_rate, rate_per_hour as hourly_rate, gratuity_fund as graduity from `tabOpen Air Prisoner` where status = 'Active'"
 
-		elif self.employee_type == "Muster Roll Employee":
-			query = "select 'Muster Roll Employee' as employee_type, r.name as employee, r.person_name, r.id_card, m.rate_per_day as daily_rate, m.rate_per_hour as hourly_rate from `tabMuster Roll Employee` r, tabMusterroll m where r.status = 'Active' and r.name=m.parent order by m.rate_per_day desc limit 1"
+		if self.employee_type == "Muster Roll Employee":
+			frappe.throw("hi")
+			query = "select 'Muster Roll Employee' as employee_type, r.type,r.name as employee, r.person_name, r.id_card, m.rate_per_day as daily_rate, m.rate_per_hour as hourly_rate from `tabMuster Roll Employee` r, tabMusterroll m where r.status = 'Active' and r.name=m.parent order by m.rate_per_day"
 		else:
 			frappe.throw("Select employee record first!")
 	
@@ -216,7 +219,7 @@ class ProcessMRPayment(Document):
 				frappe.throw("Duplicate Employee entry {} at #Row. {}".format(a.employee, a.idx))
 
 	def post_journal_entry(self):
-		expense_bank_account, ot_account, wage_account, gratuity_account = self.prepare_gls()
+		expense_bank_account,je_expense_bank_account,mu_account, lp_account,je_mu_account,je_lp_account = self.prepare_gls()
 		# expense_bank_account=frappe.db.get_value("Cost Center",self.cost_center,"expense_account")
 		if not expense_bank_account:
 			frappe.throw("Set Expense Account In Cost Center for '{}'".format(self.cost_center))
@@ -228,78 +231,95 @@ class ProcessMRPayment(Document):
 		je.remark = 'Payment against : ' + self.name
 		je.posting_date = self.posting_date
 		je.branch = self.branch
-		total_amount = self.total_overall_amount
-		wages_amount = self.wages_amount
-
-		if self.gratuity_amount and self.employee_type == "Open Air Prisoner":
-			total_amount = self.total_overall_amount -  flt(self.gratuity_amount)
-			wages_amount = self.wages_amount - flt(self.gratuity_amount)			
+		total_amount_mu = self.total_overall_amount
+		total_amount_lp = self.gross_loading_amount
+					
 
 		je.append("accounts", {
 				"account": expense_bank_account,
 				"cost_center": self.cost_center,
-				"credit_in_account_currency": flt(total_amount),
-				"credit": flt(total_amount),
+				"credit_in_account_currency": flt(self.total_amount),
+				"credit": flt(self.total_amount),
 			})
 	
-		if self.ot_amount:	
+		if self.total_overall_amount:	
 			je.append("accounts", {
-					"account": ot_account,
+					"account": je_expense_bank_account,
 					"reference_type": "Process MR Payment",
 					"reference_name": self.name,
 					"cost_center": self.cost_center,
-					"debit_in_account_currency": flt(self.ot_amount),
-					"debit": flt(self.ot_amount),
+					"debit_in_account_currency": flt(self.total_amount),
+					"debit": flt(self.total_amount),
 				})
 
-		if self.wages_amount:
-			je.append("accounts", {
-					"account": wage_account,
-					"reference_type": "Process MR Payment",
-					"reference_name": self.name,
-					"cost_center": self.cost_center,
-					"debit_in_account_currency": flt(wages_amount),
-					"debit": flt(wages_amount),
-				})
+		# if self.gross_loading_amount:
+		# 	je.append("accounts", {
+		# 			"account": lp_account,
+		# 			"reference_type": "Process MR Payment",
+		# 			"reference_name": self.name,
+		# 			"cost_center": self.cost_center,
+		# 			"debit_in_account_currency": flt(total_amount_lp),
+		# 			"debit": flt(total_amount_lp),
+		# 		})
 
 		je.insert()
 		self.db_set("payment_jv", je.name)
 
-		
-		if self.gratuity_amount and self.employee_type == "Open Air Prisoner":
-			hjv = frappe.new_doc("Journal Entry")
-			hjv.flags.ignore_permissions = 1 
-			hjv.title = "Gratuity Fund for" + " " + self.employee_type  + " (" + self.branch + ")" + "(" + self.month + ")"
-			hjv.voucher_type = 'Bank Entry'
-			hjv.naming_series = 'Bank Payment Voucher'
-			hjv.remark = 'Gratuity Fund Release against : ' + self.name;
-			hjv.posting_date = self.posting_date
-			hjv.branch = self.branch
 
+		je_journal = frappe.new_doc("Journal Entry")
+		je_journal.flags.ignore_permissions = 1 
+		je_journal.title = "Payable " + self.employee_type + " (" + self.branch + ")" + "(" + self.month + ")"
+		je_journal.voucher_type = 'Journal Entry'
+		je_journal.naming_series ='Journal Voucher'
+		je_journal.remark = 'loading and unloading payable : ' + self.name
+		je_journal.posting_date = self.posting_date
+		je_journal.branch = self.branch
 
-			hjv.append("accounts", {
-				"account": expense_bank_account,
+		# Debit entry for expense_bank_account (opposite of bank entry)
+		je_journal.append("accounts", {
+			"account": je_expense_bank_account,
+			"cost_center": self.cost_center,
+			"credit_in_account_currency": flt(self.total_amount),
+			"credit": flt(self.total_amount),
+		})
+
+		# Credit entries for MU and LP accounts
+		if self.total_overall_amount:	
+			je_journal.append("accounts", {
+				"account": mu_account,
+				"reference_type": "Process MR Payment",
+				"reference_name": self.name,
 				"cost_center": self.cost_center,
-				"credit_in_account_currency": flt(self.gratuity_amount),
-				"credit": flt(self.gratuity_amount),
+				"debit_in_account_currency": flt(total_amount_mu),
+				"debit": flt(total_amount_mu),
 			})
 
+		if self.gross_loading_amount:
+			je_journal.append("accounts", {
+				"account": lp_account,
+				"reference_type": "Process MR Payment",
+				"reference_name": self.name,
+				"cost_center": self.cost_center,
+				"debit_in_account_currency": flt(total_amount_lp),
+				"debit": flt(total_amount_lp),
+			})
 
-			hjv.append("accounts", {
-					"account": gratuity_account,
-					"reference_type": "Process MR Payment",
-					"reference_name": self.name,
-					"cost_center": self.cost_center,
-					"debit_in_account_currency": flt(self.gratuity_amount),
-					"debit": flt(self.gratuity_amount),
-				})
+		je_journal.insert()
+		je_journal.submit()
 
-			hjv.insert()
+		# Optionally store both references
+		#self.db_set("payment_jv", je_bank.name)
+		self.db_set("journal_entry", je_journal.name)  # Add this field to your doctype if needed
+
+
+		
+		
 
 
 	def prepare_gls(self):
 		gratuity_account = None
 		expense_bank_account = frappe.db.get_value("Branch", self.branch, "expense_bank_account")
+		je_expense_bank_account = frappe.db.get_single_value("HR Accounts Settings","muster_roll_payable_account")
 		if not expense_bank_account:
 			frappe.throw("Setup Default Expense Bank Account for your Branch")
 
@@ -308,52 +328,31 @@ class ProcessMRPayment(Document):
 		wage_account = None
 
 		if self.employee_type == "Muster Roll Employee":
-			ot_account = frappe.db.get_single_value("HR Accounts Settings", "mr_overtime_account")
-			if not ot_account:
-				frappe.throw("Setup MR Overtime Account in HR Accounts Settings")
-			wage_account = frappe.db.get_single_value("HR Accounts Settings", "mr_wages_account")
-			if not wage_account:
+			account = frappe.get_doc("Muster Roll Type", "muster roll","account")
+			mu_account=account.account
+			if not mu_account:
+				frappe.throw("Setup MR Overtime Account")
+			account1 = frappe.get_doc("Muster Roll Type", "Unloading and loading","account")
+			lp_account=account1.account
+			if not lp_account:
+				frappe.throw("Setup lp Account")
+
+			je_mu_account=frappe.db.get_single_value("HR Accounts Settings","mr_wages_account")
+			if not je_mu_account:
 				frappe.throw("Setup MR Wages Account in HR Accounts Settings")
 
-		# elif self.employee_type == "DFG":
-		# 	ot_account = frappe.db.get_single_value("Projects Accounts Settings", "dfg_overtime_account")
-		# 	if not ot_account:
-		# 		frappe.throw("Setup Overtime Account for DFG in Projects Accounts Settings")
-		# 	wage_account = frappe.db.get_single_value("Projects Accounts Settings", "dfg_wage_account")
-		# 	if not wage_account:
-		# 		frappe.throw("Setup DFG Wage Account in Projects Accounts Settings")
+			je_lp_account=je_mu_account=frappe.db.get_single_value("HR Accounts Settings","mr_overtime_account")
+			if not je_lp_account:
+				frappe.throw("Setup MR Overtime Account in HR Accounts Settings")
+
+
+
+
 		
-		# elif self.employee_type == "GFG":
-		# 	ot_account = frappe.db.get_single_value("Projects Accounts Settings", "gfg_overtime_account")
-		# 	if not ot_account:
-		# 		frappe.throw("Setup Overtime Account for GFG in Projects Accounts Settings")
-		# 	wage_account = frappe.db.get_single_value("Projects Accounts Settings", "gfg_wage_account")
-		# 	if not wage_account:
-		# 		frappe.throw("Setup GFG Wage Account in Projects Accounts Settings")
-
-		# elif self.employee_type == "Operator":
-		# 	ot_account = frappe.db.get_single_value("Projects Accounts Settings", "operator_overtime_account")
-		# 	if not ot_account:
-		# 		frappe.throw("Setup Operator Overtime Account in Projects Accounts Settings")
-		# 	wage_account = frappe.db.get_single_value("Projects Accounts Settings", "operator_allowance_account")
-		# 	if not wage_account:
-		# 		frappe.throw("Setup Operator Allowance Account in Projects Accounts Settings")
-
-		# elif self.employee_type == "Open Air Prisoner":
-		# 	ot_account = frappe.db.get_single_value("Projects Accounts Settings", "oap_overtime_account")
-		# 	if not ot_account:
-		# 		frappe.throw("Setup OAP Overtime Account in Projects Accounts Settings")
-		# 	wage_account = frappe.db.get_single_value("Projects Accounts Settings", "oap_wage_account")
-		# 	if not wage_account:
-		# 		frappe.throw("Setup OAP Wage Account in Projects Accounts Settings")
-		# 	gratuity_account = frappe.db.get_single_value("Projects Accounts Settings", "oap_gratuity_account")
-		# 	if not gratuity_account:
-		# 		frappe.throw("Setup OAP Gratuity Account in Projects Accounts Settings")
-
 		else:
 			frappe.throw("Invalid Employee Type")
 
-		return expense_bank_account, ot_account, wage_account, gratuity_account
+		return expense_bank_account,je_expense_bank_account,mu_account, lp_account,je_mu_account,je_mu_account
 	
 def update_mr_rates(employee_type, employee, cost_center, from_date, to_date):
 	# Updating wage rate
@@ -410,28 +409,29 @@ def update_mr_rates(employee_type, employee, cost_center, from_date, to_date):
 
 @frappe.whitelist()
 def get_records(employee_type, fiscal_year, fiscal_month, from_date, to_date, cost_center, branch, dn):	
-	#frappe.throw(dn)
+	
+	
 	month = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].index(fiscal_month) + 1
 	month = str(month) if cint(month) > 9 else str("0" + str(month))
-	if employee_type == 'DFG' or employee_type =='GFG':
+	# if employee_type == 'DFG' or employee_type =='GFG':
 		
-		if employee_type=='DFG':
-			employee_category='DFG'
-		elif employee_type=='GFG':
-			employee_category='GFG'
-		employee_type = 'DFG AND GFG'
+	# 	if employee_type=='DFG':
+	# 		employee_category='DFG'
+	# 	elif employee_type=='GFG':
+	# 		employee_category='GFG'
+	# 	employee_type = 'DFG AND GFG'
 	
-	elif employee_type=='Muster Roll Employee':
+	if employee_type=='Muster Roll Employee':
 		employee_type='Muster Roll Employee'
 		employee_category='NULL'
-	elif employee_type=='Operator':
-		employee_type='Operator'
-		employee_category='NULL'
+	# elif employee_type=='Operator':
+	# 	employee_type='Operator'
+	# 	employee_category='NULL'
 	
-	elif employee_type=='Open Air Prisoner':
-		employee_type='Open Air Prisoner'
-		employee_category='NULL'
-	# frappe.throw(str(employee_type))
+	# elif employee_type=='Open Air Prisoner':
+	# 	employee_type='Open Air Prisoner'
+	# 	employee_category='NULL'
+	# # frappe.throw(str(employee_type))
 
 	total_days = monthrange(cint(fiscal_year), cint(month))[1]
 	from_date = str(fiscal_year) + '-' + str(month) + '-' + str('01')
@@ -446,6 +446,7 @@ def get_records(employee_type, fiscal_year, fiscal_month, from_date, to_date, co
 										person_name,
 										id_card,
 										rate_per_day,
+										type,
 										rate_per_hour,
 					status,
 					designation,
@@ -505,39 +506,40 @@ def get_records(employee_type, fiscal_year, fiscal_month, from_date, to_date, co
 		is_lifer=0
 		#frappe.throw(str(e.id_card))
 		salary=0
-		if employee_type == 'DFG AND GFG':
-			pay_details=get_pay_details_dfg_gfg_opa_opt(e.name,employee_type)
-			#frappe.throw(str(pay_details))
-			rate_per_day 		 = flt(pay_details[0]['rate_per_day'])
-			rate_per_hour_normal = flt(pay_details[0]['rate_per_hour'])
-			salary=flt(pay_details[0]['salary'])
+		# if employee_type == 'DFG AND GFG':
+		# 	pay_details=get_pay_details_dfg_gfg_opa_opt(e.name,employee_type)
+		# 	#frappe.throw(str(pay_details))
+		# 	rate_per_day 		 = flt(pay_details[0]['rate_per_day'])
+		# 	rate_per_hour_normal = flt(pay_details[0]['rate_per_hour'])
+		# 	salary=flt(pay_details[0]['salary'])
 		
-		elif employee_type=='Operator':
-			pay_details=get_pay_details_dfg_gfg_opa_opt(e.name,employee_type)
-			rate_per_day=flt(pay_details[0]['rate_per_day'])
-			rate_per_hour_normal=flt(pay_details[0]['rate_per_hour'])
-			salary=flt(pay_details[0]['salary'])
-			#frappe.throw(str(pay_details))
-		elif employee_type=='Open Air Prisoner':
-			pay_details=get_pay_opa(e.name,employee_type)
-			rate_per_day=flt(pay_details[0]['rate_per_day'])
-			rate_per_hour_normal=flt(pay_details[0]['rate_per_hour'])
-			is_lifer=flt(pay_details[0]['is_lifer'])
-			salary=flt(pay_details[0]['salary'])
+		# elif employee_type=='Operator':
+		# 	pay_details=get_pay_details_dfg_gfg_opa_opt(e.name,employee_type)
+		# 	rate_per_day=flt(pay_details[0]['rate_per_day'])
+		# 	rate_per_hour_normal=flt(pay_details[0]['rate_per_hour'])
+		# 	salary=flt(pay_details[0]['salary'])
+		# 	#frappe.throw(str(pay_details))
+		# elif employee_type=='Open Air Prisoner':
+		# 	pay_details=get_pay_opa(e.name,employee_type)
+		# 	rate_per_day=flt(pay_details[0]['rate_per_day'])
+		# 	rate_per_hour_normal=flt(pay_details[0]['rate_per_hour'])
+		# 	is_lifer=flt(pay_details[0]['is_lifer'])
+		# 	salary=flt(pay_details[0]['salary'])
 
-		else:
-			pay_details=get_pay_details(e.name)
-			if not pay_details:
-				# Log a warning and skip processing for this employee
-				frappe.throw(f"No pay details found for Employee: {e.name} for Fiscal Year: {fiscal_year}, Month: {month}")
-				continue			
-			rate_per_day = flt(pay_details[e.name]['rate_per_day'])		
-			rate_per_hour_normal = flt(pay_details[e.name]['rate_per_hour_normal'])
+		# else:
+		pay_details=get_pay_details(e.name)
+		if not pay_details:
+			# Log a warning and skip processing for this employee
+			frappe.throw(f"No pay details found for Employee: {e.name} for Fiscal Year: {fiscal_year}, Month: {month}")
+			continue			
+		rate_per_day = flt(pay_details[e.name]['rate_per_day'])		
+		rate_per_hour_normal = flt(pay_details[e.name]['rate_per_hour_normal'])
 		
 
 		master.setdefault(e.name, frappe._dict({
-			"type": employee_type,
+			"employee_type": employee_type,
 			"employee": e.name,
+			"type":e.type,
 			"person_name": e.person_name,
 			"id_card": e.id_card,
 			"rate_per_day": rate_per_day,
@@ -550,34 +552,34 @@ def get_records(employee_type, fiscal_year, fiscal_month, from_date, to_date, co
 		}))
 		# if employee_type == "Muster Roll Employee":
 		# 	update_mr_rates(employee_type, e.name, cost_center, from_date, to_date)
-		if employee_type in ('Operator', 'Open Air Prisoner', 'DFG AND GFG'):
+		# if employee_type in ('Operator', 'Open Air Prisoner', 'DFG AND GFG'):
 		
-			frappe.db.sql("""
-						update `tabAttendance Others`
-						set rate_per_day = {rate_per_day}
-						where employee_type = '{employee_type}'
-						and employee = '{employee}'
-						and status in ('Present', 'Half Day')
-						and docstatus = 1 
-				""".format(
-						rate_per_day=flt(rate_per_day),
-						employee_type=employee_type,
-						employee=e.name,
-				))
+		# 	frappe.db.sql("""
+		# 				update `tabAttendance Others`
+		# 				set rate_per_day = {rate_per_day}
+		# 				where employee_type = '{employee_type}'
+		# 				and employee = '{employee}'
+		# 				and status in ('Present', 'Half Day')
+		# 				and docstatus = 1 
+		# 		""".format(
+		# 				rate_per_day=flt(rate_per_day),
+		# 				employee_type=employee_type,
+		# 				employee=e.name,
+		# 		))
 
-			frappe.db.sql("""
-				update `tabOvertime Entry`
-				set rate_per_hour = {rate_per_hour}
-				where employee_type = '{employee_type}'
-				and number = '{employee}'
-				and docstatus = 1 
-			""".format(
-					rate_per_hour=flt(e.rate_per_hour),
-					employee_type=employee_type,
-					employee=e.name,
-			))
+		# 	frappe.db.sql("""
+		# 		update `tabOvertime Entry`
+		# 		set rate_per_hour = {rate_per_hour}
+		# 		where employee_type = '{employee_type}'
+		# 		and number = '{employee}'
+		# 		and docstatus = 1 
+		# 	""".format(
+		# 			rate_per_hour=flt(e.rate_per_hour),
+		# 			employee_type=employee_type,
+		# 			employee=e.name,
+		# 	))
 
-		frappe.db.commit()  
+		# frappe.db.commit()  
 
 	#	
 	rest_list = frappe.db.sql("""
@@ -639,9 +641,10 @@ def get_records(employee_type, fiscal_year, fiscal_month, from_date, to_date, co
 		#gratuity_percent = frappe.db.get_single_value("HR Settings", "gratuity_percent")
 		gratuity_percent=1
 		if master.get(r.employee): #and (flt(r.total_wage)+flt(r.total_ot)):
+			#frappe.throw(str(r.type))
 			#frappe.throw(str(mr['type']))
-			r.employee_type = r.type
-			# frappe.throw(str(master[r.employee]['type']))
+			#r.employee_type = r.type
+			#frappe.msgprint(str(master[r.employee]['type']))
 			r.gratuity = flt(gratuity_percent)/100 * flt(r.total_wage)
 			master[r.employee].update(r)
 			

@@ -23,13 +23,17 @@
   "to_date",
   "section_break_6",
   "wages_amount",
+  "total_loading_wages_amount",
   "column_break_14",
-  "ot_amount",
-  "column_break_8",
-  "total_health_amount",
-  "gratuity_amount",
-  "column_break_20",
   "total_overall_amount",
+  "gross_loading_amount",
+  "ot_amount",
+  "gratuity_amount",
+  "total_loading_over_time",
+  "column_break_8",
+  "total_amount",
+  "total_health_amount",
+  "column_break_20",
   "deduction",
   "total_amount_payable",
   "column_break_10",
@@ -40,6 +44,7 @@
   "items",
   "section_break_10",
   "payment_jv",
+  "journal_entry",
   "column_break_23",
   "amended_from"
  ],
@@ -163,6 +168,7 @@
   {
    "fieldname": "ot_amount",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Total Overtime Amount",
    "read_only": 1
   },
@@ -173,6 +179,7 @@
   {
    "fieldname": "total_health_amount",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Total Health Contribution",
    "read_only": 1
   },
@@ -224,8 +231,9 @@
   },
   {
    "fieldname": "payment_jv",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "label": "Payment Journal",
+   "options": "Journal Entry",
    "read_only": 1
   },
   {
@@ -244,26 +252,56 @@
   {
    "fieldname": "deduction",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Total Deduction",
    "read_only": 1
   },
   {
    "fieldname": "total_amount_payable",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Net Amount ",
    "read_only": 1
   },
   {
    "fieldname": "gratuity_amount",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Gratuity Amount",
    "read_only": 1
+  },
+  {
+   "fieldname": "total_loading_wages_amount",
+   "fieldtype": "Currency",
+   "label": "Total Loading Wages Amount"
+  },
+  {
+   "fieldname": "total_loading_over_time",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Total Loading Over Time "
+  },
+  {
+   "fieldname": "gross_loading_amount",
+   "fieldtype": "Currency",
+   "label": "Gross Loading Amount "
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "label": "Total Amount "
+  },
+  {
+   "fieldname": "journal_entry",
+   "fieldtype": "Link",
+   "label": "Journal Entry",
+   "options": "Journal Entry"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-11-29 11:19:01.247308",
+ "modified": "2026-05-16 13:00:10.881380",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Process MR Payment",

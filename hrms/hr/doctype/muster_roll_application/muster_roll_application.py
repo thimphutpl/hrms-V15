@@ -173,6 +173,7 @@ class MusterRollApplication(Document):
 						"temp_doctype": self.doctype,
 						"temp_docname": self.name,
 						"person_name": a.person_name,
+						"type":a.type,
 						"designation": a.designation,
 						"bank_name": a.bank,
 						"bank_branch": a.bank_branch,
