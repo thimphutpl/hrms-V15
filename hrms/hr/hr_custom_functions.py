@@ -538,6 +538,107 @@ def post_earned_leaves():
 
 # end
 
+# reminder notitification fro contract renewal
+def send_contract_renewal_reminders():
+	today_date = getdate(nowdate())
+
+	# Run only on 15th or last day of the month
+	if today_date.day != 15 and today_date != get_last_day(today_date):
+		return 0
+
+	# Find next scheduler run date
+	if today_date.day == 15:
+		next_run_date = get_last_day(today_date)
+	else:
+		next_month_date = add_days(today_date, 1)
+		next_run_date = getdate(f"{next_month_date.year}-{next_month_date.month}-15")
+
+	# Check contract_end_date around 3 months before contract expiry
+	contract_end_from = add_days(today_date, 90)
+	contract_end_to = add_days(next_run_date, 90)
+	allowed_employment_types = [
+		"Regular Contract",
+		"Consolidated Contract",
+		"Deputation",
+	]
+
+	employees = frappe.get_all(
+		"Employee",
+		filters={
+			"status": "Active",
+			"employment_type": ["in", allowed_employment_types],
+			"contract_end_date": ["between", [contract_end_from, contract_end_to]],
+		},
+		fields=[
+			"name",
+			"employee_name",
+			"employment_type",
+			"department",
+			"designation",
+			"contract_end_date",
+			"user_id",
+			"company_email",
+			"personal_email",
+		],
+	)
+
+	if not employees:
+		frappe.logger().info(
+			f"[Contract Renewal Reminder] No employees due between {contract_end_from} and {contract_end_to}"
+		)
+		return 0
+
+	hr_group_email = "hr@gyalsunginfra.bt"
+
+	for emp in employees:
+		employee_email = emp.user_id or emp.company_email or emp.personal_email
+
+		recipients = [hr_group_email]
+
+		if employee_email:
+			recipients.append(employee_email)
+
+		recipients = list(set([r for r in recipients if r]))
+
+		days_left = date_diff(emp.contract_end_date, today_date)
+
+		subject = f"Contract Renewal Reminder: {emp.employee_name}"
+
+		message = f"""
+		Dear HR Team and {emp.employee_name},<br><br>
+
+		This is a reminder that the employment contract for the following employee will expire in approximately <b>3 months</b>.<br><br>
+
+		<b>Employee ID:</b> {emp.name}<br>
+		<b>Employee Name:</b> {emp.employee_name}<br>
+		<b>Employment Type:</b> {emp.employment_type or ''}<br>
+		<b>Department:</b> {emp.department or ''}<br>
+		<b>Designation:</b> {emp.designation or ''}<br>
+		<b>Contract End Date:</b> {emp.contract_end_date}<br>
+		<b>Days Remaining:</b> {days_left}<br><br>
+
+		HR is requested to review and initiate the contract renewal process as required.<br><br>
+
+		Regards,<br>
+		ERP System
+		"""
+
+		frappe.sendmail(
+			recipients=recipients,
+			subject=subject,
+			message=message,
+			reference_doctype="Employee",
+			reference_name=emp.name,
+			now=False,
+		)
+
+		frappe.logger().info(
+			f"[Contract Renewal Reminder] Email queued for {emp.name} "
+			f"to {', '.join(recipients)}. Contract End Date: {emp.contract_end_date}"
+		)
+
+	return 1
+
 #function to get the difference between two dates
 @frappe.whitelist()
 def get_date_diff(start_date, end_date):

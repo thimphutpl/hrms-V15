@@ -234,7 +234,7 @@ scheduler_events = {
 		"hrms.hr.doctype.interview.interview.send_daily_feedback_reminder",
 		"hrms.hr.doctype.job_opening.job_opening.close_expired_job_openings",
 		#"hrms.hr.hr_custom_functions.post_leave_credits",
-		
+		"hrms.hr.hr_custom_functions.send_contract_renewal_reminders",		
 		
 	],
 	"daily_long": [
