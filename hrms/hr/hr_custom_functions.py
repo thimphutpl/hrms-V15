@@ -555,7 +555,7 @@ def send_contract_renewal_reminders():
 
 	# Check contract_end_date around 3 months before contract expiry
 	contract_end_from = add_days(today_date, 90)
-	contract_end_to = add_days(next_run_date, 90)
+	contract_end_to = add_days(next_run_date, 89)
 	allowed_employment_types = [
 		"Regular Contract",
 		"Consolidated Contract",
