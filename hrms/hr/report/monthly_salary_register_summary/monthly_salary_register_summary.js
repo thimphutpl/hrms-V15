@@ -45,42 +45,9 @@ frappe.query_reports["Monthly Salary Register Summary"] = {
 			label: __("Branch"),
 			fieldtype: "Link",
 			options: "Branch"
-		},
+		},		
 		
 		{
-			fieldname: "cost_center",
-			label: __("Cost Center"),
-			fieldtype: "Link",
-			options: "Cost Center",
-			get_query: function () {
-				let company = frappe.query_report.get_filter_value("company");
-
-				return {
-					filters: {
-						company: company,
-						is_group: 0
-					}
-				};
-			}
-		},
-		{
-			fieldname: "consultant_account",
-			label: __("Consultant Expense Account"),
-			fieldtype: "Link",
-			options: "Account",
-			get_query: function () {
-				let company = frappe.query_report.get_filter_value("company");
-
-				return {
-					filters: {
-						company: company,
-						is_group: 0
-					}
-				};
-			},
-			description: __("Optional. Select only if consultant payment is posted through Journal Entry.")
-		},
-				{
 			fieldname: "only_slipped_employees",
 			label: __("Only Slipped Employees"),
 			fieldtype: "Check",
