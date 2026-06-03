@@ -25,8 +25,9 @@ class SalaryStructure(Document):
 
 	def validate(self):
 		self.validate_dates()
-		self.validate_amount()
+		#self.validate_amount()
 		self.update_salary_structure()
+		self.validate_amount()
 
 	def validate_dates(self):
 		joining_date, relieving_date = frappe.db.get_value(

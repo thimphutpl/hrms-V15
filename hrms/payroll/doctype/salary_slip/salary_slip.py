@@ -143,14 +143,44 @@ class SalarySlip(TransactionBase):
             self.get_emp_and_working_day_details()
         else:
             self.get_working_days_details(lwp=self.leave_without_pay)
-
+        self.remove_invalid_deductions()
         self.set_salary_structure()
         # self.calculate_net_pay()
         self.calculate_employer_pf_contribution()
         self.compute_year_to_date()
         self.compute_month_to_date()
+        self.set_net_pay()
 
         # self.add_leave_balances()
+
+    def remove_invalid_deductions(self):
+        posting_date = getdate(self.posting_date)
+
+        valid_deductions = []
+
+        for d in self.deductions:
+            to_date = frappe.db.get_value(
+                "Salary Detail",
+                {
+                    "parent": self.salary_structure,
+                    "parentfield": "deductions",
+                    "salary_component": d.salary_component
+                },
+                "to_date"
+            )
+
+            # no restriction → keep it
+            if not to_date:
+                valid_deductions.append(d)
+                continue
+
+            to_date = getdate(to_date)
+
+            # keep only if still valid on posting date
+            if to_date >= posting_date:
+                valid_deductions.append(d)
+
+        self.set("deductions", valid_deductions)
 
     def set_net_total_in_words(self):
         doc_currency = self.currency
