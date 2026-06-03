@@ -454,8 +454,8 @@ def make_salary_slip(
 		# 	row.total_deducted_amount = d.get("total_deducted_amount")
 		# 	row.total_outstanding_amount = d.get("total_outstanding_amount")
 
-		target.start_date = structure_from_date
-		target.end_date = structure_to_date
+		# target.start_date = structure_from_date
+		# target.end_date = structure_to_date
 		target.run_method("process_salary_structure", for_preview=for_preview)
 
 		for row in target.get("deductions"):
