@@ -752,7 +752,7 @@ class SalarySlip(TransactionBase):
             if struct_row.salary_component == 'Salary Advance Deductions':
                 
         
-                # if struct_row.to_date and struct_row.to_date > posting_date_obj:
+                # if struct_row.to_date and struct_row.to_date > posting_date_obj: add by tulsi
                 # 	self.add_structure_component(struct_row, component_type)
                 if (
                     struct_row.to_date
