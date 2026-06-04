@@ -538,24 +538,27 @@ def post_earned_leaves():
 
 # end
 
-# reminder notitification fro contract renewal
+# reminder notification for contract renewal
 def send_contract_renewal_reminders():
 	today_date = getdate(nowdate())
 
-	# Run only on 15th or last day of the month
-	if today_date.day != 15 and today_date != get_last_day(today_date):
+	# Run only on 15th or second last day of the month
+	second_last_day = add_days(get_last_day(today_date), -1)
+
+	if today_date.day != 15 and today_date != second_last_day:
 		return 0
 
 	# Find next scheduler run date
 	if today_date.day == 15:
-		next_run_date = get_last_day(today_date)
+		next_run_date = second_last_day
 	else:
-		next_month_date = add_days(today_date, 1)
+		next_month_date = add_days(get_last_day(today_date), 1)
 		next_run_date = getdate(f"{next_month_date.year}-{next_month_date.month}-15")
 
-	# Check contract_end_date around 3 months before contract expiry
-	contract_end_from = add_days(today_date, 90)
-	contract_end_to = add_days(next_run_date, 89)
+	# Check employees whose contract will expire before next scheduler coverage
+	contract_end_from = today_date
+	contract_end_to = add_days(next_run_date, 90)
+
 	allowed_employment_types = [
 		"Regular Contract",
 		"Consolidated Contract",
@@ -589,8 +592,45 @@ def send_contract_renewal_reminders():
 		return 0
 
 	hr_group_email = "hr@gyalsunginfra.bt"
+	email_count = 0
 
 	for emp in employees:
+		days_left = date_diff(emp.contract_end_date, today_date)
+
+		# Subject includes contract end date so future renewed contracts can be reminded again
+		subject = f"Contract Renewal Reminder: {emp.employee_name} - {emp.contract_end_date}"
+
+		# Prevent duplicate reminder for same employee + same contract end date
+		existing_communication = frappe.db.exists(
+			"Communication",
+			{
+				"reference_doctype": "Employee",
+				"reference_name": emp.name,
+				"subject": subject,
+			},
+		)
+
+		existing_email_queue = frappe.db.sql(
+			"""
+			select name
+			from `tabEmail Queue`
+			where reference_doctype = 'Employee'
+			  and reference_name = %s
+			  and message like %s
+			  and status in ('Not Sent', 'Sending', 'Sent')
+			limit 1
+			""",
+			(emp.name, f"%Subject: {subject}%"),
+			as_dict=True,
+		)
+
+		if existing_communication or existing_email_queue:
+			frappe.logger().info(
+				f"[Contract Renewal Reminder] Skipped duplicate for {emp.name} "
+				f"with Contract End Date: {emp.contract_end_date}"
+			)
+			continue
+
 		employee_email = emp.user_id or emp.company_email or emp.personal_email
 
 		recipients = [hr_group_email]
@@ -600,14 +640,10 @@ def send_contract_renewal_reminders():
 
 		recipients = list(set([r for r in recipients if r]))
 
-		days_left = date_diff(emp.contract_end_date, today_date)
-
-		subject = f"Contract Renewal Reminder: {emp.employee_name}"
-
 		message = f"""
 		Dear HR Team and {emp.employee_name},<br><br>
 
-		This is a reminder that the employment contract for the following employee will expire in approximately <b>3 months</b>.<br><br>
+		This is a reminder that the employment contract for the following employee will expire soon.<br><br>
 
 		<b>Employee ID:</b> {emp.name}<br>
 		<b>Employee Name:</b> {emp.employee_name}<br>
@@ -632,13 +668,14 @@ def send_contract_renewal_reminders():
 			now=False,
 		)
 
+		email_count += 1
+
 		frappe.logger().info(
 			f"[Contract Renewal Reminder] Email queued for {emp.name} "
 			f"to {', '.join(recipients)}. Contract End Date: {emp.contract_end_date}"
 		)
 
-	return 1
-
+	return email_count
 #function to get the difference between two dates
 @frappe.whitelist()
 def get_date_diff(start_date, end_date):
