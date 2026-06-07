@@ -217,13 +217,14 @@
    "fieldname": "type",
    "fieldtype": "Link",
    "label": "Type",
-   "options": "Muster Roll Type"
+   "options": "Muster Roll Type",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-05-13 20:39:50.714363",
+ "modified": "2026-06-01 15:40:41.389939",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Muster Roll Application Item",

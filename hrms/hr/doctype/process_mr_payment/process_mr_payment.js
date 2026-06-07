@@ -134,7 +134,7 @@ function get_records(employee_type, fiscal_year, month, from_date, to_date, cost
 						row.type=mr['type']
 						
 						
-						if(mr['type'] == 'muster roll') {
+						if(mr['type'] == 'Wages MR') {
 							row.daily_rate 	= mr['rate_per_day'];
 							// frappe.throw(row.daily_rate)
 							row.hourly_rate 	= mr['rate_per_hour'];
@@ -152,7 +152,7 @@ function get_records(employee_type, fiscal_year, month, from_date, to_date, cost
 							wages_amount 		 += row.total_wage;
 							gratuity_amount     += row.gratuity_amount
 						}
-						if(mr['type'] == 'Unloading and loading') {
+						if(mr['type'] == 'Loading and Unloading MR') {
 							//#alert(mr['type'])
 							//msgprint("hii"+mr['type'])
 							row.daily_rate 	= mr['rate_per_day'];

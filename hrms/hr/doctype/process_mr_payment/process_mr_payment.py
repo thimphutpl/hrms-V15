@@ -234,7 +234,7 @@ class ProcessMRPayment(Document):
 		total_amount_mu = self.total_overall_amount
 		total_amount_lp = self.gross_loading_amount
 					
-
+		
 		je.append("accounts", {
 				"account": expense_bank_account,
 				"cost_center": self.cost_center,
@@ -252,15 +252,15 @@ class ProcessMRPayment(Document):
 					"debit": flt(self.total_amount),
 				})
 
-		# if self.gross_loading_amount:
-		# 	je.append("accounts", {
-		# 			"account": lp_account,
-		# 			"reference_type": "Process MR Payment",
-		# 			"reference_name": self.name,
-		# 			"cost_center": self.cost_center,
-		# 			"debit_in_account_currency": flt(total_amount_lp),
-		# 			"debit": flt(total_amount_lp),
-		# 		})
+		if self.gross_loading_amount:
+			je.append("accounts", {
+					"account": lp_account,
+					"reference_type": "Process MR Payment",
+					"reference_name": self.name,
+					"cost_center": self.cost_center,
+					"debit_in_account_currency": flt(total_amount_lp),
+					"debit": flt(total_amount_lp),
+				})
 
 		je.insert()
 		self.db_set("payment_jv", je.name)
@@ -295,6 +295,7 @@ class ProcessMRPayment(Document):
 			})
 
 		if self.gross_loading_amount:
+			
 			je_journal.append("accounts", {
 				"account": lp_account,
 				"reference_type": "Process MR Payment",
@@ -328,11 +329,11 @@ class ProcessMRPayment(Document):
 		wage_account = None
 
 		if self.employee_type == "Muster Roll Employee":
-			account = frappe.get_doc("Muster Roll Type", "muster roll","account")
+			account = frappe.get_doc("Muster Roll Type", "Wages MR","account")
 			mu_account=account.account
 			if not mu_account:
 				frappe.throw("Setup MR Overtime Account")
-			account1 = frappe.get_doc("Muster Roll Type", "Unloading and loading","account")
+			account1 = frappe.get_doc("Muster Roll Type", "Loading and Unloading MR","account")
 			lp_account=account1.account
 			if not lp_account:
 				frappe.throw("Setup lp Account")
