@@ -1,0 +1,13 @@
+{
+ "creation": "2026-06-08 17:26:21.479641",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart Source",
+ "idx": 0,
+ "modified": "2026-06-08 17:26:21.479641",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Today Leave By Department",
+ "owner": "Administrator",
+ "source_name": "Today Leave By Department",
+ "timeseries": 0
+}
