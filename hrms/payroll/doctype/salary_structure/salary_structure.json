@@ -854,14 +854,14 @@
    "default": "0",
    "fieldname": "eligible_for_project_deployment_allowance",
    "fieldtype": "Check",
-   "label": "Eligible for Project Deployment Allowance"
+   "label": "Eligible for Project Allowance"
   },
   {
    "default": "Percent",
    "depends_on": "eligible_for_project_deployment_allowance",
    "fieldname": "eligible_for_project_deployment_allowance_payment_method",
    "fieldtype": "Select",
-   "label": "Eligible for Project Deployment Allowance Payment Method",
+   "label": "Eligible for Project Allowance Payment Method",
    "options": "Percent\nLumpsum",
    "print_hide": 1
   },
@@ -919,7 +919,7 @@
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2025-08-29 10:50:37.177380",
+ "modified": "2026-06-09 11:36:53.102239",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
