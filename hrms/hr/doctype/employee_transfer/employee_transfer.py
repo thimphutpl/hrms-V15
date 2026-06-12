@@ -6,7 +6,7 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.utils import getdate
-
+from frappe.model.mapper import get_mapped_doc
 from hrms.hr.utils import update_employee_work_history
 
 
@@ -72,3 +72,40 @@ class EmployeeTransfer(Document):
 			if item.fieldname == "user_id" and item.new != item.current:
 				return True
 		return False
+
+	@frappe.whitelist()
+	def has_benefit(self) -> dict[str, bool]:
+		ta = frappe.qb.DocType("Employee Benefits")
+
+		benefit_claim = (
+			frappe.qb.from_(ta)
+			.select(ta.name)
+			.where((ta.docstatus < 2) & (ta.employee_transfer_id == self.name))
+		).run(as_dict=True)
+
+		return {"has_benefit": bool(benefit_claim)}
+
+@frappe.whitelist()
+def make_employee_benefit(source_name, target_doc=None, skip_item_mapping=False):
+	#frappe.throw(str(source_name))
+	# def update_item(source, target, source_parent):
+	# 	frappe.throw(str(target))
+	# 	# target.purpose = "Separation"
+	# 	target.employee_separation_id = source.name
+	# 	target.grade = source.employee_grade
+	# 	target.division = frappe.db.get_value("Employee",source.employee,"division")
+	mapper = {
+		"Employee Transfer": {
+			"doctype": "Employee Benefits",
+			"fieldmap": {
+				"name": "employee_transfer_id",
+				"employee_grade": "grade",
+			}
+			#"postprocess": update_item
+		},
+	}
+	#frappe.throw("kkk")
+
+	target_doc = get_mapped_doc("Employee Transfer", source_name, mapper, target_doc)
+
+	return target_doc

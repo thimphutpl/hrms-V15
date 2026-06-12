@@ -2,6 +2,7 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Employee Benefits', {
+	 
 	refresh: function(frm) {
 		if(frm.doc.employee_separation_id){
 			frm.set_value("purpose","Separation")
@@ -12,8 +13,8 @@ frappe.ui.form.on('Employee Benefits', {
 		if(frm.doc.docstatus == 1 && frm.doc.journal){
 			frm.add_custom_button(__('Bank Entries'), function() {
 				frappe.route_options = {
-					"Journal Entry Account.reference_type": me.frm.doc.doctype,
-					"Journal Entry Account.reference_name": me.frm.doc.name,
+					"Journal Entry Account.reference_type": frm.doc.doctype,
+					"Journal Entry Account.reference_name": frm.doc.name,
 				};
 				frappe.set_route("List", "Journal Entry");
 			}, __("View"));
@@ -29,6 +30,18 @@ frappe.ui.form.on('Employee Benefits', {
 		frm.refresh_fields();
 
 	},
+	setup: function(frm){
+		frm.set_query("branch", function(doc) {
+            return {
+                filters: {
+                    "company": frm.doc.company,
+					"disabled":0
+                }
+            };
+        });
+
+	},
+	 
 	onload: function(frm) {
 		if(!frm.doc.posting_date) {
 			frm.set_value("posting_date", get_today())
@@ -59,7 +72,23 @@ frappe.ui.form.on("Separation Item", {
 		var load_capacity = frappe.meta.get_docfield("Separation Item", "load_capacity", frm.doc.name);
 	},
     "benefit_type": function(frm, cdt, cdn) {
+		
 		var row = locals[cdt][cdn];
+		//alert(frm.doc.company)
+		frm.call({
+			method: "hrms.hr.doctype.employee_benefits.employee_benefits.get_gl_head",
+			//doc:frm.doc,
+			args:{type:row.benefit_type,company:frm.doc.company,is_deduction:0},
+			callback: function(r) {
+				//alert("Success! Value is:"+r.message.account);
+				if (!r.exc && r.message.account) {
+					  frappe.model.set_value(cdt, cdn, "gl_account", r.message.account);
+					
+				}
+         }
+
+		});
+	
 		frappe.model.set_value(cdt, cdn, "amount", null);
 		frappe.model.set_value(cdt, cdn, "earned_leave_balance", null);
 		frappe.model.set_value(cdt, cdn, "distance", null);
@@ -226,6 +255,20 @@ frappe.ui.form.on("Separation Item", {
 frappe.ui.form.on("Deduction Details", {
 	"deduction_type": function(frm, cdt, cdn){
 		get_outstanding_amount(frm, cdt, cdn);
+		var row = locals[cdt][cdn];
+		frm.call({
+			method: "hrms.hr.doctype.employee_benefits.employee_benefits.get_gl_head",
+			//doc:frm.doc,
+			args:{type:row.deduction_type,company:frm.doc.company,is_deduction:1},
+			callback: function(r) {
+				//alert("Success! Value is:"+r.message.account);
+				if (!r.exc && r.message.account) {
+					  frappe.model.set_value(cdt, cdn, "deduction_account", r.message.account);
+					
+				}
+         }
+
+		});
 	},
 
 	"amount": function(frm, cdt, cdn){

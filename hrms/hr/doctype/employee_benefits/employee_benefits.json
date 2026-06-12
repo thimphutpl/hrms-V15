@@ -7,6 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "workflow_state",
+  "company",
   "branch",
   "column_break_2",
   "posting_date",
@@ -22,6 +23,7 @@
   "section_break_8",
   "separation_date",
   "reason_for_resignation",
+  "status",
   "column_break_10",
   "description",
   "section_break_12",
@@ -48,7 +50,6 @@
   "employee_separation_id",
   "employee_transfer_id",
   "column_break_32",
-  "company",
   "amended_from"
  ],
  "fields": [
@@ -204,7 +205,6 @@
    "fieldtype": "Link",
    "label": "Company",
    "options": "Company",
-   "read_only": 1,
    "reqd": 1
   },
   {
@@ -305,11 +305,16 @@
   {
    "fieldname": "column_break_37",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-09-19 01:57:26.566462",
+ "modified": "2026-06-10 15:35:33.551655",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Benefits",

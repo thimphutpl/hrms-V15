@@ -10,7 +10,7 @@
 from __future__ import unicode_literals
 import frappe
 from frappe.model.mapper import get_mapped_doc
-# from erpnext.controllers.employee_boarding_controller import EmployeeBoardingController
+#from erpnext.controllers.employee_boarding_controller import EmployeeBoardingController
 from hrms.controllers.employee_boarding_controller import EmployeeBoardingController
 
 from erpnext.custom_workflow import validate_workflow_states, notify_workflow_states
@@ -18,16 +18,33 @@ from frappe.utils import today
 
 class EmployeeSeparation(EmployeeBoardingController):
 	def validate(self):
-		super(EmployeeSeparation, self).validate()
-		validate_workflow_states(self)
-		notify_workflow_states(self)
+		pass
+		#super(EmployeeSeparation, self).validate()
+		#validate_workflow_states(self)
+		#notify_workflow_states(self)
 
 	def on_submit(self):
-		super(EmployeeSeparation, self).on_submit()
+		self.db_set("boarding_status", "Approved")
+		frappe.db.commit()
+		#super(EmployeeSeparation, self).on_submit()
 		# notify_workflow_states(self)
 	def on_cancel(self):
 		super(EmployeeSeparation, self).on_cancel()
 		notify_workflow_states(self)
+  
+  
+	@frappe.whitelist()
+	def has_benefit(self) -> dict[str, bool]:
+		ta = frappe.qb.DocType("Employee Benefits")
+
+		benefit_claim = (
+			frappe.qb.from_(ta)
+			.select(ta.name)
+			.where((ta.docstatus < 2) & (ta.employee_separation_id == self.name))
+		).run(as_dict=True)
+
+		return {"has_benefit": bool(benefit_claim)}
+
   
 @frappe.whitelist()
 def make_employee_benefit(source_name, target_doc=None, skip_item_mapping=False):

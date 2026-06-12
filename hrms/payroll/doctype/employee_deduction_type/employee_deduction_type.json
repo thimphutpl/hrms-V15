@@ -8,7 +8,8 @@
  "engine": "InnoDB",
  "field_order": [
   "deduction_type",
-  "account"
+  "account",
+  "accounts"
  ],
  "fields": [
   {
@@ -27,11 +28,17 @@
    "label": " Account",
    "options": "Account",
    "reqd": 1
+  },
+  {
+   "fieldname": "accounts",
+   "fieldtype": "Table",
+   "label": "Accounts",
+   "options": "Deduction Type Account"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-11-07 16:43:01.592585",
+ "modified": "2026-06-09 14:54:40.082865",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Employee Deduction Type",

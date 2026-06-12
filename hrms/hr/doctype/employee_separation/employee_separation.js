@@ -9,16 +9,34 @@ frappe.ui.form.on('Employee Separation', {
 		frm.add_fetch("employee_separation_template", "employee_grade", "employee_grade");
 	},
 	refresh: function(frm) {
-		if(cur_frm.doc.docstatus == 1 && cur_frm.doc.employee_benefit_claim_status == "Not Claimed" && cur_frm.doc.clearance_acquired == 1){
-			if(frappe.user.has_role("HR User")){
-				frm.add_custom_button("Create Employee Benefit", function(){
-					frappe.model.open_mapped_doc({
-						method: "hrms.hr.doctype.employee_separation.employee_separation.make_employee_benefit",
-						frm: frm
-					})
-				});
-			}
-		}
+		//if(cur_frm.doc.docstatus == 1 && cur_frm.doc.employee_benefit_claim_status == "Not Claimed" && cur_frm.doc.clearance_acquired == 1){
+		
+		// if(cur_frm.doc.docstatus == 1 ){
+		// 	if(frappe.user.has_role("HR User")){
+		// 		frm.add_custom_button("Create Employee Benefit", function(){
+		// 			frappe.model.open_mapped_doc({
+		// 				method: "hrms.hr.doctype.employee_separation.employee_separation.make_employee_benefit",
+		// 				frm: frm
+		// 			})
+		// 		});
+		// 	}
+		// }
+
+		frm.call("has_benefit").then((r) => {
+			if (!r.message.has_benefit) {
+				if(cur_frm.doc.docstatus == 1){
+					if(frappe.user.has_role("HR User")){
+						frm.add_custom_button("Create Employee Benefit", function(){
+							frappe.model.open_mapped_doc({
+								method: "hrms.hr.doctype.employee_separation.employee_separation.make_employee_benefit",
+								frm: frm
+							})
+						});
+					}
+				}
+
+			}});
+
 		if(cur_frm.doc.docstatus == 1 && cur_frm.doc.employee_benefit_claim_status == "Not Claimed" && cur_frm.doc.clearance_acquired == 0){
 			console.log("here")
 			frm.add_custom_button("Create Employee Clearance", function(){

@@ -12,6 +12,15 @@ frappe.ui.form.on("Employee Benefit Type", {
 				}
 			};
 		});
+		frm.set_query("gl_account", function() {
+			
+			return {
+				filters: {
+					"is_group": 0
+					
+				}
+			};
+		});
     },
     
 	refresh(frm) {

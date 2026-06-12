@@ -44,7 +44,7 @@ class EmployeeBoardingController(Document):
 		).insert(ignore_permissions=True, ignore_mandatory=True)
 
 		self.db_set("project", project.name)
-		self.db_set("boarding_status", "Pending")
+		self.db_set("boarding_status", "Approved")
 		self.reload()
 		self.create_task_and_notify_user()
 
