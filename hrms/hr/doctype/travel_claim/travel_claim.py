@@ -273,6 +273,7 @@ def get_travel_claim(dt, dn):
 
 	for d in doc.get("items"):
 		#frappe.msgprint(str(d.country))
+		#change made
 		item = d.as_dict()
 		if d.is_last_day == 1:
 			item["dsa_percent"] = return_day_dsa if return_day_dsa else 100
