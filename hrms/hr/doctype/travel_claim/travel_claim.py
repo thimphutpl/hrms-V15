@@ -109,8 +109,12 @@ class TravelClaim(Document):
 			grade_found = False
 			for dsa_int in dsa_international.country_dsa_detail:
 				if dsa_int.grade == employee_grade:
-					base_dsa_amount = flt(dsa_int.dsa) * self.exchange_rate
-					item.dsa = base_dsa_amount * flt(item.dsa_percent) / 100
+					if item.country=='India':
+						base_dsa_amount = flt(dsa_int.dsa) 
+						item.dsa = base_dsa_amount * flt(item.dsa_percent) / 100
+					else:
+						base_dsa_amount = flt(dsa_int.dsa) * self.exchange_rate
+						item.dsa = base_dsa_amount * flt(item.dsa_percent) / 100
 					grade_found = True
 					break
 
