@@ -578,7 +578,6 @@ def get_permission_query_conditions(user):
 				from `tabEmployee` as e
 				where e.name = `tabSalary Slip`.employee
 				and e.user_id = '{user}')
-		or
 		)""".format(user=user)
 
 # Following code added by SHIV on 2020/09/21
