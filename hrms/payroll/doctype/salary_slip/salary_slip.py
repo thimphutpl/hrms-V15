@@ -552,72 +552,32 @@ def unlink_ref_doc_from_salary_slip(doc, method=None):
 
 # Following code added by SHIV on 2020/09/21
 def get_permission_query_conditions(user):
-    if not user:
-        user = frappe.session.user
+	if not user: user = frappe.session.user
+	user_roles = frappe.get_roles(user)
+	if user == "Administrator":
+		return
 
-    user_roles = frappe.get_roles(user)
-
-    if user == "Administrator":
-        return
-
-    if "HR User" in user_roles or "HR Manager" in user_roles:
-        return
-
-    if "HR Support" in user_roles:
-        return """
-        (
-            EXISTS(
-                SELECT 1
-                FROM `tabEmployee` e
-                WHERE e.name=`tabSalary Slip`.employee
-                AND e.user_id='{user}'
-            )
-            OR
-            EXISTS(
-                SELECT 1
-                FROM `tabEmployee` emp1
-                JOIN `tabEmployee` emp2
-                    ON emp1.branch=emp2.branch
-                WHERE emp1.user_id='{user}'
-                AND emp2.name=`tabSalary Slip`.employee
-            )
-        )
-        """.format(user=user)
-
-    return """
-    EXISTS(
-        SELECT 1
-        FROM `tabEmployee` e
-        WHERE e.name=`tabSalary Slip`.employee
-        AND e.user_id='{user}'
-    )
-    """.format(user=user)
-	# if not user: user = frappe.session.user
-	# user_roles = frappe.get_roles(user)
-	# if user == "Administrator":
-	# 	return
-
-	# if "HR User" in user_roles or "HR Manager" in user_roles:
-	# 	return
-	# if "HR Support" in user_roles:
-	# 	return """(
-	# 		exists(select 1
-	# 			from `tabEmployee` as e
-	# 			where e.name = `tabSalary Slip`.employee
-	# 			and e.user_id = '{user}')
-	# 		or
-	# 		exists(select 1
-	# 			from `tabEmployee`
-	# 			where `tabEmployee`.user_id = '{user}'
-	# 			and `tabEmployee`.branch = `tabSalary Slip`.branch)
-	# 	)""".format(user=user)
+	if "HR User" in user_roles or "HR Manager" in user_roles:
+		return
+	if "HR Support" in user_roles:
+		return """(
+			exists(select 1
+				from `tabEmployee` as e
+				where e.name = `tabSalary Slip`.employee
+				and e.user_id = '{user}')
+			or
+			exists(select 1
+				from `tabEmployee`
+				where `tabEmployee`.user_id = '{user}'
+				and `tabEmployee`.branch = `tabSalary Slip`.branch)
+		)""".format(user=user)
 	
-	# return """(
-	# 	exists(select 1
-	# 		from `tabEmployee` as e
-	# 		where e.name = `tabSalary Slip`.employee
-	# 		and e.user_id = '{user}')
-	# 	)""".format(user=user)
+	return """(
+		exists(select 1
+			from `tabEmployee` as e
+			where e.name = `tabSalary Slip`.employee
+			and e.user_id = '{user}')
+		)""".format(user=user)
 
 # Following code added by SHIV on 2020/09/21
 def has_record_permission(doc, user):
