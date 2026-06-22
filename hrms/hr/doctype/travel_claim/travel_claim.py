@@ -289,7 +289,7 @@ def get_travel_claim(dt, dn):
 					#frappe.msgprint(str(dsa_int.grade))
 					if dsa_int.grade==employee_grade:
 						#frappe.msgprint(str(d.country))
-						if d.country=='Bhutan':
+						if d.country=='Bhutan' or d.country=='India':
 
 							item["dsa"] = flt(dsa_int.dsa) 
 						else:
