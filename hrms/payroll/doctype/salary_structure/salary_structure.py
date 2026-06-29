@@ -293,7 +293,9 @@ class SalaryStructure(Document):
 						_("Percentage cannot exceed 200 for component <b>{0}</b>").format(m['name']), title="Invalid Data")
 
 				if ed == 'earnings':
+				
 					if self.get(m['field_name']):
+						# frappe.throw(str("hi"))
 						if self.get(m["field_method"]) == 'Percent':
 							if m['based_on'] == 'Pay Scale Lower Limit':
 								calc_amt = flt(payscale_lower_limit)*flt(self.get(m['field_value']))*0.01
@@ -655,9 +657,18 @@ def get_permission_query_conditions(user):
 	if not user:
 		user = frappe.session.user
 	user_roles = frappe.get_roles(user)
-
-	if "HR User" in user_roles or "HR Manager" in user_roles or "Auditor" in user_roles:
-		return
+	
+#added by kinzang
+	if "Salary User" in user_roles or "HR Manager" in user_roles or "Auditor" in user_roles:
+		return """
+            branch in (
+                select bi.branch
+                from `tabAssign Branch` ab
+                inner join `tabBranch Item` bi
+                    on bi.parent = ab.name
+                where ab.user = '{user}'
+            )
+        """.format(user=user)
 	else:
 		return """(
 			employee in (select e.name
@@ -674,7 +685,7 @@ def has_record_permission(doc, user):
 		user = frappe.session.user
 	user_roles = frappe.get_roles(user)
 
-	if "HR User" in user_roles or "HR Manager" in user_roles or "Auditor" in user_roles :
+	if "Salary User" in user_roles or "HR Manager" in user_roles or "Auditor" in user_roles :
 		return True
 	else:
 		if frappe.db.exists("Employee", {"name": doc.employee, "user_id": user}):
