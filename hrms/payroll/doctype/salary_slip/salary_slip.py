@@ -602,9 +602,9 @@ def get_permission_query_conditions(user):
 	if not user: user = frappe.session.user
 	user_roles = frappe.get_roles(user)
 
-	if "Admin" in user_roles or "HR Manager" in user_roles:
+	if "Admin" in user_roles:
 		return
-	if "Salary User" in user_roles:
+	if "Salary User" in user_roles or "HR Manager" in user_roles:
 		return """(
 			employee in (select s.employee
 				from `tabEmployee` as e, `tabSalary Slip` as s

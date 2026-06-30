@@ -149,14 +149,17 @@ def get_conditions(filters):
 	user_roles = frappe.get_roles(user)
 
 
+	# if "Admin" in user_roles:
+	# 	employee = frappe.db.get_value(
+	# 		"Employee",
+	# 		{"user_id": user},
+	# 		"name"
+	# 	)
+	# Admin can see everything
 	if "Admin" in user_roles:
-		employee = frappe.db.get_value(
-			"Employee",
-			{"user_id": user},
-			"name"
-		)
-
-	elif "HR Manager" in user_roles and "Salary User" not in user_roles:
+		pass
+	# HR Manager and Salary User can see assigned branches
+	elif ("HR Manager" in user_roles) or ("Salary User" in user_roles):
 		conditions += " and branch in ( \
 					select bi.branch \
 					from `tabSalary Slip` a, `tabAssign Branch` ab, `tabBranch Item` bi \
@@ -164,8 +167,8 @@ def get_conditions(filters):
 					and ab.employee = a.employee \
 					and bi.parent = ab.name \
 				)".format(user=user)
-	elif "HR Manager" not in user_roles and "Salary User" not in user_roles:
-		conditions += " and employee = (select name from tabEmployee where user_id='{user}')".format(user=user)
+	# elif "HR Manager" not in user_roles and "Salary User" not in user_roles:
+	# 	conditions += " and employee = (select name from tabEmployee where user_id='{user}')".format(user=user)
 
 	else: 
 		employee = frappe.db.get_value(
