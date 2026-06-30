@@ -149,14 +149,14 @@ def get_conditions(filters):
 	user_roles = frappe.get_roles(user)
 
 
-	if "HR Manager" in user_roles:
+	if "Admin" in user_roles:
 		employee = frappe.db.get_value(
 			"Employee",
 			{"user_id": user},
 			"name"
 		)
 
-	elif "Approver" in user_roles and "Salary User" not in user_roles:
+	elif "HR Manager" in user_roles and "Salary User" not in user_roles:
 		conditions += " and branch in ( \
 					select bi.branch \
 					from `tabSalary Slip` a, `tabAssign Branch` ab, `tabBranch Item` bi \
@@ -164,7 +164,7 @@ def get_conditions(filters):
 					and ab.employee = a.employee \
 					and bi.parent = ab.name \
 				)".format(user=user)
-	elif "Approver" not in user_roles and "Salary User" not in user_roles:
+	elif "HR Manager" not in user_roles and "Salary User" not in user_roles:
 		conditions += " and employee = (select name from tabEmployee where user_id='{user}')".format(user=user)
 
 	else: 
