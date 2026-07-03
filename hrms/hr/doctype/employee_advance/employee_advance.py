@@ -49,6 +49,7 @@ class EmployeeAdvance(Document):
 
 	def validate(self):
 		validate_active_employee(self.employee)
+		self.check_duplicates()
 		self.validate_exchange_rate()
 		self.set_status()
 		# self.set_pending_amount()
@@ -80,6 +81,22 @@ class EmployeeAdvance(Document):
 		if not self.exchange_rate:
 			frappe.throw(_("Exchange Rate cannot be zero."))
 
+	def check_duplicates(self):
+		##### Ver 3.0.190204 Beings, follow code commented by SHIV on 2019/02/04
+		# as per NRDCL, employee can avail advance more than once as long as they do not have any due from earlier advance 
+		'''
+		# Checking for duplicate requests withing the fiscal_year
+		for d in frappe.db.sql("select * from `tabSalary Advance` where employee = '{0}' and year(posting_date) = {1} and docstatus=1".format(self.employee, getdate(self.posting_date).year), as_dict=True):
+				frappe.throw(_('You have already taken advance for the fiscal year {0} via <a href="#Form/Salary Advance/{1}" target="_blank">{1}</a> on {2}').format(getdate(self.posting_date).year, d.name, getdate(self.posting_date).strftime("%B %d, %Y")), title="Duplicate Entry")
+		'''
+		##### Ver 3.0.190204 Ends
+		
+		# Checking for unsettled advances
+		sst_doc = frappe.get_doc("Salary Structure",frappe.db.get_value('Salary Structure', {'employee': self.employee, 'is_active' : 'Yes'}, "name"))
+		for d in sst_doc.deductions:
+			if d.salary_component == "Salary Advance Deductions" and d.to_date >= getdate(self.recovery_start_date):
+					frappe.throw(_("Please settle your previous advance received for <b>{0}</b> to <b>{1}</b>").format(d.from_date, d.to_date), title="Not Permitted")
+					
 	def update_salary_structure(self, cancel=False):
 		if cancel:
 			rem_list = []
