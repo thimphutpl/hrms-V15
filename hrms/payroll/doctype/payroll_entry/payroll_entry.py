@@ -13,6 +13,7 @@ from erpnext.budget.doctype.budget.budget import validate_expense_against_budget
 # from erpnext.accounts.doctype.hr_accounts_settings.hr_accounts_settings import get_bank_account
 from datetime import date
 
+BATCH_SIZE = 1000
 class PayrollEntry(Document):
 	def onload(self):
 		if not self.docstatus==1 or self.salary_slips_submitted:
@@ -71,16 +72,56 @@ class PayrollEntry(Document):
 
 	# ver.2020.10.20 Begins
 	# following method copied from NRDCL by SHIV on 2020/10/20
+
 	def get_emp_list(self, process_type=None):
 		self.set_month_dates()
 
 		cond = self.get_filter_condition()
 		
 		cond += self.get_joining_relieving_condition()
+
+		if self.processing_branch:
+			cond += " and t1.branch = '{}'".format(self.processing_branch)
+	
+		# if self.branch_wise_payroll_entry:
+		# 	emp_list = frappe.db.sql("""
+		# 		select t1.name as employee, t1.employee_name, t1.department, t1.designation
+		# 		from `tabEmployee` t1
+		# 		where t1.branch = '{}' and not exists(select 1
+		# 				from `tabSalary Slip` as t3
+		# 				where t3.employee = t1.name
+		# 				and t3.docstatus != 2
+		# 				and t3.fiscal_year = '{}'
+		# 				and t3.month = '{}')
+		# 		{}
+		# 		and t1.status = '{}'
+		# 		order by t1.branch, t1.name
+		# 	""".format(self.processing_branch,self.fiscal_year, self.month, cond, self.status), as_dict=True)
+
+		# 	if not emp_list:
+		# 		frappe.msgprint(_("No employees found for processing or Salary Slips already created"))
+		# 	return emp_list
+		# else:
+		# 	frappe.throw(str("hi"))
+
+		# emp_list = frappe.db.sql("""
+		# 	select t1.name as employee, t1.employee_name, t1.department, t1.designation
+		# 	from `tabEmployee` t1
+		# 	where not exists(select 1
+		# 			from `tabSalary Slip` as t3
+		# 			where t3.employee = t1.name
+		# 			and t3.docstatus != 2
+		# 			and t3.fiscal_year = '{}'
+		# 			and t3.month = '{}')
+		# 	{}
+		# 	and t1.status = '{}'
+		# 	order by t1.branch, t1.name
+		# """.format(self.fiscal_year, self.month, cond, self.status), as_dict=True)
+
 		emp_list = frappe.db.sql("""
 			select t1.name as employee, t1.employee_name, t1.department, t1.designation
 			from `tabEmployee` t1
-			where t1.branch = '{}' and not exists(select 1
+			where not exists(select 1
 					from `tabSalary Slip` as t3
 					where t3.employee = t1.name
 					and t3.docstatus != 2
@@ -89,16 +130,69 @@ class PayrollEntry(Document):
 			{}
 			and t1.status = '{}'
 			order by t1.branch, t1.name
-		""".format(self.processing_branch,self.fiscal_year, self.month, cond, self.status), as_dict=True)
+		""".format(self.fiscal_year, self.month, cond, self.status), as_dict=True)
+
 
 		if not emp_list:
 			frappe.msgprint(_("No employees found for processing or Salary Slips already created"))
 		return emp_list
 
+	# def get_emp_list(self, process_type=None):
+	# 	self.set_month_dates()
+
+	# 	cond = self.get_filter_condition()
+	# 	cond += self.get_joining_relieving_condition()
+
+	# 	if self.processing_branch:
+	# 		cond += " and t1.branch = '{}'".format(self.processing_branch)
+
+	# 	# First get all employees matching the criteria
+	# 	emp_list = frappe.db.sql("""
+	# 		SELECT t1.name as employee, t1.employee_name, t1.department, t1.designation
+	# 		FROM `tabEmployee` t1
+	# 		WHERE 1=1
+	# 		{}
+	# 		AND t1.status = %s
+	# 		ORDER BY t1.branch, t1.name
+	# 	""".format(cond), self.status, as_dict=True)
+
+	# 	# Specific employees to filter
+	# 	specific_employees = ["33716", "33725", "50035", "389", "60142", "32976"]
+		
+	# 	# Filter only specific employees
+	# 	if specific_employees:
+	# 		emp_list = [emp for emp in emp_list if emp.employee in specific_employees]
+
+	# 	# Then check if salary slips already exist for these employees
+	# 	if emp_list:
+	# 		employee_names = [emp.employee for emp in emp_list]
+	# 		placeholders = ', '.join(['%s'] * len(employee_names))
+			
+	# 		# Get employees who already have salary slips
+	# 		existing_slips = frappe.db.sql("""
+	# 			SELECT DISTINCT employee
+	# 			FROM `tabSalary Slip`
+	# 			WHERE employee IN ({})
+	# 			AND docstatus != 2
+	# 			AND fiscal_year = %s
+	# 			AND month = %s
+	# 		""".format(placeholders), tuple(employee_names + [self.fiscal_year, self.month]), as_dict=True)
+			
+	# 		existing_employees = [emp.employee for emp in existing_slips]
+			
+	# 		# Filter out employees with existing salary slips
+	# 		emp_list = [emp for emp in emp_list if emp.employee not in existing_employees]
+
+	# 	if not emp_list:
+	# 		frappe.msgprint(_("No employees found for processing or Salary Slips already created"))
+		
+	# 	return emp_list
+
 	@frappe.whitelist()
 	def fill_employee_details(self):
 		self.set('employees', [])
 		employees = self.get_emp_list()
+		# employees = ["33716", "33725", "50035"]
 		if not employees:
 			frappe.throw(_("No employees for the mentioned criteria"))
 
@@ -107,6 +201,22 @@ class PayrollEntry(Document):
 
 		self.number_of_employees = len(employees)
 		return self.number_of_employees
+
+	# @frappe.whitelist()
+	# def fill_employee_details(self):
+	# 	self.set('employees', [])
+	# 	employee_ids = ["33716", "33725", "50035"]
+		
+	# 	if not employee_ids:
+	# 		frappe.throw(_("No employees for the mentioned criteria"))
+
+	# 	for emp_id in employee_ids:
+	# 		row = self.append('employees', {})
+	# 		row.employee = emp_id  # Replace with your actual field name
+	# 		# Set other fields here
+
+	# 	self.number_of_employees = len(employee_ids)
+	# 	return self.number_of_employees
 
 	def get_filter_condition(self):
 		self.check_mandatory()
@@ -181,12 +291,17 @@ class PayrollEntry(Document):
 				"fiscal_year": self.fiscal_year,
 				"month": self.month
 			})
-			if len(emp_list) > 300:
-				frappe.enqueue(create_salary_slips_for_employees, timeout=600, employees=emp_list, args=args)
+			if len(emp_list) > 300 or frappe.flags.enqueue_payroll_entry:
+				frappe.enqueue(create_salary_slips_for_employees, timeout=3000, employees=emp_list, args=args)
+				frappe.msgprint(
+					_("Salary Slip creation is queued. It may take a few minutes"),
+					alert=True,
+					indicator="blue",
+				)
 			else:
 				create_salary_slips_for_employees(emp_list, args, publish_progress=False)
 				# since this method is called via frm.call this doc needs to be updated manually
-				self.reload()
+				self.reload()		
 
 	
 	def get_sal_slip_list(self, ss_status, as_dict=False):
@@ -217,8 +332,18 @@ class PayrollEntry(Document):
 	def submit_salary_slips(self):
 		self.check_permission('write')
 		ss_list = self.get_sal_slip_list(ss_status=0)
-		if len(ss_list) > 300:
-			frappe.enqueue(submit_salary_slips_for_employees, timeout=600, payroll_entry=self, salary_slips=ss_list)
+		if len(ss_list) > 300 or frappe.flags.enqueue_payroll_entry:
+			self.db_set("status", "Queued")
+			frappe.enqueue(submit_salary_slips_for_employees,
+				  timeout=3000, 
+				  payroll_entry=self, 
+				  salary_slips=ss_list, 
+				  publish_progress=False,)
+			frappe.msgprint(
+				_("Salary Slip submission is queued. It may take a few minutes"),
+				alert=True,
+				indicator="blue",
+			)
 		else:
 			submit_salary_slips_for_employees(self, ss_list, publish_progress=False)
 
@@ -606,285 +731,821 @@ class PayrollEntry(Document):
 			order by t1.cost_center, sc.type, sc.name
 		""".format(self.fiscal_year, self.month, salary_component_pf, self.name),as_dict=1)
 	
+	# @frappe.whitelist()
+	# def make_accounting_entry(self):
+
+	# 	if frappe.db.exists("Journal Entry", {"reference_type": self.doctype, "reference_name": self.name}):
+	# 		frappe.msgprint(_("Accounting Entries already posted"))
+	# 		return
+
+	# 	company = frappe.db.get("Company", self.company)
+	# 	default_bank_account    = frappe.db.get_value("Branch", self.processing_branch,"expense_bank_account")
+	# 	# default_bank_account = get_bank_account(self.processing_branch)
+	# 	default_payable_account = company.get("default_payroll_payable_account")
+	# 	company_cc              = company.get("cost_center")
+	# 	default_gpf_account     = company.get("employee_contribution_pf")
+	# 	salary_component_pf     = "PF"
+
+	# 	if not default_bank_account:
+	# 		frappe.throw(_("Please set default <b>Expense Bank Account</b> for processing branch {}")\
+	# 			.format(frappe.get_desk_link("Branch", self.processing_branch)))
+	# 	elif not default_payable_account:
+	# 		frappe.throw(_("Please set default <b>Salary Payable Account</b> for the Company"))
+	# 	elif not company_cc:
+	# 		frappe.throw(_("Please set <b>Default Cost Center</b> for the Company"))
+	# 	elif not default_gpf_account:
+	# 		frappe.throw(_("Please set account for <b>Employer Contribution to PF</b> for the Company"))
+
+	# 	employee_list = [d.employee for d in self.employees]
+
+	# 	if not employee_list:
+	# 		frappe.throw(_("No employees found in Payroll Employee Detail"))
+
+	# 	if self.branch_wise_payroll_entry:
+	# 		cc = frappe.db.sql("""
+	# 			SELECT
+	# 				t1.employee,
+	# 				(CASE
+	# 					WHEN sc.type = 'Deduction' AND IFNULL(sc.make_party_entry,0) = 0 THEN c.cost_center
+	# 					ELSE t1.cost_center
+	# 				END) AS cost_center,
+
+	# 				(CASE
+	# 					WHEN sc.type = 'Earning' THEN sc.type
+	# 					ELSE IFNULL(sc.clubbed_component, sc.name)
+	# 				END) AS salary_component,
+
+	# 				sc.type AS component_type,
+	# 				IFNULL(sc.is_remittable,0) AS is_remittable,
+	# 				sca.account AS gl_head,
+
+	# 				SUM(IFNULL(sd.amount,0)) AS amount,
+
+	# 				(CASE
+	# 					WHEN IFNULL(sc.make_party_entry,0) = 1 THEN 'Payable'
+	# 					ELSE 'Other'
+	# 				END) AS account_type,
+
+	# 				(CASE
+	# 					WHEN IFNULL(sc.make_party_entry,0) = 1 THEN 'Employee'
+	# 					ELSE 'Other'
+	# 				END) AS party_type,
+
+	# 				(CASE
+	# 					WHEN IFNULL(sc.make_party_entry,0) = 1 THEN t1.employee
+	# 					ELSE ''
+	# 				END) AS party
+
+	# 			FROM `tabSalary Slip` t1
+	# 			JOIN `tabSalary Detail` sd ON sd.parent = t1.name
+	# 			JOIN `tabSalary Component` sc ON sc.name = sd.salary_component
+	# 			JOIN `tabSalary Component Account` sca ON sca.parent = sc.name AND sca.company = t1.company
+	# 			JOIN `tabCompany` c ON c.name = t1.company
+
+	# 			WHERE t1.fiscal_year = %(fiscal_year)s
+	# 			AND t1.month = %(month)s
+	# 			AND t1.docstatus = 1
+	# 			AND t1.payroll_entry = %(payroll_entry)s
+	# 			AND t1.employee IN %(employees)s
+
+	# 			GROUP BY 
+	# 				salary_component,
+	# 				cost_center,
+	# 				sc.type,
+	# 				sca.account
+	# 		""", {
+	# 			"fiscal_year": self.fiscal_year,
+	# 			"month": self.month,
+	# 			"payroll_entry": self.name,
+	# 			"employees": tuple(employee_list)
+	# 		}, as_dict=1)
+
+	# 		posting        = frappe._dict()
+	# 		cc_wise_totals = frappe._dict()
+	# 		tot_payable_amt= 0
+	# 		salary_tax_and_health_contri=0
+	# 		salary_tax_cost_center = ""
+	# 	else:
+	# 		cc = frappe.db.sql("""
+	# 			select
+	# 				(case
+	# 					when sc.type = 'Deduction' and ifnull(sc.make_party_entry,0) = 0 then c.cost_center
+	# 					else t1.cost_center
+	# 				end)                       as cost_center,
+	# 				(case
+	# 					when sc.type = 'Earning' then sc.type
+	# 					else ifnull(sc.clubbed_component,sc.name)
+	# 				end)                       as salary_component,
+	# 				sc.type                    as component_type,
+	# 				sc.group_by_institution_name as group_by_institution_name,
+	# 				sd.institution_name,
+	# 				(case
+	# 					when sc.type = 'Earning' then 0
+	# 					else ifnull(sc.is_remittable,0)
+	# 				end)                       as is_remittable,
+	# 				sca.account                as gl_head,
+	# 				sum(ifnull(sd.amount,0))   as amount,
+	# 				(case
+	# 					when ifnull(sc.make_party_entry,0) = 1 then 'Payable'
+	# 					else 'Other'
+	# 				end) as account_type,
+	# 				(case
+	# 					when ifnull(sc.make_party_entry,0) = 1 then 'Employee'
+	# 					else 'Other'
+	# 				end) as party_type,
+	# 				(case
+	# 					when ifnull(sc.make_party_entry,0) = 1 then t1.employee
+	# 					else 'Other'
+	# 				end) as party
+	# 			FROM `tabSalary Slip` t1
+	# 			JOIN `tabSalary Detail` sd ON sd.parent = t1.name
+	# 			JOIN `tabSalary Component` sc ON sc.name = sd.salary_component
+	# 			JOIN `tabSalary Component Account` sca ON sca.parent = sc.name AND sca.company = t1.company
+	# 			JOIN `tabCompany` c ON c.name = t1.company
+
+	# 			where t1.fiscal_year = '{0}'
+	# 			and t1.month       = '{1}'
+	# 			and t1.docstatus   = 1
+	# 			and sd.parent      = t1.name
+	# 			and sc.name        = sd.salary_component
+	# 			and c.name         = t1.company
+	# 			and t1.payroll_entry = '{2}'
+	# 			and exists(select 1
+	# 						from `tabPayroll Employee Detail` ped
+	# 						where ped.parent = t1.payroll_entry
+	# 						and ped.employee = t1.employee)
+	# 			group by 
+	# 				(case
+	# 					when sc.type = 'Deduction' and ifnull(sc.make_party_entry,0) = 0 then c.cost_center
+	# 					else t1.cost_center
+	# 				end),
+	# 				(case when sc.type = 'Earning' then sc.type else ifnull(sc.clubbed_component,sc.name) end),
+	# 				sc.type,
+	# 				(case when sc.type = 'Earning' then 0 else ifnull(sc.is_remittable,0) end),
+	# 				sc.gl_head,
+	# 				(case when ifnull(sc.make_party_entry,0) = 1 then 'Payable' else 'Other' end),
+	# 				(case when ifnull(sc.make_party_entry,0) = 1 then 'Employee' else 'Other' end),
+	# 				(case when ifnull(sc.make_party_entry,0) = 1 then t1.employee else 'Other' end)
+	# 			order by t1.cost_center, sc.type, sc.name
+	# 		""".format(self.fiscal_year, self.month, self.name),as_dict=1)	
+
+	# 		posting        = frappe._dict()
+	# 		cc_wise_totals = frappe._dict()
+	# 		tot_payable_amt= 0
+	# 		salary_tax_and_health_contri=0
+	# 		salary_tax_cost_center = ""
+
+	# 		for rec in cc:
+	# 			# To Payables
+	# 			tot_payable_amt += (-1*flt(rec.amount) if rec.component_type == 'Deduction' else flt(rec.amount))
+	# 			posting.setdefault("to_payables",[]).append({
+	# 				"account"        : rec.gl_head,
+	# 				"credit_in_account_currency" if rec.component_type == 'Deduction' else "debit_in_account_currency": flt(rec.amount),
+	# 				"against_account": default_payable_account,
+	# 				"cost_center"    : rec.cost_center,
+	# 				"party_check"    : 0,
+	# 				"account_type"   : rec.account_type if rec.party_type == "Employee" else "",
+	# 				"party_type"     : rec.party_type if rec.party_type == "Employee" else "",
+	# 				"party"          : rec.party if rec.party_type == "Employee" else "",
+	# 				"reference_type": self.doctype,
+	# 				"reference_name": self.name,
+	# 				"salary_component": rec.salary_component
+	# 			}) 
+				
+				
+	# 			# Remittance
+	# 			if rec.is_remittable and rec.component_type == 'Deduction':
+	# 				remit_amount    = 0
+	# 				remit_gl_list   = [rec.gl_head, default_gpf_account] if rec.salary_component == salary_component_pf else [rec.gl_head]
+					
+	# 				# if rec.salary_component == salary_component_pf:
+	# 				# 	frappe.throw(str(remit_gl_list))
+					
+	# 				# if rec.salary_component == 'Salary Tax':
+	# 				# 	salary_tax_and_health_contri+=rec.amount
+	# 				# 	salary_tax_cost_center=rec.cost_center
+
+	# 				for r in remit_gl_list:
+	# 					# remit_amount += flt(rec.amount)
+	# 					if r == default_gpf_account:							
+	# 						# frappe.throw("<pre>{}</pre>".format(frappe.as_json(self.get_cc_wise_entries(salary_component_pf))))
+	# 						for i in self.get_cc_wise_entries(salary_component_pf):
+	# 							remit_amount += flt(i.amount)
+	# 							posting.setdefault(rec.salary_component,[]).append({
+	# 								"account"         : r,
+	# 								"debit_in_account_currency" : flt(i.amount),
+	# 								"cost_center"     : i.cost_center,
+	# 								"party_check"     : 0,
+	# 								"account_type"    : i.account_type if i.party_type == "Employee" else "",
+	# 								"party_type"      : i.party_type if i.party_type == "Employee" else "",
+	# 								"party"           : i.party if i.party_type == "Employee" else "",
+	# 								"reference_type"  : self.doctype,
+	# 								"reference_name"  : self.name,
+	# 								"salary_component": rec.salary_component
+	# 							})
+							
+	# 					else:
+	# 						remit_amount += flt(rec.amount)
+	# 						posting.setdefault(rec.salary_component,[]).append({
+	# 							"account"       : r,
+	# 							"debit_in_account_currency" : flt(rec.amount),
+	# 							"cost_center"   : rec.cost_center,
+	# 							"party_check"   : 0,
+	# 							"account_type"   : rec.account_type if rec.party_type == "Employee" else "",
+	# 							"party_type"     : rec.party_type if rec.party_type == "Employee" else "",
+	# 							"party"          : rec.party if rec.party_type == "Employee" else "",
+	# 							"reference_type": self.doctype,
+	# 							"reference_name": self.name,
+	# 							"salary_component": rec.salary_component
+	# 						})
+	# 						# remit_amount += flt(rec.amount)
+	# 						# if rec.group_by_institution_name == 0:
+	# 						# 	posting.setdefault(rec.salary_component,[]).append({
+	# 						# 		"account"       : r,
+	# 						# 		"debit_in_account_currency" : flt(rec.amount),
+	# 						# 		"cost_center"   : rec.cost_center,
+	# 						# 		"party_check"   : 0,
+	# 						# 		"account_type"   : rec.account_type if rec.party_type == "Employee" else "",
+	# 						# 		"party_type"     : rec.party_type if rec.party_type == "Employee" else "",
+	# 						# 		"party"          : rec.party if rec.party_type == "Employee" else "",
+	# 						# 		"reference_type": self.doctype,
+	# 						# 		"reference_name": self.name,
+	# 						# 		"salary_component": rec.salary_component
+	# 						# 	})
+	# 						# else:
+	# 						# 	posting.setdefault(rec.salary_component,[]).append({
+	# 						# 		"account"       : r,
+	# 						# 		"debit_in_account_currency" : flt(rec.amount),
+	# 						# 		"cost_center"   : rec.cost_center,
+	# 						# 		"account_type"   : rec.account_type if rec.party_type == "Employee" else "",
+	# 						# 		"party_type"     : "Supplier",
+	# 						# 		"party"          : frappe.get_value("Bank", rec.institution_name, "party") if rec.institution_name else "",
+	# 						# 		"reference_type": self.doctype,
+	# 						# 		"reference_name": self.name,
+	# 						# 		"salary_component": rec.salary_component
+	# 						# 	})
+
+	# 				# if rec.salary_component != 'Salary Tax':
+	# 				posting.setdefault(rec.salary_component,[]).append({
+	# 					"account"       : default_bank_account,
+	# 					"credit_in_account_currency" : flt(remit_amount),
+	# 					"cost_center"   : rec.cost_center,
+	# 					"party_check"   : 0,
+	# 					"reference_type": self.doctype,
+	# 					"reference_name": self.name,
+	# 					"salary_component": rec.salary_component
+	# 				})
+			
+			
+	# 		# To Bank
+	# 		if posting.get("to_payables") and len(posting.get("to_payables")):
+	# 			posting.setdefault("to_bank",[]).append({
+	# 				"account"       : default_payable_account,
+	# 				"debit_in_account_currency": flt(tot_payable_amt),
+	# 				"cost_center"   : company_cc,
+	# 				"party_check"   : 0,
+	# 				"reference_type": self.doctype,
+	# 				"reference_name": self.name,
+	# 				"salary_component": rec.salary_component
+	# 			})
+	# 			posting.setdefault("to_bank",[]).append({
+	# 				"account"       : default_bank_account,
+	# 				"credit_in_account_currency": flt(tot_payable_amt),
+	# 				"cost_center"   : company_cc,
+	# 				"party_check"   : 0,
+	# 				"reference_type": self.doctype,
+	# 				"reference_name": self.name,
+	# 				"salary_component": rec.salary_component
+	# 			})
+	# 			posting.setdefault("to_payables",[]).append({
+	# 				"account"       : default_payable_account,
+	# 				"credit_in_account_currency" : flt(tot_payable_amt),
+	# 				"cost_center"   : company_cc,
+	# 				"party_check"   : 0,
+	# 				"reference_type": self.doctype,
+	# 				"reference_name": self.name,
+	# 				"salary_component": "Net Pay"
+	# 			})
+	# 		# if frappe.session.user == "Administrator":
+	# 		# 	frappe.throw(str(posting))
+	# 		# Final Posting to accounts
+	# 		if posting:
+	# 			# Budget check
+	# 			self.check_budget(posting)
+
+	# 			jv_name, v_title = None, ""
+	# 			for i in posting:
+	# 				if i == "to_payables":
+	# 					v_title         = "To Payables"
+	# 					v_voucher_type  = "Journal Entry"
+	# 					v_naming_series = "Journal Voucher"
+	# 				else:
+	# 					v_title         = "To Bank" if i == "to_bank" else i
+	# 					v_voucher_type  = "Bank Entry"
+	# 					v_naming_series = "Bank Payment Voucher"
+
+	# 				if v_title:
+	# 					v_title = "SALARY "+str(self.fiscal_year)+str(self.month)+" - "+str(v_title)
+	# 				else:
+	# 					v_title = "SALARY "+str(self.fiscal_year)+str(self.month)
+		
+	# 				doc = frappe.get_doc({
+	# 						"doctype": "Journal Entry",
+	# 						"voucher_type": v_voucher_type,
+	# 						"naming_series": v_naming_series,
+	# 						"title": v_title,
+	# 						"fiscal_year": self.fiscal_year,
+	# 						"remark": v_title,
+	# 						# "user_remark": "Salary ["+str(self.fiscal_year)+str(self.month)+"] - "+str(v_title),
+	# 						"posting_date": nowdate(),                     
+	# 						"company": self.company,
+	# 						"accounts": sorted(posting[i], key=lambda item: item['cost_center'] or ''),
+	# 						"branch": self.processing_branch,
+	# 						"reference_type": self.doctype,
+	# 						"reference_name": self.name,
+	# 					})
+	# 				# frappe.throw("<pre>{}</pre>".format(frappe.as_json(doc.get('accounts'))))
+	# 				doc.flags.ignore_permissions = 1 
+	# 				doc.insert()
+
+	# 				if i == "to_payables":
+	# 					doc.submit() #Added by Thukten to submit Payable from HR
+	# 					jv_name = doc.name
+
+	# 			if jv_name:
+	# 				self.update_salary_slip_status(jv_name = jv_name)		
+	# 			frappe.msgprint(_("Salary posting to accounts is successful."),title="Posting Successful")
+	# 		else:
+	# 			frappe.throw(_("No data found"),title="Posting failed")
+
+
 	@frappe.whitelist()
 	def make_accounting_entry(self):
-
 		if frappe.db.exists("Journal Entry", {"reference_type": self.doctype, "reference_name": self.name}):
 			frappe.msgprint(_("Accounting Entries already posted"))
 			return
 
-		company = frappe.db.get("Company", self.company)
-		default_bank_account    = frappe.db.get_value("Branch", self.processing_branch,"expense_bank_account")
-		# default_bank_account = get_bank_account(self.processing_branch)
-		default_payable_account = company.get("default_payroll_payable_account")
-		company_cc              = company.get("cost_center")
-		default_gpf_account     = company.get("employee_contribution_pf")
-		salary_component_pf     = "PF"
-
+		company = frappe.db.get_value("Company", self.company, 
+			["default_payroll_payable_account", "cost_center", "employer_contribution_pf_account"], as_dict=1)
+		# default_bank_account = frappe.db.get_value("Branch", self.processing_branch, "expense_bank_account")
+		if self.processing_branch:
+			default_bank_account = frappe.db.get_value("Branch", self.processing_branch, "expense_bank_account")
+		else:	
+			default_bank_account = frappe.db.get_value("Company", self.company, "default_bank_account")
+		
 		if not default_bank_account:
-			frappe.throw(_("Please set default <b>Expense Bank Account</b> for processing branch {}")\
+			frappe.throw(_("Please set default <b>Expense Bank Account</b> for processing branch {}") \
 				.format(frappe.get_desk_link("Branch", self.processing_branch)))
-		elif not default_payable_account:
-			frappe.throw(_("Please set default <b>Salary Payable Account</b> for the Company"))
-		elif not company_cc:
+		# elif not company.default_payroll_payable_account:
+		# 	frappe.throw(_("Please set default <b>Salary Payable Account</b> for the Company"))
+		elif not company.cost_center:
 			frappe.throw(_("Please set <b>Default Cost Center</b> for the Company"))
-		elif not default_gpf_account:
+		elif not company.employer_contribution_pf_account:
 			frappe.throw(_("Please set account for <b>Employer Contribution to PF</b> for the Company"))
 
+		employee_list = [d.employee for d in self.employees]
+		if not employee_list:
+			frappe.throw(_("No employees found in Payroll Employee Detail"))
 
+		# OPTIMIZATION: Use parameterized query
+		# cc = frappe.db.sql("""
+		# 	SELECT
+		# 		CASE
+		# 			WHEN sc.type = 'Deduction' AND IFNULL(sc.make_party_entry,0) = 0 THEN c.cost_center
+		# 			ELSE t1.cost_center
+		# 		END AS cost_center,
+		# 		(select eg.budget_activity from `tabEmployee Group` eg where t1.employee_group =  eg.name) as budget_activity,
+		# 		(select eg.budget_sub_activity from `tabEmployee Group` eg where t1.employee_group =  eg.name) as budget_sub_activity,
+		# 		(select a.source_of_fund from `tabAccount` a where t1.employee_group =  eg.name) as source_of_fund,
+		# 		(select eg.source_of_fund from `tabEmployee Group` eg where t1.employee_group =  eg.name) as source_of_fund,
+		# 		CASE
+		# 			WHEN sc.type = 'Earning' THEN sc.type
+		# 			ELSE IFNULL(sc.clubbed_component, sc.name)
+		# 		END AS salary_component,
+		# 		sc.type AS component_type,
+		# 		sc.name AS component_name,
+		# 		sc.group_by_institution_name,
+		# 		sd.institution_name,
+		# 		IFNULL(sc.is_remittable,0) AS is_remittable,
+		# 		sca.account AS gl_head,
+		# 		SUM(IFNULL(sd.amount,0)) AS amount,
+		# 		SUM(IFNULL(t1.employer_pf,0)) AS employer_pf,
+		# 		CASE
+		# 			WHEN IFNULL(sc.make_party_entry,0) = 1 THEN 'Payable'
+		# 			ELSE 'Other'
+		# 		END AS account_type,
+		# 		CASE
+		# 			WHEN IFNULL(sc.make_party_entry,0) = 1 THEN 'Employee'
+		# 			ELSE 'Other'
+		# 		END AS party_type,
+		# 		CASE
+		# 			WHEN IFNULL(sc.make_party_entry,0) = 1 THEN t1.employee
+		# 			ELSE ''
+		# 		END AS party
+		# 	FROM `tabSalary Slip` t1
+		# 	INNER JOIN `tabSalary Detail` sd ON sd.parent = t1.name
+		# 	INNER JOIN `tabSalary Component` sc ON sc.name = sd.salary_component
+		# 	INNER JOIN `tabSalary Component Account` sca ON sca.parent = sc.name AND sca.company = t1.company
+		# 	INNER JOIN `tabCompany` c ON c.name = t1.company
+		# 	WHERE t1.fiscal_year = %(fiscal_year)s
+		# 		AND t1.month = %(month)s
+		# 		AND t1.docstatus = 1
+		# 		AND t1.payroll_entry = %(payroll_entry)s
+		# 		AND t1.employee IN %(employees)s
+		# 	GROUP BY 
+		# 		cost_center,
+		# 		salary_component,
+		# 		component_type,
+		# 		budget_activity,
+		# 		budget_sub_activity,
+		# 		source_of_fund,
+		# 		sc.group_by_institution_name,
+		# 		sd.institution_name,
+		# 		is_remittable,
+		# 		gl_head,
+		# 		account_type,
+		# 		party_type,
+		# 		party
+		# 	ORDER BY t1.cost_center, sc.type, sc.name
+		# """, {
+		# 	"fiscal_year": self.fiscal_year,
+		# 	"month": self.month,
+		# 	"payroll_entry": self.name,
+		# 	"employees": tuple(employee_list)
+		# }, as_dict=1)
+
+		#Second Option
 		cc = frappe.db.sql("""
-			select
-				(case
-					when sc.type = 'Deduction' and ifnull(sc.make_party_entry,0) = 0 then c.cost_center
-					else t1.cost_center
-				end)                       as cost_center,
-				(case
-					when sc.type = 'Earning' then sc.type
-					else ifnull(sc.clubbed_component,sc.name)
-				end)                       as salary_component,
-				sc.type                    as component_type,
-				sc.group_by_institution_name as group_by_institution_name,
+			SELECT
+				CASE
+					WHEN sc.type = 'Deduction' AND IFNULL(sc.make_party_entry,0) = 0 THEN c.cost_center
+					ELSE t1.cost_center
+				END AS cost_center,
+				(select eg.budget_activity from `tabEmployee Group` eg where t1.employee_group = eg.name) as budget_activity,
+				(select eg.budget_sub_activity from `tabEmployee Group` eg where t1.employee_group = eg.name) as budget_sub_activity,
+				CASE
+					WHEN (select a.source_of_fund from `tabAccount` a where a.name = sca.account) IS NOT NULL 
+						THEN (select a.source_of_fund from `tabAccount` a where a.name = sca.account)
+					ELSE (select eg.source_of_fund from `tabEmployee Group` eg where t1.employee_group = eg.name)
+				END AS source_of_fund,
+				CASE
+					WHEN sc.type = 'Earning' THEN sc.type
+					ELSE IFNULL(sc.clubbed_component, sc.name)
+				END AS salary_component,
+				sc.type AS component_type,
+				sc.name AS component_name,
+				sc.group_by_institution_name,
 				sd.institution_name,
-				(case
-					when sc.type = 'Earning' then 0
-					else ifnull(sc.is_remittable,0)
-				end)                       as is_remittable,
-				sca.account                 as gl_head,
-				sum(ifnull(sd.amount,0))   as amount,
-				(case
-					when ifnull(sc.make_party_entry,0) = 1 then 'Payable'
-					else 'Other'
-				end) as account_type,
-				(case
-					when ifnull(sc.make_party_entry,0) = 1 then 'Employee'
-					else 'Other'
-				end) as party_type,
-				(case
-					when ifnull(sc.make_party_entry,0) = 1 then t1.employee
-					else 'Other'
-				end) as party
-			 from
-				`tabSalary Slip` t1,
-				`tabSalary Detail` sd,
-				`tabSalary Component` sc,
-				`tabSalary Component Account` sca,
-				`tabCompany` c
-			where t1.fiscal_year = '{0}'
-			  and t1.month       = '{1}'
-			  and t1.docstatus   = 1
-			  and sd.parent      = t1.name
-			  and sc.name        = sd.salary_component
-			  and c.name         = t1.company
-			  and t1.company = sca.company
-			  and t1.payroll_entry = '{2}'
-			  and t1.employee = '{3}' 
-			  and exists(select 1
-						from `tabPayroll Employee Detail` ped
-						where ped.parent = t1.payroll_entry
-						and ped.employee = t1.employee)
-			group by 
-				(case
-					when sc.type = 'Deduction' and ifnull(sc.make_party_entry,0) = 0 then c.cost_center
-					else t1.cost_center
-				end),
-				(case when sc.type = 'Earning' then sc.type else ifnull(sc.clubbed_component,sc.name) end),
-				sc.type,
-				(case when sc.type = 'Earning' then 0 else ifnull(sc.is_remittable,0) end),
-				sc.gl_head,
-				(case when ifnull(sc.make_party_entry,0) = 1 then 'Payable' else 'Other' end),
-				(case when ifnull(sc.make_party_entry,0) = 1 then 'Employee' else 'Other' end),
-				(case when ifnull(sc.make_party_entry,0) = 1 then t1.employee else 'Other' end)
-			order by t1.cost_center, sc.type, sc.name
-		""".format(self.fiscal_year, self.month, self.name,self.employee),as_dict=1)
-		
+				IFNULL(sc.is_remittable,0) AS is_remittable,
+				sca.account AS gl_head,
+				SUM(IFNULL(sd.amount,0)) AS amount,
+				SUM(IFNULL(t1.employer_pf,0)) AS employer_pf,
+				CASE
+					WHEN IFNULL(sc.make_party_entry,0) = 1 THEN 'Payable'
+					ELSE 'Other'
+				END AS account_type,
+				CASE
+					WHEN IFNULL(sc.make_party_entry,0) = 1 THEN 'Employee'
+					ELSE 'Other'
+				END AS party_type,
+				CASE
+					WHEN IFNULL(sc.make_party_entry,0) = 1 THEN t1.employee
+					ELSE ''
+				END AS party
+			FROM `tabSalary Slip` t1
+			INNER JOIN `tabSalary Detail` sd ON sd.parent = t1.name
+			INNER JOIN `tabSalary Component` sc ON sc.name = sd.salary_component
+			INNER JOIN `tabSalary Component Account` sca ON sca.parent = sc.name AND sca.company = t1.company
+			INNER JOIN `tabCompany` c ON c.name = t1.company
+			WHERE t1.fiscal_year = %(fiscal_year)s
+				AND t1.month = %(month)s
+				AND t1.docstatus = 1
+				AND t1.payroll_entry = %(payroll_entry)s
+				AND t1.employee IN %(employees)s
+			GROUP BY 
+				cost_center,
+				salary_component,
+				component_type,
+				budget_activity,
+				budget_sub_activity,
+				source_of_fund,
+				sc.group_by_institution_name,
+				sd.institution_name,
+				is_remittable,
+				gl_head,
+				account_type,
+				party_type,
+				party
+			ORDER BY t1.cost_center, sc.type, sc.name
+		""", {
+			"fiscal_year": self.fiscal_year,
+			"month": self.month,
+			"payroll_entry": self.name,
+			"employees": tuple(employee_list)
+		}, as_dict=1)
 
-		posting        = frappe._dict()
-		cc_wise_totals = frappe._dict()
-		tot_payable_amt= 0
-		salary_tax_and_health_contri=0
-		salary_tax_cost_center = ""
+		# Store PF amounts per cost center and party
+		pf_cc_entries = {}
+		for entry in cc:
+			if entry.component_name == "PF":
+				key = (entry.cost_center, entry.budget_activity, entry.budget_sub_activity, entry.source_of_fund)
+				if key not in pf_cc_entries:
+					pf_cc_entries[key] = []
+				pf_cc_entries[key].append(entry.employer_pf)
+
+		posting = frappe._dict()
+		tot_payable_amt = 0
+		processed_components = set()
+		# frappe.throw(str(cc))
+		
+		# Dictionary to track total remittances per component to avoid duplicate bank entries
+		component_remittances = frappe._dict()
+
 		for rec in cc:
+			amount = flt(rec.amount)
+			
 			# To Payables
-			tot_payable_amt += (-1*flt(rec.amount) if rec.component_type == 'Deduction' else flt(rec.amount))
-			posting.setdefault("to_payables",[]).append({
-				"account"        : rec.gl_head,
-				"credit_in_account_currency" if rec.component_type == 'Deduction' else "debit_in_account_currency": flt(rec.amount),
-				"against_account": default_payable_account,
-				"cost_center"    : rec.cost_center,
-				"party_check"    : 0,
-				"account_type"   : rec.account_type if rec.party_type == "Employee" else "",
-				"party_type"     : rec.party_type if rec.party_type == "Employee" else "",
-				"party"          : rec.party if rec.party_type == "Employee" else "",
+			if rec.component_type == 'Deduction':
+				tot_payable_amt -= amount
+			else:
+				tot_payable_amt += amount
+
+			posting.setdefault("to_payables", []).append({
+				"account": rec.gl_head,
+				"credit_in_account_currency" if rec.component_type == 'Deduction' else "debit_in_account_currency": amount,
+				# "against_account": company.default_payroll_payable_account,
+				"against_account": default_bank_account,
+				"cost_center": rec.cost_center,
+				"party_check": 0,
+				"account_type": rec.account_type if rec.party_type == "Employee" else "",
+				"party_type": rec.party_type if rec.party_type == "Employee" else "",
+				"party": rec.party if rec.party_type == "Employee" else "",
+				"budget_activity": rec.budget_activity,
+				"budget_sub_activity": rec.budget_sub_activity,
+				"source_of_fund": rec.source_of_fund,
 				"reference_type": self.doctype,
 				"reference_name": self.name,
 				"salary_component": rec.salary_component
-			}) 
+			})
 			
-			
+			# # Remittance
+			# if rec.is_remittable and rec.component_type == 'Deduction':
+			# 	component_key = f"{rec.component_name}_{rec.cost_center}_{rec.budget_activity}_{rec.budget_sub_activity}_{rec.source_of_fund}"
+				
+			# 	if component_key in processed_components:
+			# 		continue
+			# 	processed_components.add(component_key)
+				
+			# 	remit_gl_list = [rec.gl_head]
+			# 	if rec.component_name == "PF":
+			# 		remit_gl_list.append(company.employer_contribution_pf_account)
+				
+			# 	# Track total debit amount for this component
+			# 	total_debit_for_component = 0
+			# 	account_types = []
+			# 	for at in frappe.get_all("Budget Settings Account Types", ["account_type"]):
+			# 		account_types.append(at.account_type)
+			# 	remit_amount = 0
+			# 	for gl_account in remit_gl_list:
+			# 		if gl_account == company.employer_contribution_pf_account:
+			# 			key = (rec.cost_center, entry.budget_activity, entry.budget_sub_activity, entry.source_of_fund)
+			# 			remit_amount = rec.employer_pf
+			# 		else:
+			# 			remit_amount = amount
+					
+			# 		if remit_amount:
+			# 			total_debit_for_component += remit_amount
+			# 			if frappe.db.get_value("Account", gl_account, "account_type") in account_types:
+			# 				budget_activity = rec.budget_activity
+			# 				budget_sub_activity = rec.budget_sub_activity
+			# 				source_of_fund = rec.source_of_fund
+			# 			else:
+			# 				budget_activity = ""
+			# 				budget_sub_activity = ""
+			# 				source_of_fund = ""
+							
+			# 			posting.setdefault(f"remittance_{rec.component_name}", []).append({
+			# 				"account": gl_account,
+			# 				"debit_in_account_currency": remit_amount,
+			# 				"cost_center": rec.cost_center,
+			# 				"party_check": 0,
+			# 				"account_type": rec.account_type if rec.party_type == "Employee" else "",
+			# 				"party_type": rec.party_type if rec.party_type == "Employee" else "",
+			# 				"party": rec.party if rec.party_type == "Employee" else "",
+			# 				"reference_type": self.doctype,
+			# 				"reference_name": self.name,
+			# 				"budget_activity": budget_activity,
+			# 				"budget_sub_activity": budget_sub_activity,
+			# 				"source_of_fund": source_of_fund,
+			# 				"salary_component": rec.salary_component
+			# 			})
+			# 	# Store total remittance for this component to add bank credit later
+			# 	if total_debit_for_component > 0:
+			# 		component_remittances[rec.component_name] = {
+			# 			"amount": total_debit_for_component,
+			# 			"cost_center": rec.cost_center,
+
+			# 		}
+
+			#new code for PF
 			# Remittance
 			if rec.is_remittable and rec.component_type == 'Deduction':
-				remit_amount    = 0
-				remit_gl_list   = [rec.gl_head, default_gpf_account] if rec.salary_component == salary_component_pf else [rec.gl_head]
+				component_key = f"{rec.component_name}_{rec.cost_center}_{rec.budget_activity}_{rec.budget_sub_activity}_{rec.source_of_fund}"
 				
-				# if rec.salary_component == salary_component_pf:
-				# 	frappe.throw(str(remit_gl_list))
+				if component_key in processed_components:
+					continue
+				processed_components.add(component_key)
 				
-				# if rec.salary_component == 'Salary Tax':
-				# 	salary_tax_and_health_contri+=rec.amount
-				# 	salary_tax_cost_center=rec.cost_center
-
-				for r in remit_gl_list:
-					# remit_amount += flt(rec.amount)
-					if r == default_gpf_account:							
-						# frappe.throw("<pre>{}</pre>".format(frappe.as_json(self.get_cc_wise_entries(salary_component_pf))))
-						for i in self.get_cc_wise_entries(salary_component_pf):
-							remit_amount += flt(i.amount)
-							posting.setdefault(rec.salary_component,[]).append({
-								"account"         : r,
-								"debit_in_account_currency" : flt(i.amount),
-								"cost_center"     : i.cost_center,
-								"party_check"     : 0,
-								"account_type"    : i.account_type if i.party_type == "Employee" else "",
-								"party_type"      : i.party_type if i.party_type == "Employee" else "",
-								"party"           : i.party if i.party_type == "Employee" else "",
-								"reference_type"  : self.doctype,
-								"reference_name"  : self.name,
-								"salary_component": rec.salary_component
-							})
-						
+				remit_gl_list = [rec.gl_head]
+				if rec.component_name == "PF":
+					remit_gl_list.append(company.employer_contribution_pf_account)
+				
+				# Track total debit amount for this component
+				total_debit_for_component = 0
+				account_types = []
+				for at in frappe.get_all("Budget Settings Account Types", ["account_type"]):
+					account_types.append(at.account_type)
+				
+				remit_amount = 0
+				for gl_account in remit_gl_list:
+					if gl_account == company.employer_contribution_pf_account:
+						# For PF Employer Contribution account - get source_of_fund from the Account itself
+						remit_amount = rec.employer_pf
+						# Get source_of_fund from the PF Account
+						pf_account_source = frappe.db.get_value("Account", company.employer_contribution_pf_account, "source_of_fund")
+						source_of_fund_for_pf = pf_account_source if pf_account_source else rec.source_of_fund
 					else:
-						remit_amount += flt(rec.amount)
-						posting.setdefault(rec.salary_component,[]).append({
-							"account"       : r,
-							"debit_in_account_currency" : flt(rec.amount),
-							"cost_center"   : rec.cost_center,
-							"party_check"   : 0,
-							"account_type"   : rec.account_type if rec.party_type == "Employee" else "",
-							"party_type"     : rec.party_type if rec.party_type == "Employee" else "",
-							"party"          : rec.party if rec.party_type == "Employee" else "",
+						remit_amount = amount
+						source_of_fund_for_pf = rec.source_of_fund
+					
+					if remit_amount:
+						total_debit_for_component += remit_amount
+						
+						# Check if account has budget settings
+						if frappe.db.get_value("Account", gl_account, "account_type") in account_types:
+							budget_activity = rec.budget_activity
+							budget_sub_activity = rec.budget_sub_activity
+							# Use appropriate source_of_fund
+							if gl_account == company.employer_contribution_pf_account:
+								source_of_fund = source_of_fund_for_pf
+							else:
+								source_of_fund = rec.source_of_fund
+						else:
+							budget_activity = ""
+							budget_sub_activity = ""
+							source_of_fund = ""
+							
+						posting.setdefault(f"remittance_{rec.component_name}", []).append({
+							"account": gl_account,
+							"debit_in_account_currency": remit_amount,
+							"cost_center": rec.cost_center,
+							"party_check": 0,
+							"account_type": rec.account_type if rec.party_type == "Employee" else "",
+							"party_type": rec.party_type if rec.party_type == "Employee" else "",
+							"party": rec.party if rec.party_type == "Employee" else "",
 							"reference_type": self.doctype,
 							"reference_name": self.name,
+							"budget_activity": budget_activity,
+							"budget_sub_activity": budget_sub_activity,
+							"source_of_fund": source_of_fund,
 							"salary_component": rec.salary_component
 						})
-						# remit_amount += flt(rec.amount)
-						# if rec.group_by_institution_name == 0:
-						# 	posting.setdefault(rec.salary_component,[]).append({
-						# 		"account"       : r,
-						# 		"debit_in_account_currency" : flt(rec.amount),
-						# 		"cost_center"   : rec.cost_center,
-						# 		"party_check"   : 0,
-						# 		"account_type"   : rec.account_type if rec.party_type == "Employee" else "",
-						# 		"party_type"     : rec.party_type if rec.party_type == "Employee" else "",
-						# 		"party"          : rec.party if rec.party_type == "Employee" else "",
-						# 		"reference_type": self.doctype,
-						# 		"reference_name": self.name,
-						# 		"salary_component": rec.salary_component
-						# 	})
-						# else:
-						# 	posting.setdefault(rec.salary_component,[]).append({
-						# 		"account"       : r,
-						# 		"debit_in_account_currency" : flt(rec.amount),
-						# 		"cost_center"   : rec.cost_center,
-						# 		"account_type"   : rec.account_type if rec.party_type == "Employee" else "",
-						# 		"party_type"     : "Supplier",
-						# 		"party"          : frappe.get_value("Bank", rec.institution_name, "party") if rec.institution_name else "",
-						# 		"reference_type": self.doctype,
-						# 		"reference_name": self.name,
-						# 		"salary_component": rec.salary_component
-						# 	})
+				
+				# Store total remittance for this component to add bank credit later
+				if total_debit_for_component > 0:
+					component_remittances[rec.component_name] = {
+						"amount": total_debit_for_component,
+						"cost_center": rec.cost_center,
+						"source_of_fund": rec.source_of_fund  # Store the source_of_fund for bank credit entry
+					}
 
-				# if rec.salary_component != 'Salary Tax':
-				posting.setdefault(rec.salary_component,[]).append({
-					"account"       : default_bank_account,
-					"credit_in_account_currency" : flt(remit_amount),
-					"cost_center"   : rec.cost_center,
-					"party_check"   : 0,
+		# # Add bank credit entries for remittances
+		# for component_name, remit_data in component_remittances.items():
+		# 	posting.setdefault(f"remittance_{component_name}", []).append({
+		# 		"account": default_bank_account,
+		# 		"credit_in_account_currency": remit_data["amount"],
+		# 		"cost_center": remit_data["cost_center"],
+		# 		"party_check": 0,
+		# 		"reference_type": self.doctype,
+		# 		"reference_name": self.name,
+		# 		"salary_component": component_name
+		# 	})
+
+		# New code
+		# Add bank credit entries for remittances
+		for component_name, remit_data in component_remittances.items():
+			posting.setdefault(f"remittance_{component_name}", []).append({
+				"account": default_bank_account,
+				"credit_in_account_currency": remit_data["amount"],
+				"cost_center": remit_data["cost_center"],
+				"party_check": 0,
+				"reference_type": self.doctype,
+				"reference_name": self.name,
+				"salary_component": component_name,
+				"source_of_fund": remit_data.get("source_of_fund", "")  # Add source_of_fund to bank entry
+			})
+
+		# # To Bank entries for net salary
+		# if posting.get("to_payables"):
+		# 	posting.setdefault("to_bank", []).extend([
+		# 		{
+		# 			"account": company.default_payroll_payable_account,
+		# 			"debit_in_account_currency": flt(tot_payable_amt),
+		# 			"cost_center": company.cost_center,
+		# 			"party_check": 0,
+		# 			"reference_type": self.doctype,
+		# 			"reference_name": self.name,
+		# 			"salary_component": "Net Pay"
+		# 		},
+		# 		{
+		# 			"account": default_bank_account,
+		# 			"credit_in_account_currency": flt(tot_payable_amt),
+		# 			"cost_center": company.cost_center,
+		# 			"party_check": 0,
+		# 			"reference_type": self.doctype,
+		# 			"reference_name": self.name,
+		# 			"salary_component": "Net Pay"
+		# 		}
+		# 	])
+
+		# Debug: Check if entries balance before posting
+		for entry_type, accounts in posting.items():
+			total_debit = sum(d.get("debit_in_account_currency", 0) for d in accounts)
+			total_credit = sum(d.get("credit_in_account_currency", 0) for d in accounts)
+			if abs(total_debit - total_credit) > 0.01:  # Allow small rounding differences
+				# frappe.msgprint(f"Warning: {entry_type} has difference of {total_debit - total_credit}")
+				# Add balancing entry if needed
+				if total_debit > total_credit:
+					accounts.append({
+						# "account": company.default_payroll_payable_account,
+						"account": default_bank_account,
+						"credit_in_account_currency": total_debit - total_credit,
+						"cost_center": company.cost_center,
+						"party_check": 0,
+						"reference_type": self.doctype,
+						"reference_name": self.name
+					})
+				elif total_credit > total_debit:
+					accounts.append({
+						# "account": company.default_payroll_payable_account,
+						"account": default_bank_account,
+						"debit_in_account_currency": total_credit - total_debit,
+						"cost_center": company.cost_center,
+						"party_check": 0,
+						"reference_type": self.doctype,
+						"reference_name": self.name
+					})
+		# Final Posting
+		# frappe.throw(str(posting))
+		if posting:
+			# frappe.throw(str(posting))
+			self.check_budget(posting)
+			
+			jv_name = None
+			for entry_type, accounts in posting.items():
+				if "to_payables" in entry_type:
+					voucher_type = "Journal Entry"
+					naming_series = "Journal Voucher"
+					title = f"SALARY {self.fiscal_year}{self.month} - Payables"
+				else:
+					voucher_type = "Bank Entry"
+					naming_series = "Bank Payment Voucher"
+					title = f"SALARY {self.fiscal_year}{self.month} - {entry_type.replace('remittance_', '')}"
+				
+				# Verify balance before creating
+				total_debit = sum(d.get("debit_in_account_currency", 0) for d in accounts)
+				total_credit = sum(d.get("credit_in_account_currency", 0) for d in accounts)
+				
+				if abs(total_debit - total_credit) > 0.01:
+					frappe.throw(f"Journal Entry {title} is not balanced. Debit: {total_debit}, Credit: {total_credit}, Difference: {total_debit - total_credit}")
+				
+				doc = frappe.get_doc({
+					"doctype": "Journal Entry",
+					"voucher_type": voucher_type,
+					"naming_series": naming_series,
+					"title": title,
+					"fiscal_year": self.fiscal_year,
+					"remark": title,
+					"posting_date": nowdate(),
+					"company": self.company,
+					"accounts": accounts,
+					"branch": self.processing_branch,
 					"reference_type": self.doctype,
 					"reference_name": self.name,
-					"salary_component": rec.salary_component
 				})
-		
-		
-		# To Bank
-		if posting.get("to_payables") and len(posting.get("to_payables")):
-			posting.setdefault("to_bank",[]).append({
-				"account"       : default_payable_account,
-				"debit_in_account_currency": flt(tot_payable_amt),
-				"cost_center"   : company_cc,
-				"party_check"   : 0,
-				"reference_type": self.doctype,
-				"reference_name": self.name,
-				"salary_component": rec.salary_component
-			})
-			posting.setdefault("to_bank",[]).append({
-				"account"       : default_bank_account,
-				"credit_in_account_currency": flt(tot_payable_amt),
-				"cost_center"   : company_cc,
-				"party_check"   : 0,
-				"reference_type": self.doctype,
-				"reference_name": self.name,
-				"salary_component": rec.salary_component
-			})
-			posting.setdefault("to_payables",[]).append({
-				"account"       : default_payable_account,
-				"credit_in_account_currency" : flt(tot_payable_amt),
-				"cost_center"   : company_cc,
-				"party_check"   : 0,
-				"reference_type": self.doctype,
-				"reference_name": self.name,
-				"salary_component": "Net Pay"
-			})
-		# if frappe.session.user == "Administrator":
-		# 	frappe.throw(str(posting))
-		# Final Posting to accounts
-		if posting:
-			# Budget check
-			self.check_budget(posting)
-
-			jv_name, v_title = None, ""
-			for i in posting:
-				if i == "to_payables":
-					v_title         = "To Payables"
-					v_voucher_type  = "Journal Entry"
-					v_naming_series = "Journal Voucher"
-				else:
-					v_title         = "To Bank" if i == "to_bank" else i
-					v_voucher_type  = "Bank Entry"
-					v_naming_series = "Bank Payment Voucher"
-
-				if v_title:
-					v_title = "SALARY "+str(self.fiscal_year)+str(self.month)+" - "+str(v_title)
-				else:
-					v_title = "SALARY "+str(self.fiscal_year)+str(self.month)
-	 
-				doc = frappe.get_doc({
-						"doctype": "Journal Entry",
-						"voucher_type": v_voucher_type,
-						"naming_series": v_naming_series,
-						"title": v_title,
-						"fiscal_year": self.fiscal_year,
-						"remark": v_title,
-						# "user_remark": "Salary ["+str(self.fiscal_year)+str(self.month)+"] - "+str(v_title),
-						"posting_date": nowdate(),                     
-						"company": self.company,
-						"accounts": sorted(posting[i], key=lambda item: item['cost_center'] or ''),
-						"branch": self.processing_branch,
-						"reference_type": self.doctype,
-						"reference_name": self.name,
-					})
-				# frappe.throw("<pre>{}</pre>".format(frappe.as_json(doc.get('accounts'))))
-				doc.flags.ignore_permissions = 1 
+				doc.flags.ignore_permissions = 1
 				doc.insert()
-
-				if i == "to_payables":
-					doc.submit() #Added by Thukten to submit Payable from HR
+				
+				if "to_payables" in entry_type:
+					doc.submit()
 					jv_name = doc.name
-
+			
 			if jv_name:
-				self.update_salary_slip_status(jv_name = jv_name)		
-			frappe.msgprint(_("Salary posting to accounts is successful."),title="Posting Successful")
+				self.update_salary_slip_status(jv_name=jv_name)
+			
+			frappe.msgprint(_("Salary posting to accounts is successful."), title="Posting Successful")
 		else:
-			frappe.throw(_("No data found"),title="Posting failed")
+			frappe.throw(_("No data found"), title="Posting failed")		
 		
 	##### Ver3.0.190304 Ends
 	# Ver 20190719.1 added by SHIV, JIGME on 2019/07/19
@@ -904,7 +1565,7 @@ class PayrollEntry(Document):
 						### Ver.2.0.200106 Begins, added by SHIV on 2019/01/06
 						# Following line is replaced
 						#error = check_budget_available(rec.get("cost_center"), rec.get("account"), nowdate(), flt(rec.get("debit_in_account_currency")), False)
-						error = validate_expense_against_budget({"cost_center": rec.get("cost_center"), "account": rec.get("account"), "posting_date": budget_date, "amount": flt(rec.get("debit_in_account_currency")), "company": self.company}, False)
+						error = validate_expense_against_budget({"cost_center": rec.get("cost_center"), "account": rec.get("account"), "posting_date": budget_date, "amount": flt(rec.get("debit_in_account_currency")), "company": self.company, "budget_activity": rec.get("budget_activity"), "budget_sub_activity": rec.get("budget_sub_activity"), "source_of_fund": rec.get("source_of_fund")}, False)
 						### Ver.2.0.200106 Ends
 						if error:
 							budget_error.append(error)

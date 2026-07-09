@@ -14,7 +14,6 @@
   "to_date",
   "section_break_5",
   "institution_name",
-  "reference_type",
   "reference_number",
   "bank_branch",
   "bank_account_type",
@@ -26,8 +25,11 @@
   "total_outstanding_amount",
   "salary_component_type",
   "ref_docname",
+  "financial_scheme",
   "sb_additional_info",
   "total_days_in_month",
+  "reference_type",
+  "reference_name",
   "column_break_10",
   "working_days",
   "leave_without_pay",
@@ -54,7 +56,7 @@
    "in_list_view": 1,
    "label": "Amount",
    "options": "Company:company:default_currency",
-   "precision": "2"
+   "precision": "0"
   },
   {
    "default": "0",
@@ -102,7 +104,7 @@
    "fieldname": "reference_type",
    "fieldtype": "Link",
    "label": "Reference Type",
-   "options": "Financial Scheme",
+   "options": "DocType",
    "print_hide": 1
   },
   {
@@ -245,11 +247,22 @@
    "fieldtype": "Link",
    "label": "Bank Account Type",
    "options": "Bank Account Type"
+  },
+  {
+   "fieldname": "financial_scheme",
+   "fieldtype": "Link",
+   "label": "Financial Scheme",
+   "options": "Financial Institution"
+  },
+  {
+   "fieldname": "reference_name",
+   "fieldtype": "Data",
+   "label": "Reference Name"
   }
  ],
  "istable": 1,
  "links": [],
- "modified": "2026-04-10 15:40:13.453425",
+ "modified": "2026-06-29 15:16:47.952006",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Detail",

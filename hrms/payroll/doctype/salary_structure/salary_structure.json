@@ -160,6 +160,7 @@
   "eligible_for_spouse_semso",
   "eligible_for_kanjur",
   "eligible_for_medical",
+  "eligible_for_relieving_fund",
   "section_break_rovx",
   "eligible_for_pbva",
   "column_break_opmp",
@@ -234,6 +235,7 @@
    "read_only": 1
   },
   {
+   "fetch_from": "employee.company",
    "fieldname": "company",
    "fieldtype": "Link",
    "in_filter": 1,
@@ -909,7 +911,6 @@
    "hidden": 1
   },
   {
-   "fetch_from": "branch.cost_center",
    "fieldname": "cost_center",
    "fieldtype": "Link",
    "label": "Cost Center",
@@ -1156,7 +1157,6 @@
    "default": "0",
    "fieldname": "eligible_for_kanjur",
    "fieldtype": "Check",
-   "hidden": 1,
    "label": "Eligible for Kanjur"
   },
   {
@@ -1197,7 +1197,6 @@
    "default": "0",
    "fieldname": "eligible_for_medical",
    "fieldtype": "Check",
-   "hidden": 1,
    "label": "Eligible for Medical"
   },
   {
@@ -1253,6 +1252,7 @@
    "label": "Medal Allowance"
   },
   {
+   "depends_on": "eligible_for_personal_pay",
    "fieldname": "eligible_for_personal_pay_method",
    "fieldtype": "Select",
    "label": "Eligible for Personal Pay Method",
@@ -1375,12 +1375,18 @@
    "fieldtype": "Check",
    "hidden": 1,
    "label": "Eligible for kidney"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_relieving_fund",
+   "fieldtype": "Check",
+   "label": "Eligible for Relieving Fund"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2026-04-15 10:10:59.027912",
+ "modified": "2026-06-10 16:40:10.859400",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",

@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestSemsoType(FrappeTestCase):
+class TestRetentionAdvance(FrappeTestCase):
 	pass

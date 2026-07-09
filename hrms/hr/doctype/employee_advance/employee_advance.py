@@ -6,14 +6,34 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.query_builder.functions import Sum
-from frappe.utils import flt, nowdate
+from frappe.utils import (
+	DATE_FORMAT,
+	add_days,
+	add_to_date,
+	cint,
+	comma_and,
+	date_diff,
+	flt,
+	get_link_to_form,
+	getdate,
+	get_last_day,
+	nowdate,
+	now_datetime
+)
+from dateutil.relativedelta import relativedelta
 
 import erpnext
 from erpnext.accounts.doctype.journal_entry.journal_entry import get_default_bank_cash_account
+from hrms.hr.hr_custom_functions import (
+	get_basic_and_gross_pay
+)
 
 import hrms
 from hrms.hr.utils import validate_active_employee
-
+MONTH_MAPPING = {
+	"January": 1, "February": 2, "March": 3, "April": 4, "May": 5, "June": 6,
+	"July": 7, "August": 8, "September": 9, "October": 10, "November": 11, "December": 12
+}
 
 class EmployeeAdvanceOverPayment(frappe.ValidationError):
 	pass
@@ -29,10 +49,13 @@ class EmployeeAdvance(Document):
 		validate_active_employee(self.employee)
 		self.validate_exchange_rate()
 		self.set_status()
-		self.set_pending_amount()
+		# self.set_pending_amount()
+	def on_submit(self):
+		self.post_journal_entry()
 
 	def on_cancel(self):
 		self.ignore_linked_doctypes = "GL Entry"
+		self.update_salary_structure(cancel=True)
 		self.set_status(update=True)
 
 	def on_update(self):
@@ -49,6 +72,153 @@ class EmployeeAdvance(Document):
 		if not self.exchange_rate:
 			frappe.throw(_("Exchange Rate cannot be zero."))
 
+	def get_max_month_adv(self):
+		Employee = frappe.qb.DocType("Employee")
+		EmployeeGroup = frappe.qb.DocType("Employee Group")
+
+		result = (
+			frappe.qb.from_(Employee)
+			.join(EmployeeGroup)
+			.on(Employee.employee_group == EmployeeGroup.name)
+			.select(EmployeeGroup.salary_advance_max_months)
+			.select(EmployeeGroup.maximum_number_of_months_allowed)
+			.where(Employee.name == self.employee)
+		).run(as_dict=True)
+
+		if not result:
+			frappe.throw(_("Employee Group not found for employee {0}").format(self.employee))
+
+		# Explicitly convert to integer
+		max_months = cint(result[0].get("salary_advance_max_months"))
+		max_amount_intrs_fre_ln=cint(result[0].get("maximum_number_of_months_allowed"))
+		
+		if not max_months:
+			frappe.throw(_("Salary Advance Max Months is not set for Employee Group of {0}").format(self.employee))
+
+		# if not max_amount_intrs_fre_ln:
+		# 	frappe.throw(_("Internest free loan Max Months is not set for Employee Group of {0}").format(self.employee))
+
+		#return max_months
+		# return {
+        # "max_months": max_months,
+        # "max_amount_intrs_fre_ln": max_amount_intrs_fre_ln
+		# }
+		return {"max_months": max_months,
+        "max_amount_intrs_fre_ln": max_amount_intrs_fre_ln
+		}
+	def update_salary_structure(self, cancel=False):
+		if cancel:
+			rem_list = []
+			if self.salary_structure:
+				doc = frappe.get_doc("Salary Structure", self.salary_structure)
+				for d in doc.get("deductions"):
+					if d.salary_component == "Salary Advance" and self.name in (
+						d.reference_type,
+						d.reference_name,
+					):
+						rem_list.append(d)
+
+				[doc.remove(d) for d in rem_list]
+				doc.save(ignore_permissions=True)
+		else:
+			
+			if frappe.db.exists(
+				"Salary Structure", {"employee": self.employee, "is_active": "Yes"}
+			):
+				doc = frappe.get_doc(
+					"Salary Structure", {"employee": self.employee, "is_active": "Yes"}
+				)
+				row = doc.append("deductions", {})
+				#row.salary_component = "Salary Advance Deduction"
+				if self.advance_type=="Employee Advance":
+					row.salary_component = "Salary advance"
+				else:
+					row.salary_component = "Interest Free Loan"
+
+				row.from_date = self.recovery_start_date
+				row.to_date = self.recovery_end_date
+				row.amount = flt(self.deduction_amount)
+				row.default_amount = flt(self.deduction_amount)
+				row.reference_type = self.doctype
+				row.reference_name = self.name
+				row.total_deductible_amount = flt(self.advance_amount)
+				row.total_deducted_amount = 0
+				row.total_outstanding_amount = flt(self.advance_amount)
+				doc.save(ignore_permissions=True)
+				self.db_set("salary_structure", doc.name)
+			else:
+				frappe.throw(
+					_("No active salary structure found for employee {0} {1}").format(
+						self.employee, self.employee_name
+					),
+					title="No Data Found",
+				)
+	def post_journal_entry(self):
+		advance_account=self.advance_account
+		#advance_account = frappe.db.get_value("Company", self.company, "default_employee_advance_account")
+		bank_account = frappe.db.get_value("Branch", self.branch, "expense_bank_account")
+
+		if not advance_account:
+			frappe.throw(
+				"Default Employee Advance Account is not set for {}. Please configure it in the Company.".format(
+					frappe.get_desk_link("Company", self.company)
+				),
+				title="Missing Advance Account"
+			)
+
+		if not bank_account:
+			frappe.throw(
+				"Default Expense Bank Account is not set for {}. Please configure it in the Branch.".format(
+					frappe.get_desk_link("Branch", self.branch)
+				),
+				title="Missing Expense Bank Account"
+			)
+
+		# Posting Journal Entry
+		accounts = []
+		accounts.append({
+			"account": advance_account,
+			"debit": flt(self.advance_amount),
+			"debit_in_account_currency": flt(self.advance_amount),
+			"cost_center": self.cost_center,
+			"party_check": 1,
+			"party_type": "Employee",
+			"party": self.employee,
+			"is_advance": "Yes",
+			"reference_type": "Employee Advance",
+			"reference_name": self.name,
+		})
+
+		accounts.append({
+			"account": bank_account,
+			"credit": flt(self.advance_amount),
+			"credit_in_account_currency": flt(self.advance_amount),
+			"cost_center": self.cost_center,
+		})
+
+		je = frappe.new_doc("Journal Entry")
+		
+		voucher_type = "Bank Entry"
+		naming_series = "Bank Payment Voucher"
+		
+		je.update({
+				"doctype": "Journal Entry",
+				"voucher_type": voucher_type,
+				"naming_series": naming_series,
+				"title": "Employee Advance - " + self.employee_name + "-" + self.employee,
+				"user_remark": "Employee Advance - "+self.employee,
+				"posting_date": nowdate(),
+				"company": self.company,
+				"accounts": accounts,
+				"branch": self.branch
+		})
+
+		if self.advance_amount:
+			je.save(ignore_permissions = True)
+			# frappe.throw(str(je))
+			self.db_set("journal_entry", je.name)
+			self.db_set("journal_entry_status", "Forwarded to accounts for processing payment on {0}".format(now_datetime().strftime('%Y-%m-%d %H:%M:%S')))
+			frappe.msgprint(_('{} posted to accounts').format(frappe.get_desk_link(je.doctype,je.name)))
 	def set_status(self, update=False):
 		precision = self.precision("paid_amount")
 		total_amount = flt(flt(self.claimed_amount) + flt(self.return_amount), precision)
@@ -75,6 +245,7 @@ class EmployeeAdvance(Document):
 				self.paid_amount, precision
 			):
 				status = "Paid"
+				self.update_salary_structure()
 			else:
 				status = "Unpaid"
 		elif self.docstatus == 2:
@@ -89,6 +260,7 @@ class EmployeeAdvance(Document):
 
 	def set_total_advance_paid(self):
 		gle = frappe.qb.DocType("GL Entry")
+		
 
 		paid_amount = (
 			frappe.qb.from_(gle)
@@ -174,9 +346,148 @@ class EmployeeAdvance(Document):
 				& (Advance.status == "Unpaid")
 			)
 		).run()[0][0] or 0.0
+	# @frappe.whitelist()
+	# def set_pay_details(self):
+	# 	# earnings = get_basic_and_gross_pay(employee=self.employee, effective_date=nowdate())
+	# 	# if not earnings:
+	# 	# 	error_msg = _(
+	# 	# 		"No salary structure found for Employee: {0}"
+	# 	# 	).format(frappe.bold(self.employee))
+	# 	# 	# frappe.throw(error_msg, title=_("No salary structure found"))
+	# 	# 	return
 
+	# 	# self.gross_pay = flt(earnings.get("total_earning", 0))
+	# 	# self.basic_pay = flt(earnings.get("basic_pay", 0))
+	# 	# self.net_pay = flt(earnings.get("net_pay", 0))
+	# 	self.advance_amount = self.basic_pay
+	@frappe.whitelist()
+	def set_default_no_of_installments(self, update=False):
+		if update:
+			if self.posting_date:
+				month = getdate(self.posting_date).month
+				self.no_of_installments = 13 - month
+			else:
+				frappe.throw("Posting Date is required to calculate installments.")
+		else:
+			salary_slips = self.get_sal_slip_list() or []
+			self.no_of_installments = 12 - len(salary_slips)
+	def get_sal_slip_list(self, as_dict=True):
+		fiscal_year = getdate(self.posting_date).year
+		ss = frappe.qb.DocType("Salary Slip")
+		ss_list = (
+			frappe.qb.from_(ss)
+			.select(ss.name, ss.month)
+			.where(
+				(ss.docstatus == 1)
+				& (ss.employee == self.employee)
+				& (ss.fiscal_year == fiscal_year)
+			)
+		).run(as_dict=as_dict)
+
+		return ss_list
+	def get_month_number(self):
+		salary_slips = self.get_sal_slip_list() or []  # Ensure it's a list
+
+		if salary_slips:
+			latest_month_number = max([MONTH_MAPPING.get(ss["month"], 1) for ss in salary_slips])
+
+			if latest_month_number == 12:
+				frappe.throw(
+					_("Cannot process Employee Advance as Salary Slip is already processed for December."),
+					title=_("Advance Not Allowed")
+				)
+				return
+
+			month_number = latest_month_number + 1
+
+		else:
+			if not self.posting_date:
+				frappe.throw(_("Posting Date is required to determine the month number."))
+
+			month_number = getdate(self.posting_date).month
+			self.set_default_no_of_installments(update=True)
+
+		max_installments = 12 - len(salary_slips)
+		
+		if flt(self.no_of_installments) > max_installments:
+			frappe.throw(
+				_("The number of installments cannot exceed {}. Please adjust the number of installments to fit within the remaining months of the fiscal year.").format(
+					frappe.bold(max_installments)
+				),
+				title=_("Exceeded Maximum Installments")
+			)
+
+		return month_number
+	
+	@frappe.whitelist()
+	def get_start_end_dates(self):
+		month_number = self.get_month_number()
+		
+		fiscal_year = getdate(self.posting_date).year
+		start_date = getdate(f"{fiscal_year}-{month_number}-01")
+
+		recovery_end_date = start_date + relativedelta(months=self.no_of_installments-1)
+
+		return frappe._dict({
+			"start_date": start_date.strftime("%Y-%m-%d"),
+			"end_date": get_last_day(recovery_end_date.strftime("%Y-%m-%d")),
+		})
+	@frappe.whitelist()
+	def calculate_amount(self):
+		installments = self.no_of_installments or 1
+		amount = self.advance_amount or 0
+
+		if installments <= 0:
+			installments = 1
+
+		return flt(amount) / flt(installments)
+	# def calculate_amount(self):
+	# 	try:
+	# 		# max_months = self.get_max_month_adv()
+	# 		# frappe.throw(max_amounts.max_amounts)
+	# 		result = self.get_max_month_adv()
+
+	# 		max_months = result["max_months"]
+			
+	# 		max_amount_intrs_fre_ln = result["max_amount_intrs_fre_ln"]
+	# 		#frappe.throw(str(self.advance_type))
+			
+			
+
+	# 		max_amount = flt(self.basic_pay) * max_months  # Use the already converted integer
+	# 		if self.advance_type=="Interest Free Loan":
+	# 			max_amount=flt(self.gross_pay)*max_amount_intrs_fre_ln
+	# 			max_months=max_amount_intrs_fre_ln
+	# 		#frappe.throw(str(max_amounts))
+	# 		#frappe.msgprint(f"Debug: basic_pay={self.basic_pay}, max_months={max_months}, max_amount={max_amount}")  # Debug line
+			
+	# 		if flt(self.advance_amount) > max_amount:
+	# 			frappe.throw(
+	# 				_("The advance amount cannot exceed {0} times your basic pay. "
+	# 				"Maximum allowed: {1}, Attempted: {2}").format(
+	# 					max_months,
+	# 					frappe.bold(frappe.format_value(max_amount, {"fieldtype": "Currency"})),
+	# 					frappe.bold(frappe.format_value(self.advance_amount, {"fieldtype": "Currency"}))
+	# 				),
+	# 				title=_("Exceeded Maximum Limit")
+	# 			)
+				
+	# 		deduction = flt(self.advance_amount) / flt(self.no_of_installments)
+	# 		frappe.throw(str(deduction))
+	# 		return deduction
+			
+	# 	except Exception as e:
+			
+	# 		frappe.log_error(f"Error in calculate_amount: {str(e)}")
 
 @frappe.whitelist()
+def get_pending_amount(employee, posting_date):
+	employee_due_amount = frappe.get_all(
+		"Employee Advance",
+		filters={"employee": employee, "docstatus": 1, "posting_date": ("<=", posting_date)},
+		fields=["advance_amount", "paid_amount"],
+	)
+	return sum([(emp.advance_amount - emp.paid_amount) for emp in employee_due_amount])@frappe.whitelist()
 def make_bank_entry(dt, dn):
 	doc = frappe.get_doc(dt, dn)
 	payment_account = get_default_bank_cash_account(

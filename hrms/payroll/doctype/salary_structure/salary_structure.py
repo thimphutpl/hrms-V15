@@ -73,6 +73,7 @@ class SalaryStructure(Document):
 		emp = frappe.get_doc("Employee", self.employee)
 		self.employee_name = emp.employee_name
 		self.branch = emp.branch
+		self.cost_center = emp.cost_center
 		self.designation = emp.designation
 		self.employment_type = emp.employment_type
 		self.employee_group = emp.employee_group
@@ -190,9 +191,9 @@ class SalaryStructure(Document):
 				deductions.append(a)
 		self.deductions = deductions
 
-	def test(self):
-		for a in self.deductions:
-			frappe.msgprint("{0} ==> {1}".format(a.salary_component, a.amount))
+	# def test(self):
+	# 	for a in self.deductions:
+	# 		frappe.msgprint("{0} ==> {1}".format(a.salary_component, a.amount))
 
 	def get_active_amount(self, rec):
 		''' return amount only if the component is active '''
@@ -306,79 +307,18 @@ class SalaryStructure(Document):
 						if m["field_name"] == "eligible_for_hra":
 							calc_amt = frappe.db.get_value("Employee Grade", self.employee_grade, "hra")
 
-						# if m["field_name"] == "eligible_for_king_allowance":
-						# 	existing_king = next(
-						# 		(d for d in self.get("earnings") if d.salary_component == "King Allowance"),
-						# 		None
-						# 	)
-						# 	if existing_king:
-						# 		# Preserve manually entered value
-						# 		if existing_king.amount in (None, 0):
-						# 			# Only set default if nothing entered
-						# 			existing_king.amount = 0.0
-						# 		# Else: keep the manually entered value
-						# 	else:
-						# 		# Append new only if it doesn't exist
-						# 		self.append('earnings', {
-						# 			'salary_component': 'King Allowance',
-						# 			'amount': 0.0
-						# 		})
+					
 
-						# if m["field_name"] == "eligible_for_king_allowance":
+						# if m["field_name"] == "eligible_for_batman_allowance":
 						# 	existing_relief_fund = next(
-						# 	(d for d in self.get("earnings") if d.salary_component == "King Allowance"),
+						# 	(d for d in self.get("earnings") if d.salary_component == "Batman Allowance"),
 						# 	None
 						# 	)
 						# 	if existing_relief_fund:
 						# 		calc_amt = flt(existing_relief_fund.amount)
 						# 	else:
 						# 		calc_amt = 0.0  
-							# calc_map.append({
-							# 	'salary_component': m['name'],
-							# 	'amount': calc_amt
-							# })		
-
-						# if m["field_name"] == "eligible_for_personal_pay":
-						# 	existing_relief_fund = next(
-						# 	(d for d in self.get("earnings") if d.salary_component == "Personal Pay"),
-						# 	None
-						# 	)
-						# 	if existing_relief_fund:
-						# 		calc_amt = flt(existing_relief_fund.amount)
-						# 	else:
-						# 		calc_amt = 0.0  
-							# calc_map.append({
-							# 	'salary_component': m['name'],
-							# 	'amount': calc_amt
-							# })
-
-						# if m["field_name"] == "eligible_for_border_allowance":
-						# 	existing_relief_fund = next(
-						# 	(d for d in self.get("earnings") if d.salary_component == "Border Allowance"),
-						# 	None
-						# 	)
-						# 	if existing_relief_fund:
-						# 		calc_amt = flt(existing_relief_fund.amount)
-						# 	else:
-						# 		calc_amt = 0.0  
-							# calc_map.append({
-							# 	'salary_component': m['name'],
-							# 	'amount': calc_amt
-							# })
-
-						if m["field_name"] == "eligible_for_batman_allowance":
-							existing_relief_fund = next(
-							(d for d in self.get("earnings") if d.salary_component == "Batman Allowance"),
-							None
-							)
-							if existing_relief_fund:
-								calc_amt = flt(existing_relief_fund.amount)
-							else:
-								calc_amt = 0.0  
-							# calc_map.append({
-							# 	'salary_component': m['name'],
-							# 	'amount': calc_amt
-							# })
+							
 
 						if m["field_name"] == "eligible_for_high_altitude_allowance":
 							existing_relief_fund = next(
@@ -389,66 +329,7 @@ class SalaryStructure(Document):
 								calc_amt = flt(existing_relief_fund.amount)
 							else:
 								calc_amt = 0.0  
-							# calc_map.append({
-							# 	'salary_component': m['name'],
-							# 	'amount': calc_amt
-							# })
-
-						# if m["field_name"] == "eligible_for_trade_allowance":
-						# 	existing_relief_fund = next(
-						# 	(d for d in self.get("earnings") if d.salary_component == "Trade Allowance"),
-						# 	None
-						# 	)
-						# 	if existing_relief_fund:
-						# 		calc_amt = flt(existing_relief_fund.amount)
-						# 	else:
-						# 		calc_amt = 0.0  
-							# calc_map.append({
-							# 	'salary_component': m['name'],
-							# 	'amount': calc_amt
-							# })
-
-						# if m["field_name"] == "eligible_for_city_allowance":
-						# 	existing_relief_fund = next(
-						# 	(d for d in self.get("earnings") if d.salary_component == "City Allowance"),
-						# 	None
-						# 	)
-						# 	if existing_relief_fund:
-						# 		calc_amt = flt(existing_relief_fund.amount)
-						# 	else:
-						# 		calc_amt = 0.0  
-							# calc_map.append({
-							# 	'salary_component': m['name'],
-							# 	'amount': calc_amt
-							# })
-
-						# if m["field_name"] == "eligible_for_medal_allowance":
-						# 	existing_relief_fund = next(
-						# 	(d for d in self.get("earnings") if d.salary_component == "Medal Allowance"),
-						# 	None
-						# 	)
-						# 	if existing_relief_fund:
-						# 		calc_amt = flt(existing_relief_fund.amount)
-						# 	else:
-						# 		calc_amt = 0.0  
-							# calc_map.append({
-							# 	'salary_component': m['name'],
-							# 	'amount': calc_amt
-							# })
-
-						# if m["field_name"] == "eligible_for_cdo_allowance":
-						# 	existing_relief_fund = next(
-						# 	(d for d in self.get("earnings") if d.salary_component == "CDO Allowance"),
-						# 	None
-						# 	)
-						# 	if existing_relief_fund:
-						# 		calc_amt = flt(existing_relief_fund.amount)
-						# 	else:
-						# 		calc_amt = 0.0  
-							# calc_map.append({
-							# 	'salary_component': m['name'],
-							# 	'amount': calc_amt
-							# })
+							
 
 						if m["field_name"] == "eligible_for_attendant_allowance":
 							existing_relief_fund = next(
@@ -459,66 +340,7 @@ class SalaryStructure(Document):
 								calc_amt = flt(existing_relief_fund.amount)
 							else:
 								calc_amt = 0.0  
-							# calc_map.append({
-							# 	'salary_component': m['name'],
-							# 	'amount': calc_amt
-							# })
-
-						# if m["field_name"] == "eligible_for_professional_dr":
-						# 	existing_relief_fund = next(
-						# 	(d for d in self.get("earnings") if d.salary_component == "Professional for (Dr)"),
-						# 	None
-						# 	)
-						# 	if existing_relief_fund:
-						# 		calc_amt = flt(existing_relief_fund.amount)
-						# 	else:
-						# 		calc_amt = 0.0  
-							# calc_map.append({
-							# 	'salary_component': m['name'],
-							# 	'amount': calc_amt
-							# })
-
-						# if m["field_name"] == "eligible_for_other_allowance":
-						# 	existing_relief_fund = next(
-						# 	(d for d in self.get("earnings") if d.salary_component == "Other Allowance"),
-						# 	None
-						# 	)
-						# 	if existing_relief_fund:
-						# 		calc_amt = flt(existing_relief_fund.amount)
-						# 	else:
-						# 		calc_amt = 0.0  
-							# calc_map.append({
-							# 	'salary_component': m['name'],
-							# 	'amount': calc_amt
-							# })
-
-						# if m["field_name"] == "eligible_for_kma":
-						# 	existing_relief_fund = next(
-						# 	(d for d in self.get("earnings") if d.salary_component == "KMA"),
-						# 	None
-						# 	)
-						# 	if existing_relief_fund:
-						# 		calc_amt = flt(existing_relief_fund.amount)
-						# 	else:
-						# 		calc_amt = 0.0  
-							# calc_map.append({
-							# 	'salary_component': m['name'],
-							# 	'amount': calc_amt
-							# })
-
-						# if m["field_name"] == "eligible_for_entertainment_allowance":
-						# 	existing_relief_fund = next(
-						# 	(d for d in self.get("earnings") if d.salary_component == "Entertainment Allowance"),
-						# 	None
-						# 	)
-						# 	if existing_relief_fund:
-						# 		calc_amt = flt(existing_relief_fund.amount)
-						# 	else:
-						# 		calc_amt = 0.0  
-							# calc_map.append({
-							# 	'salary_component': m['name'],
-							# 	'amount': calc_amt
-							# })
+							
 
 						if m["field_name"] == "eligible_for_contract_allowance":
 							existing_relief_fund = next(
@@ -529,10 +351,10 @@ class SalaryStructure(Document):
 								calc_amt = flt(existing_relief_fund.amount)
 							else:
 								calc_amt = 0.0  
-							# calc_map.append({
-							# 	'salary_component': m['name'],
-							# 	'amount': calc_amt
-							# })																																								
+							
+
+						# if m["field_name"] == "eligible_for_batman_allowance":
+						# 	calc_amt = frappe.db.get_value("Employee Grade", self.employee_grade, "batman_allowance")																																										
 
 						if m["field_name"] == "eligible_for_afsa":
 							calc_amt = frappe.db.get_value("Employee Grade", self.employee_grade, "afsa")	
@@ -555,19 +377,20 @@ class SalaryStructure(Document):
 						total_earning += calc_amt
 						calc_map.append({'salary_component': m['name'], 'amount': calc_amt})
 				else:
+								
+
 					if self.get(m['field_name']) and m['name'] == 'SWS':
 						sws_amt = flt(settings.get('sws_contribution'))
 						calc_amt = roundoff(sws_amt)
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
+					
 					elif self.get(m['field_name']) and m['name'] == 'GIS':
 						gis_amt = flt(settings.get("gis"))
 						calc_amt = roundoff(gis_amt)
-						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
+						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})	
 
-					# elif self.get(m['field_name']) and m['name'] == 'PF':
-					# 	pf_amt = (flt(basic_pay)+flt(basic_pay_arrears))*flt(settings.get("employee_pf"))*0.01
-					# 	calc_amt = roundoff_two_dec(pf_amt)
-					# 	calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
+
+				
 
 					elif self.get(m['field_name']) and m['name'] == 'PF':
 						# frappe.throw(str(flt(basic_pay)))
@@ -580,6 +403,7 @@ class SalaryStructure(Document):
 						health_cont_amt = flt(total_earning)*flt(settings.get("health_contribution"))*0.01
 						calc_amt = roundoff(health_cont_amt)
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
+						
 					elif self.get(m['field_name']) and m['name'] == 'TV Deductions':
 						existing_tv_deduction = next(
 							(d for d in self.get("deductions") if d.salary_component == "TV Deductions"),
@@ -632,45 +456,43 @@ class SalaryStructure(Document):
 							'salary_component': m['name'],
 							'amount': calc_amt
 						})		
-					elif self.get(m['field_name']) and m['name'] == 'Relief Fund':
-						existing_relief_fund = next(
-							(d for d in self.get("deductions") if d.salary_component == "Relief Fund"),
-							None
-						)
-						if existing_relief_fund:
-							calc_amt = flt(existing_relief_fund.amount)
-						else:
-							calc_amt = 0.0  
-						calc_map.append({
-							'salary_component': m['name'],
-							'amount': calc_amt
-						})
+					
 					elif self.get(m['field_name']) and m['name'] == 'Kanjur':
-						existing_kanjur = next(
-							(d for d in self.get("deductions") if d.salary_component == "Kanjur"),
-							None
+						calc_amt = frappe.db.get_value(
+							"Employee Grade",
+							self.employee_grade,
+							"kanjur_deduction"
 						)
-						if existing_kanjur:
-							calc_amt = flt(existing_kanjur.amount)
-						else:
-							calc_amt = 0.0  
+
 						calc_map.append({
 							'salary_component': m['name'],
-							'amount': calc_amt
+							'amount': flt(calc_amt)
 						})
+
 					elif self.get(m['field_name']) and m['name'] == 'Medical':
-						existing_medical = next(
-							(d for d in self.get("deductions") if d.salary_component == "Medical"),
-							None
-						)
-						if existing_medical:
-							calc_amt = flt(existing_medical.amount)
-						else:
-							calc_amt = 0.0  
+						calc_amt = frappe.db.get_value(
+							"Employee Grade",
+							self.employee_grade,
+							"medical_deduction"
+						) or 0
+
 						calc_map.append({
 							'salary_component': m['name'],
-							'amount': calc_amt
+							'amount': flt(calc_amt)
 						})
+
+					elif self.get(m['field_name']) and m['name'] == 'Relief Fund':
+						calc_amt = frappe.db.get_value(
+							"Employee Grade",
+							self.employee_grade,
+							"relieving_fund_deduction"
+						)
+
+						calc_map.append({
+							'salary_component': m['name'],
+							'amount': flt(calc_amt)
+						})
+
 					elif self.get(m['field_name']) and m['name'] == 'Semso':
 						existing_semso = next(
 							(d for d in self.get("deductions") if d.salary_component == "Semso"),
@@ -738,14 +560,16 @@ class SalaryStructure(Document):
 						})
 					else:
 						calc_amt = 0
+						
 
 					total_deduction += calc_amt
 
 			# Calculating Salary Tax
 			tax_included = 0
-			if ed == 'deductions':
-				if self.employee_group == "Civilan (MOF)":
-					calc_amt = get_salary_tax(math.floor(flt(total_earning)-flt(pf_amt)-flt(gis_amt)))
+			if ed == 'deductions' and self.eligible_for_tax:
+				if self.employee_group in ["Officer (RBA)","Civilan (RBA)","Troops (RBA)","Troops (RBG)",
+							   "Officer (RBG)","Civilan (RBG)"]:
+					calc_amt = get_salary_tax(math.floor(flt(basic_pay)-flt(pf_amt)-flt(gis_amt)))
 					calc_amt = roundoff(calc_amt)
 					total_deduction += calc_amt
 					calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(calc_amt)})
@@ -758,10 +582,11 @@ class SalaryStructure(Document):
 					total_deduction += calc_amt
 					calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(0)})
 					tax_included = 1
+				
 				else:
-					tax_amt = get_salary_tax(math.floor(flt(basic_pay) - flt(gis_amt) - flt(pf_amt)))
+					tax_amt = get_salary_tax(math.floor(flt(total_earning) - (flt(total_earning) * 0.15)))
 					tax_amt = roundoff(tax_amt)
-					total_deduction += calc_amt
+					total_deduction += tax_amt
 					calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(tax_amt)})
 					tax_included = 1	
 									
@@ -784,16 +609,13 @@ class SalaryStructure(Document):
 		self.total_earning   = sum([self.get_active_amount(rec) for rec in self.get("earnings")])
 		self.total_deduction = sum([self.get_active_amount(rec) for rec in self.get("deductions")])
 		self.net_pay = flt(self.total_earning) - flt(self.total_deduction)
-		# self.total_earning = flt(total_earning)
-		# self.total_deduction = flt(total_deduction)
-		# self.net_pay = flt(total_earning)-flt(total_deduction)
-
+	
 		if flt(self.total_earning)-flt(self.total_deduction) < 0 and not self.get('__unsaved'):
 			frappe.throw(_("Total deduction cannot be more than total earning"), title="Invalid Data")
 		return del_list_all
 
 def roundoff_two_dec(amount: Union[float, int, None]) -> float:
-    return round(amount, 2) if amount is not None else 0.00
+	return round(amount, 2) if amount is not None else 0.00
 
 def roundoff(amount):
 	if amount:
@@ -829,6 +651,8 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 		calc_map = {}
 		for key in ('earnings', 'deductions'):
 			for d in source.get(key):
+				if d.salary_component == "Semso":
+					continue
 				amount = flt(d.amount)
 				deductible_amt = 0.0
 				deducted_amt = 0.0
@@ -916,33 +740,54 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 					'bank_account_type': d.bank_account_type,
 					'bank_branch': d.bank_branch,
 				})
-		#Getting Approved OTs
-		# ot_details = frappe.db.sql("""select  * from `tabOvertime Application` where docstatus = 1 and employee = '{0}' 
-		# 	and processed = 0 and workflow_state = 'Approved' and posting_date <= '{1}'""".format(source.employee, end_date), as_dict =1)
-		# # frappe.throw(str(ot_details))
-		# total_overtime_amount = 0.0
-		# for d in ot_details:
-		# 	row = target.append("ot_items",{})
-		# 	row.reference	= d.name
-		# 	row.ot_date	  = d.posting_date
-		# 	row.hourly_rate  = d.rate
-		# 	row.total_hours  = d.total_hours
-		# 	row.total_amount = d.total_amount
-		# 	total_overtime_amount += flt(d.total_amount)
-		# target.ot_total = round(flt(total_overtime_amount))
-		# if total_overtime_amount:
-		# 	calc_map['earnings'].append({
-		# 		'salary_component': 'Overtime Allowance',
-		# 		'from_date' : start_date,
-		# 		'to_date': end_date,
-		# 		'amount': round(flt(total_overtime_amount)),
-		# 		'default_amount': round(flt(total_overtime_amount)),
-		# 		'total_days_in_month' : flt(days_in_month),
-		# 		'working_days': flt(working_days),
-		# 		'leave_without_pay': flt(lwp),
-		# 		'payment_days': flt(payment_days)
-		# 		})
-		# #ends ot logic
+		semso_total = frappe.db.sql("""
+			SELECT 
+				child.employee,
+				MAX(child.name1) as name1,
+				MAX(child.grade) as grade,
+				COALESCE(SUM(child.amount), 0) as amount,
+				MAX(parent.spouse_semso) as spouse_semso
+			FROM `tabSemso Contribution Item` child
+			JOIN `tabSemso Entry` parent
+				ON child.parent = parent.name
+			WHERE parent.docstatus = 1
+				AND child.employee = %s
+				AND parent.company = %s
+				AND parent.fiscal_year = %s
+				AND CASE parent.month
+					WHEN 'January' THEN '01'
+					WHEN 'February' THEN '02'
+					WHEN 'March' THEN '03'
+					WHEN 'April' THEN '04'
+					WHEN 'May' THEN '05'
+					WHEN 'June' THEN '06'
+					WHEN 'July' THEN '07'
+					WHEN 'August' THEN '08'
+					WHEN 'September' THEN '09'
+					WHEN 'October' THEN '10'
+					WHEN 'November' THEN '11'
+					WHEN 'December' THEN '12'
+					ELSE parent.month
+				END = %s
+			GROUP BY child.employee
+		""", (source.employee, target_doc.company, target_doc.fiscal_year, target_doc.month), as_dict=True)
+
+		if semso_total:
+			for d in semso_total:
+				# row = target.append("semso_allocated_item", {})
+				# row.employee = d.employee
+				# row.name1 = d.name1
+				# row.grade = d.grade
+				# row.amount = d.amount  # This will be 60.00 (sum of 50+10)
+				if d.amount:
+					component = "Spouse Semso" if cint(d.spouse_semso) else "Semso"
+					calc_map['deductions'].append({
+						'salary_component': component,
+						'amount': round(flt(d.amount)),
+						'default_amount': round(flt(d.amount)),
+					})
+
+			
 
 		for e in calc_map['earnings']:
 			if e['salary_component'] == 'Basic Pay':
@@ -988,7 +833,7 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 					health_cont_amt = flt(gross_amt)*flt(settings.get("health_contribution"))*0.01
 					calc_amt = roundoff(health_cont_amt)
 					d['amount'] = calc_amt
-     
+	 
 		# Calculating Salary Tax
 		tax_included = 0
 		for d in calc_map['deductions']:
@@ -997,8 +842,9 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 			else:
 				if d['salary_component'] == 'Salary Tax':
 					if not tax_included:
-						if target.employee_group == "Civilan (MOF)":
-							tax_amt = get_salary_tax(math.floor(flt(gross_amt)-flt(pf_amt)-flt(gis_amt)))
+						if target.employee_group in ["Officer (RBA)","Civilan (RBA)","Troops (RBA)","Troops (RBG)",
+								"Officer (RBG)","Civilan (RBG)"]:
+							tax_amt = get_salary_tax(math.floor(flt(basic_amt)-flt(pf_amt)-flt(gis_amt)))
 							tax_amt = roundoff(tax_amt)
 							d['amount'] = flt(tax_amt)
 							tax_included = 1
@@ -1008,10 +854,34 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 							d['amount'] = flt(0)
 							tax_included = 1
 						else:
-							tax_amt = get_salary_tax(math.floor(flt(basic_amt) - flt(gis_amt) - flt(pf_amt)))
+							tax_amt = get_salary_tax(math.floor(flt(gross_amt) - flt(gross_amt) *flt(0.15)))
 							tax_amt = roundoff(tax_amt)
 							d['amount'] = flt(tax_amt)
-							tax_included = 1				
+							tax_included = 1	
+				#tax_included = 0
+				# if d['salary_component'] == 'Salary Tax':
+				# 	if self.employee_group in ["Officer (RBA)","Civilan (RBA)","Troops (RBA)","Troops (RBG)",
+				# 				"Officer (RBG)","Civilan (RBG)"]:
+				# 		calc_amt = get_salary_tax(math.floor(flt(basic_pay)-flt(pf_amt)-flt(gis_amt)))
+				# 		calc_amt = roundoff(calc_amt)
+				# 		total_deduction += calc_amt
+				# 		calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(calc_amt)})
+				# 		tax_included = 1
+				# 	# elif self.employee_group in ["Deceased (2003)", "Deceased (2012)"]:
+				# 	elif self.employee_group in ["Deceased (2003)", "Deceased (2015)"]:
+				# 		# # return
+				# 		calc_amt = get_salary_tax(math.floor(flt(total_earning)-flt(pf_amt)-flt(gis_amt)))
+				# 		calc_amt = roundoff(calc_amt)
+				# 		total_deduction += calc_amt
+				# 		calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(0)})
+				# 		tax_included = 1
+					
+				# 	else:
+				# 		tax_amt = get_salary_tax(math.floor(flt(total_earning) - (flt(total_earning) * 0.15)))
+				# 		tax_amt = roundoff(tax_amt)
+				# 		total_deduction += calc_amt
+				# 		calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(tax_amt)})
+				# 		tax_included = 1			
 				
 		
 		# Appending calculated components to salary slip

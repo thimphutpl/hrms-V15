@@ -7,10 +7,14 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "company",
+  "column_break_vhkc",
+  "posting_date",
   "sb_payroll_period",
   "fiscal_year",
-  "month_name",
   "month",
+  "column_break_ngek",
+  "month_name",
   "section_break_8",
   "branch",
   "department",
@@ -23,8 +27,6 @@
   "salary_increments_created",
   "salary_increments_submitted",
   "section_break0",
-  "posting_date",
-  "company",
   "amended_from"
  ],
  "fields": [
@@ -123,8 +125,7 @@
   },
   {
    "fieldname": "section_break0",
-   "fieldtype": "Section Break",
-   "label": "ADDITIONAL INFORMATION"
+   "fieldtype": "Section Break"
   },
   {
    "default": "Today",
@@ -149,12 +150,20 @@
    "options": "Increment Entry",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "column_break_ngek",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_vhkc",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-11-28 12:19:15.048131",
+ "modified": "2026-05-05 11:50:33.053677",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Increment Entry",

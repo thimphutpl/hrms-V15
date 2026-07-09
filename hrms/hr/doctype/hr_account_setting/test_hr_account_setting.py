@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestSemsoDeductionGroup(FrappeTestCase):
+class TestHRAccountSetting(FrappeTestCase):
 	pass

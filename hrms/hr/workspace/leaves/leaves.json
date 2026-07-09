@@ -9,7 +9,7 @@
  "hide_custom": 0,
  "icon": "non-profit",
  "idx": 0,
- "is_hidden": 0,
+ "is_hidden": 1,
  "label": "Leaves",
  "links": [
   {
@@ -185,7 +185,7 @@
    "type": "Link"
   }
  ],
- "modified": "2023-09-29 16:55:20.281587",
+ "modified": "2026-04-22 09:38:48.272000",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leaves",

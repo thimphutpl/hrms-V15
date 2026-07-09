@@ -10,24 +10,23 @@
   "amended_from",
   "section_break_lsgx",
   "company",
-  "fiscal_year",
-  "column_break_hgaj",
   "branch",
+  "column_break_hgaj",
+  "fiscal_year",
   "month",
+  "section_break_cwxy",
+  "posting_date",
   "section_break_bigd",
-  "semso_type",
-  "column_break_rfca",
-  "amount",
+  "employee_group",
+  "spouse_semso",
   "section_break_rrzd",
   "deceased",
-  "semso_contribution_section",
-  "troops",
-  "officers",
+  "section_break_uhqz",
+  "semso_contributor",
   "section_break_jqrm",
   "get_employee",
   "section_break_gtil",
-  "semso_contribution",
-  "total_amount"
+  "semso_contribution"
  ],
  "fields": [
   {
@@ -51,8 +50,10 @@
   {
    "fieldname": "company",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Company",
-   "options": "Company"
+   "options": "Company",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_hgaj",
@@ -61,41 +62,30 @@
   {
    "fieldname": "branch",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Branch",
-   "options": "Branch"
+   "options": "Branch",
+   "reqd": 1
   },
   {
    "fieldname": "fiscal_year",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Fiscal Year",
-   "options": "Fiscal Year"
+   "options": "Fiscal Year",
+   "reqd": 1
   },
   {
    "fieldname": "month",
-   "fieldtype": "Link",
+   "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Month",
-   "options": "Month"
+   "options": "\nJanuary\nFebruary\nMarch\nApril\nMay\nJune\nJuly\nAugust\nSeptember\nOctober\nNovember\nDecember",
+   "reqd": 1
   },
   {
    "fieldname": "section_break_bigd",
    "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "semso_type",
-   "fieldtype": "Link",
-   "label": "Semso Type",
-   "options": "Semso Deduction Group"
-  },
-  {
-   "fieldname": "column_break_rfca",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fetch_from": "semso_type.amount",
-   "fieldname": "amount",
-   "fieldtype": "Currency",
-   "label": "Amount",
-   "read_only": 1
   },
   {
    "fieldname": "section_break_rrzd",
@@ -106,23 +96,6 @@
    "fieldtype": "Table",
    "label": "Deceased",
    "options": "Deceased Item"
-  },
-  {
-   "fieldname": "semso_contribution_section",
-   "fieldtype": "Section Break",
-   "label": "Semso Contribution"
-  },
-  {
-   "default": "0",
-   "fieldname": "troops",
-   "fieldtype": "Check",
-   "label": "Troops"
-  },
-  {
-   "default": "0",
-   "fieldname": "officers",
-   "fieldtype": "Check",
-   "label": "Officers"
   },
   {
    "fieldname": "section_break_jqrm",
@@ -144,16 +117,43 @@
    "options": "Semso Contribution Item"
   },
   {
-   "fieldname": "total_amount",
-   "fieldtype": "Currency",
-   "label": "Total Amount",
-   "read_only": 1
+   "fieldname": "section_break_cwxy",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "employee_group",
+   "fieldtype": "Link",
+   "label": "Employee Group",
+   "options": "Employee Group Master",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_uhqz",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "semso_contributor",
+   "fieldtype": "Table",
+   "label": "Semso Contributor",
+   "options": "Semso Contribution Items"
+  },
+  {
+   "default": "0",
+   "fieldname": "spouse_semso",
+   "fieldtype": "Check",
+   "label": "Spouse Semso"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-04-16 19:51:02.280666",
+ "modified": "2026-06-26 15:23:56.295815",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Semso Entry",

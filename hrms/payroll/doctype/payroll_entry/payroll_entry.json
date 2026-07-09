@@ -107,12 +107,14 @@
   {
    "fieldname": "branch",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Branch",
    "options": "Branch"
   },
   {
    "fieldname": "department",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Department",
    "options": "Department"
   },
@@ -123,6 +125,7 @@
   {
    "fieldname": "designation",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Designation",
    "options": "Designation"
   },
@@ -312,8 +315,7 @@
    "fieldname": "processing_branch",
    "fieldtype": "Link",
    "label": "Processing Branch",
-   "options": "Branch",
-   "reqd": 1
+   "options": "Branch"
   },
   {
    "fieldname": "sb_payroll_period",
@@ -367,7 +369,7 @@
  "icon": "fa fa-cog",
  "is_submittable": 1,
  "links": [],
- "modified": "2026-04-13 13:59:22.521559",
+ "modified": "2026-06-26 10:12:24.251805",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Payroll Entry",

@@ -9,14 +9,15 @@
   "employee",
   "name1",
   "grade",
-  "amount"
+  "amount",
+  "base_amount"
  ],
  "fields": [
   {
    "fieldname": "employee",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Employee",
+   "label": "Employee ID",
    "read_only": 1
   },
   {
@@ -39,13 +40,21 @@
    "fieldname": "amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Amount"
+   "label": "Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "base_amount",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Base Amount",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-04-16 20:17:54.625599",
+ "modified": "2026-05-03 15:19:31.300521",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Semso Contribution Item",

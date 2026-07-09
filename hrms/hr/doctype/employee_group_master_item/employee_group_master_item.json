@@ -14,16 +14,17 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Grade",
-   "options": "Employee Grade"
+   "options": "Employee Grade",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-04-16 15:26:55.883932",
+ "modified": "2026-05-02 11:06:05.037502",
  "modified_by": "Administrator",
  "module": "HR",
- "name": "Semso Item",
+ "name": "Employee Group Master Item",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "creation",

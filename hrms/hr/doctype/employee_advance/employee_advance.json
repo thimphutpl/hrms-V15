@@ -10,10 +10,13 @@
   "naming_series",
   "employee",
   "employee_name",
+  "branch",
+  "advance_type",
   "column_break_4",
   "posting_date",
   "company",
   "department",
+  "cost_center",
   "currency_section",
   "currency",
   "column_break_crso",
@@ -22,10 +25,16 @@
   "purpose",
   "column_break_11",
   "advance_amount",
+  "no_of_installments",
+  "deduction_amount",
   "paid_amount",
   "pending_amount",
   "claimed_amount",
   "return_amount",
+  "section_break_titd",
+  "recovery_start_date",
+  "column_break_cfod",
+  "recovery_end_date",
   "section_break_7",
   "column_break_18",
   "advance_account",
@@ -34,8 +43,12 @@
   "repay_unclaimed_amount_from_salary",
   "more_info_section",
   "status",
+  "journal_entry",
+  "journal_entry_html",
+  "journal_entry_status",
   "column_break_kimx",
-  "amended_from"
+  "amended_from",
+  "salary_structure"
  ],
  "fields": [
   {
@@ -140,7 +153,6 @@
    "fieldtype": "Link",
    "label": "Company",
    "options": "Company",
-   "read_only": 1,
    "reqd": 1
   },
   {
@@ -237,11 +249,88 @@
   {
    "fieldname": "column_break_crso",
    "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "no_of_installments",
+   "fieldtype": "Int",
+   "label": "No. of Installments"
+  },
+  {
+   "fieldname": "section_break_titd",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "recovery_start_date",
+   "fieldtype": "Date",
+   "label": "Recovery Start Date"
+  },
+  {
+   "fieldname": "column_break_cfod",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "recovery_end_date",
+   "fieldtype": "Date",
+   "label": "Recovery End Date"
+  },
+  {
+   "fieldname": "deduction_amount",
+   "fieldtype": "Currency",
+   "label": "Deduction Amount",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.branch",
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch"
+  },
+  {
+   "fetch_from": "branch.cost_center",
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "journal_entry",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Journal Entry",
+   "options": "Journal Entry"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "journal_entry_status",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Journal Entry Status"
+  },
+  {
+   "fieldname": "journal_entry_html",
+   "fieldtype": "HTML",
+   "label": "Journal Entry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "salary_structure",
+   "fieldtype": "Link",
+   "label": "Salary Structure",
+   "options": "Salary Structure"
+  },
+  {
+   "fieldname": "advance_type",
+   "fieldtype": "Select",
+   "label": "Advance Type",
+   "options": "Employee Advance"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-04-12 12:53:55.442187",
+ "modified": "2026-06-29 15:04:37.068793",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Advance",

@@ -312,9 +312,11 @@ def get_salary_tax(gross_amt):
 	if not (gross_amt or max_limit):
 		return tax_amount
 	max_amount = flt(max_limit[0][0])
+	# frappe.msgprint(str(gross_amt) + " - " + str(max_amount))
 
 	if flt(gross_amt) > flt(max_amount):
 		tax_amount = ((flt(gross_amt) - 125000.00) * 0.30) + 20208.00
+		frappe.throw(str(tax_amount))
 	else:
 		result = frappe.db.sql("""select ifnull(b.tax,0) from
 			`tabIncome Tax Slab` a, `tabTaxable Salary Slab` b
@@ -444,3 +446,25 @@ def update_suspension_record():
 		emp.save()
 		
 	
+@frappe.whitelist()
+def get_basic_and_gross_pay(employee, effective_date):
+	SalaryStructure = frappe.qb.DocType("Salary Structure")
+	SalaryDetail = frappe.qb.DocType("Salary Detail")
+	query = (
+		frappe.qb.from_(SalaryStructure)
+		.join(SalaryDetail)
+		.on(SalaryStructure.name == SalaryDetail.parent)
+		.select(
+			SalaryStructure.net_pay, 
+			SalaryStructure.total_earning, 
+			SalaryDetail.amount.as_("basic_pay")
+		)
+		.where(
+			(SalaryStructure.is_active == "Yes")
+			& (SalaryStructure.employee == employee)
+			& (SalaryDetail.salary_component == "Basic Salary")
+		)
+	)
+	
+	results = query.run(as_dict=True)
+	return results[0] if results else None

@@ -21,7 +21,7 @@ class SalaryIncrement(Document):
 		self.validate_increment()
 
 	def on_submit(self):
-		self.update_increment(self.new_basic)
+		self.update_increment(self.new_basic,self.remaining_balance)
 
 	def on_cancel(self):
 		self.update_increment(self.old_basic)
@@ -30,21 +30,60 @@ class SalaryIncrement(Document):
 		month_id = list(calendar.month_name).index(self.month)
 		return str(month_id).rjust(2,"0")
 
-	def update_increment(self, amount=0):
+	def update_increment(self, amount=0,remaining_balance=0):
 		if self.salary_structure and amount:
 			sst = frappe.get_doc("Salary Structure", self.salary_structure)
-			sst.update_salary_structure(amount)
+			sst.update_salary_structure(amount,remaining_balance)
+
+			if remaining_balance:
+				found = False
+				for d in sst.earnings:
+				
+					if d.salary_component == "Personal Pay":
+						d.amount = remaining_balance
+						found = True
+
+				if not found:
+					sst.append("earnings", {
+						"salary_component": "Personal Pay",
+						"amount": remaining_balance
+					})
+			else:
+				# Remove Personal Pay if zero
+				sst.earnings = [
+					d for d in sst.earnings
+					if d.salary_component != "Personal Pay"
+				]
 			sst.save(ignore_permissions = True)
    
 	def validate_dates(self):
 		cur_year = getdate(nowdate()).year
 		cur_month= getdate(nowdate()).month
 
-		if int(self.fiscal_year) > int(cur_year):
-			frappe.throw(_("Salary Increment not allowed for future years"), title="Invalid Data")
+		# if int(self.fiscal_year) > int(cur_year):
+		# 	frappe.throw(_("Salary Increment not allowed for future years"), title="Invalid Data")
 
-		if int(self.fiscal_year) < int(cur_year):
-			frappe.throw(_("Salary Increment not allowed for past years"), title="Invalid Data")
+		# if int(self.fiscal_year) < int(cur_year):
+		# 	frappe.throw(_("Salary Increment not allowed for past years"), title="Invalid Data")
+		today = getdate(nowdate())
+
+		fy_doc = frappe.get_doc("Fiscal Year", self.fiscal_year)
+
+		start_date = getdate(fy_doc.year_start_date)
+		end_date = getdate(fy_doc.year_end_date)
+
+		if today < start_date:
+			frappe.throw(
+				_("Salary Increment not allowed for future Fiscal Year"),
+				title="Invalid Data"
+			)
+
+		# Past FY
+		if today > end_date:
+			frappe.throw(
+				_("Salary Increment not allowed for past Fiscal Year"),
+				title="Invalid Data"
+			)
 	
 	def validate_increment(self):
 		if self.employee and not frappe.db.exists("Employee", {"name": self.employee, "increment_cycle": self.month}):
@@ -96,7 +135,23 @@ class SalaryIncrement(Document):
 	# Following method created by SHIV on 2018/10/10
 	def get_employee_payscale(self):
 		self.reset_amounts()
-		effective_date = "-".join([self.fiscal_year, self.get_month_id(), "01"])
+		# effective_date = "-".join([self.fiscal_year, self.get_month_id(), "01"])
+
+
+		fy = frappe.get_doc("Fiscal Year", self.fiscal_year)
+
+		month = int(self.get_month_id())
+
+		start_date = getdate(fy.year_start_date)
+		end_date = getdate(fy.year_end_date)
+
+		# Determine which calendar year the month belongs to
+		if month >= start_date.month:
+			year = start_date.year
+		else:
+			year = end_date.year
+
+		effective_date = f"{year}-{month:02d}-01"
 
 		if self.employee:
 			self.update_employee_details()
@@ -138,19 +193,7 @@ class SalaryIncrement(Document):
 				self.new_basic = flt(self.old_basic) + flt(self.increment)
 				if flt(self.new_basic) > flt(self.payscale_maximum):
 					self.new_basic = flt(self.payscale_maximum)
-				'''
-				# Calculating increment
-				if flt(self.total_months) >= flt(self.minimum_months):
-					self.calculated_factor    = 1 if flt(self.total_months)/12 >= 1 else round(flt(self.total_months if cint(group_doc.increment_prorated) else 12)/12,2)				
-					self.calculated_increment = (flt(self.old_basic)*flt(self.payscale_increment)*0.01) if self.payscale_increment_method == 'Percent' else flt(self.payscale_increment)
-					if cint(group_doc.increment_prorated):
-						self.calculated_increment = round((flt(self.calculated_increment)/12)*(flt(self.total_months) if flt(self.total_months) < 12 else 12))
-						
-					self.increment = flt(self.calculated_increment)
-					self.new_basic = flt(self.old_basic) + flt(self.increment)
-				else:
-					self.new_basic = flt(self.old_basic)
-				'''
+				
 				
 
 def get_salary_structure(employee, effective_date):
@@ -161,7 +204,8 @@ def get_salary_structure(employee, effective_date):
 			and ifnull(to_date,'{1}') >= '{1}'
 			and from_date <= ifnull(to_date,'{1}') 
 			order by ifnull(to_date,'{1}'),from_date desc limit 1
-		""".format(employee,str(effective_date)))
+		""".format(employee, str(effective_date)))
+	# frappe.throw(str(effective_date))
 
 	if sst:
 		return sst[0][0]

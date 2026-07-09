@@ -41,60 +41,7 @@ frappe.ui.form.on("Employee Advance", {
 	},
 
 	refresh: function (frm) {
-		if (
-			frm.doc.docstatus === 1 &&
-			flt(frm.doc.paid_amount) < flt(frm.doc.advance_amount) &&
-			frappe.model.can_create("Payment Entry")
-		) {
-			frm.add_custom_button(
-				__("Payment"),
-				function () {
-					frm.events.make_payment_entry(frm);
-				},
-				__("Create"),
-			);
-		} else if (
-			frm.doc.docstatus === 1 &&
-			flt(frm.doc.claimed_amount) < flt(frm.doc.paid_amount) - flt(frm.doc.return_amount) &&
-			frappe.model.can_create("Expense Claim")
-		) {
-			frm.add_custom_button(
-				__("Expense Claim"),
-				function () {
-					frm.events.make_expense_claim(frm);
-				},
-				__("Create"),
-			);
-		}
-
-		if (
-			frm.doc.docstatus === 1 &&
-			flt(frm.doc.claimed_amount) < flt(frm.doc.paid_amount) - flt(frm.doc.return_amount)
-		) {
-			if (
-				frm.doc.repay_unclaimed_amount_from_salary == 0 &&
-				frappe.model.can_create("Journal Entry")
-			) {
-				frm.add_custom_button(
-					__("Return"),
-					function () {
-						frm.trigger("make_return_entry");
-					},
-					__("Create"),
-				);
-			} else if (
-				frm.doc.repay_unclaimed_amount_from_salary == 1 &&
-				frappe.model.can_create("Additional Salary")
-			) {
-				frm.add_custom_button(
-					__("Deduction from Salary"),
-					function () {
-						frm.events.make_deduction_via_additional_salary(frm);
-					},
-					__("Create"),
-				);
-			}
-		}
+		refresh_html(frm);
 	},
 
 	make_deduction_via_additional_salary: function (frm) {
@@ -168,6 +115,127 @@ frappe.ui.form.on("Employee Advance", {
 
 	employee: function (frm) {
 		if (frm.doc.employee) frm.trigger("get_employee_currency");
+		if (frm.doc.employee) {
+			// frm.trigger("set_approver")
+			// frappe.call({
+			// 	method: "validate_employment_status",
+			// 	doc: frm.doc
+			// })
+			frappe.run_serially([
+				// () => frm.trigger('get_pending_amount'),
+				// () => frm.trigger('set_pay_details'),
+				() => frm.trigger('set_start_end_dates'),
+				() => frm.trigger('set_monthly_deduction_amount'),
+				//() => frm.trigger('get_accumulated_advance_amount_from_employee_advance')
+			]);
+		}
+	},
+
+
+	// 	set_approver: function (frm) {
+	// 	if (frm.doc.employee) {
+	// 		console.log("hi")
+	// 		return frappe.call({
+	// 			method: "hrms.hr.hr_custom_function.get_approver",
+	// 			args: {
+	// 				employee: frm.doc.employee,
+	// 			},
+	// 			callback: function (r) {
+	// 				if (r && r.message) {
+	// 					frm.set_value("approver", r.message);
+	// 				}
+	// 			},
+	// 		});
+	// 	}
+	// },
+	posting_date: function (frm) {
+		if (frm.doc.employee) {
+			frappe.run_serially([
+				() => frm.trigger('set_monthly_deduction_amount'),
+			]);
+		}
+	},
+
+	
+	no_of_installments: function (frm) {
+		if (frm.doc.employee) {
+			frappe.run_serially([
+				() => frm.trigger('set_monthly_deduction_amount'),
+			]);
+		}
+	},
+
+	advance_amount: function (frm) {
+		if (frm.doc.employee) {
+			frappe.run_serially([
+				() => frm.trigger('set_monthly_deduction_amount'),
+			]);
+		}
+	},
+
+	set_start_date: function (frm) {		
+		frappe.call({
+			method: "get_start_date",
+			doc: frm.doc,
+			callback: function (r) {
+				if (r.message) {
+					in_progress = true;
+					frm.set_value("recovery_start_date", r.message.start_date);
+				}
+			},
+		});
+	},
+
+	set_start_end_dates: function (frm) {		
+		frappe.call({
+			method: "get_start_end_dates",
+			doc: frm.doc,
+			callback: function (r) {
+				if (r.message) {
+					in_progress = true;
+					frm.set_value("recovery_start_date", r.message.start_date);
+					frm.set_value("recovery_end_date", r.message.end_date);
+				}
+			},
+		});
+	},
+
+	set_monthly_deduction_amount: function (frm) {	
+		frappe.call({
+			method: "calculate_amount",
+			doc: frm.doc,
+			callback: function (r) {
+				if (r.message) {
+					in_progress = true;
+					frm.set_value("deduction_amount", r.message);
+				}
+			},
+		});
+	},
+
+	get_pending_amount: function(frm) {
+		frappe.call({
+			method: "hrms.hr.doctype.employee_advance.employee_advance.get_pending_amount",
+			args: {
+				"employee": frm.doc.employee,
+				"posting_date": frm.doc.posting_date
+			},
+			callback: function(r) {
+				frm.set_value("pending_amount", r.message);
+			}
+		});
+	},
+
+	
+
+	set_default_no_of_installments: function(frm){
+		frappe.call({
+			method: "set_default_no_of_installments",
+			doc: frm.doc,
+			callback: function(r) {
+				frm.refresh_field("no_of_installments");
+			}
+		})
 	},
 
 	get_employee_currency: function (frm) {
@@ -222,3 +290,13 @@ frappe.ui.form.on("Employee Advance", {
 		});
 	},
 });
+var refresh_html = function(frm){
+	var journal_entry_status = "";
+	if(frm.doc.journal_entry_status){
+		journal_entry_status = '<div style="font-style: italic; font-size: 0.8em; ">* '+frm.doc.journal_entry_status+'</div>';
+	}
+	
+	if(frm.doc.journal_entry){
+		$(cur_frm.fields_dict.journal_entry_html.wrapper).html('<label class="control-label" style="padding-right: 0px;">Journal Entry</label><br><b>'+'<a href="/desk/Form/Journal Entry/'+frm.doc.journal_entry+'">'+frm.doc.journal_entry+"</a> "+"</b>"+journal_entry_status);
+	}	
+}

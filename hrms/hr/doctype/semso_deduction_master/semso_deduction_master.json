@@ -1,0 +1,118 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:emp_group",
+ "creation": "2026-05-02 09:59:57.168140",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_vlzd",
+  "amended_from",
+  "company",
+  "section_break_sqlk",
+  "emp_group",
+  "base_on_section",
+  "employee_group",
+  "column_break_jksk",
+  "employee_grade",
+  "section_break_ezph",
+  "semso_employee_grade",
+  "amount"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_vlzd",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Semso Deduction Master",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "base_on_section",
+   "fieldtype": "Section Break",
+   "label": "Base On"
+  },
+  {
+   "default": "0",
+   "fieldname": "employee_group",
+   "fieldtype": "Check",
+   "label": "Employee Group "
+  },
+  {
+   "fieldname": "column_break_jksk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "employee_grade",
+   "fieldtype": "Check",
+   "label": "Employee Grade"
+  },
+  {
+   "fieldname": "section_break_ezph",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "label": "Amount"
+  },
+  {
+   "fieldname": "semso_employee_grade",
+   "fieldtype": "Table",
+   "label": "Employee Grade",
+   "options": "Semso Employee Grade"
+  },
+  {
+   "fieldname": "section_break_sqlk",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "emp_group",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Employee Group",
+   "options": "Employee Group Master",
+   "reqd": 1,
+   "unique": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-05-18 16:27:54.437287",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Semso Deduction Master",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

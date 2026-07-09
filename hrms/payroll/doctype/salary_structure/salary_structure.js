@@ -241,9 +241,6 @@ frappe.ui.form.on('Salary Structure', {
 	eligible_for_pf: function (frm) {
 		calculate_others(frm);
 	},
-	eligible_for_tax: function (frm) {
-		calculate_others(frm);
-	},
 	eligible_for_health_contribution: function (frm) {
 		calculate_others(frm);
 	},

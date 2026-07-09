@@ -41,7 +41,7 @@ def execute(filters=None):
 			ss.cost_center, ss.branch, ss.department,
 						 ss.division, ss.employee_grade, ss.designation, 
 			 ss.fiscal_year, ss.month, ss.leave_withut_pay, ss.payment_days,
-						 status]
+						 status, ss.employee_group,]
 			
 		for e in earning_types:
 			row.append(ss_earning_map.get(ss.name, {}).get(e))
@@ -76,7 +76,8 @@ def get_columns(salary_slips):
 		_("Year") + "::80", _("Month") + "::80", 
 		_("Leave Without Pay") + ":Float:130", 
 		_("Payment Days") + ":Float:120", 
-		_("Status") + "::100"
+		_("Status") + "::100",
+		_("Employee Group") + ":Link/Employee Group:120",
 	]
 	earning_types = []
 	ded_types     = []
@@ -130,6 +131,7 @@ def get_conditions(filters):
 	if filters.get("company"): conditions += " and company = %(company)s"
 	if filters.get("employee"): conditions += " and employee = %(employee)s"
 	if filters.get("employee_group"): conditions += " and employee_group = %(employee_group)s"
+	if filters.get("cost_center"): conditions += " and cost_center = %(cost_center)s"
 	# if filters.get("division"): conditions += " and division = %(division)s"
 	# if filters.get("cost_center"):
 	# 	all_ccs = get_child_cost_centers(filters.cost_center)

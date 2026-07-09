@@ -50,7 +50,9 @@
   "exit_questionnaire_notification_template",
   "attendance_settings_section",
   "allow_employee_checkin_from_mobile_app",
-  "allow_geolocation_tracking"
+  "allow_geolocation_tracking",
+  "sign_and_seal_section",
+  "seal"
  ],
  "fields": [
   {
@@ -324,13 +326,23 @@
    "in_list_view": 1,
    "label": "Return Day DSA (%)",
    "options": "\n100\n70\n50\n20\n0"
+  },
+  {
+   "fieldname": "sign_and_seal_section",
+   "fieldtype": "Section Break",
+   "label": "Sign and Seal"
+  },
+  {
+   "fieldname": "seal",
+   "fieldtype": "Attach Image",
+   "label": "Finance Focal Seal"
   }
  ],
  "icon": "fa fa-cog",
  "idx": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-09-16 23:24:12.101106",
+ "modified": "2026-06-10 10:45:33.133821",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR Settings",

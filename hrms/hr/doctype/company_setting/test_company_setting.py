@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestSemsoAllocatedAmount(FrappeTestCase):
+class TestCompanySetting(FrappeTestCase):
 	pass

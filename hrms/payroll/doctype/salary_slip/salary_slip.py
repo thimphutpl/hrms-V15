@@ -439,6 +439,7 @@ class SalarySlip(TransactionBase):
 		# Ver 1.0 Ends
 		self.update_deduction_balance()
 		self.post_sws_entry()
+		# self.update_semso()
 		self.update_ot()
 
 
@@ -451,6 +452,39 @@ class SalarySlip(TransactionBase):
 		for a in self.ot_items:
 			frappe.db.sql(""" update `tabOvertime Application` set processed = '{0}', salary_slip = '{3}'  where name = '{1}' and employee = '{2}' 
 		""".format(processed, a.reference, self.employee, ss_name))
+	# def update_semso(self, cancel=False):
+	# 	"""
+	# 	Update Semso - mirrors update_ot pattern exactly
+	# 	"""
+	# 	processed = 1
+	# 	ss_name = self.name
+		
+	# 	if cancel:
+	# 		processed = 0
+	# 		ss_name = ''
+		
+	# 	# Update Semso Allocated Items (like OT)
+	# 	for a in self.semso_allocated_item:
+	# 		if a.name:
+	# 			frappe.db.sql("""
+	# 				UPDATE `tabSemso Allocated Item` 
+	# 				SET processed = %s, salary_slip = %s  
+	# 				WHERE name = %s AND employee = %s
+	# 			""", (processed, ss_name, a.name, self.employee))
+		
+	# 	# Update deductions (remove old, add new)
+	# 	self.deductions = [d for d in self.deductions if d.salary_component != "Semso"]
+		
+	# 	if not cancel:
+	# 		for a in self.semso_allocated_item:
+	# 			if a.amount > 0:
+	# 				self.append('deductions', {
+	# 					'salary_component': 'Semso',
+	# 					'amount': a.amount
+	# 				})
+		
+	# 	self.calculate_net_pay()
+			
 
 	def post_sws_entry(self):
 		sws = frappe.db.get_single_value("SWS Settings", "salary_component")

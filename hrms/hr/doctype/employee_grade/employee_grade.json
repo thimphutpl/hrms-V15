@@ -8,19 +8,19 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "company",
   "default_salary_structure",
   "default_leave_policy",
   "currency",
   "default_base_pay",
-  "government_grade",
   "maximum_grade",
   "column_break_vaoa",
-  "company",
   "sub_level",
   "gis",
   "dsa_per_day",
   "sws_contribution",
   "retirement_age",
+  "government_grade",
   "pay_scale_section",
   "lower_limit",
   "column_break_tgfh",
@@ -42,7 +42,13 @@
   "ltc",
   "hra",
   "orderly_allowance",
-  "lumpsum_revision"
+  "lumpsum_revision",
+  "deductions_section",
+  "kanjur_deduction",
+  "relieving_fund_deduction",
+  "column_break_iatc",
+  "medical_deduction",
+  "grade"
  ],
  "fields": [
   {
@@ -223,19 +229,49 @@
   {
    "fieldname": "company",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "Company",
-   "options": "Company"
+   "options": "Company",
+   "reqd": 1
   },
   {
    "fieldname": "batman_allowance",
    "fieldtype": "Currency",
    "label": "Batman Allowance"
+  },
+  {
+   "fieldname": "deductions_section",
+   "fieldtype": "Section Break",
+   "label": "Deductions"
+  },
+  {
+   "fieldname": "kanjur_deduction",
+   "fieldtype": "Currency",
+   "label": "Kanjur Deduction"
+  },
+  {
+   "fieldname": "relieving_fund_deduction",
+   "fieldtype": "Currency",
+   "label": "Relieving Fund Deduction"
+  },
+  {
+   "fieldname": "column_break_iatc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "medical_deduction",
+   "fieldtype": "Currency",
+   "label": "Medical Deduction"
+  },
+  {
+   "fieldname": "grade",
+   "fieldtype": "Link",
+   "label": "Employee Group",
+   "options": "Employee Group"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-04-07 11:17:46.604080",
+ "modified": "2026-05-02 16:25:01.456202",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Grade",

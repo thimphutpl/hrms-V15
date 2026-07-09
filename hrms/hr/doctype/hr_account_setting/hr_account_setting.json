@@ -1,0 +1,244 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-06-17 14:50:54.879757",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "company",
+  "salary_payable_account",
+  "salary_tax_account",
+  "overtime_allowance_account",
+  "employee_contribution_pf",
+  "column_break_hzem",
+  "leave_encashment_account",
+  "pbva_account",
+  "bonus_account",
+  "ltc_account",
+  "section_break_qlky",
+  "travel_incountry_account",
+  "travel_outcountry_account",
+  "column_break_zqzp",
+  "meeting_and_seminars_in_account",
+  "meeting_and_seminars_out_account",
+  "column_break_tjbi",
+  "training_incountry_account",
+  "training_outcountry_account",
+  "section_break_14",
+  "employee_advance_travel",
+  "column_break_obiy",
+  "employee_advance_salary",
+  "sws_accounts_settings_section",
+  "sws_credit_account",
+  "payable_account_section",
+  "leave_encashment_payable",
+  "column_break_zsqv",
+  "travel_claim_payable"
+ ],
+ "fields": [
+  {
+   "fieldname": "salary_payable_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Salary Payable Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "salary_tax_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Salary Tax Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "overtime_allowance_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Overtime Allowance Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "employee_contribution_pf",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Employer Contribution To PF",
+   "options": "Account"
+  },
+  {
+   "fieldname": "column_break_hzem",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "leave_encashment_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Leave Encashment Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "pbva_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "PBVA Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "bonus_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Bonus Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "ltc_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "LTC Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "section_break_qlky",
+   "fieldtype": "Section Break",
+   "label": "Travel/Training Accounts Settings"
+  },
+  {
+   "fieldname": "travel_incountry_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Tavel In-Country Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "travel_outcountry_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Tavel Out-Country Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "column_break_zqzp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "meeting_and_seminars_in_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Meeting &Seminars Account (In-Country)",
+   "options": "Account"
+  },
+  {
+   "fieldname": "meeting_and_seminars_out_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Meeting & Seminars Account (Out-Country)",
+   "options": "Account"
+  },
+  {
+   "fieldname": "column_break_tjbi",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "training_incountry_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Training In-Country Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "training_outcountry_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Training Out-Country Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "section_break_14",
+   "fieldtype": "Section Break",
+   "label": "Advance Accounts Settings"
+  },
+  {
+   "fieldname": "employee_advance_travel",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Advance To Employee (Travel) Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "column_break_obiy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "employee_advance_salary",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Advance To Employee (Salary) Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "sws_accounts_settings_section",
+   "fieldtype": "Section Break",
+   "label": "SWS Accounts Settings"
+  },
+  {
+   "fieldname": "sws_credit_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "SWS Credit Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "payable_account_section",
+   "fieldtype": "Section Break",
+   "label": "Payable Accounts Settings"
+  },
+  {
+   "fieldname": "leave_encashment_payable",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Leave Encashment Payable",
+   "options": "Account"
+  },
+  {
+   "fieldname": "column_break_zsqv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "travel_claim_payable",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Travel Claim Payable",
+   "options": "Account"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-06-17 16:05:26.329174",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "HR Account Setting",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

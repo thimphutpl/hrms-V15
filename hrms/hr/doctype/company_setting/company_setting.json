@@ -1,0 +1,179 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:{company}",
+ "creation": "2026-05-12 14:12:15.750984",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "company",
+  "revenue_receipts_and_remittances_section",
+  "tax_on_salary",
+  "column_break_naug",
+  "tax_deducted",
+  "column_break_labk",
+  "house_rent",
+  "column_break_twze",
+  "health_contribution",
+  "section_break_npwh",
+  "sale_proceed",
+  "column_break_raoz",
+  "interest_on_loan",
+  "column_break_uvbk",
+  "departmental_and_supervision_charge",
+  "column_break_nkbt",
+  "other_revenue",
+  "section_break_kwqc",
+  "retention_account",
+  "column_break_blhg",
+  "tds_account",
+  "sign_and_seal_section",
+  "seal"
+ ],
+ "fields": [
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "revenue_receipts_and_remittances_section",
+   "fieldtype": "Section Break",
+   "label": "Revenue Receipts and Remittances"
+  },
+  {
+   "fieldname": "tax_on_salary",
+   "fieldtype": "Link",
+   "label": "Tax on Salary",
+   "options": "Account"
+  },
+  {
+   "fieldname": "column_break_naug",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tax_deducted",
+   "fieldtype": "Link",
+   "label": "Tax Deducted",
+   "options": "Account"
+  },
+  {
+   "fieldname": "column_break_labk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "house_rent",
+   "fieldtype": "Link",
+   "label": "House Rent",
+   "options": "Account"
+  },
+  {
+   "fieldname": "column_break_twze",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "health_contribution",
+   "fieldtype": "Link",
+   "label": "Health Contribution ",
+   "options": "Account"
+  },
+  {
+   "fieldname": "section_break_npwh",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "sale_proceed",
+   "fieldtype": "Link",
+   "label": "Sale Proceed",
+   "options": "Account"
+  },
+  {
+   "fieldname": "column_break_raoz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "interest_on_loan",
+   "fieldtype": "Link",
+   "label": "Interest on Loan",
+   "options": "Account"
+  },
+  {
+   "fieldname": "column_break_uvbk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "departmental_and_supervision_charge",
+   "fieldtype": "Link",
+   "label": "Departmental and Supervision Charge",
+   "options": "Account"
+  },
+  {
+   "fieldname": "column_break_nkbt",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "other_revenue",
+   "fieldtype": "Link",
+   "label": "Other Revenue",
+   "options": "Account"
+  },
+  {
+   "fieldname": "section_break_kwqc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "retention_account",
+   "fieldtype": "Link",
+   "label": "Retention Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "column_break_blhg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tds_account",
+   "fieldtype": "Link",
+   "label": "TDS Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "sign_and_seal_section",
+   "fieldtype": "Section Break",
+   "label": "Sign and Seal"
+  },
+  {
+   "fieldname": "seal",
+   "fieldtype": "Attach Image",
+   "label": "Finance Focal Seal"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-06-11 10:34:25.881544",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Company Setting",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

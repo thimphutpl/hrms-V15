@@ -45,5 +45,11 @@ frappe.query_reports["Monthly Salary Register"] = {
 			"options": "\nAll\nDraft\nSubmitted\nCancelled",
 			"default": "All"
 		},
+		{
+			"fieldname": "cost_center",
+			"label": __("Cost Center"),
+			"fieldtype": "Link",
+			"options": "Cost Center",
+		},
 	]
 };

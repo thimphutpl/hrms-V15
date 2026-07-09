@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-# Copyright (c) 2017, Frappe Technologies Pvt. Ltd. and contributors
-# For license information, please see license.txt
-
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
@@ -44,7 +40,7 @@ class IncrementEntry(Document):
 		cond += self.get_joining_relieving_condition()
 		data = []
 		emp_list = frappe.db.sql("""
-			select t1.name as employee, t1.employee_name, t1.grade, t1.department, t1.designation
+			select t1.name as employee, t1.employee_name, t1.grade,t1.designation
 			from `tabEmployee` t1
 			where t1.status = 'Active'
 			and t1.increment_cycle = '{}' 
@@ -63,7 +59,7 @@ class IncrementEntry(Document):
 		""".format(self.month_name, self.fiscal_year, self.month_name, cond), as_dict=True)
 		if emp_list:
 			for a in emp_list:
-				new_basic, increment, old_basic = self.get_employee_payscale(a.employee)
+				new_basic, increment, old_basic,remaining_balance  = self.get_employee_payscale(a.employee)
 				data.append({
 					"employee": a.employee,
 					"employee_name": a.employee_name,
@@ -72,7 +68,8 @@ class IncrementEntry(Document):
 					"designation": a.designation,
 					"current_basic_pay": old_basic, 
 					"increment": increment, 
-					"new_basic_pay": new_basic
+					"new_basic_pay": new_basic,
+					"remaining_balance": remaining_balance
 				})
 		return data
 
@@ -94,7 +91,6 @@ class IncrementEntry(Document):
 		""" % {"start_date": self.start_date, "end_date": self.end_date}
 		return cond
 
-	# for the fiscal year format(2025)
 	# following method created by SHIV on 2020/10/20
 	# def set_month_dates(self):
 	# 	months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
@@ -106,8 +102,6 @@ class IncrementEntry(Document):
 	# 	self.start_date = month_start_date
 	# 	self.end_date = month_end_date
 	# 	self.month = month
-
-	# for the fiscal year format(2025-26)
 	def set_month_dates(self):
 		months = ['January', 'February', 'March', 'April', 'May', 'June',
 				'July', 'August', 'September', 'October', 'November', 'December']
@@ -156,6 +150,7 @@ class IncrementEntry(Document):
 				"month": self.month_name
 			})
 			if len(emp_list) > 300:
+
 				# frappe.enqueue(create_salary_increments_for_employees, timeout=600, employees=emp_list, args=args)
 				create_salary_increments_for_employees(emp_list, args, publish_progress=False)
 			else:
@@ -197,6 +192,7 @@ class IncrementEntry(Document):
 			submit_salary_increments_for_employees(self, si_list, publish_progress=False)
 
 	def email_salary_slip(self, submitted_ss):
+		
 		if frappe.db.get_single_value("HR Settings", "email_salary_slip_to_employee"):
 			for ss in submitted_ss:
 				ss.email_salary_slip()
@@ -206,16 +202,19 @@ class IncrementEntry(Document):
 		return str(month_id).rjust(2,"0")
 
 	def get_employee_payscale(self, employee):
-		effective_date = "-".join([self.fiscal_year, self.get_month_id(), "01"])
+		year = str(getdate(self.posting_date).year)
+		effective_date = "-".join([year, self.get_month_id(), "01"])
 		old_basic = 0
 		new_basic = 0
 		increment = 0
 		total_months = 0
+		remaining_balance=0
 		if employee:
 			salary_structure = get_salary_structure(employee,effective_date)
 			if salary_structure:
 				sst_doc = frappe.get_doc("Salary Structure", salary_structure)
 				date_of_reference = sst_doc.from_date if getdate(sst_doc.from_date) < getdate(frappe.db.get_value("Employee",employee,"date_of_joining")) else frappe.db.get_value("Employee", employee, "date_of_joining")
+				# frappe.throw(str(date_of_reference))
 				for d in sst_doc.earnings:
 					if d.salary_component == 'Basic Pay':
 						old_basic = flt(d.amount)
@@ -234,37 +233,29 @@ class IncrementEntry(Document):
 								end
 								) as no_of_months
 				""".format(str(date_of_reference), str(effective_date)))[0][0]
-				
+			
 				# Fetching Payscale from employee grade
 				grade= frappe.get_doc("Employee Grade", frappe.db.get_value("Employee", employee, "grade"))
 				payscale_minimum   = grade.lower_limit
 				payscale_increment_method = grade.increment_method
 				payscale_increment = grade.increment_value
 				payscale_maximum   = grade.upper_limit 
+		
 
-				# added by Dawa Tshering
 				if flt(total_months) >= 12:
 					increment = round(flt(payscale_increment), 0)
 				else:
 					increment = round(flt(payscale_increment)/12 * flt(total_months), 0)
-				new_basic = flt(old_basic) + flt(increment)
-				if flt(new_basic) > flt(payscale_maximum):
-					new_basic = flt(payscale_maximum)
-
-				'''
-				# Calculating increment
-				if flt(total_months) >= flt(minimum_months):
-					calculated_factor    = 1 if flt(total_months)/12 >= 1 else round(flt(total_months if cint(group_doc.increment_prorated) else 12)/12,2)				
-					calculated_increment = (flt(old_basic)*flt(payscale_increment)*0.01) if payscale_increment_method == 'Percent' else flt(payscale_increment)
-					if cint(group_doc.increment_prorated):
-						calculated_increment = round((flt(calculated_increment)/12)*(flt(total_months) if flt(total_months) < 12 else 12))
-						
-					increment = flt(calculated_increment)
-					new_basic = flt(old_basic) + flt(increment)
+				raw_new_basic = flt(old_basic) + flt(increment)
+				if flt(raw_new_basic) > flt(payscale_maximum):
+					# new_basic = flt(payscale_maximum)
+					remaining_balance = flt(raw_new_basic) - flt(payscale_maximum)
+					new_basic = payscale_maximum
 				else:
-					new_basic = flt(old_basic)
-				'''
-				return new_basic, increment, old_basic
+					remaining_balance = 0
+					new_basic = raw_new_basic
+
+				return new_basic, increment, old_basic,remaining_balance
 
 	@frappe.whitelist()
 	def fill_employee_details(self):
@@ -323,14 +314,19 @@ def create_salary_increments_for_employees(employees, args, publish_progress=Tru
 	count=0
 	increment_entry = frappe.get_doc("Increment Entry", args.increment_entry)
 
+
 	for emp in increment_entry.get("employees"):
 		if emp.employee not in salary_increments_exists_for:
 			args.update({
 				"doctype": "Salary Increment",
-				"employee": emp.employee
+				"employee": emp.employee,
 			})
 			si = frappe.get_doc(args)
 			si.get_employee_payscale()
+			si.old_basic = emp.current_basic_pay
+			si.increment = emp.increment
+			si.new_basic = emp.new_basic_pay
+			si.remaining_balance = emp.remaining_balance
 			si.insert()
 			count+=1
 
@@ -360,7 +356,9 @@ def submit_salary_increments_for_employees(increment_entry, salary_increments, p
 	count = 0
 	for si in salary_increments:
 		si_obj = frappe.get_doc("Salary Increment",si[0])
-		if si_obj.increment<0:
+		
+		
+		if not si_obj:
 			not_submitted_si.append(si[0])
 		else:
 			try:

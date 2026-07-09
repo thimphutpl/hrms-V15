@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class SemsoAllocatedItem(Document):
+class CompanySetting(Document):
 	pass

@@ -5,12 +5,21 @@ from frappe import _
 from frappe.utils import flt, getdate, formatdate, cstr
 from operator import itemgetter
 
+# def execute(filters=None):
+# 	validate_filters(filters)
+# 	columns = get_columns()
+# 	data = get_data(filters)
+# 	# frappe.errprint(str(data))
+# 	return columns, data, filters
+
 def execute(filters=None):
 	validate_filters(filters)
 	columns = get_columns()
 	data = get_data(filters)
-	# frappe.errprint(str(data))
-	return columns, data, filters
+
+	# Last value 1 means: do not show Frappe automatic total row
+	# because we already added our own Total row in get_data()
+	return columns, data, None, None, None, 1
 
 #added by Kinzang.n 
 def get_data(filters=None):
@@ -109,12 +118,26 @@ def get_salary_data(filters):
 								r.receipt_date, 
 								r.posting_date
 							FROM `tabSalary Slip` a
-							JOIN `tabTDS Receipt Entry` r ON a.fiscal_year = r.fiscal_year AND a.month = r.month
-							WHERE a.docstatus = 1 AND r.purpose = 'Employee Salary'
+
+							LEFT JOIN (
+								SELECT
+									fiscal_year,
+									month,
+									MAX(receipt_number) AS receipt_number,
+									MAX(receipt_date) AS receipt_date,
+									MAX(posting_date) AS posting_date
+								FROM `tabTDS Receipt Entry`
+								GROUP BY fiscal_year, month
+							) r
+								ON r.fiscal_year = a.fiscal_year
+								AND r.month = a.month
+
+							WHERE a.docstatus = 1
 							AND a.employee = '{employee}' 
 							AND a.fiscal_year = '{fiscal_year}'
-							ORDER BY r.receipt_date ASC
+							ORDER BY a.start_date ASC
 							'''.format(employee=filters.employee, fiscal_year = filters.fiscal_year),as_dict=1):
+							#JOIN `tabTDS Receipt Entry` r ON a.fiscal_year = r.fiscal_year AND a.month = r.month
 
 		data.append({
 			"month_year":d.month_year, 
@@ -132,6 +155,7 @@ def get_salary_data(filters):
 			"receipt_date":d.receipt_date,
 			"posting_date":d.posting_date
 			})
+	# frappe.throw(str(data))
 	return data
 # def get_leave_encashment(filters):
 # 	return frappe.db.sql("""SELECT 

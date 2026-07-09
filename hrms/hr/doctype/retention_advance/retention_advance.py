@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class SemsoItem(Document):
+class RetentionAdvance(Document):
 	pass

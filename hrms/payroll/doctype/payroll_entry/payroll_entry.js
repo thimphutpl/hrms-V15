@@ -143,6 +143,7 @@ frappe.ui.form.on('Payroll Entry', {
 			callback: function(r) {
 				frm.refresh();
 				frm.toolbar.refresh();
+				// frappe.show_progress('Payroll', 10, 100, 'Queued successfully');
 			},
 			freeze: true,
 			freeze_message: '<span style="color:white; background-color: red; padding: 10px 50px; border-radius: 5px;">Creating Salary Slips...</span>'

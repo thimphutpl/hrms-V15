@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class SemsoType(Document):
+class EmployeeGroupMasterItem(Document):
 	pass

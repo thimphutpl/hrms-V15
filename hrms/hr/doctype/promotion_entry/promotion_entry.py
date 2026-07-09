@@ -3,6 +3,7 @@
 
 # import frappe
 from __future__ import unicode_literals
+import calendar
 import frappe
 from frappe.model.document import Document
 from dateutil.relativedelta import relativedelta
@@ -55,6 +56,10 @@ class PromotionEntry(Document):
 		# if self.promotions_submitted == 1:
 		# 	frappe.throw("Please cancel employee promotions first.")
 		self.remove_employee_promotions()
+	def get_month_id(self):
+		month_id = list(calendar.month_name).index(self.month_name)
+		self.month = str(month_id).rjust(2, "0")
+		return self.month
 
 	@frappe.whitelist()
 	def check_increment_cycle(self):
@@ -79,13 +84,30 @@ class PromotionEntry(Document):
 		cond = self.get_filter_condition()
 		# cond += self.get_joining_relieving_condition()
 
-		if not self.fiscal_year or not self.month_name:
-			frappe.throw("Please select Fiscal Year and Month.")
+		# if not self.fiscal_year or not self.month_name:
+		# 	frappe.throw("Please select Fiscal Year and Month.")
 
-		if self.month_name == "January":
-			pe_date = self.fiscal_year+"-01-01"
-		elif self.month_name == "July":
-			pe_date = self.fiscal_year+"-07-01"
+		# if self.month_name == "January":
+		# 	pe_date = self.fiscal_year+"-01-01"
+		# elif self.month_name == "July":
+		# 	pe_date = self.fiscal_year+"-07-01"
+
+
+		fy = frappe.get_doc("Fiscal Year", self.fiscal_year)
+
+		month = int(self.get_month_id())
+
+		start_date = getdate(fy.year_start_date)
+		end_date = getdate(fy.year_end_date)
+
+		# Determine which calendar year the month belongs to
+		if month >= start_date.month:
+			year = start_date.year
+		else:
+			year = end_date.year
+
+		effective_date = f"{year}-{month:02d}-01"
+		# frappe.throw(str(effective_date))
 		# query =	"""
 		# 	select t1.name as employee, t1.employee_name, t1.department, t1.designation, t1.grade as employee_grade
 		# 	from `tabEmployee` t1
@@ -101,10 +123,16 @@ class PromotionEntry(Document):
 		# 	{}
 		# 	order by t1.branch, t1.name
 		# """.format(pe_date, self.month_name, cond)
-		query = """select t1.name as employee, t1.employee_name, t1.department, t1.designation, t1.grade as employee_grade, t1.maximum_grade 
-					from `tabEmployee` t1 
-					where t1.status = 'Active' 
-					and t1.employment_type not in ('Contract','Probation') 
+		query = """
+				select 
+					t1.name as employee, 
+					t1.employee_name, 
+					t1.department, 
+					t1.designation, 
+					t1.grade as employee_grade, 
+					t1.maximum_grade 
+				from `tabEmployee` t1 
+				where t1.status = 'Active' 
 					and t1.promotion_due_date = "{}" 
 					and t1.promotion_cycle = "{}" 
 					and exists(select 1
@@ -112,7 +140,8 @@ class PromotionEntry(Document):
 							where t2.employee = t1.name
 							and t2.is_active = "Yes")
 					{} 
-					order by t1.branch, t1.name """.format(pe_date, self.month_name, cond)
+					order by t1.branch, t1.name """.format(effective_date, self.month_name, cond)
+		# frappe.throw(str(query))
 		# frappe.msgprint(query)
 		emp_list = frappe.db.sql(query, as_dict=True)
 		emp = []
@@ -130,7 +159,10 @@ class PromotionEntry(Document):
 		# frappe.throw(emp_list)
 		for e in emp_list:
 			latest = frappe.db.sql("""
-					select name from `tabEmployee Internal Work History` where parent = '{0}' and promotion_due_date is not NULL order by idx desc limit 1
+					select 
+						name 
+					from `tabEmployee Internal Work History` 
+					where parent = '{0}' and promotion_due_date is not NULL order by idx desc limit 1
                 """.format(e.employee), as_dict = True)
 			if latest:
 				# is_eligible = frappe.db.sql("""
@@ -155,7 +187,7 @@ class PromotionEntry(Document):
 					where t3.parent = t1.name
 					and t3.promotion_due_date = '{2}'
 					and t1.name = '{0}' and t3.name = '{1}'
-                                """.format(e.employee, latest[0].name, pe_date))
+                                """.format(e.employee, latest[0].name, effective_date))
 				# frappe.msgprint(str(is_eligible))
 				# frappe.msgprint(str(e.employee)+" "+str(is_eligible)+" grade:"+str(e.employee_grade))
 				if is_eligible:
@@ -175,7 +207,7 @@ class PromotionEntry(Document):
 					`tabEmployee` t1
 					where t1.promotion_due_date = '{}'
                     and t1.name = '{}'            
-                            """.format(pe_date, e.employee))
+                            """.format(effective_date, e.employee))
 				if is_eligible:
 					salary_structure = frappe.db.sql("select sd.amount as amount,  ss.employee_grade from `tabSalary Detail` sd, `tabSalary Structure` ss where sd.parent = ss.name and ss.employee = '{0}' and ss.is_active = 'Yes' and sd.salary_component = 'Basic Pay'".format(e.employee), as_dict = True)
 
@@ -191,7 +223,8 @@ class PromotionEntry(Document):
 		emp = frappe.get_doc("Employee", employee)
 		current_increment = frappe.db.get_value("Employee Grade", emp.grade, "increment_value")
 		new_grade = frappe.db.get_value("Employee Grade", emp.grade, "promotion_grade")
-		#frappe.throw(str(emp))
+		
+		# frappe.throw(str(new_grade))
 		years_to_add = flt(frappe.db.get_value("Employee Grade", new_grade, "noof_years_for_next_promotion"))
 		old_promo_date = emp.promotion_due_date
 		new_promot_date = add_to_date(old_promo_date, years=years_to_add)
@@ -205,11 +238,13 @@ class PromotionEntry(Document):
 		# else:
 
 		new_basic_increment = flt(basic_pay)+flt(new_increment)
-		# frappe.throw(str(new_basic_increment))
+	
 		if flt(new_basic_increment) < flt(new_lower_limit):
 			new_basic_increment = flt(new_lower_limit)
+	
 		elif flt(new_basic_increment) > flt(new_upper_limit):
 			new_basic_increment = flt(new_upper_limit) 
+	
 		
 		'''
 		ratio = ((flt(basic_pay) + flt(new_increment))-flt(new_lower_limit))/flt(new_increment)
@@ -226,6 +261,7 @@ class PromotionEntry(Document):
 		
 		'''
 		amount = new_basic_increment
+	
 		return new_grade, new_increment, amount, new_promot_date
 
 
@@ -260,16 +296,55 @@ class PromotionEntry(Document):
 	# 	return cond
 
 	# following method created by SHIV on 2020/10/20
-	def set_month_dates(self):
-		months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-		month = str(int(months.index(self.month_name))+1).rjust(2,"0")
+	# def set_month_dates(self):
+	# 	# months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+	# 	# month = str(int(months.index(self.month_name))+1).rjust(2,"0")
 
-		month_start_date = "-".join([str(self.fiscal_year), month, "01"])
-		month_end_date   = get_last_day(month_start_date)
+	# 	# month_start_date = "-".join([str(self.fiscal_year), month, "01"])
+	# 	# month_end_date   = get_last_day(month_start_date)
 
-		self.start_date = month_start_date
-		self.end_date = month_end_date
+	# 	# self.start_date = month_start_date
+	# 	# self.end_date = month_end_date
+
+
+	# 	fy = frappe.get_doc("Fiscal Year", self.fiscal_year)
+
+	# 	month = int(self.get_month_id())
+
+	# 	start_date = getdate(fy.year_start_date)
+	# 	end_date = getdate(fy.year_end_date)
+
+	# 	# Determine which calendar year the month belongs to
+	# 	if month >= start_date.month:
+	# 		year = start_date.year
+	# 	else:
+	# 		year = end_date.year
+
+	# 	effective_date = f"{year}-{month:02d}-01"
+	# 	self.start_date = effective_date
+	# 	self.end_date = get_last_day(effective_date)
 		# self.month_name = month
+		# self.start_date = month_start_date
+		# self.end_date = month_end_date
+	def set_month_dates(self):
+
+		fy = frappe.get_doc("Fiscal Year", self.fiscal_year)
+
+		month = int(self.get_month_id())
+
+		start_date = getdate(fy.year_start_date)
+		end_date = getdate(fy.year_end_date)
+
+		# Determine which calendar year the month belongs to
+		if month >= start_date.month:
+			year = start_date.year
+		else:
+			year = end_date.year
+
+		effective_date = f"{year}-{month:02d}-01"
+
+		self.start_date = effective_date
+		self.end_date = get_last_day(effective_date)
 
 	def check_mandatory(self):
 		# following line is replaced by subsequent by SHIV on 2020/10/20
@@ -285,6 +360,7 @@ class PromotionEntry(Document):
 		self.check_permission('write')
 		self.created = 1
 		emp_list = [d['employee'] for d in self.get_emp_list()]
+	
 
 		if emp_list:
 			args = frappe._dict({
@@ -369,6 +445,7 @@ def remove_employee_promotions_for_employees(promotion_entry, employee_promotion
 	# 	frappe.msgprint(_("Could not submit some Employee Promotions. List: "+str(not_deleted_ep)))
 
 def create_employee_promotion_for_employees(employees, args, publish_progress=True):
+	# frappe.throw(str(args))
 	employee_promotion_exists_for = get_existing_employee_promotions(employees, args)
 	count=0
 	promotion_entry = frappe.get_doc("Promotion Entry", args.promotion_entry)
@@ -438,8 +515,19 @@ def create_employee_promotion_for_employees(employees, args, publish_progress=Tr
 			ep.new_lower_limit = new_lower_limit
 			ep.new_increment = new_increment
 			ep.new_upper_limit = new_upper_limit
-			salary_structure = frappe.db.sql("select sd.amount as amount from `tabSalary Detail` sd, `tabSalary Structure` ss where sd.parent = ss.name and ss.employee = '{0}' and ss.is_active = 'Yes' and sd.salary_component = 'Basic Pay'".format(emp.employee), as_dict = True)
+			# salary_structure = frappe.db.sql("select sd.amount as amount from `tabSalary Detail` sd, `tabSalary Structure` ss where sd.parent = ss.name and ss.employee = '{0}' and ss.is_active = 'Yes' and sd.salary_component = 'Basic Pay'".format(emp.employee), as_dict = True)
+			salary_structure = frappe.db.sql("""
+				SELECT sd.amount
+				FROM `tabSalary Detail` sd
+				JOIN `tabSalary Structure` ss ON ss.name = sd.parent
+				WHERE ss.employee = %s
+				AND ss.is_active = 'Yes'
+				AND sd.salary_component = 'Basic Pay'
+			""", emp.employee, as_dict=True)
+			# frappe.throw(str(salary_structure))
 			ep.current_basic_pay = salary_structure[0].amount
+			# frappe.throw(str(ep.current_basic_pay ))
+
 			# bp_diff = flt(salary_structure[0].amount) - flt(new_lower_limit)
 			# new_increment_div = flt(bp_diff) / flt(new_increment)
 			# if new_increment_div < 0:
@@ -451,13 +539,69 @@ def create_employee_promotion_for_employees(employees, args, publish_progress=Tr
 			# 	amount = new_lower_limit + new_increment
 			# elif int(salary_structure[0].amount) > new_lower_limit:
 			# 	amount = int(salary_structure[0].amount)+new_increment
+		
 			ep.new_basic_pay = emp.new_basic_pay
+			# frappe.throw("new_basic_pay:"+str(ep.new_basic_pay))
 			#----------------------------------End--------------------------------------------------------#
+             
+			# if args.month == "January":
+			# 	ep.promotion_date = args.fiscal_year+"-01-01"
+			# elif args.month == "July":
+			# 	ep.promotion_date = args.fiscal_year+"-07-01"
+			# fy = frappe.get_doc("Fiscal Year", args.fiscal_year)
 
-			if args.month == "January":
-				ep.promotion_date = args.fiscal_year+"-01-01"
-			elif args.month == "July":
-				ep.promotion_date = args.fiscal_year+"-07-01"
+			# from_date = getdate(fy.year_start_date)
+			# to_date = getdate(fy.year_end_date)
+
+			# # -----------------------------
+			# # 2. Convert month safely
+			# # -----------------------------
+			# # supports "01", "1", "January"
+			# month_map = {
+			# 	"January": 1, "February": 2, "March": 3,
+			# 	"April": 4, "May": 5, "June": 6,
+			# 	"July": 7, "August": 8, "September": 9,
+			# 	"October": 10, "November": 11, "December": 12
+			# }
+
+			# if isinstance(args.month, str) and args.month.isdigit():
+			# 	month_num = int(args.month)
+			# else:
+			# 	month_num = month_map.get(args.month, None)
+
+			# if not month_num:
+			# 	frappe.throw(f"Invalid month value: {args.month}")
+			fy = frappe.get_doc("Fiscal Year", ep.fiscal_year)
+
+			month = int(promotion_entry.get_month_id())
+
+			start_date = getdate(fy.year_start_date)
+			end_date = getdate(fy.year_end_date)
+
+			# Determine which calendar year the month belongs to
+			if month >= start_date.month:
+				year = start_date.year
+			else:
+				year = end_date.year
+
+			# -----------------------------
+			# 3. Decide correct year inside FY
+			# (FY: July - June logic)
+			# -----------------------------
+			fy_start_year = start_date.year
+			fy_end_year = end_date.year
+
+			# If month is July–Dec → start FY year
+			# If month is Jan–Jun → next FY year
+			if month >= 7:
+				year = fy_start_year
+			else:
+				year = fy_end_year
+
+			# -----------------------------
+			# 4. Final date
+			# -----------------------------
+			ep.promotion_date = f"{year}-{month:02d}-01"
 			ep.insert()
 			count+=1
 
