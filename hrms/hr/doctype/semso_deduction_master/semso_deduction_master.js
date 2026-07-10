@@ -1,3 +1,5 @@
+//
+
 frappe.ui.form.on("Semso Deduction Master", {
     refresh(frm) {
         // frm.set_df_property("employee_group","hidden",1)
