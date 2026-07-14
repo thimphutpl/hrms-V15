@@ -160,7 +160,7 @@ class TravelClaim(Document):
 
 	def post_journal_entry(self):
 		
-		travel_expense_account = frappe.db.get_single_value("HR Accounts Settings", "employee_advance_travel")
+		travel_expense_account = frappe.db.get_single_value("HR Accounts Settings", "travel_incountry_account") if self.travel_type == "Domestic" else frappe.db.get_single_value("HR Accounts Settings", "travel_outcountry_account")
 		advance_account = frappe.db.get_value("Company", self.company, "travel_advance_account")
 		bank_account = frappe.db.get_value("Branch", self.branch, "expense_bank_account")
 		#frappe.throw(str(travel_expense_account))
