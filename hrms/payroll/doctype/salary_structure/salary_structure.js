@@ -479,6 +479,9 @@ frappe.ui.form.on('Salary Structure', {
 	eligible_for_kanjur: function (frm) {
 		calculate_others(frm);
 	},
+	eligible_for_ration_allowance: function (frm) {
+		calculate_others(frm);
+	},
 })
 
 // // dynamically display checkboxes based on Salary Component's status

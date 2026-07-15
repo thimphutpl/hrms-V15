@@ -238,7 +238,6 @@ class SalaryStructure(Document):
 
 		tbl_list = {'earnings': 'Earning', 'deductions': 'Deduction'}
 		del_list_all = []
-		
 		for ed in ['earnings', 'deductions']:
 			add_list = []
 			del_list = []

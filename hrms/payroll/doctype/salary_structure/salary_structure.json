@@ -139,6 +139,9 @@
   "entertainment_allowance",
   "eligible_for_afsa",
   "eligible_for_contract_allowance",
+  "eligible_for_ration_allowance",
+  "eligible_for_ration_allowance_method",
+  "value_ration_allownce",
   "sb_other_benefits",
   "eligible_for_gis",
   "eligible_for_pf",
@@ -1381,12 +1384,31 @@
    "fieldname": "eligible_for_relieving_fund",
    "fieldtype": "Check",
    "label": "Eligible for Relieving Fund"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_ration_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Ration Allowance"
+  },
+  {
+   "depends_on": "eval:doc.eligible_for_ration_allowance==1",
+   "fieldname": "eligible_for_ration_allowance_method",
+   "fieldtype": "Select",
+   "label": "Eligible for Ration Allowance Method",
+   "options": "\nPercent\nLumpsum"
+  },
+  {
+   "depends_on": "eval:doc.eligible_for_ration_allowance==1",
+   "fieldname": "value_ration_allownce",
+   "fieldtype": "Currency",
+   "label": "Value (Ration Allowance)"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2026-06-10 16:40:10.859400",
+ "modified": "2026-07-10 14:20:48.979086",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
