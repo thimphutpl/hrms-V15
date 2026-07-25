@@ -21,6 +21,8 @@
   "sws_contribution",
   "retirement_age",
   "government_grade",
+  "section_break_lueo",
+  "increment_based",
   "pay_scale_section",
   "lower_limit",
   "column_break_tgfh",
@@ -267,11 +269,21 @@
    "fieldtype": "Link",
    "label": "Employee Group",
    "options": "Employee Group"
+  },
+  {
+   "fieldname": "section_break_lueo",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "increment_based",
+   "fieldtype": "Check",
+   "label": "Increment Based"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-05-02 16:25:01.456202",
+ "modified": "2026-07-18 10:55:13.855102",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Grade",
