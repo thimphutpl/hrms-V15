@@ -155,32 +155,32 @@ class EmployeePromotion(Document):
 
 
 
-# # Following code added by SHIV on 2021/05/14
-# def get_permission_query_conditions(user):
-# 	if not user: user = frappe.session.user
-# 	user_roles = frappe.get_roles(user)
+# Following code added by SHIV on 2021/05/14
+def get_permission_query_conditions(user):
+	if not user: user = frappe.session.user
+	user_roles = frappe.get_roles(user)
 
-# 	if "HR User" in user_roles or "HR Manager" in user_roles:
-# 		return
-# 	else:
-# 		return """(
-# 			exists(select 1
-# 				from `tabEmployee` as e
-# 				where e.name = `tabEmployee Promotion`.employee
-# 				and e.user_id = '{user}')
-# 		)""".format(user=user)
+	if "HR User" in user_roles or "HR Manager" in user_roles:
+		return
+	else:
+		return """(
+			exists(select 1
+				from `tabEmployee` as e
+				where e.name = `tabEmployee Promotion`.employee
+				and e.user_id = '{user}')
+		)""".format(user=user)
 
-# # Following code added by SHIV on 2021/05/14
-# def has_record_permission(doc, user):
-# 	if not user: user = frappe.session.user
-# 	user_roles = frappe.get_roles(user)
+# Following code added by SHIV on 2021/05/14
+def has_record_permission(doc, user):
+	if not user: user = frappe.session.user
+	user_roles = frappe.get_roles(user)
 	
-# 	if "HR User" in user_roles or "HR Manager" in user_roles:
-# 		return True
-# 	else:
-# 		if frappe.db.exists("Employee", {"name":doc.employee, "user_id": user}):
-# 			return True
-# 		else:
-# 			return False 
+	if "HR User" in user_roles or "HR Manager" in user_roles:
+		return True
+	else:
+		if frappe.db.exists("Employee", {"name":doc.employee, "user_id": user}):
+			return True
+		else:
+			return False 
 
-# 	return True
+	return True

@@ -157,3 +157,18 @@ def get_employee(company=None, semso_contributor=None):
 		emp.amount = (grade_amount or 0) + (group_amount or 0)
 
 	return employees
+
+
+def get_permission_query_conditions(user):
+	if not user: user = frappe.session.user
+	user_roles = frappe.get_roles(user)
+
+	if user == "Administrator" or "System Manager" in user_roles or "HR User" in user_roles or "HR Manager" in user_roles: 
+		return
+
+	return """(
+		exists(select 1
+			from `tabEmployee` as e
+			where e.branch = `tabSemso Entry`.branch
+			and e.user_id = '{user}')
+	)""".format(user=user)	
