@@ -28,6 +28,9 @@ frappe.ui.form.on("Employee Grade", {
             };
         });
     },
+
+
+
 });
 function toggle_pay_scale(frm) {
     if (frm.doc.increment_based) {

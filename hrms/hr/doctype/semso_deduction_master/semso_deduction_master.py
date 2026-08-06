@@ -11,7 +11,7 @@ class SemsoDeductionMaster(Document):
 		self.vaildate_employee_group()
 	def vaildate_employee_group(self):
 		doc=frappe.db.sql("""
-			SELECT egmi.name  FROM `tabEmployee Group Master` egm 
+			SELECT egmi.name  FROM `tabEmployee Group` egm 
 					JOIN `tabEmployee Group Master Item` egmi 
 					ON egm.name=egmi.parent 
 					WHERE egm.name=%s
@@ -22,7 +22,7 @@ class SemsoDeductionMaster(Document):
 @frappe.whitelist()
 def get_all_employee_group(employee_group=None):
 	doc = frappe.db.sql("""
-			SELECT egmi.grade  FROM `tabEmployee Group Master` egm 
+			SELECT egmi.grade  FROM `tabEmployee Group` egm 
 			JOIN `tabEmployee Group Master Item` egmi 
 			ON egm.name=egmi.parent 
 			WHERE egm.name=%s""",(employee_group),as_dict=1

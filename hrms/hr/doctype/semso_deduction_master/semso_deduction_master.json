@@ -85,14 +85,14 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Employee Group",
-   "options": "Employee Group Master",
+   "options": "Employee Group",
    "reqd": 1,
    "unique": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-05-18 16:27:54.437287",
+ "modified": "2026-08-06 14:12:50.041747",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Semso Deduction Master",

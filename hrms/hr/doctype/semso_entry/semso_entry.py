@@ -8,18 +8,34 @@ import json
 class SemsoEntry(Document):
 	def validate(self):
 		self.calculate_total()
+		self.semso_calculate_total()
 
 	def calculate_total(self):
-		count = len(self.deceased)
-	
 		for item in self.semso_contribution:
 			base_amount = item.base_amount
 			if self.spouse_semso:
-				item.amount = (base_amount*count)/2
+				item.amount = (base_amount*self.number_of_people)/2
 			else:
-				item.amount = (base_amount*count)
-	
-			
+				item.amount = (base_amount*self.number_of_people)
+	def semso_calculate_total(self):
+		self.total_officer = 0
+		self.total_troops = 0
+		self.total_civilan = 0
+
+		for row in self.semso_contribution:
+			amount = row.amount or 0
+			self.total_amount = (self.total_officer or 0) + (self.total_troops or 0) + (self.total_civilan or 0)
+
+			if row.employee_group == "Officer (RBA)":
+				self.total_officer += amount
+
+			elif row.employee_group == "Troops (RBA)":
+				self.total_troops += amount
+
+			elif row.employee_group == "Civilian":
+				self.total_civilan += amount
+		
+				
 
 
 @frappe.whitelist()
@@ -57,7 +73,7 @@ def get_employee(company=None, semso_contributor=None):
 	group_names = []
 	if employee_groups:
 		group_names = frappe.get_all(
-			"Employee Group Master",
+			"Employee Group",
 			filters={
 				"company": company,
 				"name": ["in",employee_groups]
@@ -134,9 +150,9 @@ def get_employee(company=None, semso_contributor=None):
 			grade_placeholders = ', '.join(['%s'] * len(grades))
 			
 			query = f"""
-				SELECT sdm.amount, seg.grade
+				SELECT sdm.amount, seg.grade, egm.name as employee_group
 				FROM `tabSemso Deduction Master` sdm
-				JOIN `tabEmployee Group Master` egm 
+				JOIN `tabEmployee Group` egm 
 					ON sdm.emp_group = egm.name
 				JOIN `tabEmployee Group Master Item` seg 
 					ON egm.name = seg.parent

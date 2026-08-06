@@ -22,11 +22,20 @@
   "section_break_rrzd",
   "deceased",
   "section_break_uhqz",
+  "number_of_people",
   "semso_contributor",
   "section_break_jqrm",
   "get_employee",
   "section_break_gtil",
-  "semso_contribution"
+  "semso_contribution",
+  "section_break_vraj",
+  "total_officer",
+  "column_break_dfyh",
+  "total_troops",
+  "column_break_ddqh",
+  "total_civilan",
+  "section_break_tgnm",
+  "total_amount"
  ],
  "fields": [
   {
@@ -94,6 +103,7 @@
   {
    "fieldname": "deceased",
    "fieldtype": "Table",
+   "hidden": 1,
    "label": "Deceased",
    "options": "Deceased Item"
   },
@@ -130,7 +140,7 @@
    "fieldname": "employee_group",
    "fieldtype": "Link",
    "label": "Employee Group",
-   "options": "Employee Group Master",
+   "options": "Employee Group",
    "reqd": 1
   },
   {
@@ -148,12 +158,57 @@
    "fieldname": "spouse_semso",
    "fieldtype": "Check",
    "label": "Spouse Semso"
+  },
+  {
+   "fieldname": "number_of_people",
+   "fieldtype": "Int",
+   "label": "Number of People"
+  },
+  {
+   "fieldname": "section_break_vraj",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "total_officer",
+   "fieldtype": "Currency",
+   "label": "Total Officer",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_dfyh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_troops",
+   "fieldtype": "Currency",
+   "label": "Total Troops",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_ddqh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_civilan",
+   "fieldtype": "Currency",
+   "label": "Total Civilan",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_tgnm",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "label": "Total Amount",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-06-26 15:23:56.295815",
+ "modified": "2026-08-06 15:29:05.356156",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Semso Entry",
