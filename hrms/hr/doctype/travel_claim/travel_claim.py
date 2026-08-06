@@ -146,9 +146,7 @@ class TravelClaim(Document):
 			total_claim_amount += flt(item.base_amount)
 
 		self.total_claim_amount = flt(total_claim_amount)
-		self.balance_amount = (
-			flt(self.total_claim_amount) + flt(self.extra_claim_amount) - flt(self.advance_amount)
-		)
+		self.balance_amount = round((flt(self.total_claim_amount) + flt(self.extra_claim_amount) - flt(self.advance_amount)),2)
 		if self.balance_amount < 0:
 			frappe.throw(_("Balance Amount cannot be a negative value."), title="Invalid Amount")		
 		
