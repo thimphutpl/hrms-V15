@@ -11,77 +11,98 @@ cur_frm.add_fetch("employee", "cost_center", "cost_center")
 
 frappe.ui.form.on('Travel Authorization', {
 
-	setup: function(frm) {
-        // Set query for employee field
-        frm.set_query("employee", function() {
-            return erpnext.queries.employee();
-        });
-        
-        // Set query for approver field
-        frm.set_query("approver", function() {
-            if (!frm.doc.employee) {
-                frappe.msgprint(__("Please select an employee first"));
-                return;
-            }
-            
-            return {
-                // Correct module path - point to current doctype's method
-                query: "hrms.hr.doctype.travel_authorization.travel_authorization.get_approvers",
-                filters: {
-                    employee: frm.doc.employee
-                }
-            };
-        });
-    },
-    
-    employee: function(frm) {
-        // Clear approver when employee changes
-        frm.set_value("approver", null);
-        frm.set_value("approver_name", null);
-        frm.set_value("approver_designation", null);
-        // Fetch new approver if employee is selected
+	setup: function (frm) {
+		// Set query for employee field
+		frm.set_query("employee", function () {
+			return erpnext.queries.employee();
+		});
+
+		// Set query for approver field
+		frm.set_query("approver", function () {
+			if (!frm.doc.employee) {
+				frappe.msgprint(__("Please select an employee first"));
+				return;
+			}
+
+			return {
+				// Correct module path - point to current doctype's method
+				query: "hrms.hr.doctype.travel_authorization.travel_authorization.get_approvers",
+				filters: {
+					employee: frm.doc.employee
+				}
+			};
+		});
+	},
+
+	employee: function (frm) {
+		// Clear approver when employee changes
+		frm.set_value("approver", null);
+		frm.set_value("approver_name", null);
+		frm.set_value("approver_designation", null);
+		// Fetch new approver if employee is selected
 		frappe.call({
 			method: "set_employee_supervisor",
 			doc: frm.doc,
-			callback: function(r){
-				if(r.message){
+			callback: function (r) {
+				if (r.message) {
 					frm.set_value("approver", r.message[0]);
 					frm.set_value("approver_name", r.message[1]);
 					frm.set_value("approver_designation", r.message[2]);
 					frm.refresh_fields();
 				}
+				// IMPORTANT: added by kinzang 
+				// Employee fetches Grade asynchronously.
+				// Wait briefly, then populate DSA for existing rows.
+				setTimeout(function () {
+
+					frm.doc.items.forEach(function (row) {
+
+						if (row.country) {
+							set_employee_dsa(
+								frm,
+								row.doctype,
+								row.name
+							);
+						}
+
+					});
+
+				}, 500);
+
+
+
 			}
 		})
-        
-        // Your existing DSA calculation
-        frappe.call({
-            method: "set_dsa_per_day",
-            doc: frm.doc,
-            callback: function(r) {
-                if (r.message) {
-                    frm.set_value("dsa_per_day", r.message);
-                    frm.refresh_field("dsa_per_day");
-                }
-            }
-        });
-    },
 
+		// Your existing DSA calculation
+		frappe.call({
+			method: "set_dsa_per_day",
+			doc: frm.doc,
+			callback: function (r) {
+				if (r.message) {
+					frm.set_value("dsa_per_day", r.message);
+					frm.refresh_field("dsa_per_day");
+				}
+			}
+		});
+	},
 	refresh: function (frm) {
+		// frm.dashboard.wrapper.find('.btn-add').hide();
 		if (frm.doc.docstatus == 1 && !frm.doc.travel_claim) {
 			// if (frm.doc.end_date_auth < frappe.datetime.get_today()) {
-				if (!frm.doc.travel_claim) {
-					frm.add_custom_button(__("Travel Claim"), function () {
-						frm.trigger("create_travel_claim");
-						},
-						__("Create")
-					);
-				}
-				if (!frm.doc.travel_adjustment) {
-					frm.add_custom_button(__("Travel Adjustment"), function () {
-						frm.trigger("create_travel_adjustment");
-						}, __("Create")
-					);
-				}
+			if (!frm.doc.travel_claim) {
+				frm.add_custom_button(__("Travel Claim"), function () {
+					frm.trigger("create_travel_claim");
+				},
+					__("Create")
+				);
+			}
+			if (!frm.doc.travel_adjustment) {
+				frm.add_custom_button(__("Travel Adjustment"), function () {
+					frm.trigger("create_travel_adjustment");
+				}, __("Create")
+				);
+			}
 			// }
 		}
 
@@ -101,7 +122,7 @@ frappe.ui.form.on('Travel Authorization', {
 			frm: cur_frm
 		})
 	},
-	
+
 	onload: function (frm) {
 		if (!frm.doc.posting_date) {
 			frm.set_value("posting_date", frappe.datetime.get_today());
@@ -109,7 +130,7 @@ frappe.ui.form.on('Travel Authorization', {
 
 		frm.set_query("employee", erpnext.queries.employee);
 	},
-	
+
 	need_advance: function (frm) {
 		// frm.toggle_reqd("estimated_amount", frm.doc.need_advance == 1);
 		calculate_advance(frm);
@@ -148,12 +169,12 @@ frappe.ui.form.on('Travel Authorization', {
 	},
 
 	advance_amount: (frm) => {
-        frm.set_value("base_advance_amount", flt(frm.doc.advance_amount) * flt(frm.doc.exchange_rate));
-    },
+		frm.set_value("base_advance_amount", flt(frm.doc.advance_amount) * flt(frm.doc.exchange_rate));
+	},
 
 	exchange_rate: (frm) => {
-        frm.set_value("base_advance_amount", flt(frm.doc.advance_amount) * flt(frm.doc.exchange_rate));
-    },
+		frm.set_value("base_advance_amount", flt(frm.doc.advance_amount) * flt(frm.doc.exchange_rate));
+	},
 
 	set_dynamic_field_label: function (frm) {
 		frm.trigger("change_form_labels");
@@ -171,7 +192,7 @@ frappe.ui.form.on('Travel Authorization', {
 			frm.doc.currency != company_currency
 		);
 	},
-	
+
 	make_traveil_claim: function () {
 		frappe.model.open_mapped_doc({
 			method: "hrms.hr.doctype.travel_authorization.travel_authorization.make_travel_claim",
@@ -181,12 +202,12 @@ frappe.ui.form.on('Travel Authorization', {
 });
 
 frappe.ui.form.on("Travel Authorization Item", {
-	onload: function(frm, cdt, cdn) {
-		set_employee_dsa(frm, cdt, cdn);
+	onload: function (frm, cdt, cdn) {
+		//set_employee_dsa(frm, cdt, cdn); comment by kinzang
 		calculate_total_dsa(frm, cdt, cdn);
 	},
 
-	items_add: function(frm, cdt, cdn) {
+	items_add: function (frm, cdt, cdn) {
 		set_employee_dsa(frm, cdt, cdn);
 		calculate_total_dsa(frm, cdt, cdn);
 	},
@@ -217,14 +238,14 @@ frappe.ui.form.on("Travel Authorization Item", {
 		}
 		frm.refresh_field("items");
 	},
-	
+
 	from_date: function (frm, cdt, cdn) {
 		var item = locals[cdt][cdn];
 		frappe.call({
 			method: "check_date_overlap",
 			doc: frm.doc,
 		})
-	
+
 		if (!item.halt) {
 			if (item.from_date != item.to_date || !item.to_date) {
 				frappe.model.set_value(cdt, cdn, "to_date", item.to_date);
@@ -257,7 +278,7 @@ frappe.ui.form.on("Travel Authorization Item", {
 				frappe.model.set_value(cdt, cdn, "to_date", "")
 			}
 		}
-		
+
 		set_employee_dsa(frm, cdt, cdn);
 		calculate_total_dsa(frm, cdt, cdn);
 
@@ -268,7 +289,7 @@ frappe.ui.form.on("Travel Authorization Item", {
 	halt: function (frm, cdt, cdn) {
 		var item = locals[cdt][cdn]
 		cur_frm.toggle_reqd("to_date", item.halt);
-		
+
 		if (item.to_date && item.from_date) {
 			frappe.model.set_value(cdt, cdn, "travel_from", "");
 			frappe.model.set_value(cdt, cdn, "travel_to", "");
@@ -276,7 +297,7 @@ frappe.ui.form.on("Travel Authorization Item", {
 		}
 	},
 
-	country: function(frm, cdt, cdn) {
+	country: function (frm, cdt, cdn) {
 		set_employee_dsa(frm, cdt, cdn);
 		calculate_total_dsa(frm, cdt, cdn);
 	},
@@ -301,7 +322,7 @@ const set_employee_dsa = (frm, cdt, cdn) => {
 				country: child.country,
 				grade: frm.doc.grade,
 			},
-			callback: function(r) {					
+			callback: function (r) {
 				if (r.message && r.message.length > 0) {
 					frappe.model.set_value(cdt, cdn, "dsa", r.message[0].dsa);
 					frappe.model.set_value(cdt, cdn, "currency", r.message[0].currency);
@@ -318,7 +339,7 @@ function calculate_advance(frm) {
 	frappe.call({
 		method: "set_estimate_amount",
 		doc: frm.doc,
-		callback: function(r) {
+		callback: function (r) {
 			if (r.message) {
 				frm.set_value("estimated_amount", r.message)
 				frm.refresh_field("estimated_amount");
@@ -328,19 +349,19 @@ function calculate_advance(frm) {
 }
 
 function calculate_total_dsa(frm, cdt, cdn) {
-    var item = locals[cdt][cdn];
+	var item = locals[cdt][cdn];
 	if (!item.exchange_rate) {
 		item.exchange_rate = 1
 	}
-    if (item.dsa && item.no_days) {
+	if (item.dsa && item.no_days) {
 		if (item.to_date && item.from_date) {
 			frappe.model.set_value(cdt, cdn, "no_days", 1 + cint(frappe.datetime.get_day_diff(item.to_date, item.from_date)))
 		} else {
-			frappe.model.set_value(cdt, cdn, "no_days", 1)	
+			frappe.model.set_value(cdt, cdn, "no_days", 1)
 		}
 		frappe.model.set_value(cdt, cdn, "dsa_nu_per_day", flt(item.dsa) * flt(item.exchange_rate))
-        frappe.model.set_value(cdt, cdn, "total_dsa", flt(item.dsa_nu_per_day) * flt(item.no_days));
-    }
+		frappe.model.set_value(cdt, cdn, "total_dsa", flt(item.dsa_nu_per_day) * flt(item.no_days));
+	}
 
 	frm.refresh_field("items");
 	frm.refresh_fields();
