@@ -911,7 +911,7 @@ def get_rows(employee_details: dict, filters: Filters, holiday_map: dict, attend
 				# if no attendance → check holiday/weekly off
 				if status is None:
 					status = get_holiday_status(day, holidays)
-					if not status and  date(int(filters.year), int(filters.month), day) <= today: 
+					if not status and  date(int(filters.year), int(filters.month), day) < today: 
 						status = "Absent"
 				final_status = "Tour" if status == "Tour" else status
 
