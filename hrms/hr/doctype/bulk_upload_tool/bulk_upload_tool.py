@@ -30,11 +30,12 @@ class BulkUploadTool(Document):
 			doctype = "Attendance Others"
 		if not frappe.has_permission(doctype, "create"):
 			raise frappe.PermissionError
-
+		rows = []
 		from frappe.utils.csvutils import read_csv_content_from_attached_file
 		from frappe.modules import scrub
 		if frappe.safe_encode(self.import_file).lower().endswith("csv".encode("utf-8")):
 			from frappe.utils.csvutils import read_csv_content
+			
 			file_name = frappe.get_doc("File", {"file_url": self.import_file})
 			fcontent = file_name.get_content()
 			rows = read_csv_content(fcontent)
@@ -176,7 +177,8 @@ class BulkUploadTool(Document):
 						pay_details = get_pay_details(employee)
 						#frappe.throw(str(date_str))
 						if not pay_details:
-							frappe.throw("Wage Details is not defined")
+							# frappe.throw("Wage Details is not defined")
+							frappe.throw(f"Wage Details is not defined for Employee ID: {employee}, Name: {row[4]}")
 						status = ''
 						if str(day_value) in ("P", "p", "1"):
 							status = 'Present'
