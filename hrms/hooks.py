@@ -236,7 +236,8 @@ scheduler_events = {
         "* * * * *": [
             "hrms.hr.doctype.shift_type.shift_type.update_last_sync_of_checkin",
             "hrms.hr.doctype.shift_type.shift_type.process_auto_attendance_for_all_shifts",
-            "hrms.hr.doctype.shift_assignment_schedule.shift_assignment_schedule.process_auto_shift_creation"
+            "hrms.hr.doctype.shift_assignment_schedule.shift_assignment_schedule.process_auto_shift_creation",
+            #"hrms.hr.doctype.employee_attendance.employee_attendance.auto_mark_absent"
         ]
     },
     "all": [
@@ -256,7 +257,7 @@ scheduler_events = {
         # "hrms.hr.doctype.daily_work_summary_group.daily_work_summary_group.send_summary",
         # "hrms.hr.doctype.interview.interview.send_daily_feedback_reminder",
         "hrms.hr.doctype.job_opening.job_opening.close_expired_job_openings",
-        "hrms.hr.doctype.employee_attendance.employee_attendance.auto_mark_absent"
+        # "hrms.hr.doctype.employee_attendance.employee_attendance.auto_mark_absent"
      
     ],
     "daily_long": [
