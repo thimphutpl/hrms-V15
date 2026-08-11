@@ -952,14 +952,15 @@ class LeaveApplication(Document, PWANotificationsMixin):
         )
 
     def set_reports_med_mat(self):
-        if self.leave_type in ('Maternity leave','Medical Leave'):
+        if self.leave_type in ('Maternity leave','Medical Leave','Paternity Leave'):
 
             ceo=frappe.db.get_single_value("HR Settings","ceo")
             if not ceo:
                 frappe.throw("set CEO approver in HR Settings")
             user_id,employee_name=frappe.get_value("Employee",ceo,["user_id","employee_name"])
+        
             self.reports_to=user_id
-            self.reports_to_name=employee_name
+            self.reports_name=employee_name
         else:
             return
 
