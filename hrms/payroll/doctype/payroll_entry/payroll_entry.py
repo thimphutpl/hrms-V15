@@ -677,14 +677,14 @@ class PayrollEntry(Document):
 		if employee_wise_accounting_enabled:
 			"""
 			employee_based_payroll_payable_entries = {
-			                'HREMP00004': {
-			                                'earnings': 83332.0,
-			                                'deductions': 2000.0
-			                },
-			                'HREMP00005': {
-			                                'earnings': 50000.0,
-			                                'deductions': 2000.0
-			                }
+							'HREMP00004': {
+											'earnings': 83332.0,
+											'deductions': 2000.0
+							},
+							'HREMP00005': {
+											'earnings': 50000.0,
+											'deductions': 2000.0
+							}
 			}
 			"""
 			for employee, employee_details in self.employee_based_payroll_payable_entries.items():
@@ -839,6 +839,7 @@ class PayrollEntry(Document):
 
 	@frappe.whitelist()
 	def make_bank_entry(self):
+	
 		
 		"""
 			---------------------------------------------------------------------------------
@@ -854,6 +855,7 @@ class PayrollEntry(Document):
 		company = frappe.db.get("Company", self.company)
 		default_bank_account    = frappe.db.get_value("Branch", self.processing_branch, "expense_bank_account")
 		default_payable_account = company.get("default_payroll_payable_account")
+		
 		company_cc              = company.get("cost_center")
 		default_employer_pf_account = company.get("employer_contribution_pf_account")
 		salary_component_pf     = "PF"
@@ -1281,13 +1283,13 @@ class PayrollEntry(Document):
 	def get_employee_and_attendance_details(self) -> list[dict]:
 		"""Returns a list of employee and attendance details like
 		[
-		        {
-		                "name": "HREMP00001",
-		                "date_of_joining": "2019-01-01",
-		                "relieving_date": "2022-01-01",
-		                "holiday_list": "Holiday List Company",
-		                "attendance_count": 22
-		        }
+				{
+						"name": "HREMP00001",
+						"date_of_joining": "2019-01-01",
+						"relieving_date": "2022-01-01",
+						"holiday_list": "Holiday List Company",
+						"attendance_count": 22
+				}
 		]
 		"""
 		employees = [emp.employee for emp in self.employees]
@@ -2410,14 +2412,14 @@ class PayrollEntry(Document):
 		if employee_wise_accounting_enabled:
 			"""
 			employee_based_payroll_payable_entries = {
-			                'HREMP00004': {
-			                                'earnings': 83332.0,
-			                                'deductions': 2000.0
-			                },
-			                'HREMP00005': {
-			                                'earnings': 50000.0,
-			                                'deductions': 2000.0
-			                }
+							'HREMP00004': {
+											'earnings': 83332.0,
+											'deductions': 2000.0
+							},
+							'HREMP00005': {
+											'earnings': 50000.0,
+											'deductions': 2000.0
+							}
 			}
 			"""
 			for employee, employee_details in self.employee_based_payroll_payable_entries.items():
@@ -2834,13 +2836,13 @@ class PayrollEntry(Document):
 	def get_employee_and_attendance_details(self) -> list[dict]:
 		"""Returns a list of employee and attendance details like
 		[
-		        {
-		                "name": "HREMP00001",
-		                "date_of_joining": "2019-01-01",
-		                "relieving_date": "2022-01-01",
-		                "holiday_list": "Holiday List Company",
-		                "attendance_count": 22
-		        }
+				{
+						"name": "HREMP00001",
+						"date_of_joining": "2019-01-01",
+						"relieving_date": "2022-01-01",
+						"holiday_list": "Holiday List Company",
+						"attendance_count": 22
+				}
 		]
 		"""
 		employees = [emp.employee for emp in self.employees]
