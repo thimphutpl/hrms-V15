@@ -1,77 +1,117 @@
-# Copyright (c) 2025, Frappe Technologies Pvt. Ltd. and contributors
-# For license information, please see license.txt
-
+from __future__ import unicode_literals
 import frappe
 from frappe import _
-
+from frappe.utils import getdate, nowdate
+from erpnext.accounts.utils import get_fiscal_year
 
 def execute(filters=None):
-	if not filters:
-		filters = {}
-	columns, data = [], []
-	data = get_data(filters)
-	if not data:
-		return columns, data
-	columns = get_columns(data)
-	return columns, data
+    columns = get_columns()
+    data = get_data(filters)
+    return columns, data
 
-def get_columns(data):
-	columns = [
-		_("Employee") + ":Link/Employee:80", 
-		_("Employee Name") + ":Data:140", 
-		_("CID") + ":Data:120", 
-		_("Designation") + ":Link/Designation:120",
-		_("Loan Type") + ":Data:140", 
-		_("Loan From") + ":Data:160", 
-		_("Account No") + ":Data:140",  
-		_("Deduction Amount") + ":Currency:140", 
-		_("Total Deductible Amount") + ":Currency:170", 
-		_("Balance Amount") + ":Currency:140",
-		_("Company") + ":Link/Company:120", 
-		_("Cost Center") + ":Link/Cost Center:120", 
-		_("Branch") + ":Link/Branch:120", 
-		_("Department") + ":Link/Department:120",
-		_("Division") + ":Link/Department:120", 
-		_("Section") + ":Link/Department:120", 
-		_("Year") + ":Data:80", 
-		_("Month") + ":Data:80"
-	]
-	return columns
-
-def get_data(filters):
-	conditions, filters = get_conditions(filters)
-
-	data = frappe.db.sql("""
-		select t1.employee, t3.employee_name, t3.passport_number, t1.designation,
-			t2.reference_type,t2.reference_number, t2.amount, t2.total_deductible_amount, t2.total_outstanding_amount,
-			t1.company, t1.cost_center, t1.branch, t1.department,t1.section,
-			t1.fiscal_year, t1.month
-		from `tabSalary Slip` t1, `tabSalary Detail` t2, `tabEmployee` t3
-		where t1.docstatus = 1 {}
-		and t3.employee = t1.employee
-		and t2.parent = t1.name
-		and t2.parentfield = 'deductions'
-		and exists
-			(select 1
-				from `tabSalary Component` sc
-				where sc.name = t2.salary_component
-			)
-		and t2.reference_type != 'NULL'
-	""".format(conditions))
-	return data
+def get_columns():
+    return [
+        {
+            "fieldname": "employee",
+            "label": _("Employee"),
+            "fieldtype": "Link",
+            "options": "Employee",
+            "width": 120
+        },
+        {
+            "fieldname": "employee_name",
+            "label": _("Employee Name"),
+            "fieldtype": "Data",
+            "width": 150
+        },
+        {
+            "fieldname": "loan_deduction_amount",
+            "label": _("Loan Deduction Amount"),
+            "fieldtype": "Currency",
+            "width": 150
+        },
+        {
+            "fieldname": "loan_start_date",
+            "label": _("Loan Start Date"),
+            "fieldtype": "Date",
+            "width": 120
+        },
+        {
+            "fieldname": "loan_end_date",
+            "label": _("Loan End Date"),
+            "fieldtype": "Date",
+            "width": 120
+        },
+        {
+            "fieldname": "Month",
+            "label": _("Month"),
+            "fieldtype": "Data",
+            
+            "width": 150
+        }
+        
+    ]
 
 def get_conditions(filters):
-	conditions = ""
-	if filters.get("month"):
-		month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", 
-			"Dec"].index(filters["month"]) + 1
-		filters["month"] = month
-		conditions += " and t1.month = {}".format(filters.get("month"))
-	
-	if filters.get("fiscal_year"): conditions += " and t1.fiscal_year = {}".format(filters.get("fiscal_year"))
-	if filters.get("company"): conditions += " and t1.company = '{}'".format(filters.get("company"))
-	if filters.get("employee"): conditions += " and t1.employee = '{}'".format(filters.get("employee"))
-	if filters.get("bank"): conditions += "and t2.financial_scheme = '{0}'".format(filters.bank)
-	if filters.get("cost_center"): conditions += " and exists(select 1 from `tabCost Center` cc where t1.cost_center = cc.name and (cc.parent_cost_center = '{0}' or cc.name = '{0}'))".format(filters.cost_center)
+    conditions = []
+    conditions.append("sd.salary_component = 'Financial Institution Loan'")
+    conditions.append("sl.docstatus = 1")
+    
+    if filters.get("fiscal_year"):
+        fiscal_year = filters.get("fiscal_year")
+        fiscal_year_details = get_fiscal_year_details(fiscal_year)
+        if fiscal_year_details:
+            conditions.append("sl.posting_date BETWEEN %(start_date)s AND %(end_date)s")
+            filters.update({
+                "start_date": fiscal_year_details[0],
+                "end_date": fiscal_year_details[1]
+            })
+    
+    if filters.get("employee"):
+        conditions.append("sl.employee = %(employee)s")
+    
+    if filters.get("employee_name"):
+        conditions.append("sl.employee_name LIKE %(employee_name)s")
+        filters["employee_name"] = "%" + filters["employee_name"] + "%"
+        
+    if filters.get("month"):
+        conditions.append("sl.month =%(month)s")
+    
+    if filters.get("company"):
+        conditions.append("sl.company = %(company)s")
+    
+    return conditions
 
-	return conditions, filters
+def get_data(filters):
+    conditions = get_conditions(filters)
+    
+    query = """
+        SELECT 
+            sl.employee,
+            sl.employee_name,
+            sd.amount as loan_deduction_amount,
+            ssd.from_date as loan_start_date,
+            ssd.to_date as loan_end_date,
+            sl.month as Month
+        FROM `tabSalary Detail` sd
+        INNER JOIN `tabSalary Slip` sl ON sd.parent = sl.name
+        INNER JOIN `tabSalary Structure` ss ON sl.salary_structure = ss.name
+        INNER JOIN `tabSalary Detail` ssd ON ssd.parent = ss.name 
+            AND ssd.salary_component = ''
+            AND ssd.idx = sd.idx
+    """
+    
+    if conditions:
+        query += " WHERE " + " AND ".join(conditions)
+    
+    query += " ORDER BY sl.employee, sl.posting_date DESC"
+    
+    data = frappe.db.sql(query, filters, as_dict=1)
+    return data
+
+def get_fiscal_year_details(fiscal_year):
+    try:
+        fiscal_year_doc = frappe.get_doc("Fiscal Year", fiscal_year)
+        return [fiscal_year_doc.year_start_date, fiscal_year_doc.year_end_date]
+    except frappe.DoesNotExistError:
+        return None
