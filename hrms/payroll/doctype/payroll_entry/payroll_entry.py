@@ -82,41 +82,20 @@ class PayrollEntry(Document):
 
 		if self.processing_branch:
 			cond += " and t1.branch = '{}'".format(self.processing_branch)
-	
-		# if self.branch_wise_payroll_entry:
-		# 	emp_list = frappe.db.sql("""
-		# 		select t1.name as employee, t1.employee_name, t1.department, t1.designation
-		# 		from `tabEmployee` t1
-		# 		where t1.branch = '{}' and not exists(select 1
-		# 				from `tabSalary Slip` as t3
-		# 				where t3.employee = t1.name
-		# 				and t3.docstatus != 2
-		# 				and t3.fiscal_year = '{}'
-		# 				and t3.month = '{}')
-		# 		{}
-		# 		and t1.status = '{}'
-		# 		order by t1.branch, t1.name
-		# 	""".format(self.processing_branch,self.fiscal_year, self.month, cond, self.status), as_dict=True)
+		if self.salary_group_item:
+			selected_employee_groups = {
+				row.employee_group
+				for row in self.salary_group_item
+				if row.employee_group
+			}
 
-		# 	if not emp_list:
-		# 		frappe.msgprint(_("No employees found for processing or Salary Slips already created"))
-		# 	return emp_list
-		# else:
-		# 	frappe.throw(str("hi"))
+			if selected_employee_groups:
+				groups = ", ".join(
+					frappe.db.escape(group)
+					for group in selected_employee_groups
+				)
 
-		# emp_list = frappe.db.sql("""
-		# 	select t1.name as employee, t1.employee_name, t1.department, t1.designation
-		# 	from `tabEmployee` t1
-		# 	where not exists(select 1
-		# 			from `tabSalary Slip` as t3
-		# 			where t3.employee = t1.name
-		# 			and t3.docstatus != 2
-		# 			and t3.fiscal_year = '{}'
-		# 			and t3.month = '{}')
-		# 	{}
-		# 	and t1.status = '{}'
-		# 	order by t1.branch, t1.name
-		# """.format(self.fiscal_year, self.month, cond, self.status), as_dict=True)
+				cond += f" and t1.employee_group in ({groups})"
 
 		emp_list = frappe.db.sql("""
 			select t1.name as employee, t1.employee_name, t1.department, t1.designation
@@ -1249,6 +1228,92 @@ class PayrollEntry(Document):
 
 		#Third Option
 		# Modified SQL with conditional logic
+		# cc = frappe.db.sql("""
+		# 	SELECT
+		# 		CASE
+		# 			WHEN sc.type = 'Deduction' AND IFNULL(sc.make_party_entry,0) = 0 THEN c.cost_center
+		# 			ELSE t1.cost_center
+		# 		END AS cost_center,
+		# 		CASE
+		# 			WHEN %(is_royal_body_guard)s = 1 THEN 
+		# 				(SELECT cc.budget_activity FROM `tabCost Center` cc WHERE cc.name = t1.cost_center)
+		# 			ELSE 
+		# 				(SELECT eg.budget_activity FROM `tabEmployee Group` eg WHERE t1.employee_group = eg.name)
+		# 		END AS budget_activity,
+		# 		CASE
+		# 			WHEN %(is_royal_body_guard)s = 1 THEN 
+		# 				(SELECT cc.budget_sub_activity FROM `tabCost Center` cc WHERE cc.name = t1.cost_center)
+		# 			ELSE 
+		# 				(SELECT eg.budget_sub_activity FROM `tabEmployee Group` eg WHERE t1.employee_group = eg.name)
+		# 		END AS budget_sub_activity,
+		# 		CASE
+		# 			WHEN %(is_royal_body_guard)s = 1 THEN 
+		# 				(SELECT cc.source_of_fund FROM `tabCost Center` cc WHERE cc.name = t1.cost_center)
+		# 			ELSE 
+		# 				CASE
+		# 					WHEN (SELECT a.source_of_fund FROM `tabAccount` a WHERE a.name = sca.account) IS NOT NULL 
+		# 						THEN (SELECT a.source_of_fund FROM `tabAccount` a WHERE a.name = sca.account)
+		# 					ELSE (SELECT eg.source_of_fund FROM `tabEmployee Group` eg WHERE t1.employee_group = eg.name)
+		# 				END
+		# 		END AS source_of_fund,
+		# 		CASE
+		# 			WHEN sc.type = 'Earning' THEN sc.type
+		# 			ELSE IFNULL(sc.clubbed_component, sc.name)
+		# 		END AS salary_component,
+		# 		sc.type AS component_type,
+		# 		sc.name AS component_name,
+		# 		sc.group_by_institution_name,
+		# 		sd.institution_name,
+		# 		IFNULL(sc.is_remittable,0) AS is_remittable,
+		# 		sca.account AS gl_head,
+		# 		SUM(IFNULL(sd.amount,0)) AS amount,
+		# 		SUM(IFNULL(t1.employer_pf,0)) AS employer_pf,
+		# 		CASE
+		# 			WHEN IFNULL(sc.make_party_entry,0) = 1 THEN 'Payable'
+		# 			ELSE 'Other'
+		# 		END AS account_type,
+		# 		CASE
+		# 			WHEN IFNULL(sc.make_party_entry,0) = 1 THEN 'Employee'
+		# 			ELSE 'Other'
+		# 		END AS party_type,
+		# 		CASE
+		# 			WHEN IFNULL(sc.make_party_entry,0) = 1 THEN t1.employee
+		# 			ELSE ''
+		# 		END AS party
+		# 	FROM `tabSalary Slip` t1
+		# 	INNER JOIN `tabSalary Detail` sd ON sd.parent = t1.name
+		# 	INNER JOIN `tabSalary Component` sc ON sc.name = sd.salary_component
+		# 	INNER JOIN `tabSalary Component Account` sca ON sca.parent = sc.name AND sca.company = t1.company
+		# 	INNER JOIN `tabCompany` c ON c.name = t1.company
+		# 	WHERE t1.fiscal_year = %(fiscal_year)s
+		# 		AND t1.month = %(month)s
+		# 		AND t1.docstatus = 1
+		# 		AND t1.payroll_entry = %(payroll_entry)s
+		# 		AND t1.employee IN %(employees)s
+		# 	GROUP BY 
+		# 		cost_center,
+		# 		salary_component,
+		# 		component_type,
+		# 		budget_activity,
+		# 		budget_sub_activity,
+		# 		source_of_fund,
+		# 		sc.group_by_institution_name,
+		# 		sd.institution_name,
+		# 		is_remittable,
+		# 		gl_head,
+		# 		account_type,
+		# 		party_type,
+		# 		party
+		# 	ORDER BY t1.cost_center, sc.type, sc.name
+		# """, {
+		# 	"fiscal_year": self.fiscal_year,
+		# 	"month": self.month,
+		# 	"payroll_entry": self.name,
+		# 	"employees": tuple(employee_list),
+		# 	"is_royal_body_guard": 1 if is_royal_body_guard else 0
+		# }, as_dict=1)
+
+		#4th Condition
 		cc = frappe.db.sql("""
 			SELECT
 				CASE
@@ -1256,18 +1321,21 @@ class PayrollEntry(Document):
 					ELSE t1.cost_center
 				END AS cost_center,
 				CASE
+					WHEN IFNULL(sc.budget_activity, '') != '' THEN sc.budget_activity
 					WHEN %(is_royal_body_guard)s = 1 THEN 
 						(SELECT cc.budget_activity FROM `tabCost Center` cc WHERE cc.name = t1.cost_center)
 					ELSE 
 						(SELECT eg.budget_activity FROM `tabEmployee Group` eg WHERE t1.employee_group = eg.name)
 				END AS budget_activity,
 				CASE
+					WHEN IFNULL(sc.budget_sub_activity, '') != '' THEN sc.budget_sub_activity
 					WHEN %(is_royal_body_guard)s = 1 THEN 
 						(SELECT cc.budget_sub_activity FROM `tabCost Center` cc WHERE cc.name = t1.cost_center)
 					ELSE 
 						(SELECT eg.budget_sub_activity FROM `tabEmployee Group` eg WHERE t1.employee_group = eg.name)
 				END AS budget_sub_activity,
 				CASE
+					WHEN IFNULL(sc.source_of_fund, '') != '' THEN sc.source_of_fund
 					WHEN %(is_royal_body_guard)s = 1 THEN 
 						(SELECT cc.source_of_fund FROM `tabCost Center` cc WHERE cc.name = t1.cost_center)
 					ELSE 
