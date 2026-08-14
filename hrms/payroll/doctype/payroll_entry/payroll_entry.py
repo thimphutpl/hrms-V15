@@ -96,7 +96,7 @@ class PayrollEntry(Document):
 				)
 
 				cond += f" and t1.employee_group in ({groups})"
-
+		cond += " and ifnull(t1.ignore_from_payroll_entry, 0) = 0"
 		emp_list = frappe.db.sql("""
 			select t1.name as employee, t1.employee_name, t1.department, t1.designation
 			from `tabEmployee` t1
