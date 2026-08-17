@@ -229,6 +229,13 @@ class SalaryStructure(Document):
 						table but amounts do not match, then update the respective row.
 		'''
 		self.validate_salary_component()
+		if not self.employee_grade:
+			frappe.throw(
+				_("Employee {0} does not have a Rank/Grade assigned. Please update the employee's Rank/Grade before proceeding.").format(self.employee),
+				title="Missing Rank/Grade"
+			)
+
+
 
 		basic_pay = comm_allowance = gis_amt = pf_amt = health_cont_amt = tax_amt = basic_pay_arrears = payscale_lower_limit= 0
 		total_earning = total_deduction = net_pay = 0
