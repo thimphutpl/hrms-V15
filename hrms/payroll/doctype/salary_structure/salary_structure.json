@@ -830,6 +830,7 @@
    "oldfieldname": "total_earning",
    "oldfieldtype": "Currency",
    "options": "Company:company:default_currency",
+   "precision": "0",
    "read_only": 1
   },
   {
@@ -1408,7 +1409,7 @@
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2026-07-10 14:20:48.979086",
+ "modified": "2026-08-17 11:41:38.685591",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
