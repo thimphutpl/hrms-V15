@@ -840,6 +840,7 @@
    "oldfieldname": "total_deduction",
    "oldfieldtype": "Currency",
    "options": "Company:company:default_currency",
+   "precision": "0",
    "read_only": 1
   },
   {
@@ -847,6 +848,7 @@
    "fieldtype": "Currency",
    "label": "Net Pay",
    "options": "Company:company:default_currency",
+   "precision": "0",
    "read_only": 1
   },
   {
@@ -1409,7 +1411,7 @@
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2026-08-17 11:41:38.685591",
+ "modified": "2026-08-17 11:46:47.114662",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
