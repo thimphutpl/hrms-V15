@@ -22,6 +22,7 @@
   "column_break_crso",
   "exchange_rate",
   "section_break_8",
+  "is_opening",
   "purpose",
   "column_break_11",
   "advance_amount",
@@ -326,11 +327,17 @@
    "fieldtype": "Select",
    "label": "Advance Type",
    "options": "Employee Advance"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_opening",
+   "fieldtype": "Check",
+   "label": "Is Opening"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2026-06-29 15:04:37.068793",
+ "modified": "2026-08-18 14:59:16.216088",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Advance",
