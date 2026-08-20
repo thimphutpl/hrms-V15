@@ -27,6 +27,11 @@
   "round_off",
   "accounts_details_section",
   "table_ayfl",
+  "budget_activity_mapping_section",
+  "budget_activity",
+  "source_of_fund",
+  "column_break_swjw",
+  "budget_sub_activity",
   "sb_posting_settings",
   "make_party_entry",
   "make_cc_entry",
@@ -240,12 +245,39 @@
    "in_list_view": 1,
    "label": "Company",
    "options": "Company"
+  },
+  {
+   "fieldname": "budget_activity_mapping_section",
+   "fieldtype": "Section Break",
+   "label": "Budget Activity Mapping"
+  },
+  {
+   "fieldname": "budget_activity",
+   "fieldtype": "Link",
+   "label": "Budget Activity",
+   "options": "Budget Activity"
+  },
+  {
+   "fieldname": "source_of_fund",
+   "fieldtype": "Link",
+   "label": "Source of Fund",
+   "options": "Source of Fund"
+  },
+  {
+   "fieldname": "column_break_swjw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "budget_sub_activity",
+   "fieldtype": "Link",
+   "label": "Budget Sub Activity",
+   "options": "Budget Sub Activity"
   }
  ],
  "icon": "fa fa-flag",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-05-05 16:17:12.378270",
+ "modified": "2026-07-20 10:45:17.169529",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Component",
