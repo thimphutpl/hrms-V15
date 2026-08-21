@@ -800,7 +800,7 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 				basic_amt = (flt(e['amount']))
 			# Following condition added by SHIV on 2019/04/29
 			elif frappe.db.exists("Salary Component", {"name": e['salary_component'], "is_pf_deductible": 1}):
-				basic_pay_arrears += (flt(e['amount']))
+				basic_pay_arrears += (round(e['amount']))
 			if e['salary_component'] == 'Communication Allowance':
 				comm_amt = (flt(e['amount']))
 			gross_amt += flt(e['amount'])
