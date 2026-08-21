@@ -613,8 +613,8 @@ class SalaryStructure(Document):
 			[self.append(ed, i) for i in add_list]
 			
 		self.total_earning   = sum([self.get_active_amount(rec) for rec in self.get("earnings")])
-		self.total_deduction = sum([self.get_active_amount(rec) for rec in self.get("deductions")])
-		self.net_pay = flt(self.total_earning) - flt(self.total_deduction)
+		self.total_deduction = round(sum([self.get_active_amount(rec) for rec in self.get("deductions")]))
+		self.net_pay = round(flt(self.total_earning) - flt(self.total_deduction))
 	
 		if flt(self.total_earning)-flt(self.total_deduction) < 0 and not self.get('__unsaved'):
 			frappe.throw(_("Total deduction cannot be more than total earning"), title="Invalid Data")
@@ -822,12 +822,12 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 				if d['salary_component'] == 'PF':
 					percent = flt(settings.get("employee_pf"))
 					pf_amt = (flt(basic_amt)+flt(basic_pay_arrears))*flt(percent)*0.01
-					calc_amt = flt(pf_amt, 2)
+					calc_amt = round(pf_amt, 2)
 					# added by phuntsho on feb April 6th 2021
 					# calculate employer pf
 					employer_percent = flt(settings.get("employer_pf"))
 					employer_pf_amount = (flt(basic_amt)+flt(basic_pay_arrears))*flt(employer_percent)*0.01
-					employer_pf_amount = flt(employer_pf_amount, 2)
+					employer_pf_amount = round(employer_pf_amount, 2)
 					target.employer_pf = employer_pf_amount
 					# ----- end of code by phuntsho -----
 					d['amount'] = calc_amt
