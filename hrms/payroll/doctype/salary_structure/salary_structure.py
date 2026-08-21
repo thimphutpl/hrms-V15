@@ -402,7 +402,7 @@ class SalaryStructure(Document):
 						# frappe.throw(str(flt(basic_pay)))
 						pf_amt = (flt(basic_pay)+flt(basic_pay_arrears))*flt(settings.get("employee_pf"))*0.01
 						# calc_amt = roundoff(pf_amt)
-						calc_amt = flt(pf_amt)
+						calc_amt = round(pf_amt)
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})	
 
 					elif self.get(m['field_name']) and m['name'] == 'Health Contribution':
