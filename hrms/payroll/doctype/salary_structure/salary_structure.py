@@ -580,6 +580,14 @@ class SalaryStructure(Document):
 					total_deduction += calc_amt
 					calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(calc_amt)})
 					tax_included = 1
+
+				elif self.employee_group in ["Civilan (RBA)", "Civilan (RBG)"]:
+					calc_amt = get_salary_tax(math.floor(flt(basic_pay)-(flt(basic_pay) * 0.15)))
+					calc_amt = roundoff(calc_amt)
+					total_deduction += calc_amt
+					calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(calc_amt)})
+					tax_included = 1
+
 				# elif self.employee_group in ["Deceased (2003)", "Deceased (2012)"]:
 				elif self.employee_group in ["Deceased (2003)", "Deceased (2015)"]:
 					# # return
