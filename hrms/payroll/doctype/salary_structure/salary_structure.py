@@ -573,8 +573,8 @@ class SalaryStructure(Document):
 			# Calculating Salary Tax
 			tax_included = 0
 			if ed == 'deductions' and self.eligible_for_tax:
-				if self.employee_group in ["Officer (RBA)","Civilan (RBA)","Troops (RBA)","Troops (RBG)",
-							   "Officer (RBG)","Civilan (RBG)"]:
+				if self.employee_group in ["Officer (RBA)","Troops (RBA)","Troops (RBG)",
+							   "Officer (RBG)"]:
 					calc_amt = get_salary_tax(math.floor(flt(basic_pay)-flt(pf_amt)-flt(gis_amt)))
 					calc_amt = roundoff(calc_amt)
 					total_deduction += calc_amt
