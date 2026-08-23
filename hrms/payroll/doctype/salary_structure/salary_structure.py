@@ -369,7 +369,8 @@ class SalaryStructure(Document):
 							calc_amt = frappe.db.get_value("Employee Grade", self.employee_grade, "vegetable_allowance")
 
 						if m["field_name"] == "eligible_for_lumpsum_revision":
-							calc_amt = frappe.db.get_value("Employee Grade", self.employee_grade, "lumpsum_revision")		
+							calc_amt = frappe.db.get_value("Employee Grade", self.employee_grade, "lumpsum_revision")
+
 
 						if m["field_name"] == "eligible_for_orderly_allowance":
 							calc_amt = frappe.db.get_value("Employee Grade", self.employee_grade, "orderly_allowance")		
@@ -581,12 +582,19 @@ class SalaryStructure(Document):
 					calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(calc_amt)})
 					tax_included = 1
 
+				elif self.employee_group in ["Contract (RBA)"]:
+					calc_amt = get_salary_tax(math.floor(flt(total_earning)))
+					calc_amt = roundoff(calc_amt)
+					total_deduction += calc_amt
+					calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(calc_amt)})
+					tax_included = 1
+
 				elif self.employee_group in ["Civilan (RBA)", "Civilan (RBG)"]:
 					calc_amt = get_salary_tax(math.floor(flt(basic_pay)-(flt(basic_pay) * 0.15)))
 					calc_amt = roundoff(calc_amt)
 					total_deduction += calc_amt
 					calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(calc_amt)})
-					tax_included = 1
+					tax_included = 1	
 
 				# elif self.employee_group in ["Deceased (2003)", "Deceased (2012)"]:
 				elif self.employee_group in ["Deceased (2003)", "Deceased (2015)"]:
