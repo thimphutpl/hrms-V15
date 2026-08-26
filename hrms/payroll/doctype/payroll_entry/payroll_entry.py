@@ -80,8 +80,8 @@ class PayrollEntry(Document):
 		
 		cond += self.get_joining_relieving_condition()
 
-		if self.processing_branch:
-			cond += " and t1.branch = '{}'".format(self.processing_branch)
+		# if self.processing_branch:
+		# 	cond += " and t1.branch = '{}'".format(self.processing_branch)
 		if self.salary_group_item:
 			selected_employee_groups = {
 				row.employee_group
@@ -290,7 +290,7 @@ class PayrollEntry(Document):
 		cond = self.get_filter_condition()
 
 		ss_list = frappe.db.sql("""
-			select t1.name, t1.salary_structure from `tabSalary Slip` t1
+			select distinct t1.name, t1.salary_structure from `tabSalary Slip` t1
 			where t1.docstatus = %s
 			and (t1.journal_entry is null or t1.journal_entry = "") and ifnull(salary_slip_based_on_timesheet,0) = %s %s
 			and t1.payroll_entry = %s
@@ -792,7 +792,7 @@ class PayrollEntry(Document):
 				sc.type AS component_type,
 				sc.name AS component_name,
 				sc.group_by_institution_name,
-				sd.institution_name,
+				sd.name,
 				IFNULL(sc.is_remittable,0) AS is_remittable,
 				sca.account AS gl_head,
 				SUM(IFNULL(sd.amount,0)) AS amount,
@@ -829,9 +829,7 @@ class PayrollEntry(Document):
 				sc.group_by_institution_name,
 				is_remittable,
 				gl_head,
-				account_type,
-				party_type,
-				party
+				account_type
 			ORDER BY t1.cost_center, sc.type, sc.name
 		""", {
 			"fiscal_year": self.fiscal_year,
@@ -1033,7 +1031,7 @@ class PayrollEntry(Document):
 		# Add bank credit entries for remittances
 		for component_name, remit_data in component_remittances.items():
 			posting.setdefault(f"remittance_{component_name}", []).append({
-				"account": default_bank_account,
+				"account": default_account,
 				"credit_in_account_currency": remit_data["amount"],
 				"cost_center": remit_data["cost_center"],
 				"party_check": 0,
@@ -1455,7 +1453,7 @@ def submit_salary_slips_for_employees(payroll_entry, salary_slips, publish_progr
 
 def get_payroll_entries_for_jv(doctype, txt, searchfield, start, page_len, filters):
 	return frappe.db.sql("""
-		select name from `tabPayroll Entry`
+		select distinct name from `tabPayroll Entry`
 		where `{key}` LIKE %(txt)s
 		and name not in
 			(select reference_name from `tabJournal Entry Account`
