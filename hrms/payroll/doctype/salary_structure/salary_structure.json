@@ -107,7 +107,11 @@
   "batman_allowance",
   "eligible_for_high_altitude_allowance",
   "eligible_for_hra",
+  "eligible_for_hra_allowance_method",
+  "hra_allowance",
   "eligible_for_lumpsum_revision",
+  "eligible_lumpsum_revision_method",
+  "lumpsum_revision",
   "column_break_obuh",
   "eligible_for_trade_allowance",
   "eligible_for_trade_allowance_method",
@@ -1407,12 +1411,38 @@
    "fieldname": "value_ration_allownce",
    "fieldtype": "Currency",
    "label": "Value (Ration Allowance)"
+  },
+  {
+   "depends_on": "eligible_for_hra",
+   "fieldname": "eligible_for_hra_allowance_method",
+   "fieldtype": "Select",
+   "label": "Eligible for HRA Allowance Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_lumpsum_revision",
+   "fieldname": "lumpsum_revision",
+   "fieldtype": "Int",
+   "label": "(Lumpsum Revision)"
+  },
+  {
+   "depends_on": "eligible_for_hra",
+   "fieldname": "hra_allowance",
+   "fieldtype": "Int",
+   "label": "Value(HRA)"
+  },
+  {
+   "depends_on": "eligible_for_lumpsum_revision",
+   "fieldname": "eligible_lumpsum_revision_method",
+   "fieldtype": "Select",
+   "label": "Eligible for Lumpsum Revision Method",
+   "options": "Percent\nLumpsum"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2026-08-17 12:23:53.062254",
+ "modified": "2026-08-24 14:32:58.825217",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",

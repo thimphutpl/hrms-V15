@@ -310,8 +310,16 @@ class SalaryStructure(Document):
 							
 							calc_amt = flt(self.get(m['field_value']))
 
-						if m["field_name"] == "eligible_for_hra":
-							calc_amt = frappe.db.get_value("Employee Grade", self.employee_grade, "hra")
+						# if m["field_name"] == "eligible_for_hra":
+						# 	# calc_amt = frappe.db.get_value("Employee Grade", self.employee_grade, "hra")
+						# 	existing_Hra_fund = next(
+						# 	(d for d in self.get("earnings") if d.salary_component == "HRA"),
+						# 	None
+						# 	)
+						# 	if existing_Hra_fund:
+						# 		calc_amt = flt(existing_Hra_fund.amount)
+						# 	else:
+						# 		calc_amt = 0.0
 
 					
 
@@ -368,8 +376,8 @@ class SalaryStructure(Document):
 						if m["field_name"] == "eligible_for_vegetable_allowance":
 							calc_amt = frappe.db.get_value("Employee Grade", self.employee_grade, "vegetable_allowance")
 
-						if m["field_name"] == "eligible_for_lumpsum_revision":
-							calc_amt = frappe.db.get_value("Employee Grade", self.employee_grade, "lumpsum_revision")
+						# if m["field_name"] == "eligible_for_lumpsum_revision":
+						# 	calc_amt = frappe.db.get_value("Employee Grade", self.employee_grade, "lumpsum_revision")
 
 
 						if m["field_name"] == "eligible_for_orderly_allowance":
