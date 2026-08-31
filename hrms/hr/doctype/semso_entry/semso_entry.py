@@ -9,7 +9,7 @@ class SemsoEntry(Document):
 	def validate(self):
 		self.calculate_total()
 		self.semso_calculate_total()
-
+    
 	def calculate_total(self):
 		for item in self.semso_contribution:
 			base_amount = item.base_amount
