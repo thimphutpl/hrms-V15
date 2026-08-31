@@ -105,12 +105,17 @@ frappe.ui.form.on("Semso Entry", {
             method: "hrms.hr.doctype.semso_entry.semso_entry.get_employee",
             args: {
                 "company": frm.doc.company,
-                "semso_contributor": frm.doc.semso_contributor
+                "semso_contributor": frm.doc.semso_contributor,
+                "employee_group": frm.doc.employee_group
             },
             callback: function (res) {
 
 
                 if (res.message && res.message.length > 0) {
+                    frappe.show_alert({
+                        message: __("Employee loading started in background"),
+                        indicator: "blue"
+                    });
                     res.message.forEach(function (row) {
                         let child = frm.add_child("semso_contribution");
                         child.employee = row.name;

@@ -36,144 +36,80 @@ class SemsoEntry(Document):
 				self.total_civilan += amount
 		
 				
-
-
 @frappe.whitelist()
-def get_employee(company=None, semso_contributor=None):
+def get_employee(employee_group, company=None, semso_contributor=None):
 
 	if not company:
 		frappe.throw("Company is required")
 
-	if not semso_contributor:
-		return []
+	if not employee_group:
+		frappe.throw("Employee Group is required")
 
-	# FIX: convert string to list if needed
+	# Convert child table JSON to Python list
 	if isinstance(semso_contributor, str):
 		semso_contributor = json.loads(semso_contributor)
 
-
+	# Get groups from Semso Contributor
 	employee_groups = []
-	use_grade = False
-	use_group = False
 
-	for row in semso_contributor:
-
+	for row in semso_contributor or []:
 		contribution = row.get("semso_contribution")
 
-		if row.get("employee_group") == 1:
+		if contribution:
 			employee_groups.append(contribution)
-			use_group = True
 
-		if row.get("employee_grade") == 1:
-			employee_groups.append(contribution)
-			use_grade = True
+	# Remove duplicate groups
+	employee_groups = list(set(employee_groups))
 
-
-
-	group_names = []
-	if employee_groups:
-		group_names = frappe.get_all(
-			"Employee Group",
-			filters={
-				"company": company,
-				"name": ["in",employee_groups]
-			},
-			pluck="name"
-		)
-
-	if not group_names:
-		group_names = []
-
-	# -----------------------------
-	# 3. Get Grades from Master Items
-	# -----------------------------
-	grades = []
-	if group_names:
-		grades = frappe.get_all(
-			"Employee Group Master Item",
-			filters={
-				"parent": ["in", group_names]
-			},
-			pluck="grade"
-		)
-
-	# merge grade filters from direct selection + master
-	all_grades = list(set(grades))
-	
-
-	if not all_grades:
+	if not employee_groups:
 		return []
 
-	employees = frappe.get_all(
-		"Employee",
-		filters={
-			"company": company,
-			"grade": ["in", all_grades],
-			"status": "Active"
-		},
-		fields=[
-			"name",
-			"employee_name",
-			"grade",
-			"employee_group"
-		]
+	placeholders = ", ".join(["%s"] * len(employee_groups))
+
+	# Amount is based on MAIN employee_group
+	if employee_group == "Officer (RBA)":
+		amount_field = "eg.officer_semso_amount"
+
+	elif employee_group == "Troops (RBA)":
+		amount_field = "eg.troop_semso_amount"
+
+	elif employee_group == "Civilan (RBA)":
+		amount_field = "eg.civilan_semso_amount"
+
+	else:
+		amount_field = "0"
+
+	query = f"""
+		SELECT
+			e.name AS employee,
+			e.employee_name,
+			e.grade,
+			e.employee_group,
+
+			IFNULL({amount_field}, 0) AS amount
+
+		FROM `tabEmployee` e
+
+		INNER JOIN `tabEmployee Grade` eg
+			ON e.grade = eg.name
+
+		WHERE
+			e.company = %s
+			AND e.status = 'Active'
+			AND e.employee_group IN ({placeholders})
+
+		ORDER BY
+			e.employee_group,
+			e.employee_name
+	"""
+
+	values = [company] + employee_groups
+
+	return frappe.db.sql(
+		query,
+		values,
+		as_dict=True
 	)
-	for emp in employees:
-
-	
-		grade_amount = 0
-		group_amount = 0
-
-	
-		if use_grade:
-			grade_result =frappe.db.sql("""
-							SELECT egm.amount
-							FROM `tabSemso Deduction Master` sdm 
-							JOIN `tabSemso Employee Grade` egm 
-							   ON sdm.name = egm.parent
-							WHERE sdm.company = %s AND egm.employee_grade = %s	
-							""",(company,emp.grade),as_dict=1)
-			grade_amount = grade_result[0].amount if grade_result else 0
-		if use_group:
-
-			if not isinstance(employee_groups, list):
-				employee_groups = [employee_groups]
-			
-	
-			if not isinstance(emp.grade, list):
-				grades = [emp.grade]
-			else:
-				grades = emp.grade
-			
-
-			group_placeholders = ', '.join(['%s'] * len(employee_groups))
-			grade_placeholders = ', '.join(['%s'] * len(grades))
-			
-			query = f"""
-				SELECT sdm.amount, seg.grade, egm.name as employee_group
-				FROM `tabSemso Deduction Master` sdm
-				JOIN `tabEmployee Group` egm 
-					ON sdm.emp_group = egm.name
-				JOIN `tabEmployee Group Master Item` seg 
-					ON egm.name = seg.parent
-				WHERE sdm.emp_group IN ({group_placeholders})
-					AND seg.grade IN ({grade_placeholders})
-					AND sdm.company = %s
-			"""
-			
-			params = employee_groups + grades + [company]
-			result = frappe.db.sql(query, params, as_dict=1)
-	
-
-			group_amount = result[0].amount if result else 0
-			
-
-		emp.grade_amount = grade_amount
-		emp.group_amount = group_amount
-		emp.amount = (grade_amount or 0) + (group_amount or 0)
-
-	return employees
-
 
 def get_permission_query_conditions(user):
 	if not user: user = frappe.session.user
