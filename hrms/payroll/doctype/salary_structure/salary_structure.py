@@ -420,7 +420,10 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 			return
 
 		# Copy earnings and deductions table from source salary structure
-		calc_map = {}
+		calc_map = {
+			"earnings": [],
+			"deductions": []
+		}
 		full_basic = 0.0
 		for key in ('earnings', 'deductions'):
 			for d in source.get(key):
