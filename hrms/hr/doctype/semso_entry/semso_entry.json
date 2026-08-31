@@ -71,7 +71,6 @@
   {
    "fieldname": "branch",
    "fieldtype": "Link",
-   "in_list_view": 1,
    "label": "Branch",
    "options": "Branch"
   },
@@ -138,6 +137,7 @@
   {
    "fieldname": "employee_group",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Employee Group",
    "options": "Employee Group",
    "reqd": 1
@@ -156,6 +156,7 @@
    "default": "0",
    "fieldname": "spouse_semso",
    "fieldtype": "Check",
+   "in_list_view": 1,
    "label": "Spouse Semso"
   },
   {
@@ -207,7 +208,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-08-31 18:20:40.464059",
+ "modified": "2026-08-31 20:15:03.983895",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Semso Entry",
