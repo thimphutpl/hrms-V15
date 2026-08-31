@@ -2,13 +2,14 @@
  "actions": [],
  "allow_import": 1,
  "allow_rename": 1,
- "autoname": "Prompt",
+ "autoname": "prompt",
  "creation": "2018-04-13 16:14:24.174138",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "company",
+  "abbr",
   "default_salary_structure",
   "default_leave_policy",
   "currency",
@@ -50,7 +51,15 @@
   "relieving_fund_deduction",
   "column_break_iatc",
   "medical_deduction",
-  "grade"
+  "grade",
+  "section_break_gunb",
+  "officer_semso_amount",
+  "column_break_rzub",
+  "civilan_semso_amount",
+  "column_break_itrq",
+  "troop_semso_amount",
+  "column_break_quiu",
+  "spouse_semso_amount"
  ],
  "fields": [
   {
@@ -279,11 +288,53 @@
    "fieldname": "increment_based",
    "fieldtype": "Check",
    "label": "Increment Based"
+  },
+  {
+   "fetch_from": "company.abbr",
+   "fieldname": "abbr",
+   "fieldtype": "Data",
+   "label": "Abbr"
+  },
+  {
+   "fieldname": "section_break_gunb",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "officer_semso_amount",
+   "fieldtype": "Currency",
+   "label": "Officer Semso Amount"
+  },
+  {
+   "fieldname": "column_break_rzub",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "civilan_semso_amount",
+   "fieldtype": "Currency",
+   "label": "Civilan Semso Amount"
+  },
+  {
+   "fieldname": "column_break_itrq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "troop_semso_amount",
+   "fieldtype": "Currency",
+   "label": "Troop Semso Amount"
+  },
+  {
+   "fieldname": "column_break_quiu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "spouse_semso_amount",
+   "fieldtype": "Currency",
+   "label": "Spouse Semso Amount"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-07-18 10:55:13.855102",
+ "modified": "2026-08-31 15:31:07.262026",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Grade",
