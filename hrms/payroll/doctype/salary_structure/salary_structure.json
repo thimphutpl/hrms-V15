@@ -157,7 +157,6 @@
   "cb_16",
   "eligible_for_leave_encashment",
   "eligible_for_overtime_and_payment",
-  "eligible_for_sws",
   "eligible_for_relief_fund",
   "eligible_for_child_alimony",
   "eligible_for_kidney",
@@ -901,13 +900,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "1",
-   "fieldname": "eligible_for_sws",
-   "fieldtype": "Check",
-   "label": "Eligible for SWS",
-   "print_hide": 1
-  },
-  {
    "fieldname": "cb_10",
    "fieldtype": "Column Break"
   },
@@ -1168,6 +1160,7 @@
    "default": "0",
    "fieldname": "eligible_for_kanjur",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Eligible for Kanjur"
   },
   {
@@ -1208,6 +1201,7 @@
    "default": "0",
    "fieldname": "eligible_for_medical",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Eligible for Medical"
   },
   {
@@ -1442,7 +1436,7 @@
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2026-08-24 14:32:58.825217",
+ "modified": "2026-08-31 23:16:59.554795",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",

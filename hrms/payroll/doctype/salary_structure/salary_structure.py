@@ -803,52 +803,52 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 		# 	GROUP BY child.employee
 		# """, (source.employee, target_doc.company, target_doc.fiscal_year, target_doc.month), as_dict=True)
 		semso_total = frappe.db.sql("""
-            SELECT 
-                child.employee,
-                MAX(child.name1) AS name1,
-                MAX(child.grade) AS grade,
-                COALESCE(SUM(child.amount), 0) AS amount,
-                parent.spouse_semso AS spouse_semso
+			SELECT 
+				child.employee,
+				MAX(child.name1) AS name1,
+				MAX(child.grade) AS grade,
+				COALESCE(SUM(child.amount), 0) AS amount,
+				parent.spouse_semso AS spouse_semso
 
-            FROM `tabSemso Contribution Item` child
+			FROM `tabSemso Contribution Item` child
 
-            INNER JOIN `tabSemso Entry` parent
-                ON child.parent = parent.name
+			INNER JOIN `tabSemso Entry` parent
+				ON child.parent = parent.name
 
-            WHERE parent.docstatus = 1
-                AND child.employee = %s
-                AND parent.company = %s
-                AND parent.fiscal_year = %s
+			WHERE parent.docstatus = 1
+				AND child.employee = %s
+				AND parent.company = %s
+				AND parent.fiscal_year = %s
 
-                AND CASE parent.month
-                    WHEN 'January' THEN '01'
-                    WHEN 'February' THEN '02'
-                    WHEN 'March' THEN '03'
-                    WHEN 'April' THEN '04'
-                    WHEN 'May' THEN '05'
-                    WHEN 'June' THEN '06'
-                    WHEN 'July' THEN '07'
-                    WHEN 'August' THEN '08'
-                    WHEN 'September' THEN '09'
-                    WHEN 'October' THEN '10'
-                    WHEN 'November' THEN '11'
-                    WHEN 'December' THEN '12'
-                    ELSE parent.month
-                END = %s
+				AND CASE parent.month
+					WHEN 'January' THEN '01'
+					WHEN 'February' THEN '02'
+					WHEN 'March' THEN '03'
+					WHEN 'April' THEN '04'
+					WHEN 'May' THEN '05'
+					WHEN 'June' THEN '06'
+					WHEN 'July' THEN '07'
+					WHEN 'August' THEN '08'
+					WHEN 'September' THEN '09'
+					WHEN 'October' THEN '10'
+					WHEN 'November' THEN '11'
+					WHEN 'December' THEN '12'
+					ELSE parent.month
+				END = %s
 
-            GROUP BY
-                child.employee,
-                parent.spouse_semso
+			GROUP BY
+				child.employee,
+				parent.spouse_semso
 
-            ORDER BY
-                parent.spouse_semso
-        """, (
-            source.employee,
-            target_doc.company,
-            target_doc.fiscal_year,
-            target_doc.month
-        ), as_dict=True)
-		# frappe.throw("semso_total:"+str(semso_total))
+			ORDER BY
+				parent.spouse_semso
+		""", (
+			source.employee,
+			target_doc.company,
+			target_doc.fiscal_year,
+			target_doc.month
+		), as_dict=True)
+	
 
 		if semso_total:
 			for d in semso_total:

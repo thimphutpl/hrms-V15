@@ -232,12 +232,12 @@ frappe.ui.form.on('Salary Structure', {
     eligible_for_spouse_semso: function (frm) {
         calculate_others(frm);
     },
-    eligible_for_kanjur: function (frm) {
-        calculate_others(frm);
-    },
-    eligible_for_medical: function (frm) {
-        calculate_others(frm);
-    },
+    // eligible_for_kanjur: function (frm) {
+    //     calculate_others(frm);
+    // },
+    // eligible_for_medical: function (frm) {
+    //     calculate_others(frm);
+    // },
     eligible_for_pf: function (frm) {
         calculate_others(frm);
     },
