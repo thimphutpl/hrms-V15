@@ -82,9 +82,9 @@ def get_employee(employee_group, company=None, semso_contributor=None):
 	query = f"""
 		SELECT
 			e.name AS employee,
-			e.employee_name,
-			e.grade,
-			e.employee_group,
+			e.employee_name as employee_name ,
+			e.grade as grade,
+			e.employee_group as employee_group,
 
 			IFNULL({amount_field}, 0) AS amount
 

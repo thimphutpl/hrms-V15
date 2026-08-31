@@ -73,8 +73,7 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Branch",
-   "options": "Branch",
-   "reqd": 1
+   "options": "Branch"
   },
   {
    "fieldname": "fiscal_year",
@@ -208,7 +207,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-08-06 15:29:05.356156",
+ "modified": "2026-08-31 18:20:40.464059",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Semso Entry",

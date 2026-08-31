@@ -118,7 +118,7 @@ frappe.ui.form.on("Semso Entry", {
                     });
                     res.message.forEach(function (row) {
                         let child = frm.add_child("semso_contribution");
-                        child.employee = row.name;
+                        child.employee = row.employee;
                         child.name1 = row.employee_name;
                         child.grade = row.grade;
                         child.amount = row.amount;
