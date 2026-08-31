@@ -15,11 +15,15 @@
  ],
  "fields": [
   {
+   "allow_in_quick_entry": 1,
    "fieldname": "employee",
    "fieldtype": "Data",
+   "in_filter": 1,
+   "in_global_search": 1,
    "in_list_view": 1,
-   "label": "Employee ID",
-   "read_only": 1
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Employee ID"
   },
   {
    "fetch_from": "employee.employee_name",
@@ -62,7 +66,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-08-06 14:39:43.187180",
+ "modified": "2026-08-13 13:31:39.631892",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Semso Contribution Item",
