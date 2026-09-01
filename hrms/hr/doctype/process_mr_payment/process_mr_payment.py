@@ -248,8 +248,8 @@ class ProcessMRPayment(Document):
 					"reference_type": "Process MR Payment",
 					"reference_name": self.name,
 					"cost_center": self.cost_center,
-					"debit_in_account_currency": flt(self.total_amount),
-					"debit": flt(self.total_amount),
+					"debit_in_account_currency": flt(total_amount_mu),
+					"debit": flt(total_amount_mu),
 				})
 
 		if self.gross_loading_amount:
