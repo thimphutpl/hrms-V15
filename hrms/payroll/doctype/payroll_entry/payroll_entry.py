@@ -733,7 +733,7 @@ class PayrollEntry(Document):
 
 		company = frappe.db.get_value("Company", self.company, 
 			["default_payroll_payable_account", "cost_center", "employer_contribution_pf_account"], as_dict=1)
-		# default_bank_account = frappe.db.get_value("Branch", self.processing_branch, "expense_bank_account")
+		default_bank_account =  None
 		if self.processing_branch:
 			default_bank_account = frappe.db.get_value("Branch", self.processing_branch, "expense_bank_account")
 		else:	
@@ -1162,8 +1162,8 @@ class PayrollEntry(Document):
 				doc.insert()
 				
 				if "to_payables" in entry_type:
-					# doc.submit()
-					doc.insert()
+					doc.submit()
+					# doc.insert()
 					jv_name = doc.name
 			
 			if jv_name:
