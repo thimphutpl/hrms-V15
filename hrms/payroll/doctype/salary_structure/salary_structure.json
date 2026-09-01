@@ -146,7 +146,7 @@
   "entertainment_allowance",
   "eligible_for_afsa",
   "eligible_for_afsa_method",
-  "valueafsa",
+  "afsa",
   "eligible_for_contract_allowance",
   "eligible_for_ration_allowance",
   "eligible_for_ration_allowance_method",
@@ -1469,7 +1469,7 @@
   },
   {
    "depends_on": "eligible_for_afsa",
-   "fieldname": "valueafsa",
+   "fieldname": "afsa",
    "fieldtype": "Int",
    "label": "Value(AFSA)"
   }
@@ -1477,7 +1477,7 @@
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2026-09-01 14:14:50.618768",
+ "modified": "2026-09-01 14:19:34.387256",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
