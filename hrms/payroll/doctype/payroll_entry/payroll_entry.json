@@ -15,6 +15,12 @@
   "fiscal_year",
   "processing_branch",
   "status",
+  "employee_status_section",
+  "active",
+  "deceased",
+  "inactive",
+  "left",
+  "suspended",
   "section_break_xwrz",
   "salary_group_item",
   "section_break_8",
@@ -143,6 +149,7 @@
    "fieldtype": "Section Break"
   },
   {
+   "allow_bulk_edit": 1,
    "fieldname": "employees",
    "fieldtype": "Table",
    "label": "Employee Details",
@@ -360,12 +367,11 @@
    "read_only": 1
   },
   {
-   "default": "Active",
    "fieldname": "status",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Employee Status",
-   "options": "Active\nInactive\nSuspended\nLeft",
-   "reqd": 1
+   "options": "\nActive\nInactive\nSuspended\nLeft\nDeceased"
   },
   {
    "fieldname": "section_break_xwrz",
@@ -376,12 +382,47 @@
    "fieldtype": "Table",
    "label": "Employee Group",
    "options": "Salary Group Item"
+  },
+  {
+   "fieldname": "employee_status_section",
+   "fieldtype": "Section Break",
+   "label": "Employee Status"
+  },
+  {
+   "default": "0",
+   "fieldname": "active",
+   "fieldtype": "Check",
+   "label": "Active"
+  },
+  {
+   "default": "0",
+   "fieldname": "deceased",
+   "fieldtype": "Check",
+   "label": "Deceased"
+  },
+  {
+   "default": "0",
+   "fieldname": "inactive",
+   "fieldtype": "Check",
+   "label": "Inactive"
+  },
+  {
+   "default": "0",
+   "fieldname": "left",
+   "fieldtype": "Check",
+   "label": "Left"
+  },
+  {
+   "default": "0",
+   "fieldname": "suspended",
+   "fieldtype": "Check",
+   "label": "Suspended"
   }
  ],
  "icon": "fa fa-cog",
  "is_submittable": 1,
  "links": [],
- "modified": "2026-08-13 12:02:41.195872",
+ "modified": "2026-09-01 11:08:14.778626",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Payroll Entry",

@@ -97,8 +97,22 @@ class PayrollEntry(Document):
 
 				cond += f" and t1.employee_group in ({groups})"
 		cond += " and ifnull(t1.ignore_from_payroll_entry, 0) = 0"
+
+		statuses = [
+			field.label
+			for field in frappe.get_meta(self.doctype).fields
+			if field.fieldtype == "Check" and self.get(field.fieldname)
+		]
+
+		status_condition = ""
+
+		if statuses:
+			status_condition = "AND t1.status IN ({})".format(
+				", ".join(frappe.db.escape(status) for status in statuses)
+			)
+		# frappe.throw(str(status_condition))
 		emp_list = frappe.db.sql("""
-			select t1.name as employee, t1.employee_name, t1.department, t1.designation
+			select t1.name as employee, t1.employee_name, t1.department, t1.designation,t1.employee_group
 			from `tabEmployee` t1
 			where not exists(select 1
 					from `tabSalary Slip` as t3
@@ -107,9 +121,9 @@ class PayrollEntry(Document):
 					and t3.fiscal_year = '{}'
 					and t3.month = '{}')
 			{}
-			and t1.status = '{}'
+			{}
 			order by t1.branch, t1.name
-		""".format(self.fiscal_year, self.month, cond, self.status), as_dict=True)
+		""".format(self.fiscal_year, self.month, cond,   status_condition), as_dict=True)
 
 
 		if not emp_list:
