@@ -93,6 +93,9 @@
   "fixed_allowance_method",
   "fixed_allowance",
   "section_break_oaxi",
+  "eligible_for_radiation_allowance",
+  "eligible_for_radiation_allowance_method",
+  "radiation_allowance",
   "eligible_for_king_allowance",
   "eligible_for_king_allowance_method",
   "king_allowance",
@@ -1431,12 +1434,35 @@
    "fieldtype": "Select",
    "label": "Eligible for Lumpsum Revision Method",
    "options": "Percent\nLumpsum"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_radiation_allowance",
+   "fieldtype": "Check",
+   "label": "Eligible for Radiation Allowance"
+  },
+  {
+   "default": "Percent",
+   "depends_on": "eligible_for_radiation_allowance",
+   "fieldname": "eligible_for_radiation_allowance_method",
+   "fieldtype": "Select",
+   "label": "Eligible for Radiation Allowance Method",
+   "options": "Percent\nLumpsum",
+   "print_hide": 1
+  },
+  {
+   "default": "45",
+   "depends_on": "eval:doc.eligible_for_radiation_allowance==1",
+   "fieldname": "radiation_allowance",
+   "fieldtype": "Int",
+   "label": "Value(Radiation Allowance)",
+   "print_hide": 1
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2026-08-31 23:16:59.554795",
+ "modified": "2026-09-01 12:09:46.953952",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",

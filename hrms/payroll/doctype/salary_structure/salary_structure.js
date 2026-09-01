@@ -151,6 +151,9 @@ frappe.ui.form.on('Salary Structure', {
     eligible_for_lumpsum_revision: function (frm) {
         calculate_others(frm);
     },
+    eligible_for_radiation_allowance: function (frm) {
+        calculate_others(frm);
+    },
     eligible_for_orderly_allowance: function (frm) {
         calculate_others(frm);
     },
