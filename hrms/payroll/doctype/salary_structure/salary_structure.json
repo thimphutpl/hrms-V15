@@ -145,6 +145,8 @@
   "eligible_for_entertainment_allowance_method",
   "entertainment_allowance",
   "eligible_for_afsa",
+  "eligible_for_afsa_method",
+  "valueafsa",
   "eligible_for_contract_allowance",
   "eligible_for_ration_allowance",
   "eligible_for_ration_allowance_method",
@@ -1457,12 +1459,25 @@
    "fieldtype": "Int",
    "label": "Value(Radiation Allowance)",
    "print_hide": 1
+  },
+  {
+   "depends_on": "eligible_for_afsa",
+   "fieldname": "eligible_for_afsa_method",
+   "fieldtype": "Select",
+   "label": "Eligible for AFSA Method",
+   "options": "Percent\nLumpsum"
+  },
+  {
+   "depends_on": "eligible_for_afsa",
+   "fieldname": "valueafsa",
+   "fieldtype": "Int",
+   "label": "Value(AFSA)"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2026-09-01 12:09:46.953952",
+ "modified": "2026-09-01 14:14:50.618768",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",

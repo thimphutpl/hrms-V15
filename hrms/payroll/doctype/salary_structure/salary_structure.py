@@ -370,8 +370,8 @@ class SalaryStructure(Document):
 						# if m["field_name"] == "eligible_for_batman_allowance":
 						# 	calc_amt = frappe.db.get_value("Employee Grade", self.employee_grade, "batman_allowance")																																										
 
-						if m["field_name"] == "eligible_for_afsa":
-							calc_amt = frappe.db.get_value("Employee Grade", self.employee_grade, "afsa")	
+						# if m["field_name"] == "eligible_for_afsa":
+						# 	calc_amt = frappe.db.get_value("Employee Grade", self.employee_grade, "afsa")	
 
 						if m["field_name"] == "eligible_for_vegetable_allowance":
 							calc_amt = frappe.db.get_value("Employee Grade", self.employee_grade, "vegetable_allowance")
