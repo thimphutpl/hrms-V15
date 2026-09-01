@@ -1113,14 +1113,29 @@ class PayrollEntry(Document):
 			
 			jv_name = None
 			for entry_type, accounts in posting.items():
-				if "to_payables" in entry_type:
+				# if "to_payables" in entry_type:
+				# 	voucher_type = "Journal Entry"
+				# 	naming_series = "Journal Voucher"
+				# 	title = f"SALARY {self.fiscal_year}{self.month} - Payables"
+				# else:
+				# 	voucher_type = "Bank Entry"
+				# 	naming_series = "Bank Payment Voucher"
+				# 	title = f"SALARY {self.fiscal_year}{self.month} - {entry_type.replace('remittance_', '')}"
+
+				if entry_type == "to_payables":
 					voucher_type = "Journal Entry"
 					naming_series = "Journal Voucher"
 					title = f"SALARY {self.fiscal_year}{self.month} - Payables"
+
+				elif entry_type == "to_bank":
+					voucher_type = "Contra Entry"
+					naming_series = "Contra Entry"
+					title = f"SALARY {self.fiscal_year}{self.month} - Bank"
+
 				else:
 					voucher_type = "Bank Entry"
 					naming_series = "Bank Payment Voucher"
-					title = f"SALARY {self.fiscal_year}{self.month} - {entry_type.replace('remittance_', '')}"
+					title = f"SALARY {self.fiscal_year}{self.month} - {entry_type.replace('remittance_', '')}"	
 				
 				# Verify balance before creating
 				total_debit = sum(d.get("debit_in_account_currency", 0) for d in accounts)
@@ -1147,7 +1162,8 @@ class PayrollEntry(Document):
 				doc.insert()
 				
 				if "to_payables" in entry_type:
-					doc.submit()
+					# doc.submit()
+					doc.insert()
 					jv_name = doc.name
 			
 			if jv_name:
