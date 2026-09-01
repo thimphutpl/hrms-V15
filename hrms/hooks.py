@@ -210,7 +210,7 @@ doc_events = {
 scheduler_events = {
 	
     "cron": {
-		"0 6 * * *": [
+		"0 1 * * *": [
 			"hrms.hr.hr_custom_functions.post_earned_leaves"
 		],
 		"0 7 * * *": [
