@@ -41,21 +41,82 @@ class PayrollEntry(Document):
 		# ver.2020.10.20 Ends
 		pass
 
-	def on_cancel(self):
-		# ver.2020.10.21 Begins
-		# following code commented by SHIV on 2020.10.21
-		'''
-		frappe.delete_doc("Salary Slip", frappe.db.sql_list("""select name from `tabSalary Slip`
-			where payroll_entry=%s """, (self.name)))
-		'''
-		# following code added by SHIV on 2020.10.21
-		self.remove_salary_slips()
-		# ver.2020.10.21 Ends
-		from erpnext.accounts.utils import unlink_ref_doc_from_payment_entries
+	# def on_cancel(self):
+	# 	# ver.2020.10.21 Begins
+	# 	# following code commented by SHIV on 2020.10.21
+	# 	'''
+	# 	frappe.delete_doc("Salary Slip", frappe.db.sql_list("""select name from `tabSalary Slip`
+	# 		where payroll_entry=%s """, (self.name)))
+	# 	'''
+	# 	# following code added by SHIV on 2020.10.21
+	# 	self.remove_salary_slips()
+	# 	# ver.2020.10.21 Ends
+	# 	from erpnext.accounts.utils import unlink_ref_doc_from_payment_entries
 
-		unlink_ref_doc_from_payment_entries(self)
-		self.ignore_linked_doctypes = ("GL Entry", "Payment Ledger Entry")
-		pass
+	# 	unlink_ref_doc_from_payment_entries(self)
+	# 	self.ignore_linked_doctypes = ("GL Entry", "Payment Ledger Entry")
+	# 	pass
+
+	def on_cancel(self):
+		"""Override cancel to bypass validation and use enqueue"""
+		try:
+			# CRITICAL: Set all ignore flags BEFORE any validation
+			self.flags.ignore_validate = True
+			self.flags.ignore_validate_on_cancel = True
+			self.flags.ignore_mandatory = True
+			self.flags.ignore_permissions = True
+			self.flags.ignore_links = True  # MOST IMPORTANT - skip link checks
+			
+			# Show message
+			frappe.msgprint(_("Payroll Entry cancellation started..."))
+			
+			# Get count of salary slips
+			total_count = frappe.db.count("Salary Slip", {
+				'payroll_entry': self.name,
+				'docstatus': 1  # Only submitted ones
+			})
+			
+			if total_count > 0:
+				# Enqueue the batch cancellation
+				frappe.enqueue(
+					"erpnext.payroll.doctype.salary_slip.salary_slip.cancel_salary_slips_batch",
+					payroll_entry_name=self.name,
+					batch_size=500,
+					queue="long",
+					timeout=7200,
+					enqueue_after_commit=True,
+					publish_progress=True,
+					job_name=f"cancel_salary_slips_{self.name}"
+				)
+				
+				frappe.msgprint(
+					_("{0} salary slips are being cancelled in the background.").format(total_count),
+					alert=True,
+					indicator="blue"
+				)
+			
+			# Unlink payment entries
+			from erpnext.accounts.utils import unlink_ref_doc_from_payment_entries
+			unlink_ref_doc_from_payment_entries(self)
+			
+			# Set ignore linked doctypes
+			self.ignore_linked_doctypes = ("GL Entry", "Payment Ledger Entry", "Salary Slip")
+			
+			# Directly set docstatus to 2 (cancelled) - BYPASS ALL VALIDATION
+			frappe.db.set_value("Payroll Entry", self.name, "docstatus", 2)
+			frappe.db.set_value("Payroll Entry", self.name, "status", "Cancelled")
+			frappe.db.set_value("Payroll Entry", self.name, "salary_slips_submitted", 0)
+			frappe.db.set_value("Payroll Entry", self.name, "salary_slips_created", 0)
+			
+			# Commit the changes
+			frappe.db.commit()
+			
+			frappe.msgprint(_("Payroll Entry cancelled successfully!"))
+			
+		except Exception as e:
+			frappe.db.rollback()
+			frappe.log_error(f"on_cancel error: {str(e)}", "Payroll Entry Cancel")
+			frappe.throw(_("Error cancelling: {0}").format(str(e)))
 
 	def on_cancel_after_draft(self):
 		self.remove_salary_slips()
