@@ -819,9 +819,16 @@ class PayrollEntry(Document):
 		# Check if company is "Royal Body Guard"
 		is_royal_body_guard = self.company == "Royal Body Guard"	
 
+		# Pre-school's employer pf should be deducted from RGOF
+		pre_school_pf_account = "24.03 - Contributions - Provident Fund - RBA"
+
 		for employee in self.salary_group_item:
 			employee_group = employee.employee_group	
 		e_group =employee_group
+
+		# Check if this is a Pre-school employee
+    	is_pre_school = 1 if e_group == pre_school_pf_account else 0
+
 		
 		cc = frappe.db.sql("""
 			SELECT
@@ -831,7 +838,7 @@ class PayrollEntry(Document):
 				END AS cost_center,
 				CASE
 					WHEN IFNULL(sc.budget_activity, '') != '' THEN sc.budget_activity
-					WHEN %(e_group)s = "Teachers (RBA)" THEN 
+					WHEN %(e_group)s = "Teachers (RBA)" AND %(is_pre_school)s = 1 THEN 
 						(SELECT cc.budget_activity FROM `tabCost Center` cc WHERE cc.name = t1.cost_center)
 					WHEN %(is_royal_body_guard)s = 1 THEN 
 						(SELECT cc.budget_activity FROM `tabCost Center` cc WHERE cc.name = t1.cost_center)
@@ -840,7 +847,7 @@ class PayrollEntry(Document):
 				END AS budget_activity,
 				CASE
 					WHEN IFNULL(sc.budget_sub_activity, '') != '' THEN sc.budget_sub_activity
-					WHEN %(e_group)s = "Teachers (RBA)" THEN
+					WHEN %(e_group)s = "Teachers (RBA)" AND %(is_pre_school)s = 1 THEN
 						(SELECT cc.budget_sub_activity FROM `tabCost Center` cc WHERE cc.name = t1.cost_center)
 					WHEN %(is_royal_body_guard)s = 1 THEN 
 						(SELECT cc.budget_sub_activity FROM `tabCost Center` cc WHERE cc.name = t1.cost_center)
@@ -849,7 +856,7 @@ class PayrollEntry(Document):
 				END AS budget_sub_activity,
 				CASE
 					WHEN IFNULL(sc.source_of_fund, '') != '' THEN sc.source_of_fund
-					WHEN %(e_group)s = "Teachers (RBA)" THEN
+					WHEN %(e_group)s = "Teachers (RBA)" AND %(is_pre_school)s = 1 THEN
 						(SELECT cc.source_of_fund FROM `tabCost Center` cc WHERE cc.name = t1.cost_center)
 					WHEN %(is_royal_body_guard)s = 1 THEN 
 						(SELECT cc.source_of_fund FROM `tabCost Center` cc WHERE cc.name = t1.cost_center)
@@ -912,7 +919,8 @@ class PayrollEntry(Document):
 			"payroll_entry": self.name,
 			"employees": tuple(employee_list),
 			"is_royal_body_guard": 1 if is_royal_body_guard else 0,
-			"e_group": e_group
+			"e_group": e_group,
+			"is_pre_school": is_pre_school,
 		}, as_dict=1)
 
 		# Store PF amounts per cost center and party
