@@ -912,7 +912,7 @@ class PayrollEntry(Document):
 			"payroll_entry": self.name,
 			"employees": tuple(employee_list),
 			"is_royal_body_guard": 1 if is_royal_body_guard else 0,
-			"e_group": 1 if e_group else 0
+			"e_group": e_group
 		}, as_dict=1)
 
 		# Store PF amounts per cost center and party
