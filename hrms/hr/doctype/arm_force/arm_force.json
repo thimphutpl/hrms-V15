@@ -36,8 +36,7 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Full Name",
-   "reqd": 1,
-   "unique": 1
+   "reqd": 1
   },
   {
    "fieldname": "branch",
@@ -179,7 +178,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-12 17:34:26.514421",
+ "modified": "2026-09-03 12:15:31.319268",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Arm Force",
