@@ -31,6 +31,12 @@ frappe.query_reports["PF Report"] = {
 			"options": "Employment Type"
 		},
 		{
+			"fieldname": "employment_group",
+			"label": __("Employment Group"),
+			"fieldtype": "Link",
+			"options": "Employment Group"
+		},
+		{
 			"fieldname": "cost_center",
 			"label": __("Cost Center"),
 			"fieldtype": "Link",

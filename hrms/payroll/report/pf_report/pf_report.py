@@ -44,6 +44,12 @@ def get_columns(data):
 			"width":100
 		},
 		{
+			"fieldname": "employee_group",
+			"label": "Employee Group",
+			"fieldtype": "Link",
+			"width":100
+		},
+		{
 			"fieldname": "cid",
 			"label": "CID",
 			"fieldtype": "Data",
@@ -138,7 +144,7 @@ def get_columns(data):
 def construct_query(filters):
 	conditions, filters = get_conditions(filters)
 	query =("""
-			select t1.employee as employee, t3.employee_name as employee_name, t1.designation as designation, t1.employment_type as employment_type, t3.passport_number as passport_number, t3.pf_number as pf_number,
+			select t1.employee as employee, t1.employee_group, t3.employee_name as employee_name, t1.designation as designation, t1.employment_type as employment_type, t3.passport_number as passport_number, t3.pf_number as pf_number,
 				sum(case when t2.salary_component = 'Basic Pay' then ifnull(t2.amount,0) else 0 end) as basicpay,
 				sum(case when t2.salary_component = 'PF' then ifnull(t2.amount,0) else 0 end) as employeepf,
 				sum(case when t2.salary_component = 'PF' then ifnull(t2.amount,0) else 0 end) as employerpf,
@@ -202,4 +208,6 @@ def get_conditions(filters):
 		conditions += """and exists(select 1 from `tabCost Center` cc where t1.cost_center = cc.name and (cc.parent_cost_center = '{0}' or cc.name = '{0}'))""".format(filters.cost_center)
 	if filters.get("company"): 
 		conditions += """and t1.company = '{}'""".format(filters.get("company"))
+	if filters.get("employee_group"): 
+		conditions += """and t1.employee_group = '{}'""".format(filters.get("employee_group"))	
 	return conditions, filters
