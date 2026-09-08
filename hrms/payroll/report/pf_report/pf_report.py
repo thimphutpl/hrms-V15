@@ -47,6 +47,7 @@ def get_columns(data):
 			"fieldname": "employee_group",
 			"label": "Employee Group",
 			"fieldtype": "Link",
+			"options": "Employee Group",
 			"width":100
 		},
 		{
