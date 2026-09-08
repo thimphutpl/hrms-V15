@@ -31,10 +31,10 @@ frappe.query_reports["PF Report"] = {
 			"options": "Employment Type"
 		},
 		{
-			"fieldname": "employment_group",
-			"label": __("Employment Group"),
+			"fieldname": "employee_group",
+			"label": __("Employee Group"),
 			"fieldtype": "Link",
-			"options": "Employment Group"
+			"options": "Employee Group"
 		},
 		{
 			"fieldname": "cost_center",
