@@ -32,6 +32,15 @@ frappe.query_reports["Employee Salary Structure"] = {
 			"options": "All\nActive\nInactive",
 			"default": "Active"
 		},
+        {
+            fieldname: "employee_group",
+            label: __("Employee Group"),
+            fieldtype: "MultiSelectList",
+            options: "Employee Group",
+            get_data: function(txt) {
+                return frappe.db.get_link_options("Employee Group", txt);
+            }
+        },
 		{
 			"fieldname": "grade",
 			"label": __("Grade"),
