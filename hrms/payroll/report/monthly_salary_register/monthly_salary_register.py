@@ -130,7 +130,15 @@ def get_conditions(filters):
 	if filters.get("fiscal_year"): conditions += " and fiscal_year = %(fiscal_year)s"
 	if filters.get("company"): conditions += " and company = %(company)s"
 	if filters.get("employee"): conditions += " and employee = %(employee)s"
-	if filters.get("employee_group"): conditions += " and employee_group = %(employee_group)s"
+	# if filters.get("employee_group"): conditions += " and employee_group = %(employee_group)s"
+	if filters.get("employee_group"):
+		employee_groups = filters.get("employee_group")
+
+		if isinstance(employee_groups, str):
+			employee_groups = frappe.parse_json(employee_groups)
+
+		conditions += " and employee_group in %(employee_group)s"
+		filters["employee_group"] = employee_groups
 	if filters.get("cost_center"): conditions += " and cost_center = %(cost_center)s"
 	# if filters.get("division"): conditions += " and division = %(division)s"
 	# if filters.get("cost_center"):
