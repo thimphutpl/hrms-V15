@@ -9,9 +9,12 @@ class SemsoEntry(Document):
 	def validate(self):
 		self.calculate_total()
 		self.semso_calculate_total()
-    
+	
 	def calculate_total(self):
 		for item in self.semso_contribution:
+			if item.employee_group == "Contract (RBA)":
+		
+				continue
 			base_amount = item.base_amount
 			if self.spouse_semso:
 				item.amount = (base_amount*self.number_of_people)/2
@@ -21,10 +24,11 @@ class SemsoEntry(Document):
 		self.total_officer = 0
 		self.total_troops = 0
 		self.total_civilan = 0
+		self.total_contract =0
 
 		for row in self.semso_contribution:
 			amount = row.amount or 0
-			self.total_amount = (self.total_officer or 0) + (self.total_troops or 0) + (self.total_civilan or 0)
+			
 
 			if row.employee_group == "Officer (RBA)":
 				self.total_officer += amount
@@ -32,10 +36,94 @@ class SemsoEntry(Document):
 			elif row.employee_group == "Troops (RBA)":
 				self.total_troops += amount
 
-			elif row.employee_group == "Civilian":
+			elif row.employee_group == "Civilan (RBA)":
 				self.total_civilan += amount
+			elif row.employee_group == "Contract (RBA)":
+				self.total_contract += amount
+		self.total_amount = (
+			(self.total_officer or 0)
+			+ (self.total_troops or 0)
+			+ (self.total_civilan or 0)
+			+ (self.total_contract or 0)
+		)
 		
 				
+# @frappe.whitelist()
+# def get_employee(employee_group, company=None, semso_contributor=None):
+
+# 	if not company:
+# 		frappe.throw("Company is required")
+
+# 	if not employee_group:
+# 		frappe.throw("Employee Group is required")
+
+# 	# Convert child table JSON to Python list
+# 	if isinstance(semso_contributor, str):
+# 		semso_contributor = json.loads(semso_contributor)
+
+# 	# Get groups from Semso Contributor
+# 	employee_groups = []
+
+# 	for row in semso_contributor or []:
+# 		contribution = row.get("semso_contribution")
+
+# 		if contribution:
+# 			employee_groups.append(contribution)
+
+# 	# Remove duplicate groups
+# 	employee_groups = list(set(employee_groups))
+
+# 	if not employee_groups:
+# 		return []
+
+# 	placeholders = ", ".join(["%s"] * len(employee_groups))
+
+# 	# Amount is based on MAIN employee_group
+# 	if employee_group == "Officer (RBA)":
+# 		amount_field = "eg.officer_semso_amount"
+
+# 	elif employee_group == "Troops (RBA)":
+# 		amount_field = "eg.troop_semso_amount"
+
+# 	elif employee_group == "Civilan (RBA)":
+# 		amount_field = "eg.civilan_semso_amount"
+
+# 	else:
+# 		amount_field = "0"
+
+# 	query = f"""
+# 		SELECT
+# 			e.name AS employee,
+# 			e.employee_name as employee_name ,
+# 			e.grade as grade,
+# 			e.employee_group as employee_group,
+#             e.status as status,
+
+# 			IFNULL({amount_field}, 0) AS amount
+
+# 		FROM `tabEmployee` e
+
+# 		INNER JOIN `tabEmployee Grade` eg
+# 			ON e.grade = eg.name
+
+# 		WHERE
+# 			e.company = %s
+# 			AND e.employee_status NOT IN ('Probation', 'Left')
+# 			AND e.status = 'Active'
+# 			AND e.employee_group IN ({placeholders})
+
+# 		ORDER BY
+# 			e.employee_group,
+# 			e.employee_name
+# 	"""
+
+# 	values = [company] + employee_groups
+
+# 	return frappe.db.sql(
+# 		query,
+# 		values,
+# 		as_dict=True
+# 	)
 @frappe.whitelist()
 def get_employee(employee_group, company=None, semso_contributor=None):
 
@@ -45,11 +133,9 @@ def get_employee(employee_group, company=None, semso_contributor=None):
 	if not employee_group:
 		frappe.throw("Employee Group is required")
 
-	# Convert child table JSON to Python list
 	if isinstance(semso_contributor, str):
 		semso_contributor = json.loads(semso_contributor)
 
-	# Get groups from Semso Contributor
 	employee_groups = []
 
 	for row in semso_contributor or []:
@@ -58,7 +144,6 @@ def get_employee(employee_group, company=None, semso_contributor=None):
 		if contribution:
 			employee_groups.append(contribution)
 
-	# Remove duplicate groups
 	employee_groups = list(set(employee_groups))
 
 	if not employee_groups:
@@ -66,7 +151,6 @@ def get_employee(employee_group, company=None, semso_contributor=None):
 
 	placeholders = ", ".join(["%s"] * len(employee_groups))
 
-	# Amount is based on MAIN employee_group
 	if employee_group == "Officer (RBA)":
 		amount_field = "eg.officer_semso_amount"
 
@@ -82,9 +166,11 @@ def get_employee(employee_group, company=None, semso_contributor=None):
 	query = f"""
 		SELECT
 			e.name AS employee,
-			e.employee_name as employee_name ,
-			e.grade as grade,
-			e.employee_group as employee_group,
+			e.employee_name AS employee_name,
+			e.grade AS grade,
+			e.employee_group AS employee_group,
+			e.status AS status,
+
 
 			IFNULL({amount_field}, 0) AS amount
 
@@ -95,8 +181,14 @@ def get_employee(employee_group, company=None, semso_contributor=None):
 
 		WHERE
 			e.company = %s
+			AND e.employee_status NOT IN ('Probation', 'Left')
 			AND e.status = 'Active'
 			AND e.employee_group IN ({placeholders})
+			AND eg.eligible_for_semso=1
+			AND (
+				IFNULL({amount_field}, 0) > 0
+				OR eg.eligible_for_semso = 1
+			)
 
 		ORDER BY
 			e.employee_group,

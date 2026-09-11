@@ -59,7 +59,9 @@
   "column_break_itrq",
   "troop_semso_amount",
   "column_break_quiu",
-  "spouse_semso_amount"
+  "spouse_semso_amount",
+  "section_break_lsay",
+  "eligible_for_semso"
  ],
  "fields": [
   {
@@ -330,11 +332,21 @@
    "fieldname": "spouse_semso_amount",
    "fieldtype": "Currency",
    "label": "Spouse Semso Amount"
+  },
+  {
+   "fieldname": "section_break_lsay",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_semso",
+   "fieldtype": "Check",
+   "label": "Eligible for Semso"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-08-31 15:31:07.262026",
+ "modified": "2026-09-10 14:59:05.029638",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Grade",

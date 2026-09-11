@@ -124,6 +124,7 @@ frappe.ui.form.on("Semso Entry", {
                         child.amount = row.amount;
                         child.base_amount = row.amount;
                         child.employee_group = row.employee_group;
+                        child.status = row.status;
                     });
 
                     frm.refresh_field("semso_contribution");

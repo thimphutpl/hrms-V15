@@ -34,6 +34,8 @@
   "total_troops",
   "column_break_ddqh",
   "total_civilan",
+  "column_break_tslr",
+  "total_contract",
   "section_break_tgnm",
   "total_amount"
  ],
@@ -203,12 +205,22 @@
    "fieldtype": "Currency",
    "label": "Total Amount",
    "read_only": 1
+  },
+  {
+   "fieldname": "column_break_tslr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_contract",
+   "fieldtype": "Currency",
+   "label": "Total Contract",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-08-31 20:15:03.983895",
+ "modified": "2026-09-10 11:00:44.743522",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Semso Entry",
