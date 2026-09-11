@@ -242,6 +242,7 @@
    "fieldname": "company",
    "fieldtype": "Link",
    "hidden": 1,
+   "ignore_user_permissions": 1,
    "in_list_view": 1,
    "label": "Company",
    "options": "Company"
@@ -277,7 +278,7 @@
  "icon": "fa fa-flag",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-07-20 10:45:17.169529",
+ "modified": "2026-09-10 18:00:32.853181",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Component",
