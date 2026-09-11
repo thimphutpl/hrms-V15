@@ -1390,6 +1390,7 @@
    "default": "0",
    "fieldname": "eligible_for_relieving_fund",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Eligible for Relieving Fund"
   },
   {
@@ -1477,7 +1478,7 @@
  "icon": "fa fa-file-text",
  "idx": 1,
  "links": [],
- "modified": "2026-09-01 14:19:34.387256",
+ "modified": "2026-09-09 18:42:26.836586",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Structure",
