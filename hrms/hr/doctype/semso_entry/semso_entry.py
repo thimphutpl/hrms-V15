@@ -9,6 +9,8 @@ class SemsoEntry(Document):
 	def validate(self):
 		self.calculate_total()
 		self.semso_calculate_total()
+	def on_submit(self):
+		self.semso_calculate_total()
 	
 	def calculate_total(self):
 		for item in self.semso_contribution:
@@ -20,32 +22,60 @@ class SemsoEntry(Document):
 				item.amount = (base_amount*self.number_of_people)/2
 			else:
 				item.amount = (base_amount*self.number_of_people)
-	def semso_calculate_total(self):
-		self.total_officer = 0
-		self.total_troops = 0
-		self.total_civilan = 0
-		self.total_contract =0
 
-		for row in self.semso_contribution:
-			amount = row.amount or 0
+	def semso_calculate_total(self):
+		totals = frappe.db.sql("""
+			SELECT
+				employee_group,
+				COALESCE(SUM(amount), 0) AS total
+			FROM `tabSemso Contribution Item`
+			WHERE parent = %s
+			AND parenttype = 'Semso Entry'
+			GROUP BY employee_group
+		""", (self.name,), as_dict=True)
+
+		total_map = {
+			row.employee_group: row.total
+			for row in totals
+		}
+
+		self.total_officer = total_map.get("Officer (RBA)", 0)
+		self.total_troops = total_map.get("Troops (RBA)", 0)
+		self.total_civilan = total_map.get("Civilan (RBA)", 0)
+		self.total_contract = total_map.get("Contract (RBA)", 0)
+
+		self.total_amount = (
+			self.total_officer
+			+ self.total_troops
+			+ self.total_civilan
+			+ self.total_contract
+		)
+	# def semso_calculate_total(self):
+	# 	self.total_officer = 0
+	# 	self.total_troops = 0
+	# 	self.total_civilan = 0
+	# 	self.total_contract =0
+
+	# 	for row in self.semso_contribution:
+	# 		amount = row.amount or 0
 			
 
-			if row.employee_group == "Officer (RBA)":
-				self.total_officer += amount
+	# 		if row.employee_group == "Officer (RBA)":
+	# 			self.total_officer += amount
 
-			elif row.employee_group == "Troops (RBA)":
-				self.total_troops += amount
+	# 		elif row.employee_group == "Troops (RBA)":
+	# 			self.total_troops += amount
 
-			elif row.employee_group == "Civilan (RBA)":
-				self.total_civilan += amount
-			elif row.employee_group == "Contract (RBA)":
-				self.total_contract += amount
-		self.total_amount = (
-			(self.total_officer or 0)
-			+ (self.total_troops or 0)
-			+ (self.total_civilan or 0)
-			+ (self.total_contract or 0)
-		)
+	# 		elif row.employee_group == "Civilan (RBA)":
+	# 			self.total_civilan += amount
+	# 		elif row.employee_group == "Contract (RBA)":
+	# 			self.total_contract += amount
+	# 	self.total_amount = (
+	# 		(self.total_officer or 0)
+	# 		+ (self.total_troops or 0)
+	# 		+ (self.total_civilan or 0)
+	# 		+ (self.total_contract or 0)
+	# 	)
 		
 				
 # @frappe.whitelist()

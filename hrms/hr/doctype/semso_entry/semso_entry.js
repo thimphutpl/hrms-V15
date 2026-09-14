@@ -6,7 +6,6 @@ frappe.ui.form.on("Semso Entry", {
     //     }
     // },
     refresh: function (frm) {
-        frm.set_value("posting_date", frappe.datetime.get_today());
         // frm.set_query("employee", "deceased", function (doc, cdt, cdn) {
         //     return {
         //         filters: {
