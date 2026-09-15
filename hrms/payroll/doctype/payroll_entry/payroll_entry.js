@@ -161,6 +161,9 @@ frappe.ui.form.on('Payroll Entry', {
     },
 
     add_bank_entry_button: function (frm) {
+        if (!frm.doc.salary_slips_submitted) {
+            return;
+        }
         frappe.call({
             method: 'hrms.payroll.doctype.payroll_entry.payroll_entry.payroll_entry_has_bank_entries',
             args: {

@@ -597,6 +597,13 @@ class SalaryStructure(Document):
 					calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(calc_amt)})
 					tax_included = 1
 
+				elif self.employee_group in ["Soelra -RBA"]:
+					calc_amt = get_salary_tax(math.floor(flt(basic_pay)))
+					calc_amt = roundoff(calc_amt)
+					total_deduction += calc_amt
+					calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(calc_amt)})
+					tax_included = 1	
+
 				elif self.employee_group in ["Civilan (RBA)", "Civilan (RBG)"]:
 					calc_amt = get_salary_tax(math.floor(flt(basic_pay)-(flt(basic_pay) * 0.15)))
 					calc_amt = roundoff(calc_amt)
@@ -653,173 +660,483 @@ def roundoff(amount):
 	else:
 		return 0
 	
-@frappe.whitelist()
-def make_salary_slip(source_name, target_doc=None, calc_days={}):
-	def postprocess(source, target):
-		gross_amt = 0.00
-		comm_amt = 0.00
-		basic_amt = 0.00
-		basic_pay_arrears = 0.00
-		settings = get_payroll_settings(source.employee)
-		m_details = get_month_details(target_doc.fiscal_year, target_doc.month)
-		target.gross_pay = 0
-		target.total_deduction = 0
-		target.net_pay = 0
-		target.rounded_total = 0
-		target.actual_basic = 0
-		if calc_days:
-			start_date = calc_days.get("from_date")
-			end_date = calc_days.get("to_date")
-			days_in_month = calc_days.get("total_days_in_month")
-			working_days = calc_days.get("working_days")
-			lwp = calc_days.get("leave_without_pay")
-			payment_days = calc_days.get("payment_days")
-		else:
-			return
+# @frappe.whitelist()
+# def make_salary_slip(source_name, target_doc=None, calc_days={}):
+# 	def postprocess(source, target):
+# 		gross_amt = 0.00
+# 		comm_amt = 0.00
+# 		basic_amt = 0.00
+# 		basic_pay_arrears = 0.00
+# 		settings = get_payroll_settings(source.employee)
+# 		m_details = get_month_details(target_doc.fiscal_year, target_doc.month)
+# 		target.gross_pay = 0
+# 		target.total_deduction = 0
+# 		target.net_pay = 0
+# 		target.rounded_total = 0
+# 		target.actual_basic = 0
+# 		if calc_days:
+# 			start_date = calc_days.get("from_date")
+# 			end_date = calc_days.get("to_date")
+# 			days_in_month = calc_days.get("total_days_in_month")
+# 			working_days = calc_days.get("working_days")
+# 			lwp = calc_days.get("leave_without_pay")
+# 			payment_days = calc_days.get("payment_days")
+# 		else:
+# 			return
 
-		# Copy earnings and deductions table from source salary structure
-		calc_map = {}
-		for key in ('earnings', 'deductions'):
-			for d in source.get(key):
-				if d.salary_component == "Semso":
-					continue
-				amount = flt(d.amount)
-				deductible_amt = 0.0
-				deducted_amt = 0.0
-				outstanding_amt = 0.0
+# 		# Copy earnings and deductions table from source salary structure
+# 		calc_map = {}
+# 		for key in ('earnings', 'deductions'):
+# 			for d in source.get(key):
+# 				if d.salary_component == "Semso":
+# 					continue
+# 				amount = flt(d.amount)
+# 				deductible_amt = 0.0
+# 				deducted_amt = 0.0
+# 				outstanding_amt = 0.0
 
-				if d.from_date:
-					if (start_date <= d.from_date <= end_date) or ((d.from_date <= end_date) and (nvl(d.to_date, end_date) >= start_date)):
-						if key == 'deductions':
-							if flt(d.total_deductible_amount) > 0:
-								if flt(d.total_outstanding_amount) > 0:
-									if flt(amount) >= flt(d.total_outstanding_amount):
-										amount = flt(d.total_outstanding_amount)
-								else:
-									amount = 0
-					else:
-						amount = 0
-				elif d.to_date:
-					if (start_date <= d.to_date <= end_date) or ((d.to_date >= start_date) and (nvl(d.from_date, start_date) <= end_date)):
-						if key == 'deductions':
-							if flt(d.total_deductible_amount) > 0:
-								if flt(d.total_outstanding_amount) > 0:
-									if flt(amount) >= flt(d.total_outstanding_amount):
-										amount = flt(d.total_outstanding_amount)
-								else:
-									amount = 0
-					else:
-						amount = 0
-				else:
-					if key == 'deductions':
-						if flt(d.total_deductible_amount) > 0:
-							if flt(d.total_outstanding_amount) > 0:
-								if flt(amount) >= flt(d.total_outstanding_amount):
-									amount = flt(d.total_outstanding_amount)
+# 				if d.from_date:
+# 					if (start_date <= d.from_date <= end_date) or ((d.from_date <= end_date) and (nvl(d.to_date, end_date) >= start_date)):
+# 						if key == 'deductions':
+# 							if flt(d.total_deductible_amount) > 0:
+# 								if flt(d.total_outstanding_amount) > 0:
+# 									if flt(amount) >= flt(d.total_outstanding_amount):
+# 										amount = flt(d.total_outstanding_amount)
+# 								else:
+# 									amount = 0
+# 					else:
+# 						amount = 0
+# 				elif d.to_date:
+# 					if (start_date <= d.to_date <= end_date) or ((d.to_date >= start_date) and (nvl(d.from_date, start_date) <= end_date)):
+# 						if key == 'deductions':
+# 							if flt(d.total_deductible_amount) > 0:
+# 								if flt(d.total_outstanding_amount) > 0:
+# 									if flt(amount) >= flt(d.total_outstanding_amount):
+# 										amount = flt(d.total_outstanding_amount)
+# 								else:
+# 									amount = 0
+# 					else:
+# 						amount = 0
+# 				else:
+# 					if key == 'deductions':
+# 						if flt(d.total_deductible_amount) > 0:
+# 							if flt(d.total_outstanding_amount) > 0:
+# 								if flt(amount) >= flt(d.total_outstanding_amount):
+# 									amount = flt(d.total_outstanding_amount)
 
-							else:
-								amount = 0
+# 							else:
+# 								amount = 0
 
-				if flt(d.total_deductible_amount) > 0:
-					if flt(d.total_outstanding_amount) > 0:
-						deductible_amt = flt(d.total_deductible_amount)
-						deducted_amt = flt(d.total_deducted_amount) + flt(amount)
-						outstanding_amt = flt(d.total_outstanding_amount) - flt(amount)
+# 				if flt(d.total_deductible_amount) > 0:
+# 					if flt(d.total_outstanding_amount) > 0:
+# 						deductible_amt = flt(d.total_deductible_amount)
+# 						deducted_amt = flt(d.total_deducted_amount) + flt(amount)
+# 						outstanding_amt = flt(d.total_outstanding_amount) - flt(amount)
 				
-				# for 0 salary tax
-				if key == 'deductions':
-					if frappe.db.get_value("Salary Component", d.salary_component, "name") == "Salary Tax":
-						if (d.amount or d.default_amount) == 0:
-							calc_map.setdefault(key, []).append({
-								'salary_component': d.salary_component
-							})
-
-				# Leave without pay
-				calc_amount = flt(amount)
-				if key == "earnings":
-					if d.depends_on_lwp:
-						calc_amount = round(flt(amount)*flt(payment_days)/flt(days_in_month), 2)
-					else:
-						calc_amount = round(flt(amount)*(flt(working_days)/flt(days_in_month)), 2)
-				calc_amount = roundoff_two_dec(calc_amount)
-
-				# following condition added by SHIV on 2021/05/28
-				if not flt(calc_amount):
-					continue
+# 				# for 0 salary tax
+# 				if key == 'deductions':
+# 					if frappe.db.get_value("Salary Component", d.salary_component, "name") == "Salary Tax":
+# 						if (d.amount or d.default_amount) == 0:
+# 							calc_map.setdefault(key, []).append({
+# 								'salary_component': d.salary_component
+# 							})
 				
-				calc_map.setdefault(key, []).append({
-					'salary_component': d.salary_component,
-					'depends_on_lwp': d.depends_on_lwp,
-					'institution_name': d.institution_name,
-					'reference_type': d.reference_type,
-					'reference_number': d.reference_number,
-					'bank_branch': d.bank_branch,
-					'bank_account_type': d.bank_account_type,
-					'ref_docname': d.name,
-					'from_date': start_date,
-					'to_date': end_date,
-					'amount': flt(calc_amount),
-					'default_amount': flt(amount),
-					'total_deductible_amount': flt(deductible_amt),
-					'total_deducted_amount': flt(deducted_amt),
-					'total_outstanding_amount': flt(outstanding_amt),
-					'total_days_in_month': flt(days_in_month),
-					'working_days': flt(working_days),
-					'leave_without_pay': flt(lwp),
-					'payment_days': flt(payment_days),
-					'bank_account_type': d.bank_account_type,
-					'bank_branch': d.bank_branch,
-				})
+
+# 				# Leave without pay
+# 				calc_amount = flt(amount)
+# 				if key == "earnings":
+# 					if d.depends_on_lwp:
+# 						calc_amount = round(flt(amount)*flt(payment_days)/flt(days_in_month), 2)
+# 					else:
+# 						calc_amount = round(flt(amount)*(flt(working_days)/flt(days_in_month)), 2)
+# 				calc_amount = roundoff_two_dec(calc_amount)
+
+# 				# following condition added by SHIV on 2021/05/28
+# 				if not flt(calc_amount):
+# 					continue
+				
+# 				calc_map.setdefault(key, []).append({
+# 					'salary_component': d.salary_component,
+# 					'depends_on_lwp': d.depends_on_lwp,
+# 					'institution_name': d.institution_name,
+# 					'reference_type': d.reference_type,
+# 					'reference_number': d.reference_number,
+# 					'bank_branch': d.bank_branch,
+# 					'bank_account_type': d.bank_account_type,
+# 					'ref_docname': d.name,
+# 					'from_date': start_date,
+# 					'to_date': end_date,
+# 					'amount': flt(calc_amount),
+# 					'default_amount': flt(amount),
+# 					'total_deductible_amount': flt(deductible_amt),
+# 					'total_deducted_amount': flt(deducted_amt),
+# 					'total_outstanding_amount': flt(outstanding_amt),
+# 					'total_days_in_month': flt(days_in_month),
+# 					'working_days': flt(working_days),
+# 					'leave_without_pay': flt(lwp),
+# 					'payment_days': flt(payment_days),
+# 					'bank_account_type': d.bank_account_type,
+# 					'bank_branch': d.bank_branch,
+# 				})
 	
-		# semso_total = frappe.db.sql("""
-		# 	SELECT 
-		# 		child.employee,
-		# 		MAX(child.name1) as name1,
-		# 		MAX(child.grade) as grade,
-		# 		COALESCE(SUM(child.amount), 0) as amount,
-		# 		MAX(parent.spouse_semso) as spouse_semso
-		# 	FROM `tabSemso Contribution Item` child
-		# 	JOIN `tabSemso Entry` parent
-		# 		ON child.parent = parent.name
-		# 	WHERE parent.docstatus = 1
-		# 		AND child.employee = %s
-		# 		AND parent.company = %s
-		# 		AND parent.fiscal_year = %s
-		# 		AND CASE parent.month
-		# 			WHEN 'January' THEN '01'
-		# 			WHEN 'February' THEN '02'
-		# 			WHEN 'March' THEN '03'
-		# 			WHEN 'April' THEN '04'
-		# 			WHEN 'May' THEN '05'
-		# 			WHEN 'June' THEN '06'
-		# 			WHEN 'July' THEN '07'
-		# 			WHEN 'August' THEN '08'
-		# 			WHEN 'September' THEN '09'
-		# 			WHEN 'October' THEN '10'
-		# 			WHEN 'November' THEN '11'
-		# 			WHEN 'December' THEN '12'
-		# 			ELSE parent.month
-		# 		END = %s
-		# 	GROUP BY child.employee
-		# """, (source.employee, target_doc.company, target_doc.fiscal_year, target_doc.month), as_dict=True)
+		
+# 		semso_total = frappe.db.sql("""
+# 			SELECT 
+# 				child.employee,
+# 				MAX(child.name1) AS name1,
+# 				MAX(child.grade) AS grade,
+# 				COALESCE(SUM(child.amount), 0) AS amount,
+# 				parent.spouse_semso AS spouse_semso
+
+# 			FROM `tabSemso Contribution Item` child
+
+# 			INNER JOIN `tabSemso Entry` parent
+# 				ON child.parent = parent.name
+
+# 			WHERE parent.docstatus = 1
+# 				AND child.employee = %s
+# 				AND parent.company = %s
+# 				AND parent.fiscal_year = %s
+
+# 				AND CASE parent.month
+# 					WHEN 'January' THEN '01'
+# 					WHEN 'February' THEN '02'
+# 					WHEN 'March' THEN '03'
+# 					WHEN 'April' THEN '04'
+# 					WHEN 'May' THEN '05'
+# 					WHEN 'June' THEN '06'
+# 					WHEN 'July' THEN '07'
+# 					WHEN 'August' THEN '08'
+# 					WHEN 'September' THEN '09'
+# 					WHEN 'October' THEN '10'
+# 					WHEN 'November' THEN '11'
+# 					WHEN 'December' THEN '12'
+# 					ELSE parent.month
+# 				END = %s
+
+# 			GROUP BY
+# 				child.employee,
+# 				parent.spouse_semso
+
+# 			ORDER BY
+# 				parent.spouse_semso
+# 		""", (
+# 			source.employee,
+# 			target_doc.company,
+# 			target_doc.fiscal_year,
+# 			target_doc.month
+# 		), as_dict=True)
+	
+
+# 		if semso_total:
+# 			for d in semso_total:
+# 				if d.amount:
+# 					component = "Spouse Semso" if cint(d.spouse_semso) else "Semso"
+# 					calc_map['deductions'].append({
+# 						'salary_component': component,
+# 						'amount': round(flt(d.amount)),
+# 						'default_amount': round(flt(d.amount)),
+# 					})
+
+			
+
+# 		for e in calc_map['earnings']:
+# 			if e['salary_component'] == 'Basic Pay':
+# 				basic_amt = (flt(e['amount']))
+# 			# Following condition added by SHIV on 2019/04/29
+# 			elif frappe.db.exists("Salary Component", {"name": e['salary_component'], "is_pf_deductible": 1}):
+# 				basic_pay_arrears += (flt(e['amount']))
+# 			if e['salary_component'] == 'Communication Allowance':
+# 				comm_amt = (flt(e['amount']))
+# 			gross_amt += flt(e['amount'])
+
+# 		gross_amt += (flt(target.arrear_amount) + flt(target.leave_encashment_amount))
+
+# 		# Calculating PF, Group Insurance Scheme, Health Contribution
+# 		sws_amt = pf_amt = gis_amt = health_cont_amt = 0.00
+# 		# frappe.msgprint(str(source.employee)+" "+str(calc_map))
+# 		for d in calc_map['deductions']:
+# 			if not flt(gross_amt):
+# 				d['amount'] = 0
+# 			else:
+# 				if d['salary_component'] == 'SWS':
+# 					# sws_amt = flt(get_sws_contribution(source.employee, end_date))
+# 					sws_amt = flt(settings.get("sws_contribution"))
+# 					calc_amt = roundoff(sws_amt)
+# 					d['amount'] = calc_amt
+# 				if d['salary_component'] == 'PF':
+# 					percent = flt(settings.get("employee_pf"))
+# 					pf_amt = (flt(basic_amt)+flt(basic_pay_arrears))*flt(percent)*0.01
+# 					calc_amt = round(pf_amt)
+# 					# added by phuntsho on feb April 6th 2021
+# 					# calculate employer pf
+# 					employer_percent = flt(settings.get("employer_pf"))
+# 					employer_pf_amount = (flt(basic_amt)+flt(basic_pay_arrears))*flt(employer_percent)*0.01
+# 					# employer_pf_amount = round(employer_pf_amount)
+# 					target.employer_pf = round(employer_pf_amount)
+# 					# ----- end of code by phuntsho -----
+# 					d['amount'] = calc_amt
+# 				if d['salary_component'] == 'GIS':
+# 					gis_amt = flt(settings.get("gis"))
+# 					calc_amt = roundoff(gis_amt)
+# 					d['amount'] = calc_amt
+# 				if d['salary_component'] == 'Health Contribution':
+# 					health_cont_amt = flt(gross_amt)*flt(settings.get("health_contribution"))*0.01
+# 					calc_amt = roundoff(health_cont_amt)
+# 					d['amount'] = calc_amt
+	 
+# 		# Calculating Salary Tax
+# 		tax_included = 0
+# 		for d in calc_map['deductions']:
+# 			if not flt(gross_amt):
+# 				d['amount'] = 0
+# 			else:
+# 				if d['salary_component'] == 'Salary Tax':
+# 					if not tax_included:
+# 						# if target.employee_group in ["Officer (RBA)","Civilan (RBA)","Troops (RBA)","Troops (RBG)",
+# 						# 		"Officer (RBG)","Civilan (RBG)"]:
+# 						# 	tax_amt = get_salary_tax(math.floor(flt(basic_amt)-flt(pf_amt)-flt(gis_amt)))
+# 						# 	tax_amt = roundoff(tax_amt)
+# 						# 	d['amount'] = flt(tax_amt)
+# 						# 	tax_included = 1
+# 						# elif target.employee_group in ["Deceased (2003)", "Deceased (2015)"]:
+# 						# 	tax_amt = get_salary_tax(math.floor(flt(gross_amt)-flt(pf_amt)-flt(gis_amt)))
+# 						# 	tax_amt = roundoff(tax_amt)
+# 						# 	d['amount'] = flt(0)
+# 						# 	tax_included = 1
+# 						# else:
+# 						# 	tax_amt = get_salary_tax(math.floor(flt(gross_amt) - flt(gross_amt) *flt(0.15)))
+# 						# 	tax_amt = roundoff(tax_amt)
+# 						# 	d['amount'] = flt(tax_amt)
+# 						# 	tax_included = 1	
+# 						if target.employee_group in ["Officer (RBA)","Troops (RBA)","Troops (RBG)",
+# 								"Officer (RBG)"]:
+# 							tax_amt = get_salary_tax(math.floor(flt(basic_amt)-flt(pf_amt)-flt(gis_amt)))
+# 							tax_amt = roundoff(tax_amt)
+# 							d['amount'] = flt(tax_amt)
+# 							tax_included = 1
+# 							tax_included = 1
+
+# 						elif target.employee_group in ["Contract (RBA)"]:
+# 							tax_amt = get_salary_tax(math.floor(flt(gross_amt)))
+# 							tax_amt = roundoff(tax_amt)
+# 							d['amount'] = flt(tax_amt)
+# 							tax_included = 1
+# 							tax_included = 1
+
+# 						elif target.employee_group in ["Soelra -RBA"]:
+# 							tax_amt = get_salary_tax(math.floor(flt(basic_amt)))
+# 							tax_amt = roundoff(tax_amt)
+# 							d['amount'] = flt(tax_amt)
+# 							tax_included = 1
+# 							tax_included = 1
+	
+
+# 						elif target.employee_group in ["Civilan (RBA)", "Civilan (RBG)"]:
+# 							tax_amt = get_salary_tax(math.floor(flt(basic_amt)-(flt(basic_amt) * 0.15)))
+# 							tax_amt = roundoff(tax_amt)
+# 							d['amount'] = flt(tax_amt)
+# 							tax_included = 1
+# 							tax_included = 1
+# 						# elif self.employee_group in ["Deceased (2003)", "Deceased (2012)"]:
+# 						elif target.employee_group in ["Deceased (2003)", "Deceased (2015)"]:
+# 							# # return
+# 							tax_amt = get_salary_tax(math.floor(flt(gross_amt)-flt(pf_amt)-flt(gis_amt)))
+# 							tax_amt = roundoff(tax_amt)
+# 							d['amount'] = flt(tax_amt)
+# 							tax_included = 1
+# 							tax_included = 1
+# 						else:
+# 							tax_amt = get_salary_tax(math.floor(flt(gross_amt) - (flt(gross_amt) * 0.15)))
+# 							tax_amt = roundoff(tax_amt)
+# 							d['amount'] = flt(tax_amt)
+# 							tax_included = 1
+# 							tax_included = 1	
+						
+				
+		
+# 		# Appending calculated components to salary slip
+# 		[target.append('earnings', m) for m in calc_map['earnings']]
+# 		[target.append('deductions', m) for m in calc_map['deductions']]
+
+# 		target.run_method("pull_emp_details")
+# 		target.run_method("calculate_net_pay")
+
+# 	doc = get_mapped_doc("Salary Structure", source_name, {
+# 		"Salary Structure": {
+# 			"doctype": "Salary Slip",
+# 			"field_map": {
+# 				"total_earning": "gross_pay",
+# 				"name": "salary_structure",
+# 			}
+# 		}
+# 	}, target_doc, postprocess, ignore_child_tables=True)
+
+# 	return doc
+# @frappe.whitelist()
+# def make_salary_slip(
+# 	source_name,
+# 	target_doc=None,
+# 	employee=None,
+# 	posting_date=None,
+# 	as_print=False,
+# 	print_format=None,
+# 	for_preview=0,
+# 	ignore_permissions=False,
+# ):
+
+# 	def postprocess(source, target):
+# 		if employee:
+# 			target.employee = employee
+
+# 		if posting_date:
+# 			target.posting_date = posting_date
+
+# 		# Keep ONLY Semso custom logic
+# 		semso_total = frappe.db.sql("""
+# 			SELECT
+# 				COALESCE(SUM(child.amount), 0) AS amount,
+# 				parent.spouse_semso AS spouse_semso
+# 			FROM `tabSemso Contribution Item` child
+# 			INNER JOIN `tabSemso Entry` parent
+# 				ON child.parent = parent.name
+# 			WHERE parent.docstatus = 1
+# 				AND child.employee = %s
+# 				AND parent.company = %s
+# 				AND parent.fiscal_year = %s
+# 				AND CASE parent.month
+# 					WHEN 'January' THEN '01'
+# 					WHEN 'February' THEN '02'
+# 					WHEN 'March' THEN '03'
+# 					WHEN 'April' THEN '04'
+# 					WHEN 'May' THEN '05'
+# 					WHEN 'June' THEN '06'
+# 					WHEN 'July' THEN '07'
+# 					WHEN 'August' THEN '08'
+# 					WHEN 'September' THEN '09'
+# 					WHEN 'October' THEN '10'
+# 					WHEN 'November' THEN '11'
+# 					WHEN 'December' THEN '12'
+# 					ELSE parent.month
+# 				END = %s
+# 			GROUP BY parent.spouse_semso
+# 			ORDER BY parent.spouse_semso
+# 		""", (
+# 			source.employee,
+# 			target.company,
+# 			target.fiscal_year,
+# 			target.month,
+# 		), as_dict=True)
+
+# 		for row in semso_total:
+# 			if flt(row.amount):
+# 				component = "Spouse Semso" if cint(row.spouse_semso) else "Semso"
+
+# 				target.append("deductions", {
+# 					"salary_component": component,
+# 					"amount": round(flt(row.amount)),
+# 					"default_amount": round(flt(row.amount)),
+# 				})
+
+# 		# Let standard Salary Slip calculation run
+# 		# target.run_method("pull_emp_details")
+# 		# target.run_method("calculate_net_pay")
+
+# 	doc = get_mapped_doc(
+# 		"Salary Structure",
+# 		source_name,
+# 		{
+# 			"Salary Structure": {
+# 				"doctype": "Salary Slip",
+# 				"field_map": {
+# 					"total_earning": "gross_pay",
+# 					"name": "salary_structure",
+# 				},
+# 			}
+# 		},
+# 		target_doc,
+# 		postprocess,
+# 		ignore_child_tables=True,
+# 		ignore_permissions=ignore_permissions,
+# 		cached=True,
+# 	)
+
+# 	if cint(as_print):
+# 		doc.name = f"Preview for {employee}"
+# 		return frappe.get_print(
+# 			doc.doctype,
+# 			doc.name,
+# 			doc=doc,
+# 			print_format=print_format,
+# 		)
+
+# 	return doc
+@frappe.whitelist()
+def make_salary_slip(
+	source_name,
+	target_doc=None,
+	employee=None,
+	posting_date=None,
+	as_print=False,
+	print_format=None,
+	for_preview=0,
+	ignore_permissions=False,
+):
+
+	def postprocess(source, target):
+		# Always set employee explicitly
+		if employee:
+			target.employee = employee
+
+		if posting_date:
+			target.posting_date = posting_date
+
+		# ---------------------------------------------------------
+		# COPY SALARY STRUCTURE EARNINGS
+		# ---------------------------------------------------------
+		target.set("earnings", [])
+
+		for row in source.earnings:
+			target.append("earnings", {
+				"salary_component": row.salary_component,
+				"amount": row.amount,
+				"default_amount": row.amount,
+				"depends_on_payment_days": row.depends_on_payment_days,
+				"amount_based_on_formula": row.amount_based_on_formula,
+				"formula": row.formula,
+				"condition": row.condition,
+			})
+
+		# ---------------------------------------------------------
+		# COPY SALARY STRUCTURE DEDUCTIONS
+		# ---------------------------------------------------------
+		target.set("deductions", [])
+
+		for row in source.deductions:
+			target.append("deductions", {
+				"salary_component": row.salary_component,
+				"amount": row.amount,
+				"default_amount": row.amount,
+				"depends_on_payment_days": row.depends_on_payment_days,
+				"amount_based_on_formula": row.amount_based_on_formula,
+				"formula": row.formula,
+				"condition": row.condition,
+			})
+
+		# ---------------------------------------------------------
+		# ONLY CUSTOM SEMSO LOGIC
+		# ---------------------------------------------------------
 		semso_total = frappe.db.sql("""
-			SELECT 
-				child.employee,
-				MAX(child.name1) AS name1,
-				MAX(child.grade) AS grade,
+			SELECT
 				COALESCE(SUM(child.amount), 0) AS amount,
 				parent.spouse_semso AS spouse_semso
-
 			FROM `tabSemso Contribution Item` child
-
 			INNER JOIN `tabSemso Entry` parent
 				ON child.parent = parent.name
-
 			WHERE parent.docstatus = 1
 				AND child.employee = %s
 				AND parent.company = %s
 				AND parent.fiscal_year = %s
-
 				AND CASE parent.month
 					WHEN 'January' THEN '01'
 					WHEN 'February' THEN '02'
@@ -835,144 +1152,61 @@ def make_salary_slip(source_name, target_doc=None, calc_days={}):
 					WHEN 'December' THEN '12'
 					ELSE parent.month
 				END = %s
-
-			GROUP BY
-				child.employee,
-				parent.spouse_semso
-
-			ORDER BY
-				parent.spouse_semso
+			GROUP BY parent.spouse_semso
+			ORDER BY parent.spouse_semso
 		""", (
-			source.employee,
-			target_doc.company,
-			target_doc.fiscal_year,
-			target_doc.month
+			employee,
+			target.company,
+			target.fiscal_year,
+			target.month,
 		), as_dict=True)
-	
 
-		if semso_total:
-			for d in semso_total:
-				if d.amount:
-					component = "Spouse Semso" if cint(d.spouse_semso) else "Semso"
-					calc_map['deductions'].append({
-						'salary_component': component,
-						'amount': round(flt(d.amount)),
-						'default_amount': round(flt(d.amount)),
-					})
+		for row in semso_total:
+			if flt(row.amount):
+				component = (
+					"Spouse Semso"
+					if cint(row.spouse_semso)
+					else "Semso"
+				)
 
-			
+				target.append("deductions", {
+					"salary_component": component,
+					"amount": round(flt(row.amount)),
+					"default_amount": round(flt(row.amount)),
+				})
+        
 
-		for e in calc_map['earnings']:
-			if e['salary_component'] == 'Basic Pay':
-				basic_amt = (flt(e['amount']))
-			# Following condition added by SHIV on 2019/04/29
-			elif frappe.db.exists("Salary Component", {"name": e['salary_component'], "is_pf_deductible": 1}):
-				basic_pay_arrears += (flt(e['amount']))
-			if e['salary_component'] == 'Communication Allowance':
-				comm_amt = (flt(e['amount']))
-			gross_amt += flt(e['amount'])
+		# Do NOT run these
+		# target.run_method("pull_emp_details")
+		# target.run_method("calculate_net_pay")
 
-		gross_amt += (flt(target.arrear_amount) + flt(target.leave_encashment_amount))
+	doc = get_mapped_doc(
+		"Salary Structure",
+		source_name,
+		{
+			"Salary Structure": {
+				"doctype": "Salary Slip",
+				"field_map": {
+					"name": "salary_structure",
+				},
+			},
+		},
+		target_doc,
+		postprocess,
+		ignore_child_tables=True,
+		ignore_permissions=ignore_permissions,
+		cached=True,
+	)
 
-		# Calculating PF, Group Insurance Scheme, Health Contribution
-		sws_amt = pf_amt = gis_amt = health_cont_amt = 0.00
-		# frappe.msgprint(str(source.employee)+" "+str(calc_map))
-		for d in calc_map['deductions']:
-			if not flt(gross_amt):
-				d['amount'] = 0
-			else:
-				if d['salary_component'] == 'SWS':
-					# sws_amt = flt(get_sws_contribution(source.employee, end_date))
-					sws_amt = flt(settings.get("sws_contribution"))
-					calc_amt = roundoff(sws_amt)
-					d['amount'] = calc_amt
-				if d['salary_component'] == 'PF':
-					percent = flt(settings.get("employee_pf"))
-					pf_amt = (flt(basic_amt)+flt(basic_pay_arrears))*flt(percent)*0.01
-					calc_amt = round(pf_amt)
-					# added by phuntsho on feb April 6th 2021
-					# calculate employer pf
-					employer_percent = flt(settings.get("employer_pf"))
-					employer_pf_amount = (flt(basic_amt)+flt(basic_pay_arrears))*flt(employer_percent)*0.01
-					# employer_pf_amount = round(employer_pf_amount)
-					target.employer_pf = round(employer_pf_amount)
-					# ----- end of code by phuntsho -----
-					d['amount'] = calc_amt
-				if d['salary_component'] == 'GIS':
-					gis_amt = flt(settings.get("gis"))
-					calc_amt = roundoff(gis_amt)
-					d['amount'] = calc_amt
-				if d['salary_component'] == 'Health Contribution':
-					health_cont_amt = flt(gross_amt)*flt(settings.get("health_contribution"))*0.01
-					calc_amt = roundoff(health_cont_amt)
-					d['amount'] = calc_amt
-	 
-		# Calculating Salary Tax
-		tax_included = 0
-		for d in calc_map['deductions']:
-			if not flt(gross_amt):
-				d['amount'] = 0
-			else:
-				if d['salary_component'] == 'Salary Tax':
-					if not tax_included:
-						if target.employee_group in ["Officer (RBA)","Civilan (RBA)","Troops (RBA)","Troops (RBG)",
-								"Officer (RBG)","Civilan (RBG)"]:
-							tax_amt = get_salary_tax(math.floor(flt(basic_amt)-flt(pf_amt)-flt(gis_amt)))
-							tax_amt = roundoff(tax_amt)
-							d['amount'] = flt(tax_amt)
-							tax_included = 1
-						elif target.employee_group in ["Deceased (2003)", "Deceased (2015)"]:
-							tax_amt = get_salary_tax(math.floor(flt(gross_amt)-flt(pf_amt)-flt(gis_amt)))
-							tax_amt = roundoff(tax_amt)
-							d['amount'] = flt(0)
-							tax_included = 1
-						else:
-							tax_amt = get_salary_tax(math.floor(flt(gross_amt) - flt(gross_amt) *flt(0.15)))
-							tax_amt = roundoff(tax_amt)
-							d['amount'] = flt(tax_amt)
-							tax_included = 1	
-				#tax_included = 0
-				# if d['salary_component'] == 'Salary Tax':
-				# 	if self.employee_group in ["Officer (RBA)","Civilan (RBA)","Troops (RBA)","Troops (RBG)",
-				# 				"Officer (RBG)","Civilan (RBG)"]:
-				# 		calc_amt = get_salary_tax(math.floor(flt(basic_pay)-flt(pf_amt)-flt(gis_amt)))
-				# 		calc_amt = roundoff(calc_amt)
-				# 		total_deduction += calc_amt
-				# 		calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(calc_amt)})
-				# 		tax_included = 1
-				# 	# elif self.employee_group in ["Deceased (2003)", "Deceased (2012)"]:
-				# 	elif self.employee_group in ["Deceased (2003)", "Deceased (2015)"]:
-				# 		# # return
-				# 		calc_amt = get_salary_tax(math.floor(flt(total_earning)-flt(pf_amt)-flt(gis_amt)))
-				# 		calc_amt = roundoff(calc_amt)
-				# 		total_deduction += calc_amt
-				# 		calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(0)})
-				# 		tax_included = 1
-					
-				# 	else:
-				# 		tax_amt = get_salary_tax(math.floor(flt(total_earning) - (flt(total_earning) * 0.15)))
-				# 		tax_amt = roundoff(tax_amt)
-				# 		total_deduction += calc_amt
-				# 		calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(tax_amt)})
-				# 		tax_included = 1			
-				
-		
-		# Appending calculated components to salary slip
-		[target.append('earnings', m) for m in calc_map['earnings']]
-		[target.append('deductions', m) for m in calc_map['deductions']]
+	if cint(as_print):
+		doc.name = f"Preview for {employee}"
 
-		target.run_method("pull_emp_details")
-		target.run_method("calculate_net_pay")
-
-	doc = get_mapped_doc("Salary Structure", source_name, {
-		"Salary Structure": {
-			"doctype": "Salary Slip",
-			"field_map": {
-				"total_earning": "gross_pay",
-				"name": "salary_structure",
-			}
-		}
-	}, target_doc, postprocess, ignore_child_tables=True)
+		return frappe.get_print(
+			doc.doctype,
+			doc.name,
+			doc=doc,
+			print_format=print_format,
+		)
 
 	return doc
 # Ver 2.0, Following method added by SHIV on 2018/02/27

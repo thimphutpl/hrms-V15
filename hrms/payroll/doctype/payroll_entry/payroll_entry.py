@@ -811,7 +811,6 @@ class PayrollEntry(Document):
 			frappe.throw(_("Please set <b>Default Cost Center</b> for the Company"))
 		elif not company.employer_contribution_pf_account:
 			frappe.throw(_("Please set account for <b>Employer Contribution to PF</b> for the Company"))
-
 		employee_list = [d.employee for d in self.employees]
 		if not employee_list:
 			frappe.throw(_("No employees found in Payroll Employee Detail"))
@@ -822,48 +821,87 @@ class PayrollEntry(Document):
 		# Pre-school's employer pf should be deducted from RGOF
 		pre_school_pf_account = "24.03 - Contributions - Provident Fund - RBA"
 
+		employee_group = None
 		for employee in self.salary_group_item:
 			employee_group = employee.employee_group	
 		e_group =employee_group
 
 		# Check if this is a Pre-school employee
-    	is_pre_school = 1 if e_group == pre_school_pf_account else 0
+		is_pre_school = 1 if e_group == pre_school_pf_account else 0
+		missing_components = frappe.db.sql("""
+			SELECT DISTINCT
+				sc.name AS salary_component,
+				sc.type AS component_type
+			FROM `tabSalary Slip` ss
+			INNER JOIN `tabSalary Detail` sd
+				ON sd.parent = ss.name
+			INNER JOIN `tabSalary Component` sc
+				ON sc.name = sd.salary_component
+			LEFT JOIN `tabSalary Component Account` sca
+				ON sca.parent = sc.name
+				AND sca.company = ss.company
+			WHERE ss.fiscal_year = %(fiscal_year)s
+				AND ss.month = %(month)s
+				AND ss.docstatus = 1
+				AND ss.payroll_entry = %(payroll_entry)s
+				AND ss.employee IN %(employees)s
+				AND IFNULL(sca.account, '') = ''
+			ORDER BY sc.type, sc.name
+		""", {
+			"fiscal_year": self.fiscal_year,
+			"month": self.month,
+			"payroll_entry": self.name,
+			"employees": tuple(employee_list),
+		}, as_dict=True)
+
+		if missing_components:
+			message = _("Missing Salary Component Account:<br><br>")
+
+			for row in missing_components:
+				message += _(
+					"<b>Salary Component:</b> {0} | "
+					"<b>Type:</b> {1}<br>"
+				).format(
+					row.salary_component,
+					row.component_type
+				)
+
+			frappe.throw(message)
 
 		
 		cc = frappe.db.sql("""
 			SELECT
+				
 				CASE
-					WHEN sc.type = 'Deduction' AND IFNULL(sc.make_party_entry,0) = 0 THEN c.cost_center
+					WHEN  t1.employee_group = "Teachers (RBA)" THEN t1.cost_center
+					WHEN sc.type = 'Deduction' AND IFNULL(sc.make_party_entry,0) = 0 
+						AND t1.employee_group != "Teachers (RBA)" THEN c.cost_center
 					ELSE t1.cost_center
 				END AS cost_center,
 				CASE
-					WHEN IFNULL(sc.budget_activity, '') != '' THEN sc.budget_activity
-					WHEN %(e_group)s = "Teachers (RBA)" AND %(is_pre_school)s = 1 THEN 
-						(SELECT cc.budget_activity FROM `tabCost Center` cc WHERE cc.name = t1.cost_center)
-					WHEN %(is_royal_body_guard)s = 1 THEN 
+					WHEN %(is_royal_body_guard)s = 1 OR (t1.employee_group = "Teachers (RBA)") THEN 
 						(SELECT cc.budget_activity FROM `tabCost Center` cc WHERE cc.name = t1.cost_center)
 					ELSE 
 						(SELECT eg.budget_activity FROM `tabEmployee Group` eg WHERE t1.employee_group = eg.name)
 				END AS budget_activity,
 				CASE
-					WHEN IFNULL(sc.budget_sub_activity, '') != '' THEN sc.budget_sub_activity
-					WHEN %(e_group)s = "Teachers (RBA)" AND %(is_pre_school)s = 1 THEN
-						(SELECT cc.budget_sub_activity FROM `tabCost Center` cc WHERE cc.name = t1.cost_center)
-					WHEN %(is_royal_body_guard)s = 1 THEN 
+					
+					WHEN %(is_royal_body_guard)s = 1 OR (t1.employee_group = "Teachers (RBA)") THEN 
 						(SELECT cc.budget_sub_activity FROM `tabCost Center` cc WHERE cc.name = t1.cost_center)
 					ELSE 
 						(SELECT eg.budget_sub_activity FROM `tabEmployee Group` eg WHERE t1.employee_group = eg.name)
 				END AS budget_sub_activity,
 				CASE
-					WHEN IFNULL(sc.source_of_fund, '') != '' THEN sc.source_of_fund
-					WHEN %(e_group)s = "Teachers (RBA)" AND %(is_pre_school)s = 1 THEN
-						(SELECT cc.source_of_fund FROM `tabCost Center` cc WHERE cc.name = t1.cost_center)
-					WHEN %(is_royal_body_guard)s = 1 THEN 
-						(SELECT cc.source_of_fund FROM `tabCost Center` cc WHERE cc.name = t1.cost_center)
+			
+					WHEN %(is_royal_body_guard)s = 1 OR (sd.salary_component = "PF" AND t1.employee_group = "Teachers (RBA)") THEN 
+						(SELECT cc.source_of_fund FROM `tabCost Center` cc WHERE cc.name = t1.cost_center)	
+
 					ELSE 
 						CASE
-							WHEN (SELECT a.source_of_fund FROM `tabAccount` a WHERE a.name = sca.account) IS NOT NULL 
-								THEN (SELECT a.source_of_fund FROM `tabAccount` a WHERE a.name = sca.account)
+							
+							WHEN sd.salary_component IN ('Deputation Allowance', 'Other Allowance') AND t1.employee_group = 'NAS (RBA)' THEN 
+								(SELECT sc.source_of_fund FROM `tabSalary Component` sc WHERE sc.name = sd.salary_component)
+
 							ELSE (SELECT eg.source_of_fund FROM `tabEmployee Group` eg WHERE t1.employee_group = eg.name)
 						END
 				END AS source_of_fund,
@@ -874,11 +912,12 @@ class PayrollEntry(Document):
 				sc.type AS component_type,
 				sc.name AS component_name,
 				sc.group_by_institution_name,
-				sd.name,
+				sd.institution_name,
 				IFNULL(sc.is_remittable,0) AS is_remittable,
 				sca.account AS gl_head,
 				SUM(IFNULL(sd.amount,0)) AS amount,
 				SUM(IFNULL(t1.employer_pf,0)) AS employer_pf,
+				t1.cost_center AS salary_slip_cost_center, 
 				CASE
 					WHEN IFNULL(sc.make_party_entry,0) = 1 THEN 'Payable'
 					ELSE 'Other'
@@ -894,24 +933,30 @@ class PayrollEntry(Document):
 			FROM `tabSalary Slip` t1
 			INNER JOIN `tabSalary Detail` sd ON sd.parent = t1.name
 			INNER JOIN `tabSalary Component` sc ON sc.name = sd.salary_component
-			INNER JOIN `tabSalary Component Account` sca ON sca.parent = sc.name AND sca.company = t1.company
+			LEFT JOIN `tabSalary Component Account` sca ON sca.parent = sc.name AND sca.company = t1.company
 			INNER JOIN `tabCompany` c ON c.name = t1.company
 			WHERE t1.fiscal_year = %(fiscal_year)s
 				AND t1.month = %(month)s
 				AND t1.docstatus = 1
 				AND t1.payroll_entry = %(payroll_entry)s
 				AND t1.employee IN %(employees)s
-			GROUP BY 
-				cost_center,
-				salary_component,
-				component_type,
-				budget_activity,
-				budget_sub_activity,
+			group by 
 				source_of_fund,
-				sc.group_by_institution_name,
-				is_remittable,
-				gl_head,
-				account_type
+				(case
+					when sc.type = 'Deduction' and ifnull(sc.make_party_entry,0) = 0 then c.cost_center
+					else t1.cost_center
+				end),
+				
+				(case when sc.type = 'Earning' then sc.type else ifnull(sc.clubbed_component,sc.name) end),
+				sc.type,
+				(case when sc.type = 'Earning' then 0 else ifnull(sc.is_remittable,0) end),
+				sca.account,
+				sca.company,
+				(case when ifnull(sc.make_party_entry,0) = 1 then 'Payable' else 'Other' end),
+				(case when ifnull(sc.make_party_entry,0) = 1 then 'Employee' else 'Other' end),
+				(case when ifnull(sc.make_party_entry,0) = 1 then t1.employee else 'Other' end)
+	
+			 
 			ORDER BY t1.cost_center, sc.type, sc.name
 		""", {
 			"fiscal_year": self.fiscal_year,
@@ -922,6 +967,10 @@ class PayrollEntry(Document):
 			"e_group": e_group,
 			"is_pre_school": is_pre_school,
 		}, as_dict=1)
+		# frappe.throw(str(cc))
+
+		
+
 
 		# Store PF amounts per cost center and party
 		pf_cc_entries = {}
@@ -967,150 +1016,119 @@ class PayrollEntry(Document):
 				"salary_component": rec.salary_component
 			})
 			
-			# # Remittance
-			# if rec.is_remittable and rec.component_type == 'Deduction':
-			# 	component_key = f"{rec.component_name}_{rec.cost_center}_{rec.budget_activity}_{rec.budget_sub_activity}_{rec.source_of_fund}"
-				
-			# 	if component_key in processed_components:
-			# 		continue
-			# 	processed_components.add(component_key)
-				
-			# 	remit_gl_list = [rec.gl_head]
-			# 	if rec.component_name == "PF":
-			# 		remit_gl_list.append(company.employer_contribution_pf_account)
-				
-			# 	# Track total debit amount for this component
-			# 	total_debit_for_component = 0
-			# 	account_types = []
-			# 	for at in frappe.get_all("Budget Settings Account Types", ["account_type"]):
-			# 		account_types.append(at.account_type)
-			# 	remit_amount = 0
-			# 	for gl_account in remit_gl_list:
-			# 		if gl_account == company.employer_contribution_pf_account:
-			# 			key = (rec.cost_center, entry.budget_activity, entry.budget_sub_activity, entry.source_of_fund)
-			# 			remit_amount = rec.employer_pf
-			# 		else:
-			# 			remit_amount = amount
-					
-			# 		if remit_amount:
-			# 			total_debit_for_component += remit_amount
-			# 			if frappe.db.get_value("Account", gl_account, "account_type") in account_types:
-			# 				budget_activity = rec.budget_activity
-			# 				budget_sub_activity = rec.budget_sub_activity
-			# 				source_of_fund = rec.source_of_fund
-			# 			else:
-			# 				budget_activity = ""
-			# 				budget_sub_activity = ""
-			# 				source_of_fund = ""
-							
-			# 			posting.setdefault(f"remittance_{rec.component_name}", []).append({
-			# 				"account": gl_account,
-			# 				"debit_in_account_currency": remit_amount,
-			# 				"cost_center": rec.cost_center,
-			# 				"party_check": 0,
-			# 				"account_type": rec.account_type if rec.party_type == "Employee" else "",
-			# 				"party_type": rec.party_type if rec.party_type == "Employee" else "",
-			# 				"party": rec.party if rec.party_type == "Employee" else "",
-			# 				"reference_type": self.doctype,
-			# 				"reference_name": self.name,
-			# 				"budget_activity": budget_activity,
-			# 				"budget_sub_activity": budget_sub_activity,
-			# 				"source_of_fund": source_of_fund,
-			# 				"salary_component": rec.salary_component
-			# 			})
-			# 	# Store total remittance for this component to add bank credit later
-			# 	if total_debit_for_component > 0:
-			# 		component_remittances[rec.component_name] = {
-			# 			"amount": total_debit_for_component,
-			# 			"cost_center": rec.cost_center,
-
-			# 		}
-
-			#new code for PF
-			# Remittance
+		   
 			if rec.is_remittable and rec.component_type == 'Deduction':
-				component_key = f"{rec.component_name}_{rec.cost_center}_{rec.budget_activity}_{rec.budget_sub_activity}_{rec.source_of_fund}"
-				
-				if component_key in processed_components:
-					continue
-				processed_components.add(component_key)
-				
+
 				remit_gl_list = [rec.gl_head]
+
 				if rec.component_name == "PF":
 					remit_gl_list.append(company.employer_contribution_pf_account)
-				
-				# Track total debit amount for this component
+
 				total_debit_for_component = 0
-				account_types = []
-				for at in frappe.get_all("Budget Settings Account Types", ["account_type"]):
-					account_types.append(at.account_type)
-				
-				remit_amount = 0
+
+				account_types = [
+					at.account_type
+					for at in frappe.get_all(
+						"Budget Settings Account Types",
+						["account_type"]
+					)
+				]
+
 				for gl_account in remit_gl_list:
+
 					if gl_account == company.employer_contribution_pf_account:
-						# For PF Employer Contribution account - get source_of_fund from the Account itself
-						remit_amount = rec.employer_pf
-						# Get source_of_fund from the PF Account
-						pf_account_source = frappe.db.get_value("Account", company.employer_contribution_pf_account, "source_of_fund")
-						source_of_fund_for_pf = pf_account_source if pf_account_source else rec.source_of_fund
+						remit_amount = round(rec.employer_pf)
+
+						pf_account_source = frappe.db.get_value(
+							"Account",
+							company.employer_contribution_pf_account,
+							"source_of_fund"
+						)
+
+						source_of_fund_for_pf = (
+							pf_account_source
+							if pf_account_source
+							else rec.source_of_fund
+						)
+
 					else:
-						remit_amount = amount
+						remit_amount = round(amount)
 						source_of_fund_for_pf = rec.source_of_fund
-					
-					if remit_amount:
-						total_debit_for_component += remit_amount
-						
-						# Check if account has budget settings
-						if frappe.db.get_value("Account", gl_account, "account_type") in account_types:
-							budget_activity = rec.budget_activity
-							budget_sub_activity = rec.budget_sub_activity
-							# Use appropriate source_of_fund
-							if gl_account == company.employer_contribution_pf_account:
-								source_of_fund = source_of_fund_for_pf
-							else:
-								source_of_fund = rec.source_of_fund
+
+					if not remit_amount:
+						continue
+
+					total_debit_for_component += remit_amount
+
+					if frappe.db.get_value(
+						"Account",
+						gl_account,
+						"account_type"
+					) in account_types:
+
+						budget_activity = rec.budget_activity
+						budget_sub_activity = rec.budget_sub_activity
+
+						if gl_account == company.employer_contribution_pf_account:
+							source_of_fund = source_of_fund_for_pf
 						else:
-							budget_activity = ""
-							budget_sub_activity = ""
-							source_of_fund = ""
-							
-						posting.setdefault(f"remittance_{rec.component_name}", []).append({
-							"account": gl_account,
-							"debit_in_account_currency": remit_amount,
-							"cost_center": rec.cost_center,
-							"party_check": 0,
-							"account_type": rec.account_type if rec.party_type == "Employee" else "",
-							"party_type": rec.party_type if rec.party_type == "Employee" else "",
-							"party": rec.party if rec.party_type == "Employee" else "",
-							"reference_type": self.doctype,
-							"reference_name": self.name,
-							"budget_activity": budget_activity,
-							"budget_sub_activity": budget_sub_activity,
-							"source_of_fund": source_of_fund,
-							"salary_component": rec.salary_component
-						})
-				
-				# Store total remittance for this component to add bank credit later
-				if total_debit_for_component > 0:
-					component_remittances[rec.component_name] = {
-						"amount": total_debit_for_component,
+							source_of_fund = rec.source_of_fund
+
+					else:
+						budget_activity = ""
+						budget_sub_activity = ""
+						source_of_fund = ""
+
+					posting.setdefault(
+						f"remittance_{rec.component_name}",
+						[]
+					).append({
+						"account": gl_account,
+						"debit_in_account_currency": remit_amount,
 						"cost_center": rec.cost_center,
-						"source_of_fund": rec.source_of_fund  # Store the source_of_fund for bank credit entry
-					}
+						"party_check": 0,
+						"account_type": (
+							rec.account_type
+							if rec.party_type == "Employee"
+							else ""
+						),
+						"party_type": (
+							rec.party_type
+							if rec.party_type == "Employee"
+							else ""
+						),
+						"party": (
+							rec.party
+							if rec.party_type == "Employee"
+							else ""
+						),
+						"reference_type": self.doctype,
+						"reference_name": self.name,
+						"budget_activity": budget_activity,
+						"budget_sub_activity": budget_sub_activity,
+						"source_of_fund": source_of_fund,
+						"salary_component": rec.salary_component
+					})
 
-		# # Add bank credit entries for remittances
-		# for component_name, remit_data in component_remittances.items():
-		# 	posting.setdefault(f"remittance_{component_name}", []).append({
-		# 		"account": default_bank_account,
-		# 		"credit_in_account_currency": remit_data["amount"],
-		# 		"cost_center": remit_data["cost_center"],
-		# 		"party_check": 0,
-		# 		"reference_type": self.doctype,
-		# 		"reference_name": self.name,
-		# 		"salary_component": component_name
-		# 	})
+				# ACCUMULATE instead of overwrite
+				if total_debit_for_component > 0:
 
-		# New code
+					existing = component_remittances.get(
+						rec.component_name
+					)
+
+					if existing:
+						existing["amount"] += total_debit_for_component
+					else:
+						component_remittances[rec.component_name] = {
+							"amount": total_debit_for_component,
+							"cost_center": rec.cost_center,
+							"source_of_fund": rec.source_of_fund
+						}
+
+
+
+
 		# Add bank credit entries for remittances
 		for component_name, remit_data in component_remittances.items():
 			posting.setdefault(f"remittance_{component_name}", []).append({
@@ -1126,6 +1144,22 @@ class PayrollEntry(Document):
 
 		# To Bank entries for net salary
 		if posting.get("to_payables"):
+			# net_pay = frappe.db.sql("""
+			# 		SELECT COALESCE(SUM(net_pay), 0)
+			# 		FROM `tabSalary Slip`
+			# 		WHERE fiscal_year = %s
+			# 			AND month = %s
+			# 			AND docstatus = 1
+			# 			AND payroll_entry = %s
+			# 			AND employee IN %s
+			# 	""", (
+			# 		self.fiscal_year,
+			# 		self.month,
+			# 		self.name,
+			# 		tuple(employee_list)
+			# 	))[0][0] or 0
+
+			# net_pay = flt(net_pay)
 			posting.setdefault("to_bank", []).extend([
 				{
 					"account": default_bank_account,
@@ -1182,14 +1216,7 @@ class PayrollEntry(Document):
 			
 			jv_name = None
 			for entry_type, accounts in posting.items():
-				# if "to_payables" in entry_type:
-				# 	voucher_type = "Journal Entry"
-				# 	naming_series = "Journal Voucher"
-				# 	title = f"SALARY {self.fiscal_year}{self.month} - Payables"
-				# else:
-				# 	voucher_type = "Bank Entry"
-				# 	naming_series = "Bank Payment Voucher"
-				# 	title = f"SALARY {self.fiscal_year}{self.month} - {entry_type.replace('remittance_', '')}"
+			 
 
 				if entry_type == "to_payables":
 					voucher_type = "Journal Entry"
@@ -1230,10 +1257,9 @@ class PayrollEntry(Document):
 				doc.flags.ignore_permissions = 1
 				doc.insert()
 				
-				if "to_payables" in entry_type:
-					doc.submit()
-					# doc.insert()
-					jv_name = doc.name
+				# if "to_payables" in entry_type:
+				#     doc.submit()
+				#     jv_name = doc.name
 			
 			if jv_name:
 				self.update_salary_slip_status(jv_name=jv_name)
@@ -1245,7 +1271,13 @@ class PayrollEntry(Document):
 	##### Ver3.0.190304 Ends
 	# Ver 20190719.1 added by SHIV, JIGME on 2019/07/19
 	def check_budget(self, posting):
+		employee_group = None
 		budget_error = []
+
+		for employee in self.salary_group_item:
+			employee_group = employee.employee_group	
+		e_group =employee_group
+
 		### Ver.2.0.200106 Begins, added by SHIV on 2019/01/06
 		# Budget check should happen on processing year and month not nowdate()
 		# budget_date = "-".join([self.fiscal_year, self.month, '01'])
@@ -1260,7 +1292,7 @@ class PayrollEntry(Document):
 						### Ver.2.0.200106 Begins, added by SHIV on 2019/01/06
 						# Following line is replaced
 						#error = check_budget_available(rec.get("cost_center"), rec.get("account"), nowdate(), flt(rec.get("debit_in_account_currency")), False)
-						error = validate_expense_against_budget({"cost_center": rec.get("cost_center"), "account": rec.get("account"), "posting_date": budget_date, "amount": flt(rec.get("debit_in_account_currency")), "company": self.company, "budget_activity": rec.get("budget_activity"), "budget_sub_activity": rec.get("budget_sub_activity"), "source_of_fund": rec.get("source_of_fund")}, False)
+						error = validate_expense_against_budget({"cost_center": rec.get("cost_center"), "account": rec.get("account"), "posting_date": budget_date, "employee_group" : e_group, "amount": flt(rec.get("debit_in_account_currency")), "company": self.company, "budget_activity": rec.get("budget_activity"), "budget_sub_activity": rec.get("budget_sub_activity"), "source_of_fund": rec.get("source_of_fund")}, False)
 						### Ver.2.0.200106 Ends
 						if error:
 							budget_error.append(error)
@@ -1419,71 +1451,356 @@ def remove_salary_slips_for_employees(payroll_entry, salary_slips, publish_progr
 		frappe.msgprint(_("Could not submit some Salary Slips"))
 	payroll_entry.reload()
 
+
+
 # following method is created by SHIV on 2020/10/20
-def create_salary_slips_for_employees(employees, args, title=None, publish_progress=True):
-	# frappe.throw(str(args))
+def create_salary_slips_for_employees(
+	employees,
+	args,
+	title=None,
+	publish_progress=True
+):
 	salary_slips_exists_for = get_existing_salary_slips(employees, args)
-	count=0
+
+	count = 0
 	successful = 0
 	failed = 0
-	payroll_entry = frappe.get_doc("Payroll Entry", args.payroll_entry)
-	payroll_entry.set('employees_failed', [])
+
+	payroll_entry = frappe.get_doc(
+		"Payroll Entry",
+		args.payroll_entry
+	)
+
+	payroll_entry.set("employees_failed", [])
+
 	refresh_interval = 25
 	total_count = len(set(employees))
+
 	for emp in payroll_entry.get("employees"):
+
 		if emp.employee in employees and emp.employee not in salary_slips_exists_for:
+
 			error = None
-			args.update({
+			ss = None
+			salary_slip_args = dict(args)
+			salary_slip_args.update({
 				"doctype": "Salary Slip",
 				"employee": emp.employee
 			})
-
 			try:
-				ss = frappe.get_doc(args)
-				frappe.log_error(args)
+				ss = frappe.get_doc(salary_slip_args)
 				ss.insert()
+
 				successful += 1
+
 			except Exception as e:
 				error = str(e)
 				failed += 1
-			count+=1
 
-			ped = frappe.get_doc("Payroll Employee Detail", emp.name)
-			# frappe.throw(frappe.as_json(ped))
-			ped.db_set("salary_slip", ss.name)
+			count += 1
+
+			# Get Payroll Employee Detail
+			ped = frappe.get_doc(
+				"Payroll Employee Detail",
+				emp.name
+			)
+
 			if error:
+
+				# Do NOT use ss.name when creation failed
 				ped.db_set("status", "Failed")
-				ped.db_set("error", error)
-				payroll_entry.append('employees_failed',{
-					'employee': emp.employee,
-					'employee_name': emp.employee_name,
-					'status': 'Failed',
-					'error': error
-				})
+
+				# Keep error within 140 characters
+				error_short = error[:140]
+
+				ped.db_set("error", error_short)
+
+				payroll_entry.append(
+					"employees_failed",
+					{
+						"employee": emp.employee,
+						"employee_name": emp.employee_name,
+						"status": "Failed",
+						"error": error_short
+					}
+				)
+
 			else:
-				ped.db_set("status", "Success")
-	
+
+				ped.db_set(
+					"salary_slip",
+					ss.name
+				)
+				ped.db_set(
+					"status",
+					"Success"
+				)
+
 			if publish_progress:
+
 				show_progress = 0
+
 				if count <= refresh_interval:
 					show_progress = 1
+
 				elif refresh_interval > total_count:
 					show_progress = 1
-				elif count%refresh_interval == 0:
+
+				elif count % refresh_interval == 0:
 					show_progress = 1
-				elif count > total_count-refresh_interval:
+
+				elif count > total_count - refresh_interval:
 					show_progress = 1
-				
+
 				if show_progress:
-					description = " Processing {}: ".format(ss.name if ss else emp.employee) + "["+str(count)+"/"+str(total_count)+"]"
-					frappe.publish_progress(count*100/len(set(employees) - set(salary_slips_exists_for)),
-						title = title if title else _("Creating Salary Slips..."),
-						description = description)
-					pass
-	payroll_entry.db_set("salary_slips_created", 0 if failed else 1)
-	payroll_entry.db_set("successful", cint(payroll_entry.successful)+cint(successful))
-	payroll_entry.db_set("failed", cint(payroll_entry.number_of_employees)-(cint(payroll_entry.successful)))
+
+					description = (
+						" Processing {}: ".format(
+							ss.name if ss else emp.employee
+						)
+						+ "["
+						+ str(count)
+						+ "/"
+						+ str(total_count)
+						+ "]"
+					)
+
+					frappe.publish_progress(
+						count * 100 / len(
+							set(employees)
+							- set(salary_slips_exists_for)
+						),
+						title=title
+						if title
+						else _("Creating Salary Slips..."),
+						description=description
+					)
+
+	payroll_entry.db_set(
+		"salary_slips_created",
+		0 if failed else 1
+	)
+
+	payroll_entry.db_set(
+		"successful",
+		cint(payroll_entry.successful) + cint(successful)
+	)
+
+	payroll_entry.db_set(
+		"failed",
+		cint(payroll_entry.number_of_employees)
+		- cint(payroll_entry.successful)
+	)
+
 	payroll_entry.reload()
+
+# def create_salary_slips_for_employees(employees, args, title=None, publish_progress=True):
+#     salary_slips_exists_for = get_existing_salary_slips(employees, args)
+
+#     count = 0
+#     successful = 0
+#     failed = 0
+
+#     payroll_entry = frappe.get_doc("Payroll Entry", args.payroll_entry)
+#     payroll_entry.set("employees_failed", [])
+
+#     refresh_interval = 25
+#     total_count = len(set(employees))
+
+#     for emp in payroll_entry.get("employees"):
+
+#         if emp.employee in employees and emp.employee not in salary_slips_exists_for:
+
+#             error = None
+#             ss = None
+
+#             employee_args = args.copy()
+
+#             employee_args.update({
+#                 "doctype": "Salary Slip",
+#                 "employee": emp.employee
+#             })
+
+#             try:
+#                 ss = frappe.get_doc(employee_args)
+
+		
+#                 for d in ss.deductions:
+#                     if d.salary_component == "Salary Tax":
+#                         frappe.log_error(
+#                             frappe.as_json({
+#                                 "employee": emp.employee,
+#                                 "salary_structure": ss.salary_structure,
+#                                 "salary_tax_before_insert": d.amount
+#                             }),
+#                             "Salary Tax BEFORE INSERT"
+#                         )
+
+
+#                 ss.insert()
+
+				
+
+#                 structure_tax = frappe.db.get_value(
+#                     "Salary Detail",
+#                     {
+#                         "parent": ss.salary_structure,
+#                         "parenttype": "Salary Structure",
+#                         "salary_component": "Salary Tax"
+#                     },
+#                     "amount"
+#                 )
+
+#                 if structure_tax is not None:
+
+#                     structure_tax = flt(structure_tax)
+
+#                     # Find Salary Tax in Salary Slip
+#                     for d in ss.deductions:
+
+#                         if d.salary_component == "Salary Tax":
+
+#                             old_tax = flt(d.amount)
+
+						  
+#                             d.amount = structure_tax
+
+#                             # If tax was changed by ERPNext calculation,
+#                             # update the database child row directly.
+#                             d.db_set(
+#                                 "amount",
+#                                 structure_tax,
+#                                 update_modified=False
+#                             )
+
+#                             # ==================================================
+#                             # CHANGE 4:
+#                             # Update totals because changing tax from 10 to 30
+#                             # increases total deduction by 20.
+#                             # ==================================================
+#                             difference = structure_tax - old_tax
+
+#                             ss.total_deduction = flt(ss.total_deduction) + difference
+#                             ss.net_pay = flt(ss.net_pay) - difference
+
+#                             ss.db_set(
+#                                 "total_deduction",
+#                                 ss.total_deduction,
+#                                 update_modified=False
+#                             )
+
+#                             ss.db_set(
+#                                 "net_pay",
+#                                 ss.net_pay,
+#                                 update_modified=False
+#                             )
+
+#                             frappe.log_error(
+#                                 frappe.as_json({
+#                                     "employee": emp.employee,
+#                                     "salary_slip": ss.name,
+#                                     "salary_structure_tax": structure_tax,
+#                                     "salary_tax_before_fix": old_tax,
+#                                     "salary_tax_after_fix": structure_tax,
+#                                     "difference": difference
+#                                 }),
+#                                 "Salary Tax FIXED"
+#                             )
+
+#                             break
+
+			 
+
+#                 successful += 1
+
+#             except Exception as e:
+#                 error = str(e)
+#                 failed += 1
+
+#                 frappe.log_error(
+#                     frappe.get_traceback(),
+#                     "Salary Slip Creation Error"
+#                 )
+
+#             count += 1
+
+		
+#             ped = frappe.get_doc(
+#                 "Payroll Employee Detail",
+#                 emp.name
+#             )
+
+#             if ss:
+#                 ped.db_set("salary_slip", ss.name)
+
+#             if error:
+
+#                 ped.db_set("status", "Failed")
+#                 ped.db_set("error", error)
+
+#                 payroll_entry.append(
+#                     "employees_failed",
+#                     {
+#                         "employee": emp.employee,
+#                         "employee_name": emp.employee_name,
+#                         "status": "Failed",
+#                         "error": error
+#                     }
+#                 )
+
+#             else:
+#                 ped.db_set("status", "Success")
+
+#             if publish_progress:
+
+#                 show_progress = 0
+
+#                 if count <= refresh_interval:
+#                     show_progress = 1
+
+#                 elif refresh_interval > total_count:
+#                     show_progress = 1
+
+#                 elif count % refresh_interval == 0:
+#                     show_progress = 1
+
+#                 elif count > total_count - refresh_interval:
+#                     show_progress = 1
+
+#                 if show_progress:
+
+#                     description = " Processing {}: ".format(
+#                         ss.name if ss else emp.employee
+#                     ) + "[" + str(count) + "/" + str(total_count) + "]"
+
+#                     denominator = len(
+#                         set(employees) - set(salary_slips_exists_for)
+#                     )
+
+#                     frappe.publish_progress(
+#                         count * 100 / denominator if denominator else 100,
+#                         title=title if title else _("Creating Salary Slips..."),
+#                         description=description
+#                     )
+
+#     payroll_entry.db_set(
+#         "salary_slips_created",
+#         0 if failed else 1
+#     )
+
+#     payroll_entry.db_set(
+#         "successful",
+#         cint(payroll_entry.successful) + cint(successful)
+#     )
+
+#     payroll_entry.db_set(
+#         "failed",
+#         cint(payroll_entry.number_of_employees)
+#         - cint(payroll_entry.successful)
+#     )
+
+#     payroll_entry.reload()
+
 
 def get_existing_salary_slips(employees, args):
 	return frappe.db.sql_list("""
