@@ -1105,6 +1105,7 @@ def make_salary_slip(
 				"amount_based_on_formula": row.amount_based_on_formula,
 				"formula": row.formula,
 				"condition": row.condition,
+				
 			})
 
 		# ---------------------------------------------------------
@@ -1121,6 +1122,12 @@ def make_salary_slip(
 				"amount_based_on_formula": row.amount_based_on_formula,
 				"formula": row.formula,
 				"condition": row.condition,
+				"institution_name": row.institution_name,
+                "reference_number": row.reference_number,
+                "bank_branch": row.bank_branch,
+                "bank_account_type": row.bank_account_type,
+                "salary_component_type": row.salary_component_type,
+		        "financial_scheme": row.financial_scheme
 			})
 
 		# ---------------------------------------------------------
