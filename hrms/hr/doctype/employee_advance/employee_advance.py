@@ -54,7 +54,7 @@ class EmployeeAdvance(Document):
 		self.post_journal_entry()
 
 	def on_cancel(self):
-		self.ignore_linked_doctypes = "GL Entry"
+		self.ignore_linked_doctypes = ["GL Entry", "Payment Ledger Entry"]
 		self.update_salary_structure(cancel=True)
 		self.set_status(update=True)
 
