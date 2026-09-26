@@ -414,7 +414,7 @@ class SalaryStructure(Document):
 						calc_amt = round(pf_amt)
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})	
 
-					elif self.get(m['field_name']) and m['name'] == 'Health Contribution' and self.employee_group in ['Teachers (RBA)', 'Teachers (RBG)', 'NAS (RBA)', 'Teachers (RBG)']:
+					elif self.get(m['field_name']) and m['name'] == 'Health Contribution' and self.employee_group in ['Teachers (RBA)', 'Teachers (RBG)', 'NAS (RBA)', 'Deputation -RBG']:
 						health_cont_amt = flt(total_earning)*flt(settings.get("health_contribution"))*0.01
 						calc_amt = roundoff(health_cont_amt)
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})
