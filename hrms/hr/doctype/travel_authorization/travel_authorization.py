@@ -37,9 +37,9 @@ class TravelAuthorization(Document):
 		self.set_status()
 		self.make_travel_advance()
 		self.validate_estimated_amount()
-		validate_workflow_states(self)
-		if self.workflow_state != "Approved":
-			notify_workflow_states(self)
+		#validate_workflow_states(self)
+		# if self.workflow_state != "Approved":
+		# 	notify_workflow_states(self)
 
 	def on_update(self):
 		self.check_date_overlap()
@@ -66,13 +66,22 @@ class TravelAuthorization(Document):
 			self.status = status
 
 	def set_reports_to_inernational(self):
-		if self.travel_type=='International':
-			ceo=frappe.db.get_single_value("HR Settings","ceo")
-			user_id,employee_name=frappe.get_value("Employee",ceo,["user_id","employee_name"])
-			self.reports_to=user_id
-			self.reports_to_name=employee_name
-		else:
-			return
+		if self.travel_type == "International":
+			ceo = frappe.db.get_single_value("HR Settings", "ceo")
+
+			user_id, employee_name, designation = frappe.db.get_value(
+				"Employee",
+				ceo,
+				["user_id", "employee_name", "designation"]
+			)
+
+			self.reports_to = user_id
+			self.reports_to_name = employee_name
+
+			# Set CEO as Approver
+			self.approver = user_id
+			self.approver_name = employee_name
+			self.approver_designation = designation
 
 	def create_attendance(self):
 		for row in self.items:
@@ -385,6 +394,7 @@ class TravelAuthorization(Document):
 
 
 def get_permission_query_conditions(user):
+	
 	if not user:
 		user = frappe.session.user
 

@@ -299,12 +299,6 @@
    "options": "Workflow State"
   },
   {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "options": "Travel Authorization"
-  },
-  {
    "depends_on": "eval:doc.need_advance && doc.travel_type === 'International'\n",
    "fieldname": "extra_travel_allowance",
    "fieldtype": "Currency",

@@ -273,13 +273,13 @@
    "label": "Approver Detail"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "approver",
    "fieldtype": "Link",
    "ignore_user_permissions": 1,
    "label": "Approver",
    "no_copy": 1,
-   "options": "User",
-   "read_only": 1
+   "options": "User"
   },
   {
    "fieldname": "column_break_xaqc",
@@ -332,7 +332,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-20 09:31:34.816018",
+ "modified": "2026-09-29 10:59:48.747863",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Travel Claim",

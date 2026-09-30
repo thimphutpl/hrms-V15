@@ -44,6 +44,7 @@ def get_salary_tax(gross_amt):
 
 	if flt(gross_amt) > flt(max_amount):
 		tax_amount = ((flt(gross_amt) - 125000.00) * 0.30) + 20208.00
+		#tax_amount = flt((((flt(gross_amt) if flt(gross_amt) else 0.00)-291600.00)*0.30)+53108.00)
 	else:
 		result = frappe.db.sql("""select ifnull(b.tax,0) from
 			`tabIncome Tax Slab` a, `tabTaxable Salary Slab` b
@@ -139,13 +140,13 @@ def post_earned_leaves():
 	# 	return 0
 	
 	date = add_days(frappe.utils.nowdate(), -20)
-	start = get_first_day(date);
-	end = get_last_day(date);
+	start = get_first_day(date)
+	end = get_last_day(date)
 	from datetime import datetime, timedelta,date
 	today = datetime.today()
 	first_day_of_year = datetime(today.year, 1, 1)
 	last_day_of_year = datetime(today.year, 12, 31)	
-	employees = frappe.db.sql("select name, employee_name,employee_group,date_of_joining from `tabEmployee` where status = 'Active'", as_dict=True)
+	employees = frappe.db.sql("select name, employee_name,employee_group,date_of_joining from `tabEmployee` where status = 'Active' and employee<>'BA202301001'", as_dict=True)
 	
 	for e in employees:
 		leave_credit=2.5
