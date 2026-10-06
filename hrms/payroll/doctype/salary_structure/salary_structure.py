@@ -411,7 +411,9 @@ class SalaryStructure(Document):
 						# frappe.throw(str(flt(basic_pay)))
 						pf_amt = (flt(basic_pay)+flt(basic_pay_arrears))*flt(settings.get("employee_pf"))*0.01
 						# calc_amt = roundoff(pf_amt)
-						calc_amt = round(pf_amt)
+						# frappe.throw(str(pf_amt))
+						calc_amt = roundoff(pf_amt)
+						# frappe.throw(str(calc_amt))
 						calc_map.append({'salary_component': m['name'], 'amount': flt(calc_amt)})	
 
 					elif self.get(m['field_name']) and m['name'] == 'Health Contribution' and self.employee_group in ['Teachers (RBA)', 'Teachers (RBG)', 'NAS (RBA)', 'Deputation -RBG', 'Trongsa Penlop (RBG)', 'Pre-School-RBG']:
@@ -592,6 +594,12 @@ class SalaryStructure(Document):
 
 				elif self.employee_group in ["Contract (RBA)"]:
 					calc_amt = get_salary_tax(math.floor(flt(total_earning)))
+					calc_amt = roundoff(calc_amt)
+					total_deduction += calc_amt
+					calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(calc_amt)})
+					tax_included = 1
+				elif self.employee_group in ["Contract (RBG)"]:
+					calc_amt = get_salary_tax(math.floor(flt(basic_pay)-(flt(pf_amt)+flt(gis_amt))))
 					calc_amt = roundoff(calc_amt)
 					total_deduction += calc_amt
 					calc_map.append({'salary_component': 'Salary Tax', 'amount': flt(calc_amt)})
@@ -1123,11 +1131,11 @@ def make_salary_slip(
 				"formula": row.formula,
 				"condition": row.condition,
 				"institution_name": row.institution_name,
-                "reference_number": row.reference_number,
-                "bank_branch": row.bank_branch,
-                "bank_account_type": row.bank_account_type,
-                "salary_component_type": row.salary_component_type,
-		        "financial_scheme": row.financial_scheme
+				"reference_number": row.reference_number,
+				"bank_branch": row.bank_branch,
+				"bank_account_type": row.bank_account_type,
+				"salary_component_type": row.salary_component_type,
+				"financial_scheme": row.financial_scheme
 			})
 
 		# ---------------------------------------------------------
@@ -1181,7 +1189,7 @@ def make_salary_slip(
 					"amount": round(flt(row.amount)),
 					"default_amount": round(flt(row.amount)),
 				})
-        
+		
 
 		# Do NOT run these
 		# target.run_method("pull_emp_details")
