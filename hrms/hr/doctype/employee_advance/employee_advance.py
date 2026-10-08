@@ -49,14 +49,31 @@ class EmployeeAdvance(Document):
 		validate_active_employee(self.employee)
 		self.validate_exchange_rate()
 		self.set_status()
+		
 		# self.set_pending_amount()
 	def on_submit(self):
 		self.post_journal_entry()
+	def before_cancel(self):
+		if not self.journal_entry:
+			return
+		
+		je = frappe.get_doc("Journal Entry", self.journal_entry)	
+		if je.workflow_state in (
+			"Waiting For Verification",
+			"Waiting Approval",
+		):
+			frappe.throw(
+				_(
+					"Cannot cancel Employee Advance {0} because linked Journal Entry {1}. "
+					"Please Reject it first."
+				).format(self.name, self.journal_entry)
+		)
 
 	def on_cancel(self):
 		self.ignore_linked_doctypes = ["GL Entry", "Payment Ledger Entry"]
 		self.update_salary_structure(cancel=True)
 		self.set_status(update=True)
+		self.removed_journal_entry()
 
 	def on_update(self):
 		self.publish_update()
@@ -71,6 +88,42 @@ class EmployeeAdvance(Document):
 	def validate_exchange_rate(self):
 		if not self.exchange_rate:
 			frappe.throw(_("Exchange Rate cannot be zero."))
+	def removed_journal_entry(self):
+		
+		if not self.journal_entry:
+			return
+
+		je_name = self.journal_entry
+
+		# Find linked Advance
+		advance_name = frappe.db.get_value(
+			"Employee Advance",
+			{"journal_entry": je_name},
+			"name"
+		)
+
+		if advance_name:
+			# Remove the Journal Entry link from Advance
+			frappe.db.set_value(
+				"Employee Advance",
+				advance_name,
+				"journal_entry",
+				None
+			)
+
+		# Delete Journal Entry if Draft
+		if frappe.db.exists("Journal Entry", je_name):
+			je = frappe.get_doc("Journal Entry", je_name)
+
+			if je.workflow_state in ["Draft","Rejected","Cancelled"] and je.docstatus == 0:
+				frappe.delete_doc(
+					"Journal Entry",
+					je_name,
+					ignore_permissions=True
+				)
+
+			self.db_set("journal_entry", None)
+
 
 	def get_max_month_adv(self):
 		Employee = frappe.qb.DocType("Employee")
@@ -100,11 +153,11 @@ class EmployeeAdvance(Document):
 
 		#return max_months
 		# return {
-        # "max_months": max_months,
-        # "max_amount_intrs_fre_ln": max_amount_intrs_fre_ln
+		# "max_months": max_months,
+		# "max_amount_intrs_fre_ln": max_amount_intrs_fre_ln
 		# }
 		return {"max_months": max_months,
-        "max_amount_intrs_fre_ln": max_amount_intrs_fre_ln
+		"max_amount_intrs_fre_ln": max_amount_intrs_fre_ln
 		}
 	def update_salary_structure(self, cancel=False):
 		if cancel:
@@ -210,7 +263,9 @@ class EmployeeAdvance(Document):
 				"posting_date": nowdate(),
 				"company": self.company,
 				"accounts": accounts,
-				"branch": self.branch
+				"branch": self.branch,
+				"reference_doctype": "Employee Advance",
+				"reference_link": self.name,
 		})
 
 		if self.advance_amount:
