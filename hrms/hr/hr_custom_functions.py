@@ -273,270 +273,711 @@ def post_casual_leaves():
 		la.submit()
 
 
+# # start --Added By Karma
+# def post_earned_leaves():
+# 	from hrms.hr.doctype.leave_application.leave_application import (
+# 		get_leave_balance_on,
+# 	)
+# 	today = getdate(nowdate())
+# 	if today != get_last_day(today):
+# 		return 0 
+
+# 	# Fiscal year = calendar year
+# 	fiscal_start = today.replace(month=1, day=1)
+# 	fiscal_end = today.replace(month=12, day=31)
+# 	fiscal_start_str = fiscal_start.strftime("%Y-%m-%d")
+# 	fiscal_end_str = fiscal_end.strftime("%Y-%m-%d")
+
+# 	month_start = get_first_day(today)
+# 	month_end = get_last_day(today)
+
+# 	# 2. Employees to process
+# 	employees = frappe.db.sql(
+# 		"""
+# 		SELECT name, employee_name, date_of_joining
+# 		FROM `tabEmployee`
+# 		WHERE status = 'Active'
+# 		  AND employment_type NOT IN ('Armed Forces', 'GCE')
+# 		""",
+# 		as_dict=True,
+# 	)
+	
+# 	leave_type = "Earned Leave"
+# 	monthly_credit = 2.5
+
+# 	for e in employees:
+# 		doj = getdate(e.date_of_joining)
+# 		if doj > fiscal_end:
+# 			continue
+
+# 		# 3. Get or create ONE Leave Allocation for this fiscal year
+# 		alloc_from = max(doj, fiscal_start)
+# 		alloc_to = fiscal_end
+
+# 		la_row = frappe.db.get_value(
+# 			"Leave Allocation",
+# 			{
+# 				"employee": e.name,
+# 				"leave_type": leave_type,
+# 				"from_date": alloc_from,
+# 				"to_date": alloc_to,
+# 				"docstatus": 1,
+# 			},
+# 			["name"],
+# 			as_dict=True,
+# 		)
+
+# 		if la_row:
+# 			la_name = la_row.name
+# 		else:
+# 			la = frappe.new_doc("Leave Allocation")
+# 			la.employee = e.name
+# 			la.employee_name = e.employee_name
+# 			la.leave_type = leave_type
+# 			la.from_date = alloc_from
+# 			la.to_date = alloc_to
+# 			la.carry_forward = cint(0)
+# 			la.unused_leaves = 0
+# 			la.new_leaves_allocated = 0
+# 			la.insert()
+# 			la.submit()
+# 			la_name = la.name
+
+# 			frappe.logger().info(
+# 				f"[EL] Created fiscal-year Leave Allocation {la_name} for {e.name} "
+# 				f"({alloc_from} to {alloc_to})"
+# 			)
+# 			#  CARRY-FORWARD FROM PREVIOUS YEAR
+# 			prev_year = fiscal_start.year - 1
+# 			prev_start = getdate(f"{prev_year}-01-01")
+# 			prev_end = getdate(f"{prev_year}-12-31")
+
+# 			closing_balance = get_leave_balance_on(
+# 				e.name,
+# 				leave_type,
+# 				prev_end,
+# 				to_date=prev_end,
+# 				consider_all_leaves_in_the_allocation_period=True,
+# 				for_consumption=False,
+# 			)
+# 			closing_balance = flt(closing_balance or 0)
+
+# 			merged_cl_to_el = frappe.db.sql(
+# 				"""
+# 				SELECT COALESCE(SUM(leaves), 0)
+# 				FROM `tabLeave Ledger Entry`
+# 				WHERE employee = %s
+# 				  AND leave_type = %s
+# 				  AND transaction_type = 'Merge CL To EL'
+# 				  AND docstatus = 1
+# 				  AND from_date >= %s
+# 				  AND to_date   <= %s
+# 				""",
+# 				(e.name, leave_type, prev_start, prev_end),
+# 			)[0][0]
+# 			merged_cl_to_el = flt(merged_cl_to_el or 0)
+# 			carry_forward_total = closing_balance + merged_cl_to_el
+
+# 			if carry_forward_total > 0:
+# 				existing_cf = frappe.db.exists(
+# 					"Leave Ledger Entry",
+# 					{
+# 						"employee": e.name,
+# 						"leave_type": leave_type,
+# 						"transaction_type": "Leave Allocation",
+# 						"transaction_name": la_name,
+# 						"from_date": fiscal_start,
+# 						"to_date": fiscal_end,
+# 						"is_carry_forward": 1,
+# 						"docstatus": 1,
+# 					},
+# 				)
+
+# 				if not existing_cf:
+# 					cf_lle = frappe.new_doc("Leave Ledger Entry")
+# 					cf_lle.employee = e.name
+# 					cf_lle.employee_name = e.employee_name
+# 					cf_lle.leave_type = leave_type
+# 					cf_lle.from_date = fiscal_start
+# 					cf_lle.to_date = fiscal_end
+# 					cf_lle.leaves = carry_forward_total
+# 					cf_lle.transaction_type = "Leave Allocation"
+# 					cf_lle.transaction_name = la_name
+# 					cf_lle.is_carry_forward = 1
+# 					cf_lle.is_expired = 0
+# 					cf_lle.insert(ignore_permissions=True)
+# 					cf_lle.submit()
+
+# 					frappe.logger().info(
+# 						f"[EL] Carry forward for {e.name}: EL closing={closing_balance}, "
+# 						f"merged CL→EL={merged_cl_to_el}, total CF={carry_forward_total}"
+# 					)
+
+# 		from_date = max(doj, month_start)
+# 		to_date = month_end
+# 		service_days = date_diff(to_date, from_date) + 1
+
+# 		if service_days <= 14:
+# 			frappe.logger().info(
+# 				f"[EL] Skipping {e.name} for {from_date}–{to_date}, "
+# 				f"service days = {service_days} (<= 14)"
+# 			)
+# 			continue
+
+# 		existing_lle = frappe.db.get_value(
+# 			"Leave Ledger Entry",
+# 			{
+# 				"employee": e.name,
+# 				"leave_type": leave_type,
+# 				"transaction_type": "Leave Allocation",
+# 				"transaction_name": la_name,
+# 				"from_date": from_date,
+# 				"to_date": to_date,
+# 			},
+# 			["name", "docstatus"],
+# 			as_dict=True,
+# 		)
+
+# 		if existing_lle and existing_lle.docstatus == 1:
+# 			frappe.logger().info(
+# 				f"[EL] Submitted LLE already exists for {e.name} "
+# 				f"{from_date} to {to_date}, LA {la_name}. Skipping."
+# 			)
+# 			continue
+
+# 		max_leaves_allowed = frappe.db.get_value(
+# 			"Leave Type", leave_type, "max_leaves_allowed"
+# 		)
+# 		max_leaves_allowed = flt(max_leaves_allowed) if max_leaves_allowed else 0
+
+# 		already_allocated_year = frappe.db.sql(
+# 			"""
+# 			SELECT COALESCE(SUM(leaves), 0)
+# 			FROM `tabLeave Ledger Entry`
+# 			WHERE employee = %s
+# 			  AND leave_type = %s
+# 			  AND transaction_type = 'Leave Allocation'
+# 			  AND transaction_name = %s
+# 			  AND docstatus = 1
+# 			  AND is_carry_forward = 0
+# 			  AND from_date >= %s
+# 			  AND to_date   <= %s
+# 			""",
+# 			(e.name, leave_type, la_name, fiscal_start_str, fiscal_end_str),
+# 		)[0][0]
+
+# 		if max_leaves_allowed and flt(already_allocated_year) + monthly_credit > max_leaves_allowed:
+# 			frappe.logger().info(
+# 				f"[EL] Allocation cap reached for {e.name}. "
+# 				f"Current year NEW total: {already_allocated_year}, skipping this month."
+# 			)
+# 			continue
+
+# 		if existing_lle and existing_lle.docstatus == 0:
+# 			lle_doc = frappe.get_doc("Leave Ledger Entry", existing_lle.name)
+# 			lle_doc.leaves = monthly_credit
+# 			lle_doc.submit()
+
+# 			frappe.logger().info(
+# 				f"[EL] Draft LLE updated & submitted for {e.name}: "
+# 				f"{from_date} to {to_date}, {monthly_credit} days, LA {la_name}"
+# 			)
+# 		else:
+# 			lle_doc = frappe.new_doc("Leave Ledger Entry")
+# 			lle_doc.employee = e.name
+# 			lle_doc.employee_name = e.employee_name
+# 			lle_doc.leave_type = leave_type
+# 			lle_doc.from_date = from_date
+# 			lle_doc.to_date = to_date
+# 			lle_doc.leaves = monthly_credit
+# 			lle_doc.transaction_type = "Leave Allocation"
+# 			lle_doc.transaction_name = la_name
+# 			lle_doc.is_carry_forward = 0
+# 			lle_doc.is_expired = 0
+# 			lle_doc.insert(ignore_permissions=True)
+# 			lle_doc.submit()
+
+# 			frappe.logger().info(
+# 				f"[EL] LLE created for {e.name}: {from_date} to {to_date}, "
+# 				f"{monthly_credit} days, LA {la_name}"
+# 			)
+
+# 		year_totals = frappe.db.sql(
+# 			"""
+# 			SELECT
+# 				COALESCE(SUM(CASE WHEN is_carry_forward = 1 THEN leaves ELSE 0 END), 0) AS carry_forward_leaves,
+# 				COALESCE(SUM(CASE WHEN is_carry_forward = 0 THEN leaves ELSE 0 END), 0) AS new_leaves
+# 			FROM `tabLeave Ledger Entry`
+# 			WHERE employee = %s
+# 			  AND leave_type = %s
+# 			  AND transaction_type = 'Leave Allocation'
+# 			  AND transaction_name = %s
+# 			  AND docstatus = 1
+# 			  AND from_date >= %s
+# 			  AND to_date   <= %s
+# 			""",
+# 			(e.name, leave_type, la_name, fiscal_start_str, fiscal_end_str),
+# 			as_dict=True,
+# 		)[0]
+
+# 		cf_leaves = flt(year_totals.carry_forward_leaves)
+# 		new_leaves = flt(year_totals.new_leaves)
+# 		total_leaves = cf_leaves + new_leaves
+
+# 		frappe.db.set_value(
+# 			"Leave Allocation",
+# 			la_name,
+# 			{
+# 				"unused_leaves": cf_leaves,
+# 				"new_leaves_allocated": new_leaves,
+# 				"total_leaves_allocated": total_leaves,
+# 			},
+# 		)
+
+# 	return 1
+
+# # end
+
 # start --Added By Karma
 def post_earned_leaves():
-	from hrms.hr.doctype.leave_application.leave_application import (
-		get_leave_balance_on,
-	)
-	today = getdate(nowdate())
-	if today != get_last_day(today):
-		return 0 
+    from hrms.hr.doctype.leave_application.leave_application import (
+        get_leave_balance_on,
+    )
 
-	# Fiscal year = calendar year
-	fiscal_start = today.replace(month=1, day=1)
-	fiscal_end = today.replace(month=12, day=31)
-	fiscal_start_str = fiscal_start.strftime("%Y-%m-%d")
-	fiscal_end_str = fiscal_end.strftime("%Y-%m-%d")
+    today = getdate(nowdate())
 
-	month_start = get_first_day(today)
-	month_end = get_last_day(today)
+    if today != get_last_day(today):
+        return 0
 
-	# 2. Employees to process
-	employees = frappe.db.sql(
-		"""
-		SELECT name, employee_name, date_of_joining
-		FROM `tabEmployee`
-		WHERE status = 'Active'
-		  AND employment_type NOT IN ('Armed Forces', 'GCE')
-		""",
-		as_dict=True,
-	)
-	
-	leave_type = "Earned Leave"
-	monthly_credit = 2.5
+    # Fiscal year = calendar year
+    fiscal_start = today.replace(month=1, day=1)
+    fiscal_end = today.replace(month=12, day=31)
 
-	for e in employees:
-		doj = getdate(e.date_of_joining)
-		if doj > fiscal_end:
-			continue
+    fiscal_start_str = fiscal_start.strftime("%Y-%m-%d")
+    fiscal_end_str = fiscal_end.strftime("%Y-%m-%d")
 
-		# 3. Get or create ONE Leave Allocation for this fiscal year
-		alloc_from = max(doj, fiscal_start)
-		alloc_to = fiscal_end
+    month_start = get_first_day(today)
+    month_end = get_last_day(today)
 
-		la_row = frappe.db.get_value(
-			"Leave Allocation",
-			{
-				"employee": e.name,
-				"leave_type": leave_type,
-				"from_date": alloc_from,
-				"to_date": alloc_to,
-				"docstatus": 1,
-			},
-			["name"],
-			as_dict=True,
-		)
+    leave_type = "Earned Leave"
+    monthly_credit = 2.5
 
-		if la_row:
-			la_name = la_row.name
-		else:
-			la = frappe.new_doc("Leave Allocation")
-			la.employee = e.name
-			la.employee_name = e.employee_name
-			la.leave_type = leave_type
-			la.from_date = alloc_from
-			la.to_date = alloc_to
-			la.carry_forward = cint(0)
-			la.unused_leaves = 0
-			la.new_leaves_allocated = 0
-			la.insert()
-			la.submit()
-			la_name = la.name
+    # ==========================================
+    # MAXIMUM EARNED LEAVE CEILING
+    # ==========================================
 
-			frappe.logger().info(
-				f"[EL] Created fiscal-year Leave Allocation {la_name} for {e.name} "
-				f"({alloc_from} to {alloc_to})"
-			)
-			#  CARRY-FORWARD FROM PREVIOUS YEAR
-			prev_year = fiscal_start.year - 1
-			prev_start = getdate(f"{prev_year}-01-01")
-			prev_end = getdate(f"{prev_year}-12-31")
+    max_leaves_allowed = flt(
+        frappe.db.get_value(
+            "Leave Type",
+            leave_type,
+            "max_leaves_allowed"
+        ) or 0
+    )
 
-			closing_balance = get_leave_balance_on(
-				e.name,
-				leave_type,
-				prev_end,
-				to_date=prev_end,
-				consider_all_leaves_in_the_allocation_period=True,
-				for_consumption=False,
-			)
-			closing_balance = flt(closing_balance or 0)
+    if max_leaves_allowed <= 0:
+        frappe.throw(
+            "Please configure Maximum Leave Allocation "
+            "Allowed for Earned Leave."
+        )
 
-			merged_cl_to_el = frappe.db.sql(
-				"""
-				SELECT COALESCE(SUM(leaves), 0)
-				FROM `tabLeave Ledger Entry`
-				WHERE employee = %s
-				  AND leave_type = %s
-				  AND transaction_type = 'Merge CL To EL'
-				  AND docstatus = 1
-				  AND from_date >= %s
-				  AND to_date   <= %s
-				""",
-				(e.name, leave_type, prev_start, prev_end),
-			)[0][0]
-			merged_cl_to_el = flt(merged_cl_to_el or 0)
-			carry_forward_total = closing_balance + merged_cl_to_el
+    # ==========================================
+    # 1. EMPLOYEES TO PROCESS
+    # ==========================================
 
-			if carry_forward_total > 0:
-				existing_cf = frappe.db.exists(
-					"Leave Ledger Entry",
-					{
-						"employee": e.name,
-						"leave_type": leave_type,
-						"transaction_type": "Leave Allocation",
-						"transaction_name": la_name,
-						"from_date": fiscal_start,
-						"to_date": fiscal_end,
-						"is_carry_forward": 1,
-						"docstatus": 1,
-					},
-				)
+    employees = frappe.db.sql(
+        """
+        SELECT name, employee_name, date_of_joining
+        FROM `tabEmployee`
+        WHERE status = 'Active'
+          AND employment_type NOT IN ('Armed Forces', 'GCE')
+        """,
+        as_dict=True,
+    )
 
-				if not existing_cf:
-					cf_lle = frappe.new_doc("Leave Ledger Entry")
-					cf_lle.employee = e.name
-					cf_lle.employee_name = e.employee_name
-					cf_lle.leave_type = leave_type
-					cf_lle.from_date = fiscal_start
-					cf_lle.to_date = fiscal_end
-					cf_lle.leaves = carry_forward_total
-					cf_lle.transaction_type = "Leave Allocation"
-					cf_lle.transaction_name = la_name
-					cf_lle.is_carry_forward = 1
-					cf_lle.is_expired = 0
-					cf_lle.insert(ignore_permissions=True)
-					cf_lle.submit()
+    for e in employees:
 
-					frappe.logger().info(
-						f"[EL] Carry forward for {e.name}: EL closing={closing_balance}, "
-						f"merged CL→EL={merged_cl_to_el}, total CF={carry_forward_total}"
-					)
+        if not e.date_of_joining:
+            frappe.logger().warning(
+                f"[EL] Missing Date of Joining for {e.name}"
+            )
+            continue
 
-		from_date = max(doj, month_start)
-		to_date = month_end
-		service_days = date_diff(to_date, from_date) + 1
+        doj = getdate(e.date_of_joining)
 
-		if service_days <= 14:
-			frappe.logger().info(
-				f"[EL] Skipping {e.name} for {from_date}–{to_date}, "
-				f"service days = {service_days} (<= 14)"
-			)
-			continue
+        if doj > fiscal_end:
+            continue
 
-		existing_lle = frappe.db.get_value(
-			"Leave Ledger Entry",
-			{
-				"employee": e.name,
-				"leave_type": leave_type,
-				"transaction_type": "Leave Allocation",
-				"transaction_name": la_name,
-				"from_date": from_date,
-				"to_date": to_date,
-			},
-			["name", "docstatus"],
-			as_dict=True,
-		)
+        # ==========================================
+        # 2. GET OR CREATE ANNUAL LEAVE ALLOCATION
+        # ==========================================
 
-		if existing_lle and existing_lle.docstatus == 1:
-			frappe.logger().info(
-				f"[EL] Submitted LLE already exists for {e.name} "
-				f"{from_date} to {to_date}, LA {la_name}. Skipping."
-			)
-			continue
+        alloc_from = max(doj, fiscal_start)
+        alloc_to = fiscal_end
 
-		max_leaves_allowed = frappe.db.get_value(
-			"Leave Type", leave_type, "max_leaves_allowed"
-		)
-		max_leaves_allowed = flt(max_leaves_allowed) if max_leaves_allowed else 0
+        la_row = frappe.db.get_value(
+            "Leave Allocation",
+            {
+                "employee": e.name,
+                "leave_type": leave_type,
+                "from_date": alloc_from,
+                "to_date": alloc_to,
+                "docstatus": 1,
+            },
+            ["name"],
+            as_dict=True,
+        )
 
-		already_allocated_year = frappe.db.sql(
-			"""
-			SELECT COALESCE(SUM(leaves), 0)
-			FROM `tabLeave Ledger Entry`
-			WHERE employee = %s
-			  AND leave_type = %s
-			  AND transaction_type = 'Leave Allocation'
-			  AND transaction_name = %s
-			  AND docstatus = 1
-			  AND is_carry_forward = 0
-			  AND from_date >= %s
-			  AND to_date   <= %s
-			""",
-			(e.name, leave_type, la_name, fiscal_start_str, fiscal_end_str),
-		)[0][0]
+        if la_row:
+            la_name = la_row.name
 
-		if max_leaves_allowed and flt(already_allocated_year) + monthly_credit > max_leaves_allowed:
-			frappe.logger().info(
-				f"[EL] Allocation cap reached for {e.name}. "
-				f"Current year NEW total: {already_allocated_year}, skipping this month."
-			)
-			continue
+        else:
+            la = frappe.new_doc("Leave Allocation")
 
-		if existing_lle and existing_lle.docstatus == 0:
-			lle_doc = frappe.get_doc("Leave Ledger Entry", existing_lle.name)
-			lle_doc.leaves = monthly_credit
-			lle_doc.submit()
+            la.employee = e.name
+            la.employee_name = e.employee_name
+            la.leave_type = leave_type
+            la.from_date = alloc_from
+            la.to_date = alloc_to
+            la.carry_forward = cint(0)
+            la.unused_leaves = 0
+            la.new_leaves_allocated = 0
 
-			frappe.logger().info(
-				f"[EL] Draft LLE updated & submitted for {e.name}: "
-				f"{from_date} to {to_date}, {monthly_credit} days, LA {la_name}"
-			)
-		else:
-			lle_doc = frappe.new_doc("Leave Ledger Entry")
-			lle_doc.employee = e.name
-			lle_doc.employee_name = e.employee_name
-			lle_doc.leave_type = leave_type
-			lle_doc.from_date = from_date
-			lle_doc.to_date = to_date
-			lle_doc.leaves = monthly_credit
-			lle_doc.transaction_type = "Leave Allocation"
-			lle_doc.transaction_name = la_name
-			lle_doc.is_carry_forward = 0
-			lle_doc.is_expired = 0
-			lle_doc.insert(ignore_permissions=True)
-			lle_doc.submit()
+            la.insert()
+            la.submit()
 
-			frappe.logger().info(
-				f"[EL] LLE created for {e.name}: {from_date} to {to_date}, "
-				f"{monthly_credit} days, LA {la_name}"
-			)
+            la_name = la.name
 
-		year_totals = frappe.db.sql(
-			"""
-			SELECT
-				COALESCE(SUM(CASE WHEN is_carry_forward = 1 THEN leaves ELSE 0 END), 0) AS carry_forward_leaves,
-				COALESCE(SUM(CASE WHEN is_carry_forward = 0 THEN leaves ELSE 0 END), 0) AS new_leaves
-			FROM `tabLeave Ledger Entry`
-			WHERE employee = %s
-			  AND leave_type = %s
-			  AND transaction_type = 'Leave Allocation'
-			  AND transaction_name = %s
-			  AND docstatus = 1
-			  AND from_date >= %s
-			  AND to_date   <= %s
-			""",
-			(e.name, leave_type, la_name, fiscal_start_str, fiscal_end_str),
-			as_dict=True,
-		)[0]
+            frappe.logger().info(
+                f"[EL] Created annual Leave Allocation "
+                f"{la_name} for {e.name}"
+            )
 
-		cf_leaves = flt(year_totals.carry_forward_leaves)
-		new_leaves = flt(year_totals.new_leaves)
-		total_leaves = cf_leaves + new_leaves
+            # ==========================================
+            # 3. CARRY-FORWARD FROM PREVIOUS YEAR
+            # ==========================================
 
-		frappe.db.set_value(
-			"Leave Allocation",
-			la_name,
-			{
-				"unused_leaves": cf_leaves,
-				"new_leaves_allocated": new_leaves,
-				"total_leaves_allocated": total_leaves,
-			},
-		)
+            prev_year = fiscal_start.year - 1
 
-	return 1
+            prev_end = getdate(
+                f"{prev_year}-12-31"
+            )
+
+            # Previous-year closing EL balance
+            # Includes eligible submitted CL-to-EL
+            # transactions already reflected in EL.
+            closing_balance = flt(
+                get_leave_balance_on(
+                    e.name,
+                    leave_type,
+                    prev_end,
+                    to_date=prev_end,
+                    consider_all_leaves_in_the_allocation_period=True,
+                    for_consumption=False,
+                ) or 0
+            )
+
+            # Maximum carry-forward ceiling
+            carry_forward_total = flt(
+                min(
+                    max(0, closing_balance),
+                    max_leaves_allowed
+                )
+            )
+
+            excess_not_carried = flt(
+                max(
+                    0,
+                    closing_balance - carry_forward_total
+                )
+            )
+
+            if carry_forward_total > 0:
+
+                existing_cf = frappe.db.exists(
+                    "Leave Ledger Entry",
+                    {
+                        "employee": e.name,
+                        "leave_type": leave_type,
+                        "transaction_type": "Leave Allocation",
+                        "transaction_name": la_name,
+                        "from_date": fiscal_start,
+                        "to_date": fiscal_end,
+                        "is_carry_forward": 1,
+                        "docstatus": 1,
+                    },
+                )
+
+                if not existing_cf:
+
+                    cf_lle = frappe.new_doc(
+                        "Leave Ledger Entry"
+                    )
+
+                    cf_lle.employee = e.name
+                    cf_lle.employee_name = e.employee_name
+                    cf_lle.leave_type = leave_type
+                    cf_lle.from_date = fiscal_start
+                    cf_lle.to_date = fiscal_end
+
+                    cf_lle.leaves = carry_forward_total
+
+                    cf_lle.transaction_type = (
+                        "Leave Allocation"
+                    )
+                    cf_lle.transaction_name = la_name
+                    cf_lle.is_carry_forward = 1
+                    cf_lle.is_expired = 0
+
+                    cf_lle.insert(
+                        ignore_permissions=True
+                    )
+                    cf_lle.submit()
+
+                    frappe.logger().info(
+                        f"[EL] Carry forward for {e.name}: "
+                        f"Closing={closing_balance}, "
+                        f"Carry Forward={carry_forward_total}, "
+                        f"Excess Not Carried={excess_not_carried}, "
+                        f"Ceiling={max_leaves_allowed}"
+                    )
+
+        # ==========================================
+        # 4. MONTHLY SERVICE DAYS
+        # ==========================================
+
+        from_date = max(doj, month_start)
+        to_date = month_end
+
+        service_days = date_diff(
+            to_date,
+            from_date
+        ) + 1
+
+        if service_days <= 14:
+
+            frappe.logger().info(
+                f"[EL] Skipping {e.name} for "
+                f"{from_date} to {to_date}, "
+                f"Service Days={service_days}"
+            )
+
+            continue
+
+        # ==========================================
+        # 5. PREVENT DUPLICATE MONTHLY LLE
+        # ==========================================
+
+        existing_lle = frappe.db.get_value(
+            "Leave Ledger Entry",
+            {
+                "employee": e.name,
+                "leave_type": leave_type,
+                "transaction_type": "Leave Allocation",
+                "transaction_name": la_name,
+                "from_date": from_date,
+                "to_date": to_date,
+            },
+            ["name", "docstatus"],
+            as_dict=True,
+        )
+
+        if existing_lle and existing_lle.docstatus == 1:
+
+            frappe.logger().info(
+                f"[EL] Monthly LLE already submitted "
+                f"for {e.name}, "
+                f"{from_date} to {to_date}. Skipping."
+            )
+
+            continue
+
+        # ==========================================
+        # 6. CHECK ACTUAL CURRENT EARNED LEAVE
+        # ==========================================
+
+        current_balance = flt(
+            get_leave_balance_on(
+                e.name,
+                leave_type,
+                month_end
+            ) or 0
+        )
+
+        remaining_capacity = flt(
+            max(
+                0,
+                max_leaves_allowed - current_balance
+            )
+        )
+
+        # Allocate the permitted amount:
+        # 2.5, partial credit, or zero.
+        actual_monthly_credit = flt(
+            min(
+                monthly_credit,
+                remaining_capacity
+            )
+        )
+
+        frappe.logger().info(
+            f"[EL] Employee={e.name}, "
+            f"Current Balance={current_balance}, "
+            f"Ceiling={max_leaves_allowed}, "
+            f"Monthly Entitlement={monthly_credit}, "
+            f"Actual Credit={actual_monthly_credit}"
+        )
+
+        # ==========================================
+        # 7. MONTHLY LEAVE LEDGER ENTRY
+        # ==========================================
+
+        if actual_monthly_credit > 0:
+
+            if existing_lle and existing_lle.docstatus == 0:
+
+                lle_doc = frappe.get_doc(
+                    "Leave Ledger Entry",
+                    existing_lle.name
+                )
+
+                lle_doc.leaves = actual_monthly_credit
+                lle_doc.submit()
+
+                frappe.logger().info(
+                    f"[EL] Draft LLE submitted for "
+                    f"{e.name}: "
+                    f"Credit={actual_monthly_credit}"
+                )
+
+            else:
+
+                lle_doc = frappe.new_doc(
+                    "Leave Ledger Entry"
+                )
+
+                lle_doc.employee = e.name
+                lle_doc.employee_name = e.employee_name
+                lle_doc.leave_type = leave_type
+                lle_doc.from_date = from_date
+                lle_doc.to_date = to_date
+                lle_doc.leaves = actual_monthly_credit
+                lle_doc.transaction_type = "Leave Allocation"
+                lle_doc.transaction_name = la_name
+                lle_doc.is_carry_forward = 0
+                lle_doc.is_expired = 0
+
+                lle_doc.insert(
+                    ignore_permissions=True
+                )
+                lle_doc.submit()
+
+                frappe.logger().info(
+                    f"[EL] Monthly LLE created for "
+                    f"{e.name}: "
+                    f"Credit={actual_monthly_credit}, "
+                    f"Balance Before={current_balance}"
+                )
+
+        else:
+
+            # Ceiling reached.
+            # Record zero monthly credit in logs.
+            #
+            # Do not force a zero-value LLE because
+            # HRMS installations may reject it.
+            #
+            # Existing Leave Allocation stays active
+            # and no additional leaves are credited.
+
+            frappe.logger().info(
+                f"[EL] ZERO MONTHLY CREDIT | "
+                f"Employee={e.name} | "
+                f"Period={from_date} to {to_date} | "
+                f"Balance={current_balance} | "
+                f"Ceiling={max_leaves_allowed} | "
+                f"Credit=0"
+            )
+
+        # ==========================================
+        # 8. UPDATE ANNUAL LEAVE ALLOCATION TOTALS
+        # ==========================================
+
+        year_totals = frappe.db.sql(
+            """
+            SELECT
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN is_carry_forward = 1
+                            THEN leaves
+                            ELSE 0
+                        END
+                    ), 0
+                ) AS carry_forward_leaves,
+
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN is_carry_forward = 0
+                            THEN leaves
+                            ELSE 0
+                        END
+                    ), 0
+                ) AS new_leaves
+
+            FROM `tabLeave Ledger Entry`
+
+            WHERE employee = %s
+              AND leave_type = %s
+              AND transaction_type = 'Leave Allocation'
+              AND transaction_name = %s
+              AND docstatus = 1
+              AND from_date >= %s
+              AND to_date <= %s
+            """,
+            (
+                e.name,
+                leave_type,
+                la_name,
+                fiscal_start_str,
+                fiscal_end_str,
+            ),
+            as_dict=True,
+        )[0]
+
+        cf_leaves = flt(
+            year_totals.carry_forward_leaves
+        )
+
+        new_leaves = flt(
+            year_totals.new_leaves
+        )
+
+        total_leaves = flt(
+            cf_leaves + new_leaves
+        )
+
+        frappe.db.set_value(
+            "Leave Allocation",
+            la_name,
+            {
+                "unused_leaves": cf_leaves,
+                "new_leaves_allocated": new_leaves,
+                "total_leaves_allocated": total_leaves,
+            },
+        )
+
+        frappe.logger().info(
+            f"[EL] Annual LA updated for {e.name}: "
+            f"Carry Forward={cf_leaves}, "
+            f"New Leaves={new_leaves}, "
+            f"Total={total_leaves}"
+        )
+
+    return 1
 
 # end
+
 
 # reminder notification for contract renewal
 def send_contract_renewal_reminders():
