@@ -3322,7 +3322,10 @@ class PayrollEntry(Document):
 					'Deceased (MTC)',
 					'RBA-Deceased (2003)',
 					'RBA-Deceased (2015)',
-					'Soelra -RBA'
+					'Soelra -RBA',
+					'Troops (RBG)',
+					'Officer (RBG)',
+					'Civilan (RBG)'
 				)
 				THEN acc.cost_center
 				WHEN t1.employee_group = 'Teachers (RBA)'
@@ -3413,7 +3416,10 @@ class PayrollEntry(Document):
 						'Deceased (MTC)',
 						'RBA-Deceased (2003)',
 						'RBA-Deceased (2015)',
-						'Soelra -RBA'
+						'Soelra -RBA',
+						'Troops (RBG)',
+						'Officer (RBG)',
+						'Civilan (RBG)'
 					)
 					THEN acc.cost_center
 					WHEN t1.employee_group = 'Teachers (RBA)'
