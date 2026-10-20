@@ -150,7 +150,7 @@ def construct_query(filters):
 				sum(case when t2.salary_component = 'PF' then ifnull(t2.amount,0) else 0 end) as employeepf,
 				sum(case when t2.salary_component = 'PF' then ifnull(t2.amount,0) else 0 end) as employerpf,
 				sum(case when t2.salary_component = 'PF' then ifnull(t2.amount,0)*2 else 0 end) as total,
-				t1.company as company, t1.branch as branch, t1.cost_center as cost_center, t1.department as department, t1.division as division, t1.section as section,
+				t1.company as company, t1.employer_pf, t1.branch as branch, t1.cost_center as cost_center, t1.department as department, t1.division as division, t1.section as section,
 				t1.fiscal_year as fiscal_year, t1.month as month
 			from `tabSalary Slip` t1, `tabSalary Detail` t2, `tabEmployee` t3
 			where t1.docstatus = 1 
@@ -179,7 +179,7 @@ def get_data(query, filters):
 				"pf_number": d.pf_number,
 				"basic_pay": d.basicpay,
 				"employee_pf":d.employeepf,
-				"employer_pf": d.employerpf,
+				"employer_pf": d.employer_pf,
 				"total":d.total,
 				"company":d.company,
 				"cost_center":d.cost_center,

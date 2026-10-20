@@ -1,0 +1,1003 @@
+<div class="pf-report-print">
+
+    {%
+        function text(value) {
+            if (value === null || value === undefined) {
+                return "";
+            }
+            return value.toString();
+        }
+
+        function number(value) {
+            value = parseFloat(value || 0);
+            return isNaN(value) ? 0 : value;
+        }
+
+        function money(value) {
+            value = number(value);
+
+            return value.toLocaleString("en-IN", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function get_company_title(name) {
+            name = text(name);
+
+            if (name.indexOf("Royal Body Guard") !== -1) {
+                return "ROYAL BODY GUARD";
+            }
+
+            if (name.indexOf("Royal Bhutan Army") !== -1) {
+                return "ROYAL BHUTAN ARMY";
+            }
+
+            return name.toUpperCase();
+        }
+
+        function format_printed_date(value) {
+            if (!value) {
+                return "";
+            }
+
+            var parts = text(value).split(" ")[0].split("-");
+
+            if (parts.length === 3) {
+                return parts[2] + "/" + parts[1] + "/" + parts[0];
+            }
+
+            return value;
+        }
+
+        function get_department_code(value) {
+            value = text(value).trim();
+
+            if (!value) {
+                return "";
+            }
+
+            if (value.indexOf(" : ") !== -1) {
+                return value.split(" : ")[0].trim();
+            }
+
+            if (value.indexOf(":") !== -1) {
+                return value.split(":")[0].trim();
+            }
+
+            return value.split(" ")[0].trim();
+        }
+
+        function get_department_name(value) {
+            value = text(value).trim();
+
+            if (!value) {
+                return "";
+            }
+
+            if (value.indexOf(" : ") !== -1) {
+                var parts = value.split(" : ");
+                parts.shift();
+                return parts.join(" : ").trim();
+            }
+
+            if (value.indexOf(":") !== -1) {
+                var parts2 = value.split(":");
+                parts2.shift();
+                return parts2.join(":").trim();
+            }
+
+            return value;
+        }
+
+        var company_name = get_company_title(
+            filters.company || "Royal Bhutan Army"
+        );
+
+        var fiscal_year = filters.fiscal_year || "";
+        var month = filters.month || "";
+
+        var printed_date = format_printed_date(
+            frappe.datetime.now_datetime()
+        );
+
+        var grand_basic_pay = 0;
+        var grand_employee_pf = 0;
+        var grand_employer_pf = 0;
+        var grand_total = 0;
+
+        var last_department = "";
+
+        var department_basic_pay = 0;
+        var department_employee_pf = 0;
+        var department_employer_pf = 0;
+        var department_total = 0;
+    %}
+
+
+    <!-- =========================
+         PRINTED DATE
+         ========================= -->
+
+    <div class="printed-date">
+        Printed Dt. {%= printed_date %}
+    </div>
+
+
+    <!-- =========================
+         REPORT HEADER
+         ========================= -->
+
+    <div class="report-header">
+
+        <h1>{%= company_name %}</h1>
+
+        <h2>
+            Monthly Provident Fund Schedule for Tier1 Members
+        </h2>
+
+    </div>
+
+
+    <!-- =========================
+         MONTH
+         ========================= -->
+
+    <div class="month-section">
+
+        <span>
+            For the month:
+            <strong>{%= month ? month.toUpperCase() : "" %}</strong>
+            {% if (fiscal_year) { %}
+                <strong>({%= fiscal_year %})</strong>
+            {% } %}
+        </span>
+
+    </div>
+
+
+    <!-- =========================
+         TABLE
+         ========================= -->
+
+    <table class="pf-table">
+
+        <thead>
+
+            <!-- FIRST HEADER ROW -->
+            <tr>
+
+                <th rowspan="2" class="sl-no">
+                    Sl #
+                </th>
+
+                <th rowspan="2" class="pf-ac-no">
+                    PF Ac No
+                </th>
+
+                <th rowspan="2" class="emp-id">
+                    EmpId
+                </th>
+
+                <th rowspan="2" class="cid">
+                    CID/WPNo
+                </th>
+
+                <th rowspan="2" class="emp-name">
+                    EmpName
+                </th>
+
+                <th rowspan="2" class="designation">
+                    Designation
+                </th>
+
+                <th rowspan="2" class="basic-pay">
+                    Basic +<br>
+                    Arrear -<br>
+                    QL/SM/TRG
+                </th>
+
+                <th colspan="2" class="contribution">
+                    Contribution (Nu.)
+                </th>
+
+                <th rowspan="2" class="total">
+                    Total
+                </th>
+
+            </tr>
+
+
+            <!-- SECOND HEADER ROW -->
+            <tr>
+
+                <th class="contribution-child">
+                    Employee
+                </th>
+
+                <th class="contribution-child">
+                    Member
+                </th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            {% for (var i = 0; i < data.length; i++) { %}
+
+                {%
+                    var row = data[i] || {};
+
+                    var employee =
+                        row.employee || "";
+
+                    var pf_number =
+                        row.pf_number || "";
+
+                    var employee_name =
+                        row.employee_name || "";
+
+                    var designation =
+                        row.designation || "";
+
+                    var cid =
+                        row.cid ||
+                        row.passport_number ||
+                        "";
+
+                    var basic_pay =
+                        number(row.basic_pay);
+
+                    var employee_pf =
+                        number(row.employee_pf);
+
+                    var employer_pf =
+                        number(row.employer_pf);
+
+                    var total =
+                        number(row.total);
+
+                    var department =
+                        row.department || "";
+
+                    var department_code =
+                        get_department_code(department);
+
+                    var department_name =
+                        get_department_name(department);
+                %}
+
+
+                <!-- =========================
+                     NEW DEPARTMENT
+                     ========================= -->
+
+                {% if (department && department != last_department) { %}
+
+                    <!-- PREVIOUS DEPARTMENT TOTAL -->
+                    {% if (last_department) { %}
+
+                        <tr class="department-total-row">
+
+                            <td colspan="6" class="department-total-label">
+                                Total for the code:
+                                <strong>
+                                    {%= get_department_code(last_department) %}
+                                </strong>
+                            </td>
+
+                            <td class="amount">
+                                {%= money(department_basic_pay) %}
+                            </td>
+
+                            <td class="amount">
+                                {%= money(department_employee_pf) %}
+                            </td>
+
+                            <td class="amount">
+                                {%= money(department_employer_pf) %}
+                            </td>
+
+                            <td class="amount">
+                                {%= money(department_total) %}
+                            </td>
+
+                        </tr>
+
+                        {%
+                            department_basic_pay = 0;
+                            department_employee_pf = 0;
+                            department_employer_pf = 0;
+                            department_total = 0;
+                        %}
+
+                    {% } %}
+
+
+                    <!-- DEPARTMENT HEADER -->
+                    <tr class="department-row">
+
+                        <td colspan="10">
+
+                            Department/Sector Code(Name) :-
+
+                            <strong>
+                                {%= department_code %}
+                            </strong>
+
+                            {% if (department_name) { %}
+                                :
+                                <strong>
+                                    {%= department_name.toUpperCase() %}
+                                </strong>
+                            {% } %}
+
+                        </td>
+
+                    </tr>
+
+
+                    {% last_department = department; %}
+
+                {% } %}
+
+
+                <!-- =========================
+                     EMPLOYEE ROW
+                     ========================= -->
+
+                <tr class="employee-row">
+
+                    <!-- SL NO -->
+                    <td class="center">
+                        {%= i + 1 %}
+                    </td>
+
+
+                    <!-- PF ACCOUNT NUMBER -->
+                    <td class="center">
+                        {%= pf_number %}
+                    </td>
+
+
+                    <!-- EMPLOYEE ID -->
+                    <td class="center">
+                        {%= employee %}
+                    </td>
+
+
+                    <!-- CID / WP NUMBER -->
+                    <td class="center">
+                        {%= cid %}
+                    </td>
+
+
+                    <!-- EMPLOYEE NAME -->
+                    <td class="left">
+                        {%= employee_name %}
+                    </td>
+
+
+                    <!-- DESIGNATION -->
+                    <td class="left">
+                        {%= designation %}
+                    </td>
+
+
+                    <!-- BASIC + ARREAR -->
+                    <td class="amount">
+                        {%= money(basic_pay) %}
+                    </td>
+
+
+                    <!-- EMPLOYEE CONTRIBUTION -->
+                    <td class="amount">
+                        {%= money(employee_pf) %}
+                    </td>
+
+
+                    <!-- MEMBER / EMPLOYER CONTRIBUTION -->
+                    <td class="amount">
+                        {%= money(employer_pf) %}
+                    </td>
+
+
+                    <!-- TOTAL -->
+                    <td class="amount">
+                        {%= money(total) %}
+                    </td>
+
+                </tr>
+
+
+                {%
+                    department_basic_pay += basic_pay;
+                    department_employee_pf += employee_pf;
+                    department_employer_pf += employer_pf;
+                    department_total += total;
+
+                    grand_basic_pay += basic_pay;
+                    grand_employee_pf += employee_pf;
+                    grand_employer_pf += employer_pf;
+                    grand_total += total;
+                %}
+
+            {% } %}
+
+
+            <!-- =========================
+                 LAST DEPARTMENT TOTAL
+                 ========================= -->
+
+            {% if (last_department) { %}
+
+                <tr class="department-total-row">
+
+                    <td colspan="6" class="department-total-label">
+
+                        Total for the code:
+
+                        <strong>
+                            {%= get_department_code(last_department) %}
+                        </strong>
+
+                    </td>
+
+                    <td class="amount">
+                        {%= money(department_basic_pay) %}
+                    </td>
+
+                    <td class="amount">
+                        {%= money(department_employee_pf) %}
+                    </td>
+
+                    <td class="amount">
+                        {%= money(department_employer_pf) %}
+                    </td>
+
+                    <td class="amount">
+                        {%= money(department_total) %}
+                    </td>
+
+                </tr>
+
+            {% } %}
+
+
+            <!-- =========================
+                 GRAND TOTAL
+                 ========================= -->
+
+            <tr class="grand-total-row">
+
+                <td colspan="6" class="grand-total-label">
+                    Grand Total:
+                </td>
+
+                <td class="amount">
+                    {%= money(grand_basic_pay) %}
+                </td>
+
+                <td class="amount">
+                    {%= money(grand_employee_pf) %}
+                </td>
+
+                <td class="amount">
+                    {%= money(grand_employer_pf) %}
+                </td>
+
+                <td class="amount">
+                    {%= money(grand_total) %}
+                </td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<style>
+
+    /* =========================================================
+       PAGE
+       ========================================================= */
+
+    @page {
+
+        size: A4 landscape;
+
+        margin: 8mm 7mm 8mm 7mm;
+    }
+
+
+    * {
+
+        box-sizing: border-box;
+    }
+
+
+    .print-format {
+
+        padding-left: 0 !important;
+
+        padding-right: 0 !important;
+    }
+
+
+    /* =========================================================
+       MAIN CONTAINER
+       ========================================================= */
+
+    .pf-report-print {
+
+        width: 100%;
+
+        max-width: 100%;
+
+        font-family: "Times New Roman", serif;
+
+        font-size: 10px;
+
+        color: #000;
+
+        margin: 0;
+
+        padding: 0;
+    }
+
+
+    /* =========================================================
+       PRINTED DATE
+       ========================================================= */
+
+    .printed-date {
+
+        width: 100%;
+
+        text-align: left;
+
+        font-size: 10px;
+
+        margin-top: 0;
+
+        margin-bottom: 3px;
+    }
+
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
+
+    .report-header {
+
+        width: 100%;
+
+        text-align: center;
+
+        margin: 0;
+
+        padding: 0;
+    }
+
+
+    .report-header h1 {
+
+        font-family: "Times New Roman", serif;
+
+        font-size: 17px;
+
+        font-weight: 700;
+
+        margin: 0;
+
+        padding: 0;
+
+        line-height: 1.15;
+
+        text-transform: uppercase;
+
+        letter-spacing: 0.2px;
+    }
+
+
+    .report-header h2 {
+
+        font-family: "Times New Roman", serif;
+
+        font-size: 13px;
+
+        font-weight: 700;
+
+        margin: 1px 0 0 0;
+
+        padding: 0;
+
+        line-height: 1.2;
+    }
+
+
+    /* =========================================================
+       MONTH
+       ========================================================= */
+
+    .month-section {
+
+        width: 100%;
+
+        text-align: left;
+
+        font-size: 11px;
+
+        margin-top: 10px;
+
+        margin-bottom: 3px;
+
+        line-height: 1.2;
+    }
+
+
+    .month-section strong {
+
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+       TABLE
+       ========================================================= */
+
+    .pf-table {
+
+        width: 100%;
+
+        max-width: 100%;
+
+        border-collapse: collapse;
+
+        table-layout: fixed;
+
+        margin: 0;
+
+        padding: 0;
+
+        border: 0.7px solid #888 !important;
+
+        font-family: "Times New Roman", serif;
+    }
+
+
+    /* =========================================================
+       TABLE CELLS
+       ========================================================= */
+
+    .pf-table th,
+    .pf-table td {
+
+        border: 0.5px solid #b0b0b0 !important;
+
+        color: #000 !important;
+
+        background: #fff !important;
+
+        padding: 3px 3px;
+
+        vertical-align: middle;
+
+        line-height: 1.15;
+
+        word-break: normal;
+
+        overflow-wrap: break-word;
+    }
+
+
+    /* =========================================================
+       TABLE HEADER
+       ========================================================= */
+
+    .pf-table th {
+
+        text-align: center;
+
+        font-size: 9.5px;
+
+        font-weight: 700;
+
+        background: #fff !important;
+
+        padding: 4px 2px;
+
+        line-height: 1.1;
+    }
+
+
+    .pf-table thead tr:first-child th {
+
+        border-bottom: 0.5px solid #aaa !important;
+    }
+
+
+    .contribution {
+
+        text-align: center !important;
+
+        font-size: 9px !important;
+    }
+
+
+    .contribution-child {
+
+        font-size: 9px !important;
+
+        padding-top: 2px !important;
+
+        padding-bottom: 2px !important;
+    }
+
+
+    /* =========================================================
+       COLUMN WIDTHS
+       ========================================================= */
+
+    .sl-no {
+
+        width: 4%;
+    }
+
+
+    .pf-ac-no {
+
+        width: 8%;
+    }
+
+
+    .emp-id {
+
+        width: 10%;
+    }
+
+
+    .cid {
+
+        width: 12%;
+    }
+
+
+    .emp-name {
+
+        width: 17%;
+    }
+
+
+    .designation {
+
+        width: 15%;
+    }
+
+
+    .basic-pay {
+
+        width: 11%;
+    }
+
+
+    .contribution-child {
+
+        width: 8%;
+    }
+
+
+    .total {
+
+        width: 9%;
+    }
+
+
+    /* =========================================================
+       EMPLOYEE ROW
+       ========================================================= */
+
+    .employee-row td {
+
+        font-size: 9px;
+
+        font-weight: 400;
+
+        height: 18px;
+    }
+
+
+    .center {
+
+        text-align: center !important;
+    }
+
+
+    .left {
+
+        text-align: left !important;
+
+        padding-left: 4px !important;
+    }
+
+
+    .amount {
+
+        text-align: right !important;
+
+        white-space: nowrap;
+
+        padding-right: 4px !important;
+    }
+
+
+    /* =========================================================
+       DEPARTMENT ROW
+       ========================================================= */
+
+    .department-row td {
+
+        font-size: 9.5px;
+
+        font-weight: 400;
+
+        text-align: left;
+
+        padding: 3px 5px;
+
+        background: #fff !important;
+
+        border-top: 0.7px solid #999 !important;
+
+        border-bottom: 0.5px solid #aaa !important;
+    }
+
+
+    .department-row strong {
+
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+       DEPARTMENT TOTAL
+       ========================================================= */
+
+    .department-total-row td {
+
+        font-size: 9.5px;
+
+        font-weight: 700;
+
+        background: #fff !important;
+
+        padding-top: 3px;
+
+        padding-bottom: 3px;
+
+        border-top: 0.7px solid #999 !important;
+    }
+
+
+    .department-total-label {
+
+        text-align: left !important;
+
+        padding-left: 7px !important;
+    }
+
+
+    /* =========================================================
+       GRAND TOTAL
+       ========================================================= */
+
+    .grand-total-row td {
+
+        font-size: 9.5px;
+
+        font-weight: 700;
+
+        background: #fff !important;
+
+        padding-top: 4px;
+
+        padding-bottom: 4px;
+
+        border-top: 0.9px solid #777 !important;
+
+        border-bottom: 0.9px solid #777 !important;
+    }
+
+
+    .grand-total-label {
+
+        text-align: right !important;
+
+        padding-right: 8px !important;
+    }
+
+
+    /* =========================================================
+       PAGE BREAK
+       ========================================================= */
+
+    thead {
+
+        display: table-header-group;
+    }
+
+
+    tfoot {
+
+        display: table-footer-group;
+    }
+
+
+    tr {
+
+        page-break-inside: avoid;
+    }
+
+
+    /* =========================================================
+       PRINT
+       ========================================================= */
+
+    @media print {
+
+        .pf-report-print {
+
+            width: 100%;
+
+            font-family: "Times New Roman", serif;
+        }
+
+
+        .pf-table {
+
+            width: 100%;
+
+            page-break-inside: auto;
+        }
+
+
+        .pf-table thead {
+
+            display: table-header-group;
+        }
+
+
+        .pf-table tr {
+
+            page-break-inside: avoid;
+
+            page-break-after: auto;
+        }
+
+
+        .printed-date {
+
+            font-size: 10px;
+        }
+
+
+        .report-header h1 {
+
+            font-size: 17px;
+        }
+
+
+        .report-header h2 {
+
+            font-size: 13px;
+        }
+
+    }
+
+</style>
