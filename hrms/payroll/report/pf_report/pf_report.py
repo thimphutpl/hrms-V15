@@ -12,6 +12,7 @@ def execute(filters=None):
 	columns = get_columns(data)
 	queries = construct_query(filters)
 	data = get_data(queries, filters)
+	
 
 	return columns, data
 
@@ -145,7 +146,13 @@ def get_columns(data):
 def construct_query(filters):
 	conditions, filters = get_conditions(filters)
 	query =("""
-			select t1.employee as employee, t1.employee_group, t3.employee_name as employee_name, t1.designation as designation, t1.employment_type as employment_type, t3.passport_number as passport_number, t3.pf_number as pf_number,
+			select t1.employee as employee, 
+			t1.employee_group as employee_group, 
+			t3.employee_name as employee_name, 
+			t1.designation as designation, 
+			t1.employment_type as employment_type, 
+			t3.passport_number as passport_number, 
+			t3.pf_number as pf_number,
 				sum(case when t2.salary_component = 'Basic Pay' then ifnull(t2.amount,0) else 0 end) as basicpay,
 				sum(case when t2.salary_component = 'PF' then ifnull(t2.amount,0) else 0 end) as employeepf,
 				sum(case when t2.salary_component = 'PF' then ifnull(t2.amount,0) else 0 end) as employerpf,
@@ -166,15 +173,18 @@ def construct_query(filters):
 def get_data(query, filters):
 	conditions = ""
 	data = []
-	datas = frappe.db.sql(query, as_dict=True)
+	
+	datas = frappe.db.sql(query, filters, as_dict=True)
 	for d in datas:
 		if d.total > 0:
 			# frappe.msgprint(str(d.employeepf))
 			row = {
 				"employee":d.employee,
 				"employee_name":d.employee_name,
+
 				"designation":	d.designation,
 				"employement_type": d.employment_type,
+				"employee_group": d.employee_group,
 				"cid": d.passport_number,
 				"pf_number": d.pf_number,
 				"basic_pay": d.basicpay,
@@ -209,6 +219,15 @@ def get_conditions(filters):
 		conditions += """and exists(select 1 from `tabCost Center` cc where t1.cost_center = cc.name and (cc.parent_cost_center = '{0}' or cc.name = '{0}'))""".format(filters.cost_center)
 	if filters.get("company"): 
 		conditions += """and t1.company = '{}'""".format(filters.get("company"))
-	if filters.get("employee_group"): 
-		conditions += """and t1.employee_group = '{}'""".format(filters.get("employee_group"))	
+	if filters.get("employee_group"):
+		employee_groups = filters.get("employee_group")
+
+		if isinstance(employee_groups, str):
+			employee_groups = frappe.parse_json(employee_groups)
+
+		if employee_groups:
+			conditions += """
+				AND t1.employee_group IN %(employee_group)s
+			"""
+			filters["employee_group"] = tuple(employee_groups)	
 	return conditions, filters
