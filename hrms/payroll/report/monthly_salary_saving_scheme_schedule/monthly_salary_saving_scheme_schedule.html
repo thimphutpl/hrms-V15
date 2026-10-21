@@ -1,0 +1,176 @@
+
+
+<div class="report-header">
+
+    <div class="report-name">
+        Monthly Salary Saving Scheme (SSS) Schedule
+    </div>
+
+</div>
+
+<div class="report-body">
+    <div class="printed-date">
+       <p>Printed Dt. {%= frappe.datetime.str_to_user(frappe.datetime.now_datetime()) %}</p>
+       <p>For the Month of {%= filters.month || "" %} ({%= filters.fiscal_year %})</p>
+    </div>
+    <table class="sss-table">
+        <thead>
+            <tr>
+                <th style="width:10%;">Sl#.</th>
+                <th>EmpId</th>
+                <th>CIDWP No.</th>
+                <th>Name</th>
+                <th>OR Ac. No.</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td colspan="6"  style="text-align: center;">
+                    Department/Sector (Code:Name):{%= filters.cost_center || "" %}
+                </td>
+            </tr>
+            {% for (var i = 0; i < data.length; i++) { %}
+                <tr>
+                    <td >{%= i + 1 %}</td>
+                    <td>{%= data[i].employee || "" %}</td>
+                    <td>{%= data[i].cid || "" %}</td>
+                    <td>{%= data[i].employee_name || "" %}</td>
+                    <td>{%= data[i].ora || "" %}</td>
+                    <td class="text-right">
+                        {%= format_currency(data[i].salary_saving_scheme || 0) %}
+                    </td>
+                </tr>
+            {% } %}
+            <tr>
+                <td colspan="5">
+                    Total for Code: {%= (data[0] && data[0].cost_center_number) || "" %}
+                </td>
+                <td >
+                 {%= format_currency(data.reduce(function(total, row) {
+                    return total + (parseFloat(row.salary_saving_scheme) || 0);
+                }, 0)) %}
+                </td>
+
+            </tr>
+            <tr style="font-size: 11px;color: #000;background-color: #E0E0E0;">
+                 <td colspan="5" >
+                   Grand Total:
+                </td>
+                <td>
+                     {%= format_currency(data.reduce(function(total, row) {
+                    return total + (parseFloat(row.salary_saving_scheme) || 0);
+                }, 0)) %}
+
+                </td>
+
+            </tr>
+        </tbody>
+
+    </table>
+</div>
+
+<style>
+    @page {
+        size: A4 landscape;
+        margin: 7mm 7mm 8mm 7mm;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+    .sss-table {
+        width: 90%;
+        margin: 0 auto;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    .sss-table th,
+    .sss-table td {
+        border: 1px solid #000;
+        padding: 6px 8px;
+    }
+
+    .sss-table th {
+        text-align: center;
+        font-weight: 800;
+        font-size: 12px;
+        color: #000;
+        background-color: #E0E0E0;
+        
+    }
+    .sss-table td {
+        text-align: left;
+        font-size: 11px;
+
+    }
+
+    .print-format {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        font-family: Arial, sans-serif;
+        font-size: 10px;
+        color: #000;
+    }
+
+    .printed-date {
+        width: 90%;
+        margin: 0 auto;
+        text-align: left;
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+
+    .report-header {
+        text-align: center;
+        margin-bottom: 12px;
+    }
+
+    .company-name {
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+
+    .report-name {
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .report-period {
+        margin-top: 5px;
+        font-size: 10px;
+    }
+
+    table {
+        width: 80%;
+        border-collapse: collapse;
+        table-layout: auto;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    tr {
+        page-break-inside: avoid;
+    }
+
+    th,
+    td {
+        border: 1px solid #000;
+        padding: 4px;
+        vertical-align: middle;
+    }
+
+    th {
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .text-right {
+        text-align: right;
+    }
+</style>
