@@ -1,0 +1,784 @@
+<div class="gel-loan-report">
+
+    {%
+        function text(value) {
+            if (value === null || value === undefined) {
+                return "";
+            }
+            return value.toString();
+        }
+    
+        function number(value) {
+            value = parseFloat(value || 0);
+            return isNaN(value) ? 0 : value;
+        }
+    
+        function money(value) {
+            return number(value).toLocaleString("en-IN", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+    
+        function format_date(value) {
+            if (!value) {
+                return "";
+            }
+    
+            value = text(value);
+    
+            if (value.indexOf("-") !== -1) {
+                var parts = value.split("-");
+    
+                if (parts.length === 3 && parts[0].length === 4) {
+                    return parts[2] + "/" + parts[1] + "/" + parts[0];
+                }
+            }
+    
+            return value;
+        }
+    
+        function get_company_title(name) {
+            name = text(name);
+    
+            if (name.indexOf("Royal Body Guard") !== -1) {
+                return "ROYAL BODY GUARD";
+            }
+    
+            if (name.indexOf("Royal Bhutan Army") !== -1) {
+                return "ROYAL BHUTAN ARMY";
+            }
+    
+            return name.toUpperCase();
+        }
+    
+        function get_code(value) {
+            value = text(value).trim();
+    
+            if (!value) {
+                return "";
+            }
+    
+            if (value.indexOf(" - ") !== -1) {
+                return value.split(" - ")[0].trim();
+            }
+    
+            if (value.indexOf(":") !== -1) {
+                return value.split(":")[0].trim();
+            }
+    
+            return value.split(" ")[0].trim();
+        }
+    
+        function get_title(value) {
+            value = text(value).trim();
+    
+            if (!value) {
+                return "";
+            }
+    
+            if (value.indexOf(" - ") !== -1) {
+                var parts = value.split(" - ");
+                parts.shift();
+                return parts.join(" - ").trim();
+            }
+    
+            if (value.indexOf(":") !== -1) {
+                var colon_parts = value.split(":");
+                colon_parts.shift();
+                return colon_parts.join(":").trim();
+            }
+    
+            var first_word = value.split(" ")[0];
+    
+            return value.replace(first_word, "").trim();
+        }
+    
+        var company_name = get_company_title(
+            filters.company || "Royal Bhutan Army"
+        );
+    
+        var fiscal_year = filters.fiscal_year || "";
+        var month = filters.month || "";
+        var financial_institution = filters.bank || "";
+    
+        var grand_total = 0;
+    
+        var department_sector = "";
+        var department_code = "";
+        var department_name = "";
+    
+        if (data && data.length > 0) {
+    
+            var first_row = data[0] || {};
+    
+            department_sector =
+                first_row.cost_center ||
+                first_row.department ||
+                first_row.branch ||
+                "";
+    
+            department_code = get_code(department_sector);
+            department_name = get_title(department_sector);
+        }
+    %}
+    
+    
+    <!-- =========================
+         HEADER
+    ========================= -->
+    
+    <div class="report-header">
+    
+        <div class="printed-date">
+            Printed Dt:
+            {%= format_date(frappe.datetime.now_datetime().split(" ")[0]) %}
+        </div>
+    
+        <div class="header-center">
+    
+            <h2>{%= company_name %}</h2>
+    
+            <h3>
+                Monthly Government Employee Loan (GEL) Schedule
+            </h3>
+    
+        </div>
+    
+    </div>
+    
+    
+    <!-- =========================
+         REPORT DETAILS
+    ========================= -->
+    
+    <div class="report-details">
+    
+        <div class="month-info">
+    
+            <div>
+                For the month :
+                <strong>
+                    {%= month %}
+                    {% if (fiscal_year) { %}
+                        ({%= fiscal_year %})
+                    {% } %}
+                </strong>
+            </div>
+    
+            {% if (financial_institution) { %}
+            <div>
+                Financial Inst :
+                <strong>{%= financial_institution %}</strong>
+            </div>
+            {% } %}
+    
+        </div>
+    
+    </div>
+    
+    
+    <!-- =========================
+         TABLE
+    ========================= -->
+    
+    <table class="gel-table">
+    
+        <thead>
+    
+            <tr>
+    
+                <th class="sl-column">
+                    Sl. #
+                </th>
+    
+                <th class="empid-column">
+                    EmpId
+                </th>
+    
+                <th class="cid-column">
+                    CIDWPNO
+                </th>
+    
+                <th class="name-column">
+                    EmpName
+                </th>
+    
+                <th class="loan-column">
+                    LoanAcNo
+                </th>
+    
+                <th class="amount-column">
+                    Amount(Nu.)
+                </th>
+    
+            </tr>
+    
+        </thead>
+    
+    
+        <tbody>
+    
+    
+            <!-- =========================
+                 DEPARTMENT / SECTOR
+            ========================= -->
+    
+            {% if (department_sector) { %}
+    
+            <tr class="department-row">
+    
+                <td colspan="6">
+    
+                    Department/Sector
+                    (Code:Name) :-
+    
+                    <strong>
+                        {%= department_code %}
+                        :
+                        {%= department_name %}
+                    </strong>
+    
+                </td>
+    
+            </tr>
+    
+            {% } %}
+    
+    
+            <!-- =========================
+                 EMPLOYEE DATA
+            ========================= -->
+    
+            {% for (var i = 0; i < data.length; i++) { %}
+    
+                {%
+                    var row = data[i] || {};
+    
+                    var employee =
+                        row.employee || "";
+    
+                    var employee_name =
+                        row.employee_name || "";
+    
+                    var cid =
+                        row.passport_number ||
+                        row.cid ||
+                        "";
+    
+                    var loan_account =
+                        row.reference_number ||
+                        row.loan_account_no ||
+                        "";
+    
+                    var amount =
+                        number(
+                            row.amount ||
+                            row.deduction_amount ||
+                            0
+                        );
+    
+                    grand_total += amount;
+                %}
+    
+    
+                <tr class="employee-row">
+    
+                    <td class="center">
+                        {%= i + 1 %}
+                    </td>
+    
+                    <td>
+                        {%= employee %}
+                    </td>
+    
+                    <td>
+                        {%= cid %}
+                    </td>
+    
+                    <td class="employee-name">
+                        {%= employee_name %}
+                    </td>
+    
+                    <td>
+                        {%= loan_account %}
+                    </td>
+    
+                    <td class="amount">
+                        {%= money(amount) %}
+                    </td>
+    
+                </tr>
+    
+    
+            {% } %}
+    
+    
+            <!-- =========================
+                 TOTAL FOR CODE
+            ========================= -->
+    
+            <tr class="total-row">
+    
+                <td colspan="5" class="total-label">
+                    Total for code :
+                    {%= department_code %}
+                </td>
+    
+                <td class="amount">
+                    {%= money(grand_total) %}
+                </td>
+    
+            </tr>
+    
+    
+            <!-- =========================
+                 GRAND TOTAL
+            ========================= -->
+    
+            <tr class="grand-total-row">
+    
+                <td colspan="5" class="grand-total-label">
+                    Grand Total:
+                </td>
+    
+                <td class="amount">
+                    {%= money(grand_total) %}
+                </td>
+    
+            </tr>
+    
+    
+        </tbody>
+    
+    </table>
+    
+    
+    </div>
+    
+    
+    <style>
+    
+        /* =========================================
+           PAGE
+        ========================================= */
+    
+        @page {
+            size: A4 portrait;
+            margin: 10mm 7mm 10mm 7mm;
+        }
+    
+    
+        * {
+            box-sizing: border-box;
+        }
+    
+    
+        .print-format {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+    
+    
+        /* =========================================
+           MAIN REPORT
+        ========================================= */
+    
+        .gel-loan-report {
+    
+            width: 100%;
+    
+            max-width: 100%;
+    
+            font-family: "Times New Roman", serif;
+    
+            color: #000;
+    
+            font-size: 10px;
+    
+            overflow: hidden;
+        }
+    
+    
+        /* =========================================
+           HEADER
+        ========================================= */
+    
+        .report-header {
+    
+            position: relative;
+    
+            width: 100%;
+    
+            min-height: 48px;
+    
+            margin-top: 3px;
+    
+            margin-bottom: 7px;
+        }
+    
+    
+        .printed-date {
+    
+            position: absolute;
+    
+            left: 0;
+    
+            top: 2px;
+    
+            font-size: 10px;
+    
+            white-space: nowrap;
+        }
+    
+    
+        .header-center {
+    
+            text-align: center;
+    
+            width: 100%;
+        }
+    
+    
+        .header-center h2 {
+    
+            margin: 0 0 3px 0;
+    
+            padding: 0;
+    
+            font-size: 17px;
+    
+            line-height: 1.1;
+    
+            font-weight: 700;
+    
+            letter-spacing: 0.2px;
+    
+            text-transform: uppercase;
+        }
+    
+    
+        .header-center h3 {
+    
+            margin: 0;
+    
+            padding: 0;
+    
+            font-size: 13px;
+    
+            line-height: 1.2;
+    
+            font-weight: 700;
+        }
+    
+    
+        /* =========================================
+           REPORT DETAILS
+        ========================================= */
+    
+        .report-details {
+    
+            width: 100%;
+    
+            margin-top: 2px;
+    
+            margin-bottom: 6px;
+    
+            font-size: 10.5px;
+        }
+    
+    
+        .month-info {
+    
+            text-align: left;
+    
+            line-height: 1.7;
+        }
+    
+    
+        .month-info strong {
+    
+            font-weight: 700;
+        }
+    
+    
+        /* =========================================
+           TABLE
+        ========================================= */
+    
+        .gel-table {
+    
+            width: 100%;
+    
+            border-collapse: collapse;
+    
+            table-layout: fixed;
+    
+            border: 0.8px solid #999 !important;
+    
+            font-size: 9px;
+        }
+    
+    
+        .gel-table th,
+        .gel-table td {
+    
+            border: 0.5px solid #b0b0b0 !important;
+    
+            color: #000 !important;
+    
+            background: #fff !important;
+    
+            padding: 4px 5px;
+    
+            vertical-align: middle;
+    
+            line-height: 1.25;
+    
+            word-break: break-word;
+    
+            overflow-wrap: break-word;
+        }
+    
+    
+        /* =========================================
+           TABLE HEADER
+        ========================================= */
+    
+        .gel-table th {
+    
+            text-align: center;
+    
+            font-size: 9.5px;
+    
+            font-weight: 700;
+    
+            background: #f8f8f8 !important;
+    
+            border-bottom: 0.8px solid #888 !important;
+    
+            height: 29px;
+        }
+    
+    
+        /* =========================================
+           COLUMN WIDTHS
+        ========================================= */
+    
+        .sl-column {
+    
+            width: 7%;
+    
+            text-align: center !important;
+        }
+    
+    
+        .empid-column {
+    
+            width: 17%;
+    
+            text-align: center !important;
+        }
+    
+    
+        .cid-column {
+    
+            width: 20%;
+    
+            text-align: center !important;
+        }
+    
+    
+        .name-column {
+    
+            width: 25%;
+    
+            text-align: left !important;
+        }
+    
+    
+        .loan-column {
+    
+            width: 19%;
+    
+            text-align: center !important;
+        }
+    
+    
+        .amount-column {
+    
+            width: 12%;
+    
+            text-align: right !important;
+        }
+    
+    
+        /* =========================================
+           DEPARTMENT / SECTOR ROW
+        ========================================= */
+    
+        .department-row td {
+    
+            font-size: 9.5px;
+    
+            font-weight: 700;
+    
+            text-align: left !important;
+    
+            padding: 4px 6px;
+    
+            background: #fafafa !important;
+    
+            border-top: 0.8px solid #999 !important;
+    
+            border-bottom: 0.8px solid #999 !important;
+        }
+    
+    
+        /* =========================================
+           EMPLOYEE ROW
+        ========================================= */
+    
+        .employee-row td {
+    
+            font-size: 9px;
+    
+            font-weight: 400;
+    
+            height: 22px;
+        }
+    
+    
+        .employee-row td:nth-child(1),
+        .employee-row td:nth-child(2),
+        .employee-row td:nth-child(3),
+        .employee-row td:nth-child(5) {
+    
+            text-align: center;
+        }
+    
+    
+        .employee-name {
+    
+            text-align: left !important;
+        }
+    
+    
+        .center {
+    
+            text-align: center !important;
+        }
+    
+    
+        .amount {
+    
+            text-align: right !important;
+    
+            white-space: nowrap;
+        }
+    
+    
+        /* =========================================
+           TOTAL FOR CODE
+        ========================================= */
+    
+        .total-row td {
+    
+            font-weight: 700;
+    
+            font-size: 9.5px;
+    
+            background: #fafafa !important;
+    
+            border-top: 0.8px solid #999 !important;
+    
+            border-bottom: 0.8px solid #999 !important;
+    
+            height: 25px;
+        }
+    
+    
+        .total-label {
+    
+            text-align: right !important;
+    
+            padding-right: 8px !important;
+        }
+    
+    
+        /* =========================================
+           GRAND TOTAL
+        ========================================= */
+    
+        .grand-total-row td {
+    
+            font-weight: 700;
+    
+            font-size: 10px;
+    
+            background: #fff !important;
+    
+            border-top: 0.8px solid #999 !important;
+    
+            border-bottom: 0.8px solid #999 !important;
+    
+            height: 25px;
+        }
+    
+    
+        .grand-total-label {
+    
+            text-align: right !important;
+    
+            padding-right: 8px !important;
+        }
+    
+    
+        /* =========================================
+           PRINT
+        ========================================= */
+    
+        thead {
+    
+            display: table-header-group;
+        }
+    
+    
+        tr {
+    
+            page-break-inside: avoid;
+        }
+    
+    
+        @media print {
+    
+            .gel-loan-report {
+    
+                width: 100%;
+            }
+    
+    
+            .gel-table {
+    
+                page-break-inside: auto;
+            }
+    
+    
+            .gel-table tr {
+    
+                page-break-inside: avoid;
+    
+                page-break-after: auto;
+            }
+    
+    
+            .gel-table thead {
+    
+                display: table-header-group;
+            }
+    
+        }
+    
+    </style>

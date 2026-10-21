@@ -1,0 +1,1093 @@
+<div class="gis-report-print">
+
+    {%
+        /* =====================================================
+           HELPER FUNCTIONS
+           ===================================================== */
+
+        function text(value) {
+            if (value === null || value === undefined) {
+                return "";
+            }
+
+            return value.toString();
+        }
+
+
+        function number(value) {
+            value = parseFloat(value || 0);
+
+            return isNaN(value) ? 0 : value;
+        }
+
+
+        function money(value) {
+            value = number(value);
+
+            return value.toLocaleString("en-IN", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+
+        function get_company_title(name) {
+
+            name = text(name);
+
+            if (name.indexOf("Royal Body Guard") !== -1) {
+                return "ROYAL BODY GUARD";
+            }
+
+            if (name.indexOf("Royal Bhutan Army") !== -1) {
+                return "ROYAL BHUTAN ARMY";
+            }
+
+            return name.toUpperCase();
+        }
+
+
+        function format_date(value) {
+
+            if (!value) {
+                return "";
+            }
+
+            value = text(value);
+
+            var parts = value.split("-");
+
+            if (parts.length === 3 && parts[0].length === 4) {
+
+                return parts[2] + "/" +
+                       parts[1] + "/" +
+                       parts[0];
+            }
+
+            return value;
+        }
+
+
+        function get_month_name(value) {
+
+            var months = [
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December"
+            ];
+
+            if (!value) {
+                return "";
+            }
+
+            value = text(value);
+
+            /* If month is already a name */
+            if (isNaN(parseInt(value))) {
+                return value.toUpperCase();
+            }
+
+            var month_number = parseInt(value);
+
+            if (month_number >= 1 && month_number <= 12) {
+                return months[month_number - 1].toUpperCase();
+            }
+
+            return value.toUpperCase();
+        }
+
+
+        function get_department_code(value) {
+
+            value = text(value).trim();
+
+            if (!value) {
+                return "";
+            }
+
+            if (value.indexOf(" : ") !== -1) {
+                return value.split(" : ")[0].trim();
+            }
+
+            if (value.indexOf(":") !== -1) {
+                return value.split(":")[0].trim();
+            }
+
+            return value.split(" ")[0].trim();
+        }
+
+
+        function get_department_name(value) {
+
+            value = text(value).trim();
+
+            if (!value) {
+                return "";
+            }
+
+            if (value.indexOf(" : ") !== -1) {
+
+                var parts = value.split(" : ");
+
+                parts.shift();
+
+                return parts.join(" : ").trim();
+            }
+
+            if (value.indexOf(":") !== -1) {
+
+                var parts2 = value.split(":");
+
+                parts2.shift();
+
+                return parts2.join(":").trim();
+            }
+
+            return value;
+        }
+
+
+        /* =====================================================
+           REPORT VARIABLES
+           ===================================================== */
+
+        var company_name = get_company_title(
+            filters.company || "Royal Bhutan Army"
+        );
+
+
+        var fiscal_year =
+            filters.fiscal_year || "";
+
+
+        var report_month =
+            get_month_name(filters.month);
+
+
+        var printed_date =
+            frappe.datetime.now_datetime().split(" ")[0];
+
+
+        /* =====================================================
+           GRAND TOTAL
+           ===================================================== */
+
+        var grand_subscription = 0;
+
+
+        /* =====================================================
+           DEPARTMENT TOTAL
+           ===================================================== */
+
+        var last_department = "";
+
+        var department_subscription = 0;
+    %}
+
+
+    <!-- =====================================================
+         PRINTED DATE
+         ===================================================== -->
+
+    <div class="printed-date">
+        Printed Dt. {%= format_date(printed_date) %}
+    </div>
+
+
+    <!-- =====================================================
+         REPORT HEADER
+         ===================================================== -->
+
+    <div class="report-header">
+
+        <div class="company-name">
+            {%= company_name %}
+        </div>
+
+        <div class="report-name">
+            Monthly GIS Schedule Statement
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MONTH
+         ===================================================== -->
+
+    <div class="month-section">
+
+        For the month :
+
+        <strong>
+            {%= report_month %}
+        </strong>
+
+        {% if (fiscal_year) { %}
+
+            <strong>
+                ({%= fiscal_year %})
+            </strong>
+
+        {% } %}
+
+    </div>
+
+
+    <!-- =====================================================
+         MAIN TABLE
+         ===================================================== -->
+
+    <table class="gis-table">
+
+        <thead>
+
+            <tr>
+
+                <th class="sl-no">
+                    Sl. #
+                </th>
+
+                <th class="gis-no">
+                    GISNo
+                </th>
+
+                <th class="emp-id">
+                    EmpId
+                </th>
+
+                <th class="cid">
+                    CID/WPNo
+                </th>
+
+                <th class="name">
+                    Name
+                </th>
+
+                <th class="grade">
+                    Grade
+                </th>
+
+                <th class="group">
+                    Group
+                </th>
+
+                <th class="subscription">
+                    Subscription(Nu.)
+                </th>
+
+                <th class="dob">
+                    DOB
+                </th>
+
+                <th class="status">
+                    Status
+                </th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+
+            {% for (var i = 0; i < data.length; i++) { %}
+
+                {%
+                    var row = data[i] || {};
+
+
+                    var employee =
+                        row.n ||
+                        row.employee ||
+                        "";
+
+
+                    var gis_number =
+                        row.gis_number ||
+                        "";
+
+
+                    var employee_name =
+                        row.employee_name ||
+                        "";
+
+
+                    var cid =
+                        row.passport_number ||
+                        row.cid ||
+                        "";
+
+
+                    var date_of_birth =
+                        row.date_of_birth ||
+                        "";
+
+
+                    var employee_group =
+                        row.employee_group ||
+                        "";
+
+
+                    var grade =
+                        row.employee_subgroup ||
+                        "";
+
+
+                    var subscription =
+                        number(row.gisamount);
+
+
+                    var department =
+                        row.department ||
+                        "";
+
+
+                    var department_code =
+                        get_department_code(department);
+
+
+                    var department_name =
+                        get_department_name(department);
+                %}
+
+
+                <!-- =================================================
+                     NEW DEPARTMENT
+                     ================================================= -->
+
+                {% if (department && department != last_department) { %}
+
+
+                    <!-- ---------------------------------------------
+                         PREVIOUS DEPARTMENT TOTAL
+                         --------------------------------------------- -->
+
+                    {% if (last_department) { %}
+
+                        <tr class="department-total-row">
+
+                            <td colspan="7"
+                                class="department-total-label">
+
+                                Total for code:
+
+                                <strong>
+                                    {%= get_department_code(last_department) %}
+                                </strong>
+
+                            </td>
+
+
+                            <td class="amount">
+
+                                {%= money(department_subscription) %}
+
+                            </td>
+
+
+                            <td colspan="2"></td>
+
+                        </tr>
+
+
+                        {%
+                            department_subscription = 0;
+                        %}
+
+                    {% } %}
+
+
+                    <!-- ---------------------------------------------
+                         DEPARTMENT HEADER
+                         --------------------------------------------- -->
+
+                    <tr class="department-row">
+
+                        <td colspan="10">
+
+                            Department/Sector :-
+
+                            <strong>
+                                {%= department_code %}
+                            </strong>
+
+                            {% if (department_name) { %}
+
+                                :
+
+                                <strong>
+                                    {%= department_name.toUpperCase() %}
+                                </strong>
+
+                            {% } %}
+
+                        </td>
+
+                    </tr>
+
+
+                    {%
+                        last_department = department;
+                    %}
+
+                {% } %}
+
+
+                <!-- =================================================
+                     EMPLOYEE ROW
+                     ================================================= -->
+
+                <tr class="employee-row">
+
+
+                    <!-- SL NUMBER -->
+
+                    <td class="center">
+                        {%= i + 1 %}
+                    </td>
+
+
+                    <!-- GIS NUMBER -->
+
+                    <td class="center">
+                        {%= gis_number %}
+                    </td>
+
+
+                    <!-- EMPLOYEE ID -->
+
+                    <td class="center">
+                        {%= employee %}
+                    </td>
+
+
+                    <!-- CID / WP NUMBER -->
+
+                    <td class="center">
+                        {%= cid %}
+                    </td>
+
+
+                    <!-- NAME -->
+
+                    <td class="left">
+                        {%= employee_name %}
+                    </td>
+
+
+                    <!-- GRADE -->
+
+                    <td class="center">
+                        {%= grade %}
+                    </td>
+
+
+                    <!-- GROUP -->
+
+                    <td class="center">
+                        {%= employee_group %}
+                    </td>
+
+
+                    <!-- GIS SUBSCRIPTION -->
+
+                    <td class="amount">
+                        {%= money(subscription) %}
+                    </td>
+
+
+                    <!-- DATE OF BIRTH -->
+
+                    <td class="center">
+                        {%= format_date(date_of_birth) %}
+                    </td>
+
+
+                    <!-- STATUS -->
+
+                    <td class="center">
+                    </td>
+
+
+                </tr>
+
+
+                {%
+                    department_subscription += subscription;
+
+                    grand_subscription += subscription;
+                %}
+
+            {% } %}
+
+
+            <!-- =====================================================
+                 LAST DEPARTMENT TOTAL
+                 ===================================================== -->
+
+            {% if (last_department) { %}
+
+                <tr class="department-total-row">
+
+                    <td colspan="7"
+                        class="department-total-label">
+
+                        Total for code:
+
+                        <strong>
+                            {%= get_department_code(last_department) %}
+                        </strong>
+
+                    </td>
+
+
+                    <td class="amount">
+
+                        {%= money(department_subscription) %}
+
+                    </td>
+
+
+                    <td colspan="2"></td>
+
+                </tr>
+
+            {% } %}
+
+
+            <!-- =====================================================
+                 GRAND TOTAL
+                 ===================================================== -->
+
+            <tr class="grand-total-row">
+
+                <td colspan="7"
+                    class="grand-total-label">
+
+                    Grand Total:
+
+                </td>
+
+
+                <td class="amount">
+
+                    {%= money(grand_subscription) %}
+
+                </td>
+
+
+                <td colspan="2"></td>
+
+            </tr>
+
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<style>
+
+
+    /* =========================================================
+       PAGE
+       ========================================================= */
+
+    @page {
+
+        size: A4 landscape;
+
+        margin: 7mm 7mm 8mm 7mm;
+
+    }
+
+
+    * {
+
+        box-sizing: border-box;
+
+    }
+
+
+    .print-format {
+
+        padding-left: 0 !important;
+
+        padding-right: 0 !important;
+
+    }
+
+
+    /* =========================================================
+       MAIN REPORT
+       ========================================================= */
+
+    .gis-report-print {
+
+        width: 100%;
+
+        max-width: 100%;
+
+        margin: 0;
+
+        padding: 0;
+
+        color: #000;
+
+        font-family: "Times New Roman", serif;
+
+        font-size: 9px;
+
+        overflow: hidden;
+
+    }
+
+
+    /* =========================================================
+       PRINTED DATE
+       ========================================================= */
+
+    .printed-date {
+
+        width: 100%;
+
+        text-align: left;
+
+        font-size: 9px;
+
+        margin: 0 0 2px 0;
+
+        padding: 0;
+
+        line-height: 1.2;
+
+    }
+
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
+
+    .report-header {
+
+        width: 100%;
+
+        text-align: center;
+
+        margin: 0;
+
+        padding: 0;
+
+        line-height: 1.1;
+
+    }
+
+
+    .company-name {
+
+        font-size: 16px;
+
+        font-weight: 700;
+
+        text-transform: uppercase;
+
+        margin: 0;
+
+        padding: 0;
+
+    }
+
+
+    .report-name {
+
+        font-size: 12px;
+
+        font-weight: 700;
+
+        margin: 1px 0 0 0;
+
+        padding: 0;
+
+    }
+
+
+    /* =========================================================
+       MONTH
+       ========================================================= */
+
+    .month-section {
+
+        width: 100%;
+
+        text-align: left;
+
+        font-size: 10px;
+
+        margin-top: 9px;
+
+        margin-bottom: 3px;
+
+        line-height: 1.2;
+
+    }
+
+
+    /* =========================================================
+       TABLE
+       ========================================================= */
+
+    .gis-table {
+
+        width: 100%;
+
+        max-width: 100%;
+
+        margin: 0;
+
+        padding: 0;
+
+        border-collapse: collapse;
+
+        table-layout: fixed;
+
+        border: 0.7px solid #888 !important;
+
+        font-family: "Times New Roman", serif;
+
+    }
+
+
+    /* =========================================================
+       CELLS
+       ========================================================= */
+
+    .gis-table th,
+    .gis-table td {
+
+        border: 0.5px solid #b5b5b5 !important;
+
+        color: #000 !important;
+
+        background: #fff !important;
+
+        padding: 3px 3px;
+
+        vertical-align: middle;
+
+        line-height: 1.15;
+
+        word-break: normal;
+
+        overflow-wrap: break-word;
+
+    }
+
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
+
+    .gis-table th {
+
+        text-align: center;
+
+        font-size: 9px;
+
+        font-weight: 700;
+
+        padding: 4px 2px;
+
+        line-height: 1.1;
+
+        background: #fff !important;
+
+    }
+
+
+    /* =========================================================
+       COLUMN WIDTHS
+
+       Based on the uploaded sample.
+       ========================================================= */
+
+    .sl-no {
+
+        width: 4%;
+
+    }
+
+
+    .gis-no {
+
+        width: 9%;
+
+    }
+
+
+    .emp-id {
+
+        width: 10%;
+
+    }
+
+
+    .cid {
+
+        width: 13%;
+
+    }
+
+
+    .name {
+
+        width: 20%;
+
+    }
+
+
+    .grade {
+
+        width: 6%;
+
+    }
+
+
+    .group {
+
+        width: 7%;
+
+    }
+
+
+    .subscription {
+
+        width: 12%;
+
+    }
+
+
+    .dob {
+
+        width: 10%;
+
+    }
+
+
+    .status {
+
+        width: 9%;
+
+    }
+
+
+    /* =========================================================
+       EMPLOYEE ROW
+       ========================================================= */
+
+    .employee-row td {
+
+        font-size: 9px;
+
+        font-weight: 400;
+
+        height: 18px;
+
+    }
+
+
+    /* =========================================================
+       ALIGNMENT
+       ========================================================= */
+
+    .center {
+
+        text-align: center !important;
+
+    }
+
+
+    .left {
+
+        text-align: left !important;
+
+        padding-left: 5px !important;
+
+    }
+
+
+    .amount {
+
+        text-align: right !important;
+
+        white-space: nowrap;
+
+        padding-right: 5px !important;
+
+    }
+
+
+    /* =========================================================
+       DEPARTMENT HEADER
+       ========================================================= */
+
+    .department-row td {
+
+        text-align: left !important;
+
+        font-size: 9.5px;
+
+        font-weight: 400;
+
+        padding: 3px 5px;
+
+        background: #fff !important;
+
+        border-top: 0.7px solid #999 !important;
+
+        border-bottom: 0.5px solid #aaa !important;
+
+    }
+
+
+    .department-row strong {
+
+        font-weight: 700;
+
+    }
+
+
+    /* =========================================================
+       DEPARTMENT TOTAL
+       ========================================================= */
+
+    .department-total-row td {
+
+        font-size: 9.5px;
+
+        font-weight: 700;
+
+        background: #fff !important;
+
+        padding-top: 4px;
+
+        padding-bottom: 4px;
+
+        border-top: 0.7px solid #999 !important;
+
+    }
+
+
+    .department-total-label {
+
+        text-align: left !important;
+
+        padding-left: 7px !important;
+
+    }
+
+
+    /* =========================================================
+       GRAND TOTAL
+       ========================================================= */
+
+    .grand-total-row td {
+
+        font-size: 9.5px;
+
+        font-weight: 700;
+
+        background: #fff !important;
+
+        padding-top: 4px;
+
+        padding-bottom: 4px;
+
+        border-top: 0.9px solid #777 !important;
+
+        border-bottom: 0.9px solid #777 !important;
+
+    }
+
+
+    .grand-total-label {
+
+        text-align: right !important;
+
+        padding-right: 8px !important;
+
+    }
+
+
+    /* =========================================================
+       PAGE BREAK
+       ========================================================= */
+
+    thead {
+
+        display: table-header-group;
+
+    }
+
+
+    tr {
+
+        page-break-inside: avoid;
+
+    }
+
+
+    /* =========================================================
+       PRINT
+       ========================================================= */
+
+    @media print {
+
+        .gis-report-print {
+
+            width: 100%;
+
+            font-family: "Times New Roman", serif;
+
+        }
+
+
+        .gis-table {
+
+            width: 100%;
+
+            page-break-inside: auto;
+
+        }
+
+
+        .gis-table thead {
+
+            display: table-header-group;
+
+        }
+
+
+        .gis-table tr {
+
+            page-break-inside: avoid;
+
+            page-break-after: auto;
+
+        }
+
+    }
+
+</style>
