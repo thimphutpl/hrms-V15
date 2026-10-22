@@ -41,6 +41,9 @@ class EmployeeBenefits(Document):
 		self.check_leave_encashment()
 		self.update_reference()
 
+		# Mark previous benefits settled
+		self.mark_previous_benefits_settled()
+
 	def set_total(self):
 		''' validate amounts in benefits and deductions '''
 		self.total_amount = self.total_deducted_amount = self.net_amount = 0
@@ -274,6 +277,19 @@ class EmployeeBenefits(Document):
 			if docstatus and docstatus != 2:				
 				frappe.throw("Cancel Journal Entry {0} before cancelling this document".format(frappe.get_desk_link("Journal Entry", self.journal)))		
 		self.db_set("journal", None)
+
+	def mark_previous_benefits_settled(self):
+		if (
+			self.purpose == "Separation"
+			and self.employee_separation_id
+			and self.employee
+		):
+			frappe.db.set_value(
+				"Employee",
+				self.employee,
+				"previous_leave_benefits_settled",
+				1
+			)	
 
 @frappe.whitelist()
 def get_basic_salary(employee):
