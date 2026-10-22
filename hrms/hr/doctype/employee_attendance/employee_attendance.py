@@ -16,6 +16,7 @@ class EmployeeAttendance(Document):
 		self.validate_ip_address()
 		self.validate_time_not_past()
 		self.validate_duplicate_logs()
+		self.validate_checkin_checkout_sequence()
 		self.validate_late()
 		self.set_geolocation()
 
@@ -80,6 +81,44 @@ class EmployeeAttendance(Document):
 				"You have already checked {0} for today.".format("in" if self.log_type=="IN" else "out")
 			))
 				
+	def validate_checkin_checkout_sequence(self):
+		if not self.employee or not self.time or not self.log_type:
+			return
+
+		current_time = get_datetime(self.time)
+
+		filters = {
+			"employee": self.employee,
+			"time": ["<", current_time],
+		}
+
+		if not self.is_new():
+			filters["name"] = ["!=", self.name]
+
+		last_log = frappe.get_all(
+			"Employee Attendance",
+			filters=filters,
+			fields=["name", "log_type", "time"],
+			order_by="time desc, creation desc",
+			limit=1,
+		)
+
+		last_log = last_log[0] if last_log else None
+
+		if self.log_type == "IN":
+			if last_log and last_log.log_type == "IN":
+				frappe.throw(
+					_(
+						"You checked in at {0} but have not checked out. "
+						"Please check out first before checking in again."
+					).format(
+						frappe.utils.format_datetime(last_log.time)
+					)
+				)
+
+		elif self.log_type == "OUT":
+			if not last_log or last_log.log_type != "IN":
+				frappe.throw(_("Please check in first, then check out."))
 	def validate_late(self):
 		if not self.time:
 			return
