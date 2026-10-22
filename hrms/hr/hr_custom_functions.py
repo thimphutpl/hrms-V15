@@ -1469,24 +1469,25 @@ def update_suspension_record():
 		
 def get_effective_leave_joining_date(employee):
     """
-    Calculate effective joining date for leave entitlement.
+    Return new RC joining date for employees with
+    confirmed previous leave settlement.
     """
 
     if not employee.date_of_joining:
         frappe.throw(
-            f"Date of Joining is missing for {employee.name}"
+            f"Date of Joining missing for {employee.name}"
         )
 
     doj = getdate(employee.date_of_joining)
 
     if is_leave_reset_employee(employee):
         reset_date = getdate(
-            employee.custom_leave_balance_reset_date
+            employee.get("leave_balance_reset_date")
         )
         return max(doj, reset_date)
 
     return doj
-
+	
 def calculate_prorated_cl(joining_date, annual_cl=10):
     """
     Calculate prorated annual Casual Leave.
@@ -1513,17 +1514,11 @@ def calculate_prorated_cl(joining_date, annual_cl=10):
 
 def is_leave_reset_employee(employee):
     """
-    Check whether the employee is a Regular Contract
-    employee whose previous leave benefits were settled.
+    Employee converted from Deputation to Regular Contract
+    after full settlement of previous benefits.
     """
-
     return bool(
         employee.employment_type == "Regular Contract"
-        and employee.get("custom_leave_balance_reset_date")
-        and cint(
-            employee.get(
-                "custom_previous_leave_benefits_settled"
-            )
-        )
-    )			
-	
+        and employee.get("leave_balance_reset_date")
+        and cint(employee.get("previous_leave_benefits_settled"))
+    )
