@@ -246,31 +246,226 @@ def adjust_el():
 ##
 # Post casual leave on the first day of every month
 ##
-def post_casual_leaves():
-	date = getdate(frappe.utils.nowdate())
-	if not (date.month == 1 and date.day == 1):
-		return 0
-	date = add_days(frappe.utils.nowdate(), 10)
-	start = get_year_start_date(date);
-	end = get_year_end_date(date);
-	# employees = frappe.db.sql("select name, employee_name from `tabEmployee` where status = 'Active'", as_dict=True)
-	employees = frappe.db.sql("""
-		select name, employee_name
-		from `tabEmployee`
-		where status = 'Active'
-		and employment_type not in ('GCE', 'Armed Forces')
-	""", as_dict=True)
+# def post_casual_leaves():
+# 	date = getdate(frappe.utils.nowdate())
+# 	if not (date.month == 1 and date.day == 1):
+# 		return 0
+# 	date = add_days(frappe.utils.nowdate(), 10)
+# 	start = get_year_start_date(date);
+# 	end = get_year_end_date(date);
+# 	# employees = frappe.db.sql("select name, employee_name from `tabEmployee` where status = 'Active'", as_dict=True)
+# 	employees = frappe.db.sql("""
+# 		select name, employee_name
+# 		from `tabEmployee`
+# 		where status = 'Active'
+# 		and employment_type not in ('GCE', 'Armed Forces')
+# 	""", as_dict=True)
 
-	for e in employees:
-		la = frappe.new_doc("Leave Allocation")
-		la.employee = e.name
-		la.employee_name = e.employee_name
-		la.leave_type = "Casual Leave"
-		la.from_date = str(start)
-		la.to_date = str(end)
-		la.carry_forward = cint(0)
-		la.new_leaves_allocated = flt(10)
-		la.submit()
+# 	for e in employees:
+# 		la = frappe.new_doc("Leave Allocation")
+# 		la.employee = e.name
+# 		la.employee_name = e.employee_name
+# 		la.leave_type = "Casual Leave"
+# 		la.from_date = str(start)
+# 		la.to_date = str(end)
+# 		la.carry_forward = cint(0)
+# 		la.new_leaves_allocated = flt(10)
+# 		la.submit()
+
+
+
+def post_casual_leaves(today=None, dry_run=False):
+    """
+    Annual Casual Leave allocation.
+
+    Normal employees:
+        10 CL on 1 January.
+
+    Deputation -> Regular Contract:
+        Prorated CL from confirmed leave reset date.
+
+    Prevents duplicate and overlapping allocations.
+    Does not modify historical leave records.
+    """
+
+    date = getdate(today) if today else getdate(nowdate())
+
+    year_start = getdate(f"{date.year}-01-01")
+    year_end = getdate(f"{date.year}-12-31")
+
+    is_january_first = (
+        date.month == 1 and date.day == 1
+    )
+
+    employees = frappe.get_all(
+        "Employee",
+        filters={
+            "status": "Active",
+            "employment_type": [
+                "not in", ["GCE", "Armed Forces"]
+            ]
+        },
+        fields=[
+            "name",
+            "employee_name",
+            "date_of_joining",
+            "employment_type"
+        ]
+    )
+
+    results = []
+
+    for e in employees:
+
+        if not e.date_of_joining:
+            continue
+
+        employee = frappe.get_doc("Employee", e.name)
+
+        reset_employee = is_leave_reset_employee(employee)
+
+        effective_date = get_effective_leave_joining_date(
+            employee
+        )
+
+        if effective_date > date:
+            continue
+
+        # ======================================
+        # 1. DETERMINE ENTITLEMENT
+        # ======================================
+
+        if reset_employee:
+
+            if effective_date.year == date.year:
+
+                # New RC employment during this year
+                allocation_start = effective_date
+
+                cl_days = calculate_prorated_cl(
+                    effective_date,
+                    annual_cl=10
+                )
+
+            elif effective_date.year < date.year:
+
+                # Subsequent years: normal annual CL
+                if not is_january_first:
+                    continue
+
+                allocation_start = year_start
+                cl_days = 10
+
+            else:
+                continue
+
+        else:
+            # Existing normal employee rules
+            if not is_january_first:
+                continue
+
+            allocation_start = max(
+                getdate(employee.date_of_joining),
+                year_start
+            )
+
+            # Preserve existing January allocation
+            cl_days = 10
+
+        cl_days = flt(cl_days, 2)
+
+        if cl_days <= 0:
+            continue
+
+        allocation_end = year_end
+
+        # ======================================
+        # 2. CHECK EXISTING ALLOCATIONS
+        # ======================================
+
+        # Check ALL overlapping allocations,
+        # including old deputation allocations.
+        existing = frappe.get_all(
+            "Leave Allocation",
+            filters={
+                "employee": e.name,
+                "leave_type": "Casual Leave",
+                "docstatus": ["<", 2],
+                "from_date": ["<=", allocation_end],
+                "to_date": [">=", allocation_start]
+            },
+            fields=[
+                "name",
+                "from_date",
+                "to_date",
+                "docstatus"
+            ]
+        )
+
+        if existing:
+            print(
+                f"[CL] SKIPPED {e.name}: "
+                f"Existing overlapping allocation(s): "
+                f"{[row.name for row in existing]}"
+            )
+            continue
+
+        # ======================================
+        # 3. ALLOCATE CASUAL LEAVE
+        # ======================================
+
+        result = {
+            "employee": e.name,
+            "employee_name": e.employee_name,
+            "from_date": str(allocation_start),
+            "to_date": str(allocation_end),
+            "cl_days": cl_days
+        }
+
+        if dry_run:
+            print("[CL] DRY RUN:", result)
+            results.append(result)
+            continue
+
+        try:
+            la = frappe.new_doc("Leave Allocation")
+
+            la.employee = e.name
+            la.employee_name = e.employee_name
+            la.leave_type = "Casual Leave"
+
+            la.from_date = allocation_start
+            la.to_date = allocation_end
+
+            la.carry_forward = 0
+            la.new_leaves_allocated = cl_days
+
+            la.insert(ignore_permissions=True)
+            la.submit()
+
+            frappe.logger().info(
+                f"[CL] Allocated {cl_days} days "
+                f"to {e.name}: {la.name}"
+            )
+
+            print(
+                f"[CL] SUCCESS: {e.name}, "
+                f"{cl_days} days, {la.name}"
+            )
+
+            result["allocation"] = la.name
+            results.append(result)
+
+        except Exception:
+            frappe.log_error(
+                title=f"CL Allocation Failed: {e.name}",
+                message=frappe.get_traceback()
+            )
+            print(f"[CL] FAILED: {e.name}")
+            raise
+
+    return results
+
 
 
 # # start --Added By Karma
@@ -1268,5 +1463,67 @@ def update_suspension_record():
 		emp.increment_and_promotion_cycle = d.increment_month
 		emp.promotion_cycle = d.promotion_month
 		emp.save()
+
 		
+# functions added for deputation -> regular contract conversion leave entitlement
+		
+def get_effective_leave_joining_date(employee):
+    """
+    Calculate effective joining date for leave entitlement.
+    """
+
+    if not employee.date_of_joining:
+        frappe.throw(
+            f"Date of Joining is missing for {employee.name}"
+        )
+
+    doj = getdate(employee.date_of_joining)
+
+    if is_leave_reset_employee(employee):
+        reset_date = getdate(
+            employee.custom_leave_balance_reset_date
+        )
+        return max(doj, reset_date)
+
+    return doj
+
+def calculate_prorated_cl(joining_date, annual_cl=10):
+    """
+    Calculate prorated annual Casual Leave.
+
+    Joining on or before 15th:
+        Include joining month.
+
+    Joining after 15th:
+        Start entitlement from following month.
+    """
+
+    joining_date = getdate(joining_date)
+
+    eligible_months = 12 - joining_date.month
+
+    if joining_date.day <= 15:
+        eligible_months += 1
+
+    return flt(
+        annual_cl * eligible_months / 12,
+        2
+    )
+
+
+def is_leave_reset_employee(employee):
+    """
+    Check whether the employee is a Regular Contract
+    employee whose previous leave benefits were settled.
+    """
+
+    return bool(
+        employee.employment_type == "Regular Contract"
+        and employee.get("custom_leave_balance_reset_date")
+        and cint(
+            employee.get(
+                "custom_previous_leave_benefits_settled"
+            )
+        )
+    )			
 	
