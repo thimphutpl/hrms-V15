@@ -110,6 +110,7 @@ class SalarySlip(TransactionBase):
 	#         self.hour_rate = ss_doc.hour_rate
 	#         self.total_working_hours = sum([d.working_hours or 0.0 for d in self.timesheets]) or 0.0
 	#         self.add_earning_for_hourly_wages(ss_doc.salary_component)
+
 	def pull_sal_struct(self, ss_doc, calc_days=None):
 		from hrms.payroll.doctype.salary_structure.salary_structure import make_salary_slip
 
@@ -134,34 +135,21 @@ class SalarySlip(TransactionBase):
 			self.employee,
 			"employee_group"
 		)
-		zero_employer_pf_groups = {
-			"Officer (RBA)",
-			"Troops (RBA)",
-			"Contract (RBA)",
-			"RBA-Deceased (2003)",
-			"RBA-Deceased (2015)",
-			"Soelra -RBA",
-			"Civilan (RBA)",
-			"Deceased (MTC)",
-		}
+		# zero_employer_pf_groups = {
+		# 	"Officer (RBA)",
+		# 	"Troops (RBA)",
+		# 	"Contract (RBA)",
+		# 	"RBA-Deceased (2003)",
+		# 	"RBA-Deceased (2015)",
+		# 	"Soelra -RBA",
+		# 	"Civilan (RBA)",
+		# 	"Deceased (MTC)",
+		# }
 
-		if employee_group in zero_employer_pf_groups:
-			self.employer_pf = 0
-		else:
-			employer_percent = flt(
-				frappe.db.get_value(
-					"Employee Group",
-					employee_group,
-					"employer_pf"
-				) or 0
-			)
-
-			self.employer_pf = round(
-				(basic_amt + basic_pay_arrears)
-				* employer_percent
-				* 0.01
-			)
-
+		# if employee_group in zero_employer_pf_groups:
+		# 	self.employer_pf = 0
+		# else:
+		
 		# employer_percent = flt(
 		# 	frappe.db.get_value(
 		# 		"Employee Group",
@@ -175,6 +163,20 @@ class SalarySlip(TransactionBase):
 		# 	* employer_percent
 		# 	* 0.01
 		# )
+
+		employer_percent = flt(
+			frappe.db.get_value(
+				"Employee Group",
+				employee_group,
+				"employer_pf"
+			) or 0
+		)
+
+		self.employer_pf = round(
+			(basic_amt + basic_pay_arrears)
+			* employer_percent
+			* 0.01
+		)
 
 		if self.salary_slip_based_on_timesheet:
 			self.salary_structure = ss_doc.name
