@@ -3325,10 +3325,13 @@ class PayrollEntry(Document):
 					'Soelra -RBA',
 					'Troops (RBG)',
 					'Officer (RBG)',
-					'Civilan (RBG)'
+					'Civilan (RBG)',
+					'Kasho Holder-RBG'
 				)
 				THEN acc.cost_center
-				WHEN t1.employee_group = 'Teachers (RBA)'
+				WHEN t1.employee_group IN ('NAS (RBG)-RBG', 'MTO (RBG)-RBG', 'Trongsa Penlop (RBG)') and sd.salary_component IN ('Deputation Allowance (RBG)', 'City Allowance', 'King Allowance', 'Vegetable Allowance')
+				THEN acc.cost_center
+				WHEN t1.employee_group IN ('Teachers (RBA)', 'NAS (RBG)-RBG', 'MTO (RBG)-RBG', 'Trongsa Penlop (RBG)') 
 					AND (
 						sc.type = 'Earning'
 						OR sd.salary_component = 'PF'
@@ -3341,27 +3344,43 @@ class PayrollEntry(Document):
 				ELSE t1.cost_center
 			END AS cost_center,
 				CASE
-					WHEN %(is_royal_body_guard)s = 1 OR (t1.employee_group = "Teachers (RBA)") THEN 
+					WHEN (%(is_royal_body_guard)s = 1 and sd.salary_component NOT IN ('Deputation Allowance (RBG)', 'City Allowance', 'King Allowance', 'Vegetable Allowance')) OR (t1.employee_group = "Teachers (RBA)") THEN 
 						(SELECT cc.budget_activity FROM `tabCost Center` cc WHERE cc.name = t1.cost_center)
+
+					WHEN sd.salary_component IN ('Deputation Allowance (RBG)', 'City Allowance', 'King Allowance', 'Vegetable Allowance')
+								AND t1.employee_group IN ('NAS (RBG)-RBG', 'MTO (RBG)-RBG', 'Trongsa Penlop (RBG)')
+							THEN
+								(SELECT sc.budget_activity FROM `tabSalary Component` sc WHERE sc.name = sd.salary_component)	
 					ELSE 
 						(SELECT eg.budget_activity FROM `tabEmployee Group` eg WHERE t1.employee_group = eg.name)
 				END AS budget_activity,
 				CASE
 					
-					WHEN %(is_royal_body_guard)s = 1 OR (t1.employee_group = "Teachers (RBA)") THEN 
+					WHEN (%(is_royal_body_guard)s = 1 and sd.salary_component NOT IN ('Deputation Allowance (RBG)', 'City Allowance', 'King Allowance', 'Vegetable Allowance')) OR (t1.employee_group = "Teachers (RBA)") THEN 
 						(SELECT cc.budget_sub_activity FROM `tabCost Center` cc WHERE cc.name = t1.cost_center)
+
+					WHEN sd.salary_component IN ('Deputation Allowance (RBG)', 'City Allowance', 'King Allowance', 'Vegetable Allowance')
+								AND t1.employee_group IN ('NAS (RBG)-RBG', 'MTO (RBG)-RBG', 'Trongsa Penlop (RBG)')
+							THEN
+								(SELECT sc.budget_sub_activity FROM `tabSalary Component` sc WHERE sc.name = sd.salary_component)	
 					ELSE 
 						(SELECT eg.budget_sub_activity FROM `tabEmployee Group` eg WHERE t1.employee_group = eg.name)
 				END AS budget_sub_activity,
 				CASE
 			
-					WHEN %(is_royal_body_guard)s = 1 OR (sd.salary_component = "PF" AND t1.employee_group = "Teachers (RBA)") THEN 
+					WHEN (%(is_royal_body_guard)s = 1 and t1.employee_group != 'Kasho Holder-RBG' and sd.salary_component NOT IN ('Deputation Allowance (RBG)', 'City Allowance', 'King Allowance', 'Vegetable Allowance')) OR (sd.salary_component = "PF" AND t1.employee_group = "Teachers (RBA)") THEN 
 						(SELECT cc.source_of_fund FROM `tabCost Center` cc WHERE cc.name = t1.cost_center)	
 
 					ELSE 
 						CASE
 							
-							WHEN sd.salary_component IN ('Deputation Allowance', 'Other Allowance') AND t1.employee_group = 'NAS (RBA)' THEN 
+							WHEN sd.salary_component IN ('Deputation Allowance (RBG)', 'City Allowance', 'King Allowance', 'Vegetable Allowance')
+								AND t1.employee_group IN ('NAS (RBA)', 'NAS (RBG)-RBG', 'MTO (RBG)-RBG', 'Trongsa Penlop (RBG)')
+							THEN
+								(SELECT sc.source_of_fund FROM `tabSalary Component` sc WHERE sc.name = sd.salary_component)
+
+							WHEN t1.employee_group = 'Kasho Holder-RBG'
+							THEN
 								(SELECT sc.source_of_fund FROM `tabSalary Component` sc WHERE sc.name = sd.salary_component)
 
 							ELSE (SELECT eg.source_of_fund FROM `tabEmployee Group` eg WHERE t1.employee_group = eg.name)
@@ -3419,15 +3438,17 @@ class PayrollEntry(Document):
 						'Soelra -RBA',
 						'Troops (RBG)',
 						'Officer (RBG)',
-						'Civilan (RBG)'
+						'Civilan (RBG)',
+						'Kasho Holder-RBG'
 					)
 					THEN acc.cost_center
-					WHEN t1.employee_group = 'Teachers (RBA)'
+					WHEN t1.employee_group in ('Teachers (RBA)', 'NAS (RBG)-RBG', 'MTO (RBG)-RBG', 'Trongsa Penlop (RBG)')  
 						AND (
 							sc.type = 'Earning'
 							OR sd.salary_component = 'PF'
 						)
 					THEN t1.cost_center
+
 
 					WHEN sc.type = 'Deduction'
 					THEN c.cost_center
@@ -3502,7 +3523,8 @@ class PayrollEntry(Document):
 				"source_of_fund": rec.source_of_fund,
 				"reference_type": self.doctype,
 				"reference_name": self.name,
-				"salary_component": rec.salary_component
+				"salary_component": rec.salary_component,
+				"employee_group": rec.employee_group
 			})
 			
 		   
@@ -3773,18 +3795,49 @@ class PayrollEntry(Document):
 		budget_date = "-".join([str(self.posting_date).split('-')[0], self.month, '01'])
 		budget_date = budget_date if budget_date else nowdate()
 		### Ver.2.0.200106 Ends
+		# def check_budget_voucher_wise(vouchertype):
+		# 	for rec in sorted(posting[vouchertype], key=lambda item: item['cost_center'] or ''):
+		# 		if flt(rec.get("debit_in_account_currency")) > 0:
+		# 			#frappe.msgprint(_("{0} {1}").format(vouchertype, rec))
+		# 			if frappe.db.exists("Account", {"name": rec.get("account"), "root_type": "Expense"}):
+		# 				### Ver.2.0.200106 Begins, added by SHIV on 2019/01/06
+		# 				# Following line is replaced
+		# 				#error = check_budget_available(rec.get("cost_center"), rec.get("account"), nowdate(), flt(rec.get("debit_in_account_currency")), False)
+		# 				error = validate_expense_against_budget({"cost_center": rec.get("cost_center"), "account": rec.get("account"), "posting_date": budget_date, "employee_group" : e_group, "amount": flt(rec.get("debit_in_account_currency")), "company": self.company, "budget_activity": rec.get("budget_activity"), "budget_sub_activity": rec.get("budget_sub_activity"), "source_of_fund": rec.get("source_of_fund")}, False)
+		# 				### Ver.2.0.200106 Ends
+		# 				if error:
+		# 					budget_error.append(error)
 		def check_budget_voucher_wise(vouchertype):
 			for rec in sorted(posting[vouchertype], key=lambda item: item['cost_center'] or ''):
 				if flt(rec.get("debit_in_account_currency")) > 0:
-					#frappe.msgprint(_("{0} {1}").format(vouchertype, rec))
 					if frappe.db.exists("Account", {"name": rec.get("account"), "root_type": "Expense"}):
-						### Ver.2.0.200106 Begins, added by SHIV on 2019/01/06
-						# Following line is replaced
-						#error = check_budget_available(rec.get("cost_center"), rec.get("account"), nowdate(), flt(rec.get("debit_in_account_currency")), False)
-						error = validate_expense_against_budget({"cost_center": rec.get("cost_center"), "account": rec.get("account"), "posting_date": budget_date, "employee_group" : e_group, "amount": flt(rec.get("debit_in_account_currency")), "company": self.company, "budget_activity": rec.get("budget_activity"), "budget_sub_activity": rec.get("budget_sub_activity"), "source_of_fund": rec.get("source_of_fund")}, False)
-						### Ver.2.0.200106 Ends
+
+
+						try:
+							error = validate_expense_against_budget({
+								"cost_center": rec.get("cost_center"),
+								"account": rec.get("account"),
+								"posting_date": budget_date,
+								"employee_group": e_group,
+								"amount": flt(rec.get("debit_in_account_currency")),
+								"company": self.company,
+								"budget_activity": rec.get("budget_activity"),
+								"budget_sub_activity": rec.get("budget_sub_activity"),
+								"source_of_fund": rec.get("source_of_fund"),
+							}, False)
+						except Exception as e:
+							frappe.clear_last_message()
+							error = f"[{rec.get('cost_center')}] {e}"
+
+	  
+
 						if error:
 							budget_error.append(error)
+
+
+		for p in posting:
+			
+			check_budget_voucher_wise(p)
 
 		for p in posting:
 			check_budget_voucher_wise(p)
@@ -3881,7 +3934,7 @@ def get_payroll_entry_bank_entries(payroll_entry_name):
 	journal_entries = frappe.db.sql(
 		'select name from `tabJournal Entry Account` '
 		'where reference_type="Payroll Entry" '
-		'and reference_name=%s and docstatus=1',
+		'and reference_name=%s and docstatus IN (0, 1)',
 		payroll_entry_name,
 		as_dict=1
 	)

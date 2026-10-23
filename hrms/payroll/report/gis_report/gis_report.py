@@ -21,6 +21,7 @@ def get_columns(data):
 	columns = [
 		_("Employee") + ":Link/Employee:100",
 		_("Employee Name") + "::140",
+		_("Employee Group") + "::140",
 		_("Designation") + ":Link/Designation:120",
 		_("CID") + "::110",
 		_("Date Of Birth") + "::100",
@@ -45,14 +46,23 @@ def get_columns(data):
 def get_data(filters):
 	conditions, filters = get_conditions(filters)
 	data = frappe.db.sql("""select 
-				t1.employee as n, t3.employee_name, t1.designation, t3.passport_number, 
-				t3.date_of_birth, t3.date_of_joining, t3.employee_group, t1.employee_subgroup, t1.gis_number, t1.gis_policy_number,
+				t1.employee as n, 
+				t3.employee_name, 
+				t1.employee_group,
+				t1.designation, 
+				t3.passport_number, 
+				t3.date_of_birth, 
+				t3.date_of_joining, 
+				t1.employee_subgroup, 
+				t1.employee_grade,
+				t3.gis_number, 
+				t1.gis_policy_number,
 				sum(case when t2.salary_component = 'Basic Pay' then ifnull(t2.amount,0) else 0 end) as basicpay,
 				sum(case when t2.salary_component = 'GIS' then ifnull(t2.amount,0) else 0 end) as gisamount,
 							t1.company, t1.branch, t1.cost_center, t1.department, t1.division, t1.section,t1.fiscal_year, t1.month
 						from `tabSalary Slip` t1, `tabSalary Detail` t2, `tabEmployee` t3
 						where t1.docstatus = 1 %s
-					  	and t3.employee_group !='Temporary'
+					  	and t1.employee_group !='Temporary'
 						and t3.employee = t1.employee
 						and t2.parent = t1.name
 						and t2.salary_component in ('Basic Pay','GIS')
@@ -73,5 +83,17 @@ def get_conditions(filters):
 	if filters.get("company"): conditions += " and t1.company = %(company)s"
 	if filters.get("employee"): 
 		conditions += " and t1.employee = %(employee)s "
-	if filters.get("cost_center"): conditions += " and exists(select 1 from `tabCost Center` cc where t1.cost_center = cc.name and (cc.parent_cost_center = '{0}' or cc.name = '{0}'))".format(filters.cost_center)
+	if filters.get("cost_center"): 
+		conditions += " and exists(select 1 from `tabCost Center` cc where t1.cost_center = cc.name and (cc.parent_cost_center = '{0}' or cc.name = '{0}'))".format(filters.cost_center)
+	if filters.get("employee_group"):
+		employee_groups = filters.get("employee_group")
+
+		if isinstance(employee_groups, str):
+			employee_groups = frappe.parse_json(employee_groups)
+
+		if employee_groups:
+			conditions += """
+				AND t1.employee_group IN %(employee_group)s
+			"""
+			filters["employee_group"] = tuple(employee_groups)	
 	return conditions, filters
