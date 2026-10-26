@@ -99,5 +99,6 @@ def get_conditions(filters):
 	if filters.get("fiscal_year"): conditions += " and t1.fiscal_year = %(fiscal_year)s"
 	if filters.get("company"): conditions += " and t1.company = %(company)s"
 	if filters.get("employee"): conditions += " and t1.employee = %(employee)s"
+	if filters.get("employee_group"): conditions += " and t3.employee_group = %(employee_group)s"
 	if filters.get("cost_center"): conditions += " and exists(select 1 from `tabCost Center` cc where t1.cost_center = cc.name and (cc.parent_cost_center = '{0}' or cc.name = '{0}'))".format(filters.cost_center)
 	return conditions, filters

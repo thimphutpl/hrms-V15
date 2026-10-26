@@ -1,14 +1,13 @@
-<h4 class="text-center">Construction Development Corporation Limited</h4>
 <h5 class="text-center">{%= __(report.report_name) %} for the Year: {%= filters.fiscal_year %}</h5>
 
 <table style="width: 100%; font-size: 12px;">
 	<tr>
-		<td>Widthholding Agency:</td>
-		<td style="text-align: left"><strong>Construction Development Corporation Limited</strong></td>
 		<td>Agency TPN: </td>
-		<td><strong>CAC00045</strong></td>
+		<td><strong>RAY01588</strong></td>
 	</tr>
 	<tr>
+		<td>Employee ID:</td>
+		<td><strong>{%= filters.employee %}</strong></td>
 		<td>Employee Name:</td>
 		<!-- <td><strong>{%= filters.employee %}:{%= filters.e_name %}</strong></td> -->
 		<td><strong>{%= filters.e_name %}</strong></td>
@@ -53,9 +52,9 @@
 		General
 		Provisions of the Income Tax Act of the Kindom of Bhutan, 2001</i>
 </div>
-<div style="margin-top: 70px; text-align: center;">
-	<img src="{{filters.seal}}" height="200" width="250" style="margin-left: 20px;transform: rotate(4deg)"></img><br>
-	Name and Signature of Disbursing Officer
+<div style="margin-top: 70px; text-align: right;">
+	<!-- <img src="{{filters.seal}}" height="200" width="250" style="margin-left: 20px;transform: rotate(4deg)"></img><br> -->
+	Name and Signature of Disbursing Officer <br>
 </div>
 
 <style>

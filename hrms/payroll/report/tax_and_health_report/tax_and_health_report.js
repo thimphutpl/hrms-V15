@@ -19,10 +19,24 @@ frappe.query_reports["Tax and Health Report"] = {
 			"default": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][frappe.datetime.str_to_obj(frappe.datetime.get_today()).getMonth()],
 		},
 		{
+			"fieldname": "employee_group",
+			"label": __("Employee Group"),
+			"fieldtype": "Link",
+			"options": "Employee Group",
+		},
+		{
 			"fieldname": "employee",
 			"label": __("Employee"),
 			"fieldtype": "Link",
 			"options": "Employee",
+			"get_query": function () {
+				var employee_group = frappe.query_report.get_filter_value("employee_group");
+				return {
+					filters: {
+						"employee_group": employee_group || ""
+					}
+				};
+			},
 		},
 		{
 			"fieldname": "cost_center",
