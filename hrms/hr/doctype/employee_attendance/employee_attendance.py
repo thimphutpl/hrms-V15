@@ -98,7 +98,7 @@ class EmployeeAttendance(Document):
 		last_log = frappe.get_all(
 			"Employee Attendance",
 			filters=filters,
-			fields=["name", "log_type", "time"],
+			fields=["name", "log_type", "time","shift"],
 			order_by="time desc, creation desc",
 			limit=1,
 		)
@@ -109,16 +109,29 @@ class EmployeeAttendance(Document):
 			if last_log and last_log.log_type == "IN":
 				frappe.throw(
 					_(
-						"You checked in at {0} but have not checked out. "
+						"You checked in at {0} under shift {1} but have not checked out. "
 						"Please check out first before checking in again."
 					).format(
-						frappe.utils.format_datetime(last_log.time)
+						frappe.utils.format_datetime(last_log.time),
+						last_log.shift
 					)
 				)
 
 		elif self.log_type == "OUT":
 			if not last_log or last_log.log_type != "IN":
 				frappe.throw(_("Please check in first, then check out."))
+			if self.shift != last_log.shift:
+				frappe.throw(
+					_(
+						"Your check-in at {0} was under shift {1}, "
+						"but your check-out shift is {2}. "
+						"Please select the same shift as your check-in."
+					).format(
+						frappe.utils.format_datetime(last_log.time),
+						last_log.shift or _("Not specified"),
+						self.shift or _("Not specified"),
+					)
+				)
 	def validate_late(self):
 		if not self.time:
 			return
