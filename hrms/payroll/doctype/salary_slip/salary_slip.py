@@ -125,9 +125,16 @@ class SalarySlip(TransactionBase):
 			if row.salary_component == "Basic Pay"
 		)
 
-		basic_pay_arrears = flt(
-			getattr(self, "basic_pay_arrears", 0)
+		# basic_pay_arrears = flt(
+		# 	getattr(self, "basic_pay_arrears", 0)
+		# )
+
+		basic_pay_arrears = sum(
+			flt(row.amount)
+			for row in self.earnings
+			if row.salary_component == "Basic Pay Arrear"
 		)
+		# frappe.throw(str(basic_pay_arrears))
 
 		# Get Employer PF % from Employee Group
 		employee_group = frappe.db.get_value(
