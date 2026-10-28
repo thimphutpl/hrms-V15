@@ -15,17 +15,17 @@ def execute(filters=None):
 	return columns, data, None, None, None, 1
 
 def validate_filters(filters):
-    if not filters.fiscal_year:
-        frappe.throw(_("Fiscal Year {0} is required").format(filters.fiscal_year))
-    
-    if filters.employee_group:
-        emp_group = frappe.db.get_value("Employee", filters.employee, "employee_group")
-        if emp_group != filters.employee_group:
-            frappe.throw(_("Selected Employee does not belong to Employee Group {0}").format(filters.employee_group))
-    
-    start, end = frappe.db.get_value("Fiscal Year", filters.fiscal_year, ["year_start_date", "year_end_date"])
-    filters.year_start = start
-    filters.year_end = end
+	if not filters.fiscal_year:
+		frappe.throw(_("Fiscal Year {0} is required").format(filters.fiscal_year))
+	
+	if filters.employee_group:
+		emp_group = frappe.db.get_value("Employee", filters.employee, "employee_group")
+		if emp_group != filters.employee_group:
+			frappe.throw(_("Selected Employee does not belong to Employee Group {0}").format(filters.employee_group))
+	
+	start, end = frappe.db.get_value("Fiscal Year", filters.fiscal_year, ["year_start_date", "year_end_date"])
+	filters.year_start = start
+	filters.year_end = end
 
 #added by Kinzang.n 
 def get_data(filters=None):
@@ -131,20 +131,24 @@ def get_salary_data(filters):
 								SELECT
 									fiscal_year,
 									month,
+                                    employee_group,
 									MAX(receipt_number) AS receipt_number,
 									MAX(receipt_date) AS receipt_date,
 									MAX(posting_date) AS posting_date
 								FROM `tabTDS Receipt Entry`
-								GROUP BY fiscal_year, month
+								GROUP BY fiscal_year, month, employee_group
 							) r
 								ON r.fiscal_year = a.fiscal_year
 								AND r.month = a.month
+								AND a.company = a.company
+                                AND r.employee_group = a.employee_group
 
 							WHERE a.docstatus = 1
 							AND a.employee = '{employee}' 
 							AND a.fiscal_year = '{fiscal_year}'
+							AND a.company = '{company}'
 							ORDER BY a.start_date ASC
-							'''.format(employee=filters.employee, fiscal_year = filters.fiscal_year),as_dict=1):
+							'''.format(employee=filters.employee, fiscal_year = filters.fiscal_year, company= filters.company),as_dict=1):
 							#JOIN `tabTDS Receipt Entry` r ON a.fiscal_year = r.fiscal_year AND a.month = r.month
 
 		# data.append({
@@ -178,6 +182,7 @@ def get_salary_data(filters):
 			"receipt_date": d.receipt_date,
 			"posting_date": d.posting_date,
 		}
+		
 
 		# Allowances only for NAS (RBA) / Teachers (RBA)
 		if filters and filters.get("employee_group") in ("NAS (RBA)", "Teachers (RBA)"):

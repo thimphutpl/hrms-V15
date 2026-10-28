@@ -4,6 +4,20 @@
 frappe.query_reports["Employee TDS Certificate"] = {
 	"filters": [
 		{
+			"fieldname": "company",
+			"label": __("Company"),
+			"fieldtype": "Link",
+			"options": "Company",
+			"default": frappe.defaults.get_user_default("Company"),
+			"on_change": function (query_report) {
+				// Company change invalidates employee selection
+				query_report.set_filter_value("employee", null);
+				query_report.set_filter_value("e_name", null);
+				query_report.set_filter_value("cid", null);
+				query_report.set_filter_value("tpn", null);
+			}
+		},
+		{
 			"fieldname": "employee_group",
 			"label": __("Employee Group"),
 			"fieldtype": "Link",
@@ -157,6 +171,7 @@ frappe.query_reports["Employee TDS Certificate"] = {
 	],
 	onload: function (report) {
 		report.page.add_inner_button("Clear Filters", function () {
+			report.set_filter_value("company", null);
 			report.set_filter_value("fiscal_year", null);
 			report.set_filter_value("employee_group", null);
 			report.set_filter_value("employee", null);
