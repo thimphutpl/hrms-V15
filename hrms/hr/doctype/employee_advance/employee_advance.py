@@ -251,8 +251,8 @@ class EmployeeAdvance(Document):
 
 		je = frappe.new_doc("Journal Entry")
 		
-		voucher_type = "Bank Entry"
-		naming_series = "Bank Payment Voucher"
+		voucher_type = "Disbursement Voucher"
+		naming_series = "Disbursement Voucher"
 		
 		je.update({
 				"doctype": "Journal Entry",
@@ -561,7 +561,7 @@ def make_bank_entry(dt, dn):
 
 	je = frappe.new_doc("Journal Entry")
 	je.posting_date = nowdate()
-	je.voucher_type = "Bank Entry"
+	je.voucher_type = "Disbursement Voucher"
 	je.company = doc.company
 	je.remark = "Payment against Employee Advance: " + dn + "\n" + doc.purpose
 	je.multi_currency = 1 if advance_account_currency != payment_account.account_currency else 0
