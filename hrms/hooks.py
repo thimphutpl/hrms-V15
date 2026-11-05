@@ -210,9 +210,6 @@ doc_events = {
 scheduler_events = {
 	
     "cron": {
-		"50 23 * * *": [
-			"hrms.hr.hr_custom_functions.post_earned_leaves"
-		],
 		"0 7 * * *": [
 			"hrms.hr.hr_custom_functions.post_casual_leaves"
 		]
@@ -238,6 +235,7 @@ scheduler_events = {
 		
 	],
 	"daily_long": [
+		"hrms.hr.hr_custom_functions.post_earned_leaves",
 		"hrms.hr.doctype.leave_ledger_entry.leave_ledger_entry.process_expired_allocation",
 		"hrms.hr.utils.generate_leave_encashment",
 		
