@@ -1,11 +1,15 @@
 frappe.ui.form.on("Travel Claim", {
-    onload: function (frm) {
-		let grid = frm.fields_dict['items'].grid;
-        grid.cannot_add_rows = true;
+	onload: function (frm) {
+		let grid = frm.fields_dict["items"].grid;
+		grid.cannot_add_rows = true;
 	},
-    
+
 	refresh(frm) {
 		refresh_html(frm);
+		// If approver is set but designation is missing (e.g. old records), fill it in
+		if (frm.doc.approver && !frm.doc.approver_designation) {
+			frm.trigger("set_approver_details");
+		}
 	},
 
 	employee: function (frm) {
@@ -15,13 +19,13 @@ frappe.ui.form.on("Travel Claim", {
 	get_employee_currency: function (frm) {
 		frappe.db.get_value(
 			"Salary Structure",
-			{ employee: frm.doc.employee},
+			{ employee: frm.doc.employee },
 			"currency",
 			(r) => {
 				if (r.currency) frm.set_value("currency", r.currency);
 				else frm.set_value("currency", erpnext.get_currency(frm.doc.company));
 				frm.refresh_fields();
-			},
+			}
 		);
 	},
 
@@ -58,10 +62,56 @@ frappe.ui.form.on("Travel Claim", {
 				frm.set_df_property(
 					"exchange_rate",
 					"description",
-					"1 " + frm.doc.currency + " = [?] " + company_currency,
+					"1 " + frm.doc.currency + " = [?] " + company_currency
 				);
 			},
 		});
+	},
+
+	// ---------------------------------------------------------------
+	// Approver Details
+	// approver -> User -> (Employee.user_id) -> Employee.designation
+	// ---------------------------------------------------------------
+	approver: function (frm) {
+		if (frm.doc.approver) {
+			frm.trigger("set_approver_details");
+		} else {
+			frm.set_value("approver_name", "");
+			frm.set_value("approver_designation", "");
+		}
+	},
+
+	set_approver_details: function (frm) {
+		if (!frm.doc.approver) return;
+
+		// 1. Set approver full name from User
+		frappe.db.get_value("User", frm.doc.approver, "full_name", (r) => {
+			if (r && r.full_name) {
+				frm.set_value("approver_name", r.full_name);
+			}
+		});
+
+		// 2. Find the Employee linked to this User and pick their designation
+		frappe.db.get_value(
+			"Employee",
+			{ user_id: frm.doc.approver },
+			"designation",
+			(r) => {
+				if (r && r.designation) {
+					frm.set_value("approver_designation", r.designation);
+				} else {
+					frm.set_value("approver_designation", "");
+					frappe.msgprint({
+						title: __("Designation Not Found"),
+						indicator: "orange",
+						message: __(
+							"No Employee is linked to User {0}. Please set the User ID on the Employee record, or set the Approver Designation manually.",
+							[frm.doc.approver]
+						),
+					});
+				}
+			}
+		);
 	},
 });
 
@@ -75,19 +125,31 @@ frappe.ui.form.on("Travel Claim Item", {
 	},
 
 	calculate: function (frm, cdt, cdn) {
-        let row = frappe.get_doc(cdt, cdn);
-        frappe.model.set_value(cdt, cdn, "mileage_amount", flt(row.mileage_rate) * flt(row.distance));
-        frappe.model.set_value(cdt, cdn, "amount", flt(row.mileage_amount) + flt(row.amount));
-    },
+		let row = frappe.get_doc(cdt, cdn);
+		frappe.model.set_value(cdt, cdn, "mileage_amount", flt(row.mileage_rate) * flt(row.distance));
+		frappe.model.set_value(cdt, cdn, "amount", flt(row.mileage_amount) + flt(row.amount));
+	},
 });
 
-var refresh_html = function(frm){
+var refresh_html = function (frm) {
 	var journal_entry_status = "";
-	if(frm.doc.journal_entry_status){
-		journal_entry_status = '<div style="font-style: italic; font-size: 0.8em; ">* '+frm.doc.journal_entry_status+'</div>';
+	if (frm.doc.journal_entry_status) {
+		journal_entry_status =
+			'<div style="font-style: italic; font-size: 0.8em; ">* ' +
+			frm.doc.journal_entry_status +
+			"</div>";
 	}
-	
-	if(frm.doc.journal_entry){
-		$(cur_frm.fields_dict.journal_entry_html.wrapper).html('<label class="control-label" style="padding-right: 0px;">Journal Entry</label><br><b>'+'<a href="/desk/Form/Journal Entry/'+frm.doc.journal_entry+'">'+frm.doc.journal_entry+"</a> "+"</b>"+journal_entry_status);
-	}	
-}
+
+	if (frm.doc.journal_entry) {
+		$(cur_frm.fields_dict.journal_entry_html.wrapper).html(
+			'<label class="control-label" style="padding-right: 0px;">Journal Entry</label><br><b>' +
+				'<a href="/desk/Form/Journal Entry/' +
+				frm.doc.journal_entry +
+				'">' +
+				frm.doc.journal_entry +
+				"</a> " +
+				"</b>" +
+				journal_entry_status
+		);
+	}
+};
