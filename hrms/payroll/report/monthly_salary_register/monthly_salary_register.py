@@ -34,14 +34,29 @@ def execute(filters=None):
 		else:
 				status = str(ss.docstatus)
 		
-		cid, joining_date = frappe.db.get_value("Employee", ss.employee, ["passport_number","date_of_joining"])
+		cid, joining_date,bank_name, bank_ac_no,cost_center,branch,employee_status,division,grade  = frappe.db.get_value("Employee", ss.employee, ["passport_number","date_of_joining","bank_name","cost_center","branch","bank_ac_no","status","division","grade"])
 						
-		row = [str(count), ss.employee, ss.employee_name, ss.employment_type, cid, joining_date,
-			ss.bank_name, ss.bank_account_no, 
-			ss.cost_center, ss.branch, ss.department,
-						 ss.division, ss.employee_grade, ss.designation, 
-			 ss.fiscal_year, ss.month, ss.leave_withut_pay, ss.payment_days,
-						 status, ss.employee_group,]
+		row = [str(count), 
+            ss.employee, 
+            ss.employee_name, 
+            ss.employment_type, 
+            cid, 
+            joining_date,
+			bank_name, 
+            bank_ac_no,
+            cost_center,
+            branch,
+			ss.department,
+            division,
+			ss.division,
+            grade,
+            ss.designation, 
+			ss.fiscal_year, 
+            ss.month,
+            ss.leave_withut_pay, 
+            ss.payment_days,
+			employee_status, 
+            ss.employee_group,]
 			
 		for e in earning_types:
 			row.append(ss_earning_map.get(ss.name, {}).get(e))
